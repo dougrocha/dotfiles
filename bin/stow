@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ln -sf ~/dotfiles/.config ~/.config
+ln -sf ~/dotfiles/.gitconfig ~/.gitconfig
+ln -sf ~/dotfiles/.gitignore ~/.gitignore
