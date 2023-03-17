@@ -9,7 +9,7 @@
     - [Windows Setup](#windows-setup)
     - [After installation](#after-installation)
 
-Do not use this yourself. It likes to break almost 100% of the time.
+Do not use this **yourself**. It likes to break almost 100% of the time.
 
 ---
 

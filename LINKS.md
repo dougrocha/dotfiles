@@ -1,7 +1,13 @@
 # Useful Links/Docs I Use
 
-## Useful Github Links
+## My Blog
 
-[Github Keys](https://github.com/settings/keys)
+[Portfolio](https://www.dougrocha.com)
 
-[Sign Git With SSH](https://www.dougrocha.com/blog/git-ssh-sign)
+[Blog](https://www.dougrocha.com/blog)
+
+## Git
+
+[Sign git commits with SSH](https://www.dougrocha.com/blog/git-ssh-sign)
+
+[Github Keys Url](https://github.com/settings/keys)
