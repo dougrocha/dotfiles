@@ -1,0 +1,21 @@
+[user]
+name = Douglas Rocha
+email = 79188161+dougrocha@users.noreply.github.com
+signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG2uovbBLYdvuuAgvDZLHu/R5hCYw6oleeH+Nh3wnl1g
+[init]
+defaultBranch = master
+[commit]
+gpgsign = true
+[gpg]
+format = ssh
+[tag]
+gpgsign = true
+[gpg "ssh"]
+allowedSignersFile = ~/.ssh/allowed_signers
+[filter "lfs"]
+process = git-lfs filter-process
+required = true
+clean = git-lfs clean -- %f
+smudge = git-lfs smudge -- %f
+[core]
+excludesfile = ~/.gitignore
