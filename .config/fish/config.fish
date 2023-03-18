@@ -9,4 +9,6 @@ if status is-login
     fish_add_path /opt/homebrew/bin
 end
 
+set PATH $HOME/.cargo/bin $PATH
+
 starship init fish | source
