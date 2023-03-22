@@ -11,4 +11,6 @@ end
 
 set PATH $HOME/.cargo/bin $PATH
 
+direnv hook fish | source
+
 starship init fish | source
