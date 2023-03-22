@@ -76,7 +76,18 @@ require("lazy").setup({
 	"nvim-lua/plenary.nvim",
 
 	-- Github Copilot
-	"github/copilot.vim",
+	{
+		"zbirenbaum/copilot.lua",
+		cmd = "Copilot",
+		event = "InsertEnter",
+		config = function()
+			require("copilot").setup({
+				suggestion = {
+					auto_trigger = true,
+				},
+			})
+		end,
+	},
 
 	-- NOTE: This is where your plugins related to LSP can be installed.
 	--  The configuration is done below. Search for lspconfig to find it below.

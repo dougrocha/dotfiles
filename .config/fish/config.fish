@@ -6,11 +6,12 @@ end
 
 if status is-login
     # Commands to run in login shells can go here
-    fish_add_path /opt/homebrew/bin
 end
 
-set PATH $HOME/.cargo/bin $PATH
-
-direnv hook fish | source
+# LS replacements using Exa
+alias ls='exa --icons'
+alias la='ls -a'
+alias ld='ls -D'
+alias lt='exa -T --icons'
 
 starship init fish | source
