@@ -75,6 +75,9 @@ require("lazy").setup({
 	-- LSP, Formatter, Debugger dependencies
 	"nvim-lua/plenary.nvim",
 
+	-- Github Copilot
+	"github/copilot.vim",
+
 	-- NOTE: This is where your plugins related to LSP can be installed.
 	--  The configuration is done below. Search for lspconfig to find it below.
 	{
@@ -514,6 +517,7 @@ cmp.setup({
 			behavior = cmp.ConfirmBehavior.Replace,
 			select = true,
 		}),
+		-- Maybe change this keybind to use Github Copilot instead.
 		["<Tab>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_next_item()
