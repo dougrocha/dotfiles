@@ -550,6 +550,7 @@ null_ls.setup({
 		formatting.prettierd,
 		formatting.prismaFmt,
 		formatting.stylua,
+		formatting.rustFmt,
 		formatting.rustywind,
 	},
 })
