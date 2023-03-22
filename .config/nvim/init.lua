@@ -72,6 +72,9 @@ require("lazy").setup({
 	-- Detect tabstop and shiftwidth automatically
 	"tpope/vim-sleuth",
 
+	-- LSP, Formatter, Debugger dependencies
+	"nvim-lua/plenary.nvim",
+
 	-- NOTE: This is where your plugins related to LSP can be installed.
 	--  The configuration is done below. Search for lspconfig to find it below.
 	{
@@ -91,11 +94,16 @@ require("lazy").setup({
 		},
 	},
 
+	-- Debugging
+	"mfussenegger/nvim-dap",
+
+	-- Formatters
 	{
 		"jose-elias-alvarez/null-ls.nvim",
 		requires = { "nvim-lua/plenary.nvim" },
 	},
 
+	-- Auto Pairs
 	{ "windwp/nvim-autopairs", opts = {} },
 
 	-- Rust Tools
@@ -541,8 +549,23 @@ null_ls.setup({
 		formatting.eslint_d,
 		formatting.prettierd,
 		formatting.prismaFmt,
-		formatting.rustFmt,
 		formatting.stylua,
+		formatting.rustywind,
+	},
+})
+
+-- Debugger options
+
+local rt = require("rust-tools")
+
+rt.setup({
+	server = {
+		on_attach = function(_, bufnr)
+			-- Hover actions
+			vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+			-- Code action groups
+			vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+		end,
 	},
 })
 
