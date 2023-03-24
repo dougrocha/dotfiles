@@ -24,3 +24,12 @@ scoop install CascadiaCode-NF
 
 # Powershell Tools
 scoop install starship psreadline terminal-icons
+
+# Set up prisma format for nvim
+git clone https://github.com/prisma/prisma-engines.git "$HOME\dotfiles"
+cd prisma-engines
+cargo build --release
+Move-Item -Path "$HOME\dotfiles\prisma-engines\target\prisma-fmt.exe" "$HOME\.config\bin"
+Remove-Item -Path "$HOME\dotfiles\prisma-engines" 
+
+# Not sure how to automatically add this to the path
