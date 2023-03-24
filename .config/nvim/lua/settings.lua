@@ -21,6 +21,9 @@ vim.o.mouse = "a"
 --  See `:help 'clipboard'`
 vim.o.clipboard = "unnamedplus"
 
+-- Show live highlighting of search matches while using :substitution
+vim.o.inccommand = "nosplit"
+
 -- Enable break indent
 vim.o.breakindent = true
 
