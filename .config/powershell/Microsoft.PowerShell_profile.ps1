@@ -25,4 +25,5 @@ function which ($command) {
     Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
 }
 
+fnm env --use-on-cd | Out-String | Invoke-Expression
 Invoke-Expression (&starship init powershell)
