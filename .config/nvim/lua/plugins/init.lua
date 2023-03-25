@@ -10,7 +10,10 @@ return {
   "tpope/vim-sleuth",
 
   -- LSP, Formatter, Debugger dependencies
-  "nvim-lua/plenary.nvim",
+  {
+    "nvim-lua/plenary.nvim",
+    lazy = true,
+  },
 
   -- Github Copilot
   {
@@ -46,6 +49,7 @@ return {
   -- Rust Tools
   {
     "simrat39/rust-tools.nvim",
+    ft = "rust",
     opts = function()
       local rt = require("rust-tools")
       return {
@@ -104,7 +108,7 @@ return {
 
   {
     "folke/tokyonight.nvim",
-    priority = 1000,
+    priority = 50,
     config = function() vim.cmd.colorscheme("tokyonight-storm") end,
   },
 
@@ -120,8 +124,19 @@ return {
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
+    lazy = true,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
+      {
+        "windwp/nvim-ts-autotag",
+        opts = {
+          filetypes = {
+            "html",
+            "typescriptreact",
+            "astro",
+          },
+        },
+      },
     },
     config = function() pcall(require("nvim-treesitter.install").update({ with_sync = true })) end,
   },
