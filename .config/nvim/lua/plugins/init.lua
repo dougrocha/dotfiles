@@ -1,10 +1,12 @@
 return {
-  -- NOTE: First, some plugins that don't require any configuration
-
   -- Git related plugins
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
-  "kdheepak/lazygit.nvim",
+
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = "LazyGit",
+  },
 
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
@@ -30,6 +32,7 @@ return {
   -- Formatter and linter
   {
     "jose-elias-alvarez/null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
     requires = { "nvim-lua/plenary.nvim" },
   },
   {
@@ -68,6 +71,7 @@ return {
   -- Autocompletion
   {
     "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       { "L3MON4D3/LuaSnip", opts = {} },
@@ -78,7 +82,6 @@ return {
   -- Colorizer
   {
     "NvChad/nvim-colorizer.lua",
-    lazy = true,
     event = "BufRead",
     opts = {
       user_default_options = {
@@ -88,12 +91,16 @@ return {
   },
 
   -- Useful plugin to show you pending keybinds.
-  { "folke/which-key.nvim", opts = {} },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
 
   {
     -- Adds git releated signs to the gutter, as well as utilities for managing changes
     "lewis6991/gitsigns.nvim",
-    lazy = true,
+    event = { "BufRead", "BufNewFile" },
     opts = {
       -- See `:help gitsigns.txt`
       signs = {
@@ -108,36 +115,41 @@ return {
 
   {
     "folke/tokyonight.nvim",
-    priority = 50,
+    lazy = false,
+    priority = 1000,
     config = function() vim.cmd.colorscheme("tokyonight-storm") end,
   },
 
   -- Comments plugin
   {
     "folke/todo-comments.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    opts = {},
+    event = { "BufRead", "BufNewFile" },
+    config = true,
   },
 
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
-    lazy = true,
+    build = ":TSUpdate",
+    event = { "BufRead", "BufNewFile" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       {
         "windwp/nvim-ts-autotag",
+        lazy = true,
+        file = {
+          "astro",
+          "html",
+          "typescriptreact",
+        },
         opts = {
           filetypes = {
+            "astro",
             "html",
             "typescriptreact",
-            "astro",
           },
         },
       },
     },
-    config = function() pcall(require("nvim-treesitter.install").update({ with_sync = true })) end,
   },
 }
