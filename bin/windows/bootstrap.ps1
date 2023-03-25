@@ -16,7 +16,7 @@ scoop install git gh z sudo
 scoop install windows-terminal vscode firefox-developer neovim
 
 # For neovim
-scoop install extras/vcredist2022
+scoop install extras/vcredist2022 make fd ripgrep
 scoop uninstall vcredist2022
 
 # Fonts
