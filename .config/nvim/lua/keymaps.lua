@@ -35,3 +35,6 @@ vim.keymap.set("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "Tab: [N]e
 vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Tab: [N]ext Tab" })
 vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Tab: [D]elete Tab" })
 vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Tab: [P]revious Tab" })
+
+-- LazyGit
+vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })

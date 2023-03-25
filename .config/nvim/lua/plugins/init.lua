@@ -4,6 +4,7 @@ return {
   -- Git related plugins
   "tpope/vim-fugitive",
   "tpope/vim-rhubarb",
+  "kdheepak/lazygit.nvim",
 
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
@@ -74,6 +75,7 @@ return {
   {
     "NvChad/nvim-colorizer.lua",
     lazy = true,
+    event = "BufRead",
     opts = {
       user_default_options = {
         tailwind = true,
