@@ -6,6 +6,16 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
 
+    {
+      "nvim-telescope/telescope-file-browser.nvim",
+      opts = {
+        extensions = {
+          theme = "tokyonight",
+        },
+      },
+      config = function(_, opts) return opts end,
+    },
+
     -- Fuzzy Finder Algorithm which requires local dependencies to be built.
     -- Only load if `make` is available. Make sure you have the system
     -- requirements installed.
@@ -49,8 +59,11 @@ return {
     vim.keymap.set("n", "<leader>sk", require("telescope.builtin").keymaps, { desc = "[S]earch [K]eymaps" })
     vim.keymap.set("n", "<leader>ss", require("telescope.builtin").spell_suggest, { desc = "[S]earch [S]pell" })
 
+    vim.keymap.set("n", "<leader>fb", telescope.extensions.file_browser.file_browser, { desc = "[F]ile [B]rowser" })
+
     pcall(telescope.load_extension, "fzf")
     pcall(telescope.load_extension, "harpoon")
     pcall(telescope.load_extension, "lazygit")
+    pcall(telescope.load_extension, "file_browser")
   end,
 }
