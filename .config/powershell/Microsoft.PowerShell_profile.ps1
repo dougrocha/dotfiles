@@ -9,6 +9,7 @@ Set-Alias vim nvim
 Set-Alias ll ls
 Set-Alias g git
 Set-Alias find which
+Set-Alias lg lazygit
 
 # Env
 $env:GIT_SSH = "C:\Windows\system32\OpenSSH\ssh.exe"
