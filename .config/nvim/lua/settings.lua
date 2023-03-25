@@ -6,6 +6,7 @@ vim.g.maplocalleader = " "
 
 -- Set highlight on search
 vim.o.hlsearch = false
+vim.o.incsearch = true
 
 -- Make line numbers default
 vim.wo.number = true
@@ -45,11 +46,10 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 
--- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
 -- Start scrolling when you're 15 away from bottom (and side)
-vim.opt.scrolloff = 15
+vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 35
 
 -- Indenting
