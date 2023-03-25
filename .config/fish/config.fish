@@ -14,4 +14,7 @@ alias la='ls -a'
 alias ld='ls -D'
 alias lt='exa -T --icons'
 
+# Git aliases
+alias lg='lazygit'
+
 starship init fish | source
