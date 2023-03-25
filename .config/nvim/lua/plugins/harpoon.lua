@@ -35,7 +35,6 @@
 -- 7~~~^!7!~^^^!?7!!?JJP#GY!^^^^~^^~~~^^~7??7!~~~~^^^^^^~~~~~~~~~^^~~^^::!G#Y::^~^^^~!!!!!?J!77JJ??7JYJ7?JYJ?JJ555B@@@@@@@@@#GG#&&&BG5???777777JYYJ~^^?Y5
 -- J7777???!~~~!!~~?GB#&&&B!~~~~~~~~!~~!7JJ7!!!~~~~~~~~~~~~~!777!~~~~^^^^5#P^^^^^^!~~!J7J?77?J77?JJ7JYJJJYJJJJYP5P&@@@@@@@@&GBB#&@@BGY???????7?YYYY^^^755
 -- YJJJ?7!~~!!!!77?5#&&#&#G7~~~~!77!!!?JYJ?!!!7!!!~~~~~~!!!7??77!!77~^^^!BB!^^^~^!~7J!!JY7?77?YY7?JYPJJ5Y55Y555PPG@@@@@@@@@&BGGB&@@BG5JJJ?????JY55YJJYY55
--- TODO: BE PRIME
 return {
   "ThePrimeagen/harpoon",
   dependencies = {
@@ -46,7 +45,7 @@ return {
     local harpoon_mark = require("harpoon.mark")
 
     vim.keymap.set("n", "<leader>hu", harpoon.toggle_quick_menu, { desc = "[H]arpoon [U]i" })
-    vim.keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "[H]arpoon add file" })
+    vim.keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "[H]arpoon [A]dd file" })
     for pos = 1, 9 do
       vim.keymap.set(
         "n",
