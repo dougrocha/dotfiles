@@ -136,7 +136,6 @@ return {
       "nvim-treesitter/nvim-treesitter-textobjects",
       {
         "windwp/nvim-ts-autotag",
-        lazy = true,
         file = {
           "astro",
           "html",
