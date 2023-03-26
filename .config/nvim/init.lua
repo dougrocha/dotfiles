@@ -28,11 +28,11 @@ local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 local lsp_formatting = function(bufnr)
   vim.lsp.buf.format({
+    bufnr = bufnr,
     filter = function(client)
       -- apply whatever logic you want (in this example, we'll only use null-ls)
       return client.name == "null-ls"
     end,
-    bufnr = bufnr,
   })
 end
 
@@ -101,6 +101,7 @@ local servers = {
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
+      diagnostics = { globals = { "vim" } },
       telemetry = { enable = false },
     },
   },
@@ -109,11 +110,12 @@ local servers = {
 local null_ls = require("null-ls")
 
 local formatting = null_ls.builtins.formatting
+local diagnostics = null_ls.builtins.diagnostics
 
 null_ls.setup({
   on_attach = on_attach,
   sources = {
-    formatting.eslint_d,
+    diagnostics.eslint_d,
     formatting.prettierd,
     formatting.prismaFmt,
     formatting.stylua,
@@ -132,6 +134,7 @@ local mason_lspconfig = require("mason-lspconfig")
 mason_lspconfig.setup({
   ensure_installed = vim.tbl_keys(servers),
   automatic_installation = true,
+  auto_install = true,
 })
 
 mason_lspconfig.setup_handlers({
