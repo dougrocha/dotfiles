@@ -63,5 +63,5 @@ vim.opt.expandtab = true
 -- Undo
 vim.o.swapfile = false
 vim.o.backup = false
-vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.o.undodir = vim.fn.expand("~/.vim/undodir")
 vim.o.undofile = true
