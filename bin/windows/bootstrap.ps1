@@ -33,3 +33,10 @@ Move-Item -Path "$HOME\dotfiles\prisma-engines\target\prisma-fmt.exe" "$HOME\.co
 Remove-Item -Path "$HOME\dotfiles\prisma-engines" 
 
 # Not sure how to automatically add this to the path
+
+# Set up exa - ls replacement
+git clone https://github.com/ogham/exa.git "$HOME\dotfiles"
+cd exa
+cargo build --release
+Move-Item -Path "$HOME\dotfiles\exa\target\release\exa.exe" "$HOME\.config\bin"
+Remove-Item -Path "$HOME\dotfiles\exa"
