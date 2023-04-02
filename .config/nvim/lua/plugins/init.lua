@@ -29,6 +29,9 @@ return {
     },
   },
 
+  -- Undotree 
+    'mbbill/undotree',
+
   -- Formatter and linter
   {
     "jose-elias-alvarez/null-ls.nvim",
@@ -143,4 +146,6 @@ return {
       },
     },
   },
+
+  'nvim-treesitter/nvim-treesitter-context',
 }

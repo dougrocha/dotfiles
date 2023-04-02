@@ -39,7 +39,7 @@ vim.o.smartcase = true
 vim.wo.signcolumn = "yes"
 
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 50
 vim.o.timeout = true
 vim.o.timeoutlen = 300
 
@@ -49,7 +49,7 @@ vim.o.completeopt = "menuone,noselect"
 vim.o.termguicolors = true
 
 -- Start scrolling when you're 15 away from bottom (and side)
-vim.opt.scrolloff = 8
+vim.opt.scrolloff = 10
 vim.opt.sidescrolloff = 35
 
 -- Indenting
@@ -59,3 +59,9 @@ vim.opt.smartindent = true
 vim.opt.cindent = true
 vim.opt.tabstop = 2
 vim.opt.expandtab = true
+
+-- Undo
+vim.o.swapfile = false
+vim.o.backup = false
+vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.o.undofile = true
