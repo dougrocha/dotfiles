@@ -17,7 +17,7 @@
   "mini.pairs": { "branch": "main", "commit": "771c08bd313614c7e9a1904d277ac76eb226f674" },
   "mini.starter": { "branch": "main", "commit": "d1245de5b50c2249f287603ff717bd3916628594" },
   "mini.statusline": { "branch": "main", "commit": "8346a03b025647acf40c0b8dd32c0bdb9dd6f8d9" },
-  "neodev.nvim": { "branch": "main", "commit": "7330427f9f71ac5aaa2d1a4c22ccd3914434e289" },
+  "neodev.nvim": { "branch": "main", "commit": "67df874f09487fbb249577077725ef7a560e9b9d" },
   "null-ls.nvim": { "branch": "main", "commit": "0180603b6f3cee40f83c6fc226b9ac5f85e691c4" },
   "nvim-cmp": { "branch": "main", "commit": "777450fd0ae289463a14481673e26246b5e38bf2" },
   "nvim-colorizer.lua": { "branch": "master", "commit": "dde3084106a70b9a79d48f426f6d6fec6fd203f7" },
