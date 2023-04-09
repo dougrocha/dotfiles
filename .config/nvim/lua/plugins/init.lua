@@ -29,14 +29,14 @@ return {
     },
   },
 
-  -- Undotree 
-    'mbbill/undotree',
+  -- Undotree
+  "mbbill/undotree",
 
   -- Formatter and linter
   {
     "jose-elias-alvarez/null-ls.nvim",
     event = { "BufReadPre", "BufNewFile" },
-    requires = { "nvim-lua/plenary.nvim" },
+    dependencies = { "nvim-lua/plenary.nvim" },
   },
 
   { "nvim-tree/nvim-web-devicons", lazy = true },
@@ -61,17 +61,6 @@ return {
         },
       }
     end,
-  },
-
-  -- Autocompletion
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      { "L3MON4D3/LuaSnip", opts = {} },
-      "saadparwaiz1/cmp_luasnip",
-    },
   },
 
   -- Colorizer
@@ -131,11 +120,6 @@ return {
       "nvim-treesitter/nvim-treesitter-textobjects",
       {
         "windwp/nvim-ts-autotag",
-        file = {
-          "astro",
-          "html",
-          "typescriptreact",
-        },
         opts = {
           filetypes = {
             "astro",
@@ -147,5 +131,5 @@ return {
     },
   },
 
-  'nvim-treesitter/nvim-treesitter-context',
+  "nvim-treesitter/nvim-treesitter-context",
 }
