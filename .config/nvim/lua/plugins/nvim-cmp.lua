@@ -1,20 +1,12 @@
 -- Autocompletion
 return {
-  "hrsh7th/nvim-cmp",
+  "yioneko/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
     "hrsh7th/cmp-nvim-lsp",
     { "L3MON4D3/LuaSnip", opts = {} },
     "saadparwaiz1/cmp_luasnip",
-    { "roobert/tailwindcss-colorizer-cmp.nvim", config = true },
   },
-  opts = function(_, opts)
-    local format_kinds = opts.formatting.format
-    opts.formatting.format = function(entry, item)
-      format_kinds(entry, item)
-      return require("tailwindcss-colorizer-cmp").format(entry, item)
-    end
-  end,
   config = function()
     local cmp = require("cmp")
     local luasnip = require("luasnip")
