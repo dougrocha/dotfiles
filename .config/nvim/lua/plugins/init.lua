@@ -11,6 +11,8 @@ return {
   -- Detect tabstop and shiftwidth automatically
   "tpope/vim-sleuth",
 
+  "andweeb/presence.nvim",
+
   -- LSP, Formatter, Debugger dependencies
   {
     "nvim-lua/plenary.nvim",
