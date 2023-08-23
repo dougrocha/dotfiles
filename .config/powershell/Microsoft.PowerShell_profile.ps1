@@ -22,7 +22,7 @@ Set-PSReadLineOption -EditMode Windows
 
 # Utilities
 function which ($command) {
-   Get-Command -Name $command -ErrorAction SilentlyContinue |
+    Get-Command -Name $command -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
 }
 

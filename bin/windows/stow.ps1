@@ -1,15 +1,15 @@
-function make-link ($target, $link) {
+function New-Link ($target, $link) {
     New-Item -Path $link -ItemType SymbolicLink -Value $target -Force
 }
 
-echo "Home: $HOME"
-echo "Creating symlinks..."
+Write-Output "> Home: $HOME"
+Write-Output "> Creating symlinks..."
 
-make-link "$HOME\dotfiles\.config\starship.toml" "$HOME\.config\starship.toml"
-make-link "$HOME\dotfiles\.gitignore_global" "$HOME\.gitignore_global"
+New-Link "$HOME\dotfiles\.config\starship.toml" "$HOME\.config\starship.toml"
+New-Link "$HOME\dotfiles\.gitignore_global" "$HOME\.gitignore_global"
 
-make-link "$HOME\dotfiles\.config\powershell\Microsoft.PowerShell_profile.ps1" "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+New-Link "$HOME\dotfiles\.config\powershell\Microsoft.PowerShell_profile.ps1" $Profile
 
-make-link "$HOME\dotfiles\.config\nvim" "$HOME\AppData\Local\nvim"
+New-Link "$HOME\dotfiles\.config\nvim" "$HOME\AppData\Local\nvim"
 
-echo "Done."
+Write-Output "> Done."
