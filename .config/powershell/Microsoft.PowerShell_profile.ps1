@@ -4,6 +4,9 @@
 Import-Module Terminal-Icons
 Import-Module PSReadLine
 
+Import-Module "$HOME\dotfiles\.config\powershell\completions\fnm.ps1"
+Import-Module "$HOME\dotfiles\.config\powershell\completions\rustup.ps1"
+
 # Alias
 Set-Alias vim nvim
 Set-Alias ll ls

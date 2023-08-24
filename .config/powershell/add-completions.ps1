@@ -15,7 +15,7 @@ Write-Output '> Making powershell completions available...'
 
 New-Item -Force -ItemType Directory $completionsPath
 
-Add-Contents-To-Completions "rust" (rustup completions powershell) 
+Add-Contents-To-Completions "rustup" (rustup completions powershell) 
 Add-Contents-To-Completions "fnm" (fnm completions --shell=power-shell)
 
 Write-Output '> Done making powershell completions available.
@@ -24,5 +24,5 @@ Notes:
 -----
 Usage: Add these two lines to your microsoft profile
 Import-Module "$HOME\dotfiles\.config\powershell\completions\fnm.ps1"
-Import-Module "$HOME\dotfiles\.config\powershell\completions\rust.ps1"
+Import-Module "$HOME\dotfiles\.config\powershell\completions\rustup.ps1"
 '
