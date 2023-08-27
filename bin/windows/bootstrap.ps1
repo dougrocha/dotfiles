@@ -38,8 +38,12 @@ Write-Output '> Installing fonts...'
 scoop install CascadiaCode-NF
 
 # Powershell Tools
-Write-Output '> Installing powershell tools...'
-scoop install starship psreadline terminal-icons
+Write-Output '> Installing powershell and powershell tools...'
+winget install --id Microsoft.Powershell --source winget
+scoop install windows-terminal starship psreadline terminal-icons
+
+Write-Output '> Adding powershell registry entry...'
+reg import "$HOME\scoop\apps\windows-terminal\current\install-context.reg"
 
 # Set up prisma format for nvim
 Write-Output '> Setting up prisma format... (Setting this up use in neovim)'
