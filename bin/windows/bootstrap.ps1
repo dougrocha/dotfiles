@@ -3,7 +3,6 @@ Write-Output '> Setting up scoop...'
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Optional: Needed to run a remote script the first time
 Invoke-RestMethod get.scoop.sh | Invoke-Expression
 
-
 Write-Output '> Setting up scoop buckets...'
 scoop install git
 
@@ -44,6 +43,12 @@ scoop install windows-terminal starship psreadline terminal-icons
 
 Write-Output '> Adding powershell registry entry...'
 reg import "$HOME\scoop\apps\windows-terminal\current\install-context.reg"
+
+Write-Output '> Installing Firefox...'
+winget install --id Mozilla.Firefox.DeveloperEdition --source winget
+
+Write-Output '> Installing PowerToys...'
+winget install --id Microsoft.PowerToys --source winget
 
 # Set up prisma format for nvim
 Write-Output '> Setting up prisma format... (Setting this up use in neovim)'
