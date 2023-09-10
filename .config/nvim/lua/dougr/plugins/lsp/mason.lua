@@ -38,6 +38,7 @@ return {
         "stylua",
         "eslint_d",
         "tailwindcss",
+        "rustywind",
         "rust_analyzer",
       },
       automatic_installation = true,
