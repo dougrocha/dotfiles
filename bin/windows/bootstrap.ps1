@@ -1,7 +1,14 @@
-
-Write-Output '> Setting up scoop...'
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Optional: Needed to run a remote script the first time
-Invoke-RestMethod get.scoop.sh | Invoke-Expression
+# Setup scoop if it doesnt exist. If it does, update scoop
+if (Get-Command scoop -errorAction SilentlyContinue) {
+    Write-Output "> Scoop already exists... Updating scoop"
+    scoop update
+    scoop status
+}
+else {
+    Write-Output '> Setting up scoop...'
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser # Optional: Needed to run a remote script the first time
+    Invoke-RestMethod get.scoop.sh | Invoke-Expression
+}
 
 Write-Output '> Setting up scoop buckets...'
 scoop install git
