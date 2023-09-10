@@ -39,10 +39,6 @@ Write-Output '> Installing neovim plugins...'
 scoop install extras/vcredist2022 mingw coreutils make fd ripgrep gcc wget unzip gzip
 scoop uninstall vcredist2022
 
-# Fonts
-Write-Output '> Installing fonts...'
-scoop install CascadiaCode-NF
-
 # Powershell Tools
 Write-Output '> Installing powershell and powershell tools...'
 winget install --id Microsoft.Powershell --source winget
