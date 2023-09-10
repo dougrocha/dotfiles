@@ -28,7 +28,7 @@ scoop install gh z sudo fnm
 
 # Development
 Write-Output '> Installing development tools...'
-scoop install vscode neovim pnpm
+scoop install neovim pnpm
 
 # Installing Rust
 Write-Output '> Installing rustup...'
