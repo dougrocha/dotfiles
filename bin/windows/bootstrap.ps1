@@ -17,7 +17,7 @@ scoop install aria2
 
 # Essentials
 Write-Output '> Installing essentials...'
-scoop install gh z sudo
+scoop install gh z sudo fnm
 
 # Development
 Write-Output '> Installing development tools...'
@@ -29,7 +29,7 @@ scoop install rustup
 
 # For neovim
 Write-Output '> Installing neovim plugins...'
-scoop install extras/vcredist2022 make fd ripgrep
+scoop install extras/vcredist2022 mingw coreutils make fd ripgrep gcc wget unzip gzip
 scoop uninstall vcredist2022
 
 # Fonts
