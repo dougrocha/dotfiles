@@ -37,7 +37,6 @@
 -- YJJJ?7!~~!!!!77?5#&&#&#G7~~~~!77!!!?JYJ?!!!7!!!~~~~~~!!!7??77!!77~^^^!BB!^^^~^!~7J!!JY7?77?YY7?JYPJJ5Y55Y555PPG@@@@@@@@@&BGGB&@@BG5JJJ?????JY55YJJYY55
 return {
   "ThePrimeagen/harpoon",
-  lazy = true,
   dependencies = {
     "nvim-lua/plenary.nvim",
   },
@@ -45,10 +44,13 @@ return {
     local harpoon = require("harpoon.ui")
     local harpoon_mark = require("harpoon.mark")
 
-    vim.keymap.set("n", "<leader>hu", harpoon.toggle_quick_menu, { desc = "[H]arpoon [U]i" })
-    vim.keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "[H]arpoon [A]dd file" })
+    local keymap = vim.keymap
+
+    keymap.set("n", "<leader>hu", harpoon.toggle_quick_menu, { desc = "[H]arpoon [U]i" })
+    keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "[H]arpoon [A]dd file" })
+
     for pos = 1, 9 do
-      vim.keymap.set(
+      keymap.set(
         "n",
         "<leader>h" .. pos,
         function() require("harpoon.ui").nav_file(pos) end,

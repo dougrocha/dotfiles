@@ -1,10 +1,8 @@
--- Mini plugins
 return {
-
   {
     "echasnovski/mini.starter",
     event = "VimEnter",
-    config = function(_, opts) require("mini.starter").setup(opts) end,
+    opts = true,
   },
   {
     "echasnovski/mini.basics",
@@ -19,33 +17,30 @@ return {
         move_with_alt = true,
       },
     },
-    config = function(_, opts) require("mini.basics").setup(opts) end,
   },
-
   {
     "echasnovski/mini.pairs",
     event = "InsertEnter",
-    config = function(_, opts) require("mini.pairs").setup(opts) end,
-  },
-
-  {
-    "echasnovski/mini.statusline",
-    event = "VeryLazy",
-    config = function(_, opts) require("mini.statusline").setup(opts) end,
+    opts = true,
   },
   {
     "echasnovski/mini.comment",
     event = { "BufRead", "BufNewFile" },
-    config = function(_, opts) require("mini.comment").setup(opts) end,
+    opts = true,
   },
   {
     "echasnovski/mini.indentscope",
     event = { "BufRead", "BufNewFile" },
-    config = function(_, opts) require("mini.indentscope").setup(opts) end,
+    opts = true,
   },
   {
     "echasnovski/mini.move",
     event = "VeryLazy",
-    config = function(_, opts) require("mini.move").setup(opts) end,
+    opts = true,
+  },
+  {
+    "echasnovski/mini.tabline",
+    event = "VimEnter",
+    opts = true,
   },
 }
