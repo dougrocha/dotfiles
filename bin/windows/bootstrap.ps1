@@ -57,7 +57,7 @@ winget install --id Microsoft.PowerToys --source winget
 Write-Output '> Setting up prisma format... (Setting this up use in neovim)'
 git clone https://github.com/prisma/prisma-engines.git "./prisma-engines"
 Set-Location prisma-engines
-cargo build --release
+cargo build --release --package prisma-fmt
 Move-Item -Path ".\target\release\prisma-fmt.exe" -Destination "$HOME\.config\bin" -Force
 Set-Location ..
 Remove-Item ".\prisma-engines" -Recurse -Force
