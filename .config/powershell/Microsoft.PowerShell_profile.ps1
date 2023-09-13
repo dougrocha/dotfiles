@@ -9,7 +9,6 @@ Import-Module "$HOME\dotfiles\.config\powershell\completions\rustup.ps1"
 
 # Alias
 Set-Alias vim nvim
-Set-Alias ll ls
 Set-Alias g git
 Set-Alias find which
 Set-Alias lg lazygit

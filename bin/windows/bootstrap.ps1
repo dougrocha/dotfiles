@@ -28,7 +28,7 @@ scoop install gh z sudo fnm
 
 # Development
 Write-Output '> Installing development tools...'
-scoop install neovim pnpm
+scoop install neovim pnpm eza
 
 # Installing Rust
 Write-Output '> Installing rustup...'
@@ -61,15 +61,6 @@ cargo build --release --package prisma-fmt
 Move-Item -Path ".\target\release\prisma-fmt.exe" -Destination "$HOME\.config\bin" -Force
 Set-Location ..
 Remove-Item ".\prisma-engines" -Recurse -Force
-
-# Set up exa - ls replacement
-Write-Output '> Setting up exa...'
-git clone https://github.com/ogham/exa.git "./exa"
-Set-Location exa
-cargo build --release
-Move-Item -Path ".\target\release\exa.exe" -Destination "$HOME\.config\bin" -Force
-Set-Location ..
-Remove-Item ".\exa" -Recurse -Force
 
 # Intall Nightly Rust
 Write-Output '> Installing nightly rust...'
