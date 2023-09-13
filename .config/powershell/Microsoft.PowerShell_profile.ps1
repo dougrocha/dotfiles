@@ -6,6 +6,7 @@ Import-Module PSReadLine
 
 Import-Module "$HOME\dotfiles\.config\powershell\completions\fnm.ps1"
 Import-Module "$HOME\dotfiles\.config\powershell\completions\rustup.ps1"
+Import-Module "$HOME\dotfiles\.config\powershell\alias.ps1"
 
 # Alias
 Set-Alias vim nvim
