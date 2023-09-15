@@ -10,8 +10,8 @@ keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
 keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Window splits
-keymap.set("n", "<leader>ww", "<C-W>o", { desc = "[W]indow: [O]ther" })
-keymap.set("n", "<leader>wd", "<C-W>d", { desc = "[W]indow: [D]elete" })
+keymap.set("n", "<leader>ww", "<C-W>o", { desc = "[W]indow: Delete all [O]ther windows" })
+keymap.set("n", "<leader>wd", "<C-W>q", { desc = "[W]indow: [D]elete" })
 keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below" })
 keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right" })
 keymap.set("n", "<leader>-", "<C-W>s", { desc = "Split window below" })
