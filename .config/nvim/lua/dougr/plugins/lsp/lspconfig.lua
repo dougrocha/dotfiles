@@ -38,8 +38,8 @@ return {
       opts.desc = "[G]oto [T]ype definition"
       nmap("gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
 
-      opts.desc = "See available code actions"
-      keymap.set("v", "<leader>ca", vim.lsp.buf.code_action, opts)
+      opts.desc = "LSP: See available [C]ode [A]ctions"
+      keymap.set("v", "ca", vim.lsp.buf.code_action, opts)
 
       opts.desc = "Smart rename"
       nmap("<leader>rn", vim.lsp.buf.rename, opts)
@@ -110,6 +110,11 @@ return {
           },
         },
       },
+    })
+
+    lspconfig["rust_analyzer"].setup({
+      capabilities = capabilities,
+      on_attach = on_attach,
     })
   end,
 }

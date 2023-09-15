@@ -34,12 +34,9 @@ return {
 
     mason_null_ls.setup({
       ensure_installed = {
-        "prettier",
-        "stylua",
         "eslint_d",
-        "tailwindcss",
-        "rustywind",
-        "rust_analyzer",
+        "stylua",
+        "prettierd",
       },
       automatic_installation = true,
     })

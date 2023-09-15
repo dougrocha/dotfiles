@@ -10,6 +10,7 @@ return {
     -- for conciseness
     local formatting = null_ls.builtins.formatting -- to setup formatters
     local diagnostics = null_ls.builtins.diagnostics -- to setup linters
+    local code_actions = null_ls.builtins.code_actions
 
     -- to setup format on save
     local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
@@ -22,17 +23,13 @@ return {
       sources = {
         --  to disable file types use
         --  "formatting.prettier.with({disabled_filetypes: {}})" (see null-ls docs)
-        formatting.prettier.with({
-          extra_filetypes = { "svelte" },
-        }), -- js/ts formatter
+        formatting.prettierd, -- js/ts formatter
         formatting.stylua, -- lua formatter
-        formatting.rustyWind,
+        formatting.rustyWind, -- tailwindcss formatter
         formatting.rustFmt,
-        diagnostics.eslint_d.with({ -- js/ts linter
-          condition = function(utils)
-            return utils.root_has_file({ ".eslintrc.js", ".eslintrc.cjs" }) -- only enable if root has .eslintrc.js or .eslintrc.cjs
-          end,
-        }),
+        formatting.eslint_d,
+        diagnostics.eslint_d,
+        code_actions.eslint_d,
       },
       -- configure format on save
       on_attach = function(current_client, bufnr)
