@@ -4,11 +4,6 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-    opts = {
-      extensions = {
-        theme = "tokyonight-storm",
-      },
-    },
     "nvim-tree/nvim-web-devicons",
   },
   config = function()
@@ -37,5 +32,15 @@ return {
     keymap.set("n", "<leader>fr", builtin.oldfiles, { desc = "[F]uzzy find [R]ecent files" })
     keymap.set("n", "<leader>fs", builtin.live_grep, { desc = "[F]ind [S]tring in cwd" })
     keymap.set("n", "<leader>fc", builtin.grep_string, { desc = "[F]ind [C]urrent word" })
+    keymap.set("n", "<leader>ss", builtin.spell_suggest, { desc = "[S]earch [S]pell" })
+    keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
+    keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
+    keymap.set("n", "<leader>fb", builtin.buffers, { desc = "[F]ind existing [B]uffers" })
+    keymap.set(
+      "n",
+      "<leader>/",
+      function() builtin.current_buffer_fuzzy_find() end,
+      { desc = "[/] Fuzzy find in current buffer" }
+    )
   end,
 }
