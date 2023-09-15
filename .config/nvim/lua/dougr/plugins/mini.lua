@@ -2,7 +2,7 @@ return {
   {
     "echasnovski/mini.starter",
     event = "VimEnter",
-    opts = true,
+    opts = {},
   },
   {
     "echasnovski/mini.basics",
@@ -21,26 +21,27 @@ return {
   {
     "echasnovski/mini.pairs",
     event = "InsertEnter",
-    opts = true,
+    opts = {},
   },
   {
     "echasnovski/mini.comment",
-    event = { "BufRead", "BufNewFile" },
-    opts = true,
+    version = false,
+    opts = {},
   },
   {
     "echasnovski/mini.indentscope",
     event = { "BufRead", "BufNewFile" },
-    opts = true,
+    opts = {},
   },
   {
+
     "echasnovski/mini.move",
     event = "VeryLazy",
-    opts = true,
+    opts = {},
   },
   {
     "echasnovski/mini.tabline",
     event = "VimEnter",
-    opts = true,
+    opts = {},
   },
 }
