@@ -83,6 +83,7 @@ return {
     lspconfig["tsserver"].setup({
       capabilities = capabilities,
       on_attach = on_attach,
+      root_dir = lspconfig.util.root_pattern(".git"),
     })
 
     -- configure tailwindcss server
