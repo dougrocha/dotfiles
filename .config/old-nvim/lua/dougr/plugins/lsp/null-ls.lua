@@ -8,7 +8,7 @@ return {
     local null_ls_utils = require("null-ls.utils")
 
     -- for conciseness
-    local formatting = null_ls.builtins.formatting -- to setup formatters
+    local formatting = null_ls.builtins.formatting   -- to setup formatters
     local diagnostics = null_ls.builtins.diagnostics -- to setup linters
     local code_actions = null_ls.builtins.code_actions
 
@@ -24,7 +24,7 @@ return {
         --  to disable file types use
         --  "formatting.prettier.with({disabled_filetypes: {}})" (see null-ls docs)
         formatting.prettierd, -- js/ts formatter
-        formatting.stylua, -- lua formatter
+        formatting.stylua,    -- lua formatter
         formatting.rustyWind, -- tailwindcss formatter
         formatting.rustFmt,
         formatting.eslint_d,

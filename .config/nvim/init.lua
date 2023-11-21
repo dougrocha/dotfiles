@@ -1,2 +1,2 @@
-require("dougr.core")
-require("dougr.lazy")
+-- bootstrap lazy.nvim, LazyVim and your plugins
+require("config.lazy")
