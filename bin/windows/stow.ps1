@@ -5,11 +5,20 @@ function New-Link ($target, $link) {
 Write-Output "> Home: $HOME"
 Write-Output "> Creating symlinks..."
 
-New-Link "$HOME\dotfiles\.config\starship.toml" "$HOME\.config\starship.toml"
+Write-Output "> Creating symlinks for dotfiles..."
+New-Link "$HOME\dotfiles\.config" "$HOME\.config"
+
+Write-Output "> Creating symlinks for git..."
 New-Link "$HOME\dotfiles\.gitignore_global" "$HOME\.gitignore_global"
 
-New-Link "$HOME\dotfiles\.config\powershell\Microsoft.PowerShell_profile.ps1" $Profile
-
+Write-Output "> Creating symlinks for neovim..."
 New-Link "$HOME\dotfiles\.config\nvim" "$HOME\AppData\Local\nvim"
+
+Write-Output "> Copying default .gitconfig..."
+Copy-Item -Path "$HOME\dotfiles\.gitconfig" -Destination "$HOME\.gitconfig"
+Write-Output "> DO NOT FORGET TO SET SSH TOKEN"
+
+Write-Output "> Writing to $PROFILE..."
+Add-Content -Path $PROFILE.CurrentUserCurrentHost -Value ". $env:USERPROFILE\.config\powershell\user_profile.ps1"
 
 Write-Output "> Done."
