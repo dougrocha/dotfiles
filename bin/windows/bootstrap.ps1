@@ -37,15 +37,10 @@ scoop install rustup
 # For neovim
 Write-Output '> Installing neovim plugins...'
 scoop install extras/vcredist2022 mingw coreutils make fd ripgrep gcc wget unzip gzip
-scoop uninstall vcredist2022
 
 # Powershell Tools
 Write-Output '> Installing powershell and powershell tools...'
-winget install --id Microsoft.Powershell --source winget
-scoop install windows-terminal starship psreadline terminal-icons
-
-Write-Output '> Adding powershell registry entry...'
-reg import "$HOME\scoop\apps\windows-terminal\current\install-context.reg"
+scoop install windows-terminal starship psreadline terminal-icons powershell
 
 Write-Output '> Installing Firefox...'
 winget install --id Mozilla.Firefox.DeveloperEdition --source winget
@@ -66,3 +61,9 @@ Remove-Item ".\prisma-engines" -Recurse -Force
 Write-Output '> Installing nightly rust...'
 rustup update
 rustup toolchain install nightly
+
+Write-Output '> Uninstalling vcredist2022...'
+scoop uninstall vcredist2022
+
+Write-Output '> Adding powershell registry entry...'
+reg import "$HOME\scoop\apps\windows-terminal\current\install-context.reg"
