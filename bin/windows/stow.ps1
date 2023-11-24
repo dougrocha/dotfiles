@@ -12,7 +12,10 @@ Write-Output "> Creating symlinks for git..."
 New-Link "$HOME\dotfiles\.gitignore_global" "$HOME\.gitignore_global"
 
 Write-Output "> Creating symlinks for neovim..."
-New-Link "$HOME\dotfiles\.config\nvim" "$HOME\AppData\Local\nvim"
+New-Link "$HOME\.config\nvim" "$HOME\AppData\Local\nvim"
+
+Write-Ouput  "> Creating symlinks for terminal profile settings..."
+New-Link "$HOME\.config\terminal/settings.json" "$HOME\scoop\apps\windows-terminal\current\settings\settings.json" --Force
 
 Write-Output "> Copying default .gitconfig..."
 Copy-Item -Path "$HOME\dotfiles\.gitconfig" -Destination "$HOME\.gitconfig"
