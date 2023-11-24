@@ -7,24 +7,33 @@ $git_state\
 $git_status\
 $cmd_duration\
 $line_break\
-$python\
 $character"""
 
 [directory]
 style = "blue"
+truncation_length = 3
+truncation_symbol = '…/'
+
+[fill]
+symbol = ''
+style = 'bold green'
 
 [character]
-success_symbol = "[❯](green)"
+success_symbol = "[❯](purple)"
 error_symbol = "[❯](red)"
 vimcmd_symbol = "[❮](green)"
 
 [git_branch]
 format = "[$branch]($style)"
 style = "bright-black"
+truncation_length = 6
+truncation_symbol = ''
 
 [git_status]
 format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
 style = "cyan"
+behind = "↓·"
+ahead = "↑·"
 conflicted = "​"
 untracked = "​"
 modified = "​"
@@ -40,7 +49,3 @@ style = "bright-black"
 [cmd_duration]
 format = "[$duration]($style) "
 style = "yellow"
-
-[python]
-format = "[$virtualenv]($style) "
-style = "bright-black"
