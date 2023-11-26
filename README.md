@@ -1,7 +1,5 @@
 # My Dotfiles
 
-Disclaimer: This is currently my barebones setup. I will add my windows config later. For now, this is only for MacOS.
-
 ## Table of Contents
 
 - [My Dotfiles](#my-dotfiles)
@@ -29,33 +27,7 @@ cd ~/.dotfiles
 
 ### Mac OSX
 
-Install brew [Homebrew](https://brew.sh)
-
-Install all brew files.
-
-```bash
-brew bundle install --file=~/config/Brewfile
-```
-
-Make Fish default shell.
-
-```bash
- echo /usr/local/bin/fish | sudo tee -a /etc/shells
-
- chsh -s /usr/local/bin/fish
-```
-
-Install all fisher plugins.
-
-```bash
-fisher update
-```
-
-Link all linkable things.
-
-```bash
-ln -sv "~/.config/.gitconfig" ~
-```
+Eventually fix this...
 
 ---
 
