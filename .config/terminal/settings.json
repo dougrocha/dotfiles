@@ -47,25 +47,25 @@
             "experimental.retroTerminalEffect": false,
             "font": 
             {
-                "face": "CaskaydiaCove Nerd Font Mono"
+                "face": "CaskaydiaCove Nerd Font",
+                "size": 13.0
             },
             "opacity": 90,
+            "padding": "6",
             "useAcrylic": true,
             "useAtlasEngine": true
         },
         "list": 
         [
             {
-                "colorScheme": "Tokyo Night Storm",
-                "font": 
+                "colorScheme": 
                 {
-                    "face": "CaskaydiaCove Nerd Font Mono",
-                    "size": 13.0
+                    "light": "Tokyo Night Storm"
                 },
                 "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
                 "hidden": false,
                 "name": "PowerShell",
-                "padding": "6",
+                "padding": "8",
                 "source": "Windows.Terminal.PowershellCore"
             },
             {
