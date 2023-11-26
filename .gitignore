@@ -1,4 +1,7 @@
-.config/gh/hosts.yml
+.config/gh/
 .config/github-copilot/hosts.json
 .config/powershell/completions
 .config/bin/
+.config/scoop/
+.config/planetscale/
+.config/neofetch/
