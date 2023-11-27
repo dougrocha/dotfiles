@@ -2,6 +2,5 @@
 .config/github-copilot/hosts.json
 .config/powershell/completions
 .config/bin/
-.config/scoop/
 .config/planetscale/
 .config/karabiner/automatic_backups/
