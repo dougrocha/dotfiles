@@ -20,3 +20,10 @@ Set-Alias -Name lr -Value lr_alias
 Set-Alias -Name lra -Value lra_alias
 Set-Alias -Name lt -Value lt_alias
 Set-Alias -Name lta -Value lta_alias
+
+# Coreutils aliases
+Set-Alias -Name rm -Value rm.exe
+Set-Alias -Name rmdir -Value rmdir.exe
+
+# Bat alias
+Set-Alias -Name cat -Value bat.exe
