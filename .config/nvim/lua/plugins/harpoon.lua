@@ -1,4 +1,4 @@
--- ~!~~:..:~^:..  :.          .BG  ..       ..^~~:  ..      ..  ..  :.      . .77:.:                            ....:..^J5J~:^~!!!J?^.^JYYYYJ?!77??77??YG
+-- ~!~~:..:~^:..  :.          .BG  ..       ..^~~:  ..      ..  ..  :.      . .78:.:                            ....:..^J5J~:^~!!!J?^.^JYYYYJ?!77??77??YG
 -- 7:^!^:~!~:...              :#Y.:^....      .::.          .::.   ..          ~:  ^~^:..                          :~::!JJ?~::^^^~!!~^^~^^~~77~~7?JYYY5PG
 -- Y5Y7~~~~^:..:.             ~&?.......           .. ....:^:...    ..             .~!^.                           .:....:^^~7!^:~~~~^^:..^^^!JYJ?JJYY5GG
 -- J7??~..    :~^...        ..J#:  .....   .......:^::::..^~^::.   .::                            .... ....                 ...:^^^~!??7777^^~!?J55JJ55PP
@@ -38,22 +38,33 @@
 return {
   "ThePrimeagen/harpoon",
   branch = "harpoon2",
+  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
   },
   config = function()
-    local harpoon = require("harpoon.ui")
-    local harpoon_mark = require("harpoon.mark")
+    local harpoon = require("harpoon")
 
-    local keymap = vim.keymap
+    harpoon:setup({})
 
-    keymap.set("n", "<leader>hu", harpoon.toggle_quick_menu, { desc = "[H]arpoon [U]i" })
-    keymap.set("n", "<leader>ha", harpoon_mark.add_file, { desc = "[H]arpoon [A]dd file" })
+    vim.keymap.set("n", "<leader>a", function()
+      harpoon:list():append()
+    end, { desc = "Add current file to harpoon" })
+    vim.keymap.set("n", "<C-e>", function()
+      harpoon.ui:toggle_quick_menu(harpoon:list())
+    end, { desc = "Toggle harpoon menu" })
 
-    for pos = 1, 9 do
-      keymap.set("n", "<leader>h" .. pos, function()
-        require("harpoon.ui").nav_file(pos)
-      end, { desc = "Move to [H]arpoon mark [" .. pos .. "]" })
-    end
+    vim.keymap.set("n", "<C-t>", function()
+      harpoon:list():select(1)
+    end, { desc = "Select harpoon item 1" })
+    vim.keymap.set("n", "<C-h>", function()
+      harpoon:list():select(2)
+    end, { desc = "Select harpoon item 2" })
+    vim.keymap.set("n", "<C-n>", function()
+      harpoon:list():select(3)
+    end, { desc = "Select harpoon item 3" })
+    vim.keymap.set("n", "<C-b>", function()
+      harpoon:list():select(4)
+    end, { desc = "Select harpoon item 4" })
   end,
 }
