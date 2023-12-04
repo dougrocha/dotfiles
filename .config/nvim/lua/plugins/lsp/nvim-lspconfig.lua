@@ -104,8 +104,6 @@ return {
           -- make the language server recognize "vim" global
           diagnostics = {
             globals = { "vim" },
-            undefined_global = false,
-            missing_parameters = false,
           },
           workspace = {
             -- make language server aware of runtime files
