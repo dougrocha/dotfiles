@@ -12,6 +12,8 @@ return {
     ensure_installed = {
       "javascript",
       "typescript",
+      "gitignore",
+      "gitattributes",
       "tsx",
       "regex",
       "svelte",
