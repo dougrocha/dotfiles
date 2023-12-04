@@ -16,7 +16,9 @@ return {
     -- load all vscode snippets
     require("luasnip.loaders.from_vscode").lazy_load()
 
+    ---@diagnostic disable-next-line: missing-fields
     cmp.setup({
+      ---@diagnostic disable-next-line: missing-fields
       completion = {
         completeopt = "menu,menuone,preview,noselect",
       },
