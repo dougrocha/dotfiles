@@ -16,9 +16,7 @@ return {
     -- load all vscode snippets
     require("luasnip.loaders.from_vscode").lazy_load()
 
-    ---@diagnostic disable-next-line: missing-fields
     cmp.setup({
-      ---@diagnostic disable-next-line: missing-fields
       completion = {
         completeopt = "menu,menuone,preview,noselect",
       },
@@ -46,6 +44,19 @@ return {
       }, {
         { name = "buffer" },
       }),
+      window = {
+        max_height = 15,
+      },
+      sorting = {
+        priority_weight = 2,
+        comparators = {
+          cmp.config.compare.offset,
+          cmp.config.compare.exact,
+          cmp.config.compare.score,
+          cmp.config.compare.recently_used,
+          cmp.config.compare.kind,
+        },
+      },
     })
   end,
 }

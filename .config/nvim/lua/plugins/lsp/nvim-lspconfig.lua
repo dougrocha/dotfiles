@@ -14,7 +14,7 @@ return {
 
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-    local capabilities = cmp_nvim_lsp.default_capabilities()
+    local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
     for name, icon in pairs(signs) do
@@ -95,6 +95,7 @@ return {
       on_attach = on_attach,
       settings = { -- custom settings for lua
         Lua = {
+          telemetry = { enable = false },
           completion = {
             callSnippet = "Replace",
           },
@@ -104,8 +105,10 @@ return {
           -- make the language server recognize "vim" global
           diagnostics = {
             globals = { "vim" },
+            disable = { "missing-fields" },
           },
           workspace = {
+            checkThirdParty = false,
             -- make language server aware of runtime files
             library = {
               [vim.fn.expand("$VIMRUNTIME/lua")] = true,
