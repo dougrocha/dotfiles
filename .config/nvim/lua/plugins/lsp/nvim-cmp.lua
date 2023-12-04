@@ -2,11 +2,11 @@ return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
-    "L3MON4D3/LuaSnip",
-    "rafamadriz/friendly-snippets",
-    "saadparwaiz1/cmp_luasnip",
+    "hrsh7th/cmp-buffer", -- source for text in buffer
+    "hrsh7th/cmp-path", -- source for file system paths
+    "L3MON4D3/LuaSnip", -- snippet engine
+    "rafamadriz/friendly-snippets", -- useful snippets
+    "saadparwaiz1/cmp_luasnip", -- for autocompletion
   },
   config = function()
     local cmp = require("cmp")
