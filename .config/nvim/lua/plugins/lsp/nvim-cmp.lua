@@ -13,6 +13,7 @@ return {
 
     local luasnip = require("luasnip")
 
+    -- load all vscode snippets
     require("luasnip.loaders.from_vscode").lazy_load()
 
     cmp.setup({
@@ -36,7 +37,7 @@ return {
         }),
       }),
       sources = cmp.config.sources({
-        { name = "copilot", group_index = 2 },
+        { name = "copilot", group_index = 1 },
         { name = "nvim_lsp", group_index = 2 },
         { name = "path", group_index = 2 },
         { name = "luasnip", group_index = 2 },
