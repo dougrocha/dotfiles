@@ -3,7 +3,7 @@ return {
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     { "folke/neoconf.nvim", cmd = "Neoconf", config = false, dependencies = { "nvim-lspconfig" } },
-    { "folke/neodev.nvim",  opts = {} },
+    { "folke/neodev.nvim", opts = {} },
     "mason.nvim",
     "williamboman/mason-lspconfig.nvim",
     "hrsh7th/cmp-nvim-lsp",
@@ -34,7 +34,7 @@ return {
 
     local opts = { noremap = true, silent = true }
 
-    local on_attach = function(client, bufnr)
+    local on_attach = function(_, bufnr)
       opts.buffer = bufnr
 
       opts.desc = "[G]oto [R]eferences"
@@ -104,6 +104,8 @@ return {
           -- make the language server recognize "vim" global
           diagnostics = {
             globals = { "vim" },
+            undefined_global = false,
+            missing_parameters = false,
           },
           workspace = {
             -- make language server aware of runtime files
