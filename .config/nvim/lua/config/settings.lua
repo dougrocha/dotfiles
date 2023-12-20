@@ -11,7 +11,7 @@ opt.clipboard = "unnamedplus" -- Sync with system clipboard
 opt.completeopt = "menu,menuone,noselect"
 
 -- Set highlight on search
-opt.hlsearch = false
+opt.hlsearch = true
 opt.incsearch = true
 
 opt.formatoptions = "jcroqlnt" -- tcjq
@@ -38,11 +38,13 @@ opt.tabstop = 2 -- Number of spaces tabs count for
 opt.shiftwidth = 2 -- Number of spaces for indent width
 opt.shiftround = true -- Round indent
 opt.expandtab = true -- Use spaces instead of tabs
+opt.autoindent = true -- Copy indent from current line when starting a new line
 
 opt.splitbelow = true -- Put new windows under current window
 opt.splitkeep = "screen"
 opt.splitright = true -- Put new windows to the right of current window
 
+opt.swapfile = false -- No swap file
 opt.timeout = true
 opt.timeoutlen = 300
 opt.undofile = true

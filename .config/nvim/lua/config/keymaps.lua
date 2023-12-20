@@ -23,3 +23,5 @@ map.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" }
 map.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
 map.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
 map.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+
+map.set("n", "<C-a>", "ggVG", { desc = "Select all", silent = true })

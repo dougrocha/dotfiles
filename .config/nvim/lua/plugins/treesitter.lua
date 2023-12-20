@@ -4,9 +4,12 @@ return {
   event = "VeryLazy",
   cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
   opts = {
+    auto_install = true,
     highlight = {
       enable = true,
+      additional_vim_regex_highlighting = false,
     },
+    autotag = { enable = true },
     sync_install = false,
     indent = { enabled = true },
     ensure_installed = {

@@ -38,8 +38,8 @@ return {
       }),
       sources = cmp.config.sources({
         { name = "copilot", group_index = 1 },
-        { name = "nvim_lsp", group_index = 2 },
         { name = "path", group_index = 2 },
+        { name = "nvim_lsp", group_index = 2 },
         { name = "luasnip", group_index = 2 },
       }, {
         { name = "buffer" },
@@ -48,13 +48,14 @@ return {
         max_height = 15,
       },
       sorting = {
-        priority_weight = 2,
         comparators = {
           cmp.config.compare.offset,
           cmp.config.compare.exact,
-          cmp.config.compare.score,
           cmp.config.compare.recently_used,
           cmp.config.compare.kind,
+          cmp.config.compare.sort_text,
+          cmp.config.compare.length,
+          cmp.config.compare.order,
         },
       },
     })

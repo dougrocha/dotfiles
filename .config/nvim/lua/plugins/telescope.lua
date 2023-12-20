@@ -42,9 +42,12 @@ return {
             ["q"] = actions.close,
           },
         },
+        file_ignore_patterns = { "node_modules", ".git" },
+        path_display = { "smart" },
         pickers = {
           find_files = {
             find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+            hidden = true,
           },
         },
       },
