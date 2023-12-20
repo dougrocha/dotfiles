@@ -38,7 +38,7 @@ return {
       opts.buffer = bufnr
 
       opts.desc = "[G]oto [R]eferences"
-      nmap("gR", "<cmd>Telescope lsp_references<CR>", opts)
+      nmap("gr", "<cmd>Telescope lsp_references<CR>", opts)
 
       opts.desc = "[G]oto [D]efinition"
       nmap("gD", vim.lsp.buf.declaration, opts)
@@ -71,17 +71,11 @@ return {
       nmap("]d", vim.diagnostic.goto_next, opts)
 
       opts.desc = "Show documentation for what is under cursor"
-      nmap("K", vim.lsp.buf.hover, opts)
+      nmap("<leader>k", vim.lsp.buf.hover, opts)
 
       opts.desc = "Restart LSP"
       nmap("<leader>rs", ":LspRestart<CR>", opts)
     end
-
-    -- configure typescript server with plugin
-    lspconfig["tsserver"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
 
     -- configure tailwindcss server
     lspconfig["tailwindcss"].setup({
