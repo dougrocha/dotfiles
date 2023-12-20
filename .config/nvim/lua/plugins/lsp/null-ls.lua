@@ -44,6 +44,8 @@ return {
         diagnostics.eslint_d, -- js/ts linter
         code_actions.eslint_d, -- js/ts code actions
 
+        diagnostics.markdownlint, -- markdown linter
+
         formatting.stylua, -- lua formatter
 
         formatting.rustFmt,

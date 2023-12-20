@@ -27,6 +27,7 @@ return {
         "tsserver",
         "html",
         "tailwindcss",
+        "marksman",
         "lua_ls",
         "svelte",
         "jsonls",
@@ -40,6 +41,7 @@ return {
         "prettierd",
         "stylua",
         "eslint_d",
+        "markdownlint",
         "luacheck",
       },
     })
