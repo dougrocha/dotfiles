@@ -20,8 +20,25 @@ return {
   { "folke/neoconf.nvim", lazy = true },
   { "nvim-tree/nvim-web-devicons", lazy = true },
   { "MunifTanjim/nui.nvim", lazy = true },
+
   {
+    "echasnovski/mini.pairs",
+    event = "InsertEnter",
+    opts = {},
   },
+  {
+    "echasnovski/mini.surround",
+    event = "InsertEnter",
+    opts = {},
+  },
+
+  {
+    "simrat39/rust-tools.nvim",
+    config = function()
+      require("rust-tools").setup({})
+    end,
+  },
+
   {
     "stevearc/dressing.nvim",
     event = "VeryLazy",
