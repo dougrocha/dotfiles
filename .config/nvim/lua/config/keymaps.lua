@@ -25,3 +25,9 @@ map.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease windo
 map.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
 map.set("n", "<C-a>", "ggVG", { desc = "Select all", silent = true })
+
+map.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down", silent = true })
+map.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up", silent = true })
+
+map.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down" })
+map.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up" })
