@@ -24,12 +24,16 @@ return {
 
     local keymap = vim.keymap
 
+    local options = { noremap = true, silent = true }
     local nmap = function(keys, func, opts)
-      if opts.desc then
-        opts.desc = "LSP: " .. opts.desc
+      if opts then
+        if opts.desc then
+          opts.desc = "LSP: " .. opts.desc
+        end
+        options = vim.tbl_extend("force", options, opts)
       end
 
-      keymap.set("n", keys, func, opts)
+      keymap.set("n", keys, func, options)
     end
 
     local opts = { noremap = true, silent = true }
@@ -116,6 +120,19 @@ return {
     lspconfig["rust_analyzer"].setup({
       capabilities = capabilities,
       on_attach = on_attach,
+      settings = {
+        cargo = {
+          allFeatures = true,
+          loadOutDirsFromCheck = true,
+          runBuildScripts = true,
+        },
+        -- Add clippy lints for Rust.
+        checkOnSave = {
+          allFeatures = true,
+          command = "clippy",
+          extraArgs = { "--no-deps" },
+        },
+      },
     })
 
     lspconfig["jsonls"].setup({
