@@ -28,6 +28,7 @@ return {
         "tailwindcss",
         "marksman",
         "lua_ls",
+        "tsserver",
         "svelte",
         "jsonls",
         "rust_analyzer",

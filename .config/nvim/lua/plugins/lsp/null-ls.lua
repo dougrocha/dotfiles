@@ -16,6 +16,7 @@ return {
         "prettierd",
         "stylua",
         "eslint_d",
+        "markdownlint",
       },
     })
 
@@ -44,6 +45,7 @@ return {
         diagnostics.eslint_d, -- js/ts linter
         code_actions.eslint_d, -- js/ts code actions
 
+        formatting.markdownlint, -- markdown formatter
         diagnostics.markdownlint, -- markdown linter
 
         formatting.stylua, -- lua formatter

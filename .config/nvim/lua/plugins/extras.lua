@@ -3,6 +3,7 @@ return {
   { "nvim-lua/plenary.nvim", lazy = true },
   {
     "kdheepak/lazygit.nvim",
+    lazy = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
@@ -38,6 +39,7 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-neo-tree/neo-tree.nvim",
     },
+    lazy = true,
     config = function()
       require("lsp-file-operations").setup()
     end,

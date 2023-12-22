@@ -10,9 +10,7 @@ return {
   },
   config = function()
     local lsp_config = require("lspconfig")
-
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
-    local capabilities = cmp_nvim_lsp.default_capabilities()
 
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
     for name, icon in pairs(signs) do
@@ -118,6 +116,7 @@ return {
       },
     }
 
+    local capabilities = cmp_nvim_lsp.default_capabilities()
     for server, config in pairs(opts.servers) do
       config.capabilities = capabilities
       lsp_config[server].setup(config)
