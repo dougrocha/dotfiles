@@ -12,11 +12,6 @@ return {
       { "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit" },
     },
   },
-  {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
   { "folke/neodev.nvim", lazy = true },
   { "folke/neoconf.nvim", lazy = true },
   { "nvim-tree/nvim-web-devicons", lazy = true },
