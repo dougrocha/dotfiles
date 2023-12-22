@@ -5,6 +5,7 @@ return {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     "nvim-tree/nvim-web-devicons",
+    "debugloop/telescope-undo.nvim",
   },
   config = function()
     local telescope = require("telescope")
@@ -56,6 +57,7 @@ return {
     local builtin = require("telescope.builtin")
 
     telescope.load_extension("fzf")
+    telescope.load_extension("undo")
 
     local keymap = vim.keymap
 
@@ -64,10 +66,12 @@ return {
     keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Recent files" })
     keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Document symbols" })
     keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "Grep word under cursor" })
+    keymap.set("n", "<leader>fu", "<cmd>Telescope undo<cr>", { desc = "Undo Tree" })
 
     keymap.set("n", "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" })
     keymap.set("n", "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<cr>", { desc = "Document diagnostics" })
     keymap.set("n", "<leader>sD", "<cmd>Telescope diagnostics<cr>", { desc = "Workspace diagnostics" })
     keymap.set("n", "<leader>sk", "<cmd>Telescope keymaps<cr>", { desc = "Key Maps" })
+    keymap.set("n", "<leader>ss", builtin.spell_suggest, { desc = "Spell suggestions" })
   end,
 }

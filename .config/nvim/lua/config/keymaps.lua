@@ -19,15 +19,22 @@ map.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window", remap = true })
 map.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window", remap = true })
 map.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window", remap = true })
 
+-- Move Lines
 map.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
 map.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
 map.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
 map.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
 
+-- Select all
 map.set("n", "<C-a>", "ggVG", { desc = "Select all", silent = true })
 
-map.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move line down", silent = true })
-map.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move line up", silent = true })
+-- Move Lines
+map.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down", silent = true })
+map.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up", silent = true })
+map.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down", silent = true })
+map.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true })
+map.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
+map.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
 
 map.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down" })
 map.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up" })
