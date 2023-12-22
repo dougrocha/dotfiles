@@ -25,11 +25,13 @@ return {
   },
   {
     "echasnovski/mini.surround",
+    event = "InsertEnter",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.ai",
+    event = "InsertEnter",
     version = "*",
     opts = {},
   },
