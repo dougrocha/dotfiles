@@ -9,10 +9,12 @@ if status is-login
 end
 
 # LS replacements using Exa
-alias ls='exa --icons'
+alias ls='eza --icons'
 alias la='ls -a'
 alias ld='ls -D'
-alias lt='exa -T --icons'
+alias lt='eza -T --icons'
+
+alias cat='bat'
 
 # Git aliases
 alias lg='lazygit'
