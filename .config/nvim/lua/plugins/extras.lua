@@ -12,7 +12,13 @@ return {
       { "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit" },
     },
   },
-  { "folke/neodev.nvim", lazy = true },
+  {
+    "folke/neodev.nvim",
+    lazy = true,
+    config = function()
+      require("neodev").setup()
+    end,
+  },
   { "folke/neoconf.nvim", lazy = true },
   { "nvim-tree/nvim-web-devicons", lazy = true },
   { "MunifTanjim/nui.nvim", lazy = true },
