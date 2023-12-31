@@ -3,7 +3,10 @@ return {
     "L3MON4D3/LuaSnip",
     event = "VeryLazy",
     build = "make install_jsregexp",
-    dependencies = { "rafamadriz/friendly-snippets" },
+    dependencies = {
+      "saadparwaiz1/cmp_luasnip", -- for autocompletion
+      "rafamadriz/friendly-snippets",
+    },
     config = function()
       -- load all vscode snippets
       require("luasnip.loaders.from_vscode").lazy_load()
@@ -17,7 +20,6 @@ return {
       "hrsh7th/cmp-buffer", -- source for text in buffer
       "hrsh7th/cmp-path", -- source for file system paths
       "rafamadriz/friendly-snippets", -- useful snippets
-      "saadparwaiz1/cmp_luasnip", -- for autocompletion
     },
     config = function()
       local cmp = require("cmp")
@@ -53,6 +55,8 @@ return {
         }),
         window = {
           max_height = 15,
+          completion = cmp.config.window.bordered(),
+          documentation = cmp.config.window.bordered(),
         },
       })
     end,
