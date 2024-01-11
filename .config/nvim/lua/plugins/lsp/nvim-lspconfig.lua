@@ -115,7 +115,9 @@ return {
       },
     }
 
-    local capabilities = cmp_nvim_lsp.default_capabilities()
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+
     for server, config in pairs(opts.servers) do
       config.capabilities = capabilities
       lsp_config[server].setup(config)
