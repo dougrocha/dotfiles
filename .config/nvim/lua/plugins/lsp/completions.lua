@@ -42,7 +42,7 @@ return {
           ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
           ["<C-e>"] = cmp.mapping.abort(), -- close competion window
           ["<CR>"] = cmp.mapping.confirm({ -- confirm completion
-            select = true,
+            select = false,
           }),
         }),
         sources = cmp.config.sources({
