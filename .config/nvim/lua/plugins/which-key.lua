@@ -5,6 +5,7 @@ return {
     defaults = {
       mode = { "n", "v" },
       ["<leader>b"] = { name = "+buffer" },
+      ["<leader>d"] = { name = "+debug" },
       ["<leader>f"] = { name = "+file/find" },
       ["<leader>g"] = { name = "+git" },
       ["<leader>w"] = { name = "+windows" },
