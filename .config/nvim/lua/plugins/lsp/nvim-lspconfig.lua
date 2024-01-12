@@ -2,9 +2,8 @@ return {
   "neovim/nvim-lspconfig",
   dependencies = {
     { "folke/neoconf.nvim", cmd = "Neoconf", config = false, dependencies = { "neovim/nvim-lspconfig" } },
-    { "williamboman/mason.nvim", config = true },
+    "williamboman/mason.nvim",
     "folke/neodev.nvim",
-    "williamboman/mason-lspconfig.nvim",
     "hrsh7th/cmp-nvim-lsp",
   },
   config = function()

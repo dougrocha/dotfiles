@@ -1,6 +1,6 @@
 return {
-  { -- snippet engine
-    "L3MON4D3/LuaSnip",
+  {
+    "L3MON4D3/LuaSnip", -- snippet engine
     event = "VeryLazy",
     build = "make install_jsregexp",
     dependencies = {
@@ -9,7 +9,7 @@ return {
     },
     config = function()
       -- load all vscode snippets
-      require("luasnip.loaders.from_vscode").lazy_load()
+      -- require("luasnip.loaders.from_vscode").lazy_load()
     end,
   },
   {
