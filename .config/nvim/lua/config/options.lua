@@ -1,0 +1,34 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
+
+local opt = vim.opt
+
+opt.clipboard = "unnamedplus" -- Sync with system clipboard
+opt.completeopt = { "menuone", "noselect" } -- For cmp
+opt.hlsearch = true -- Highlight previous search results
+opt.incsearch = true -- ignore case in search pattern
+opt.scrolloff = 8 -- Make sure there are always 8 lines below cursor
+opt.sidescrolloff = 8 -- Make sure there are always 8 lines to the left and right of cursor
+opt.signcolumn = "yes" -- Always show the sign column, otherwise it would shift the text each time
+opt.number = true -- Use Line Numbers
+opt.relativenumber = true -- Use Relative Line Numbers
+opt.smartcase = true -- Don't ignore case with capitals
+opt.smartindent = true -- Indent Automatically
+opt.showmode = false -- Don't show since I use a custom status line
+opt.spelllang = { "en" } -- Spelling language
+opt.termguicolors = true -- True color support
+opt.tabstop = 2 -- Number of spaces tabs count for
+opt.shiftwidth = 2 -- Number of spaces for indent width
+opt.shiftround = true -- Round indent
+opt.expandtab = true -- Use spaces instead of tabs
+opt.autoindent = true -- Copy indent from current line when starting a new line
+opt.splitbelow = true -- Force all horizontal splits to go below current window
+opt.splitright = true -- Force all vertical splits to go to the right of current window
+opt.backup = false -- creates a backup file
+opt.swapfile = false -- No swap file
+opt.timeout = true
+opt.timeoutlen = 1000 -- Time to wait for a mapped sequence to complete (in milliseconds)
+opt.undofile = true -- Enable persistent undo
+opt.undolevels = 10000 -- Number of undo levels
+opt.updatetime = 100 -- Faster completion (4000ms Default)
+opt.wrap = false -- Turn off line wrapping

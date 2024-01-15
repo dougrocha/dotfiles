@@ -16,7 +16,8 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    depends = { "williamboman/mason.nvim" },
+    event = "VeryLazy",
+    dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
@@ -35,7 +36,8 @@ return {
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    depends = { "williamboman/mason.nvim" },
+    event = "VeryLazy",
+    dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-tool-installer").setup({
         ensure_installed = {

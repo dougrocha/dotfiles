@@ -38,9 +38,9 @@
 return {
   "ThePrimeagen/harpoon",
   branch = "harpoon2",
-  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "nvim-telescope/telescope.nvim",
   },
   config = function()
     local harpoon = require("harpoon")
@@ -55,10 +55,6 @@ return {
       harpoon:list():append()
     end, { desc = "Add current file to harpoon" })
 
-    vim.keymap.set("n", "<C-e>", function()
-      harpoon.ui:toggle_quick_menu(harpoon:list())
-    end, { desc = "Toggle harpoon menu" })
-
     vim.keymap.set("n", "<C-t>", function()
       harpoon:list():select(1)
     end, { desc = "Select harpoon item 1" })
@@ -70,5 +66,16 @@ return {
     vim.keymap.set("n", "<C-b>", function()
       harpoon:list():select(3)
     end, { desc = "Select harpoon item 3" })
+
+    vim.keymap.set("n", "<C-S-P>", function()
+      harpoon:list():prev()
+    end, { desc = "Select previous harpoon item" })
+    vim.keymap.set("n", "<C-S-N>", function()
+      harpoon:list():next()
+    end, { desc = "Select next harpoon item" })
+
+    vim.keymap.set("n", "<C-e>", function()
+      harpoon.ui:toggle_quick_menu(harpoon:list())
+    end, { desc = "Toggle harpoon menu" })
   end,
 }

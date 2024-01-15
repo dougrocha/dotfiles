@@ -6,6 +6,21 @@ return {
     "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
     "MunifTanjim/nui.nvim",
   },
+  opts = {
+    window = {
+      mappings = {
+        ["<space>"] = "none",
+      },
+    },
+    default_component_configs = {
+      indent = {
+        with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
+        expander_collapsed = "",
+        expander_expanded = "",
+        expander_highlight = "NeoTreeExpander",
+      },
+    },
+  },
   keys = {
     {
       "<leader>fe",
@@ -28,24 +43,6 @@ return {
         require("neo-tree.command").execute({ source = "buffers", toggle = true })
       end,
       desc = "Buffer explorer",
-    },
-  },
-  deactivate = function()
-    vim.cmd([[Neotree close]])
-  end,
-  opts = {
-    window = {
-      mappings = {
-        ["<space>"] = "none",
-      },
-    },
-    default_component_configs = {
-      indent = {
-        with_expanders = true, -- if nil and file nesting is enabled, will enable expanders
-        expander_collapsed = "",
-        expander_expanded = "",
-        expander_highlight = "NeoTreeExpander",
-      },
     },
   },
 }

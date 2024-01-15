@@ -1,24 +1,20 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  event = { "BufReadPost", "BufNewFile" },
   build = ":TSUpdate",
-  event = "VeryLazy",
-  cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
   opts = {
     auto_install = true,
+    sync_install = false,
     highlight = {
       enable = true,
       additional_vim_regex_highlighting = false,
     },
     autotag = { enable = true },
-    sync_install = false,
     indent = { enabled = true },
     ensure_installed = {
       "javascript",
       "typescript",
-      "gitignore",
-      "gitattributes",
       "tsx",
-      "regex",
       "svelte",
       "markdown",
       "markdown_inline",
@@ -41,17 +37,14 @@ return {
     },
   },
   config = function(_, opts)
-    if type(opts.ensure_installed) == "table" then
-      ---@type table<string, boolean>
-      local added = {}
-      opts.ensure_installed = vim.tbl_filter(function(lang)
-        if added[lang] then
-          return false
-        end
-        added[lang] = true
-        return true
-      end, opts.ensure_installed)
-    end
     require("nvim-treesitter.configs").setup(opts)
+
+    -- MDX
+    vim.filetype.add({
+      extension = {
+        mdx = "mdx",
+      },
+    })
+    vim.treesitter.language.register("markdown", "mdx")
   end,
 }
