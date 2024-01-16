@@ -3,14 +3,9 @@ return {
   branch = "0.1.x",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    {
-      "nvim-telescope/telescope-fzf-native.nvim",
-      build = "make",
-      cond = function()
-        return vim.fn.executable("make") == 1
-      end,
-    },
+    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     "nvim-tree/nvim-web-devicons",
+    "nvim-telescope/telescope-ui-select.nvim",
     "debugloop/telescope-undo.nvim",
   },
   config = function()
@@ -18,6 +13,7 @@ return {
     local actions = require("telescope.actions")
 
     telescope.setup({
+      file_ignore_patterns = { "%.git/." },
       defaults = {
         prompt_prefix = " ",
         selection_caret = " ",
@@ -50,11 +46,56 @@ return {
         },
         file_ignore_patterns = { "node_modules", ".git" },
         path_display = { "smart" },
-        pickers = {
-          find_files = {
-            find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
-            hidden = true,
+      },
+      pickers = {
+        find_files = {
+          previewer = false,
+          layout_config = {
+            height = 0.4,
+            prompt_position = "top",
+            preview_cutoff = 120,
           },
+        },
+        git_files = {
+          previewer = false,
+          layout_config = {
+            height = 0.4,
+            prompt_position = "top",
+            preview_cutoff = 120,
+          },
+        },
+        buffers = {
+          mappings = {
+            i = {
+              ["<C-d>"] = actions.delete_buffer,
+            },
+            n = {
+              ["<C-d>"] = actions.delete_buffer,
+            },
+          },
+        },
+        current_buffer_fuzzy_find = {
+          previewer = true,
+          layout_config = {
+            prompt_position = "top",
+            preview_cutoff = 120,
+          },
+        },
+        live_grep = {
+          only_sort_text = true,
+          previewer = true,
+        },
+        grep_string = {
+          only_sort_text = true,
+          previewer = true,
+        },
+      },
+      extensions = {
+        fzf = {
+          fuzzy = true, -- false will only do exact matching
+          override_generic_sorter = true, -- override the generic sorter
+          override_file_sorter = true, -- override the file sorter
+          case_mode = "smart_case", -- or "ignore_case" or "respect_case"
         },
       },
     })
@@ -63,6 +104,7 @@ return {
 
     telescope.load_extension("fzf")
     telescope.load_extension("undo")
+    telescope.load_extension("ui-select")
 
     local wk = require("which-key")
     wk.register({

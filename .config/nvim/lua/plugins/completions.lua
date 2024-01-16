@@ -23,8 +23,9 @@ return {
     local luasnip = require("luasnip")
 
     cmp.setup({
+      preselect = "None",
       completion = {
-        completeopt = "menu,menuone,noinsert",
+        completeopt = "menu,menuone,noinsert,noselect",
       },
       snippet = {
         expand = function(args)
@@ -45,10 +46,11 @@ return {
       sources = cmp.config.sources({
         { name = "copilot" },
         { name = "nvim_lsp" },
-        { name = "luasnip" },
         { name = "path" },
+        { name = "luasnip" },
       }, {
         { name = "buffer" },
+        { name = "crates" },
       }),
     })
   end,

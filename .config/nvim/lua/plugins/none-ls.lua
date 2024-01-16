@@ -1,9 +1,10 @@
 return {
   "nvimtools/none-ls.nvim", -- configure formatters & linters
+  event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     "jay-babu/mason-null-ls.nvim",
+    "nvim-lua/plenary.nvim",
   },
-  event = { "BufReadPre", "BufNewFile" },
   config = function()
     -- import null-ls plugin
     local null_ls = require("null-ls")
@@ -42,7 +43,11 @@ return {
         formatting.prettierd.with({
           extra_filetypes = { "svelte" },
         }), -- js/ts formatter
-        diagnostics.eslint_d, -- js/ts linter
+        diagnostics.eslint_d.with({
+          condition = function(utils)
+            return utils.root_has_file({ ".eslintrc.js", ".eslintrc.json" })
+          end,
+        }), -- js/ts linter
         code_actions.eslint_d, -- js/ts code actions
 
         formatting.markdownlint, -- markdown formatter

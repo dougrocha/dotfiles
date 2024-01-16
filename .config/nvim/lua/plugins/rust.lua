@@ -1,12 +1,23 @@
 return {
-  "mrcjkb/rustaceanvim",
-  version = "^3",
-  ft = { "rust" },
-  config = function()
-    local bufnr = vim.api.nvim_get_current_buf()
-
-    vim.keymap.set("n", "<leader>ca", function()
-      vim.cmd.RustLsp("codeAction")
-    end, { silent = true, buffer = bufnr })
-  end,
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^3",
+    ft = { "rust" },
+  },
+  {
+    "saecki/crates.nvim",
+    event = { "BufRead Cargo.toml" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      require("crates").setup({
+        null_ls = {
+          enabled = true,
+          name = "crates.nvim",
+        },
+        popup = {
+          border = "rounded",
+        },
+      })
+    end,
+  },
 }

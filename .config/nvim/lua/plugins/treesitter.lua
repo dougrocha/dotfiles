@@ -12,7 +12,6 @@ return {
     autotag = { enable = true },
     indent = { enabled = true },
     ensure_installed = {
-      "javascript",
       "typescript",
       "tsx",
       "svelte",

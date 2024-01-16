@@ -4,7 +4,7 @@ vim.g.maplocalleader = "\\"
 local opt = vim.opt
 
 opt.clipboard = "unnamedplus" -- Sync with system clipboard
-opt.completeopt = { "menuone", "noselect" } -- For cmp
+opt.completeopt = { "menu", "menuone", "noselect" } -- For cmp
 opt.hlsearch = true -- Highlight previous search results
 opt.incsearch = true -- ignore case in search pattern
 opt.scrolloff = 8 -- Make sure there are always 8 lines below cursor

@@ -7,10 +7,28 @@ return {
     { "<leader>ta", "<cmd>TSToolsAddMissingImports<cr>" },
   },
   config = function()
-    local ts_tools = require("typescript-tools")
     local api = require("typescript-tools.api")
 
-    ts_tools.setup({
+    require("typescript-tools").setup({
+      settings = {
+        seperate_diagnostic_server = true,
+        expose_as_code_action = "all",
+        tsserver_mas_memory = "auto",
+        complete_function_calls = true,
+        include_completions_with_insert_text = true,
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints = "all", -- "none" | "literals" | "all";
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayVariableTypeHintsWhenArgumentMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+          includeCompletionEntryDetails = true,
+          quotePreference = "auto",
+        },
+      },
       handlers = {
         ["textDocument/publishDiagnostics"] = api.filter_diagnostics({ 6133 }),
       },
