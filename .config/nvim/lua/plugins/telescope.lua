@@ -1,6 +1,8 @@
 return {
   "nvim-telescope/telescope.nvim",
   branch = "0.1.x",
+  cmd = "Telescope",
+  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -100,11 +102,11 @@ return {
       },
     })
 
-    local builtin = require("telescope.builtin")
-
     telescope.load_extension("fzf")
     telescope.load_extension("undo")
     telescope.load_extension("ui-select")
+
+    local builtin = require("telescope.builtin")
 
     local wk = require("which-key")
     wk.register({
