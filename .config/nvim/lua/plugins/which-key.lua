@@ -33,5 +33,9 @@ return {
 
     wk.setup(opts)
     wk.register(opts.defaults)
+
+    wk.register({
+      ["<leader>ch"] = { "<cmd>noh<cr>", "Clear Search Highlight" },
+    })
   end,
 }

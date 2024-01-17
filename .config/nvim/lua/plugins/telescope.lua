@@ -157,6 +157,10 @@ return {
     })
 
     wk.register({
+      ["<leader>be"] = { "<cmd>Telescope buffers<cr>", "Show buffers" },
+    })
+
+    wk.register({
       ["<leader>sk"] = { "<cmd>Telescope keymaps<cr>", "Key Maps" },
       ["<leader>sd"] = { "<cmd>Telescope diagnostics bufnr=0<cr>", "Document diagnostics" },
       ["<leader>sh"] = { "<cmd>Telescope help_tags<cr>", "Help" },
