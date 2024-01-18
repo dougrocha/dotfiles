@@ -8,6 +8,8 @@ end
 
 -- Theme
 -- config.color_scheme = "Dracula (Official)"
+
+-- Kanagawa Color Scheme
 config.force_reverse_video_cursor = true
 config.colors = {
 	foreground = "#dcd7ba",
