@@ -36,6 +36,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local servers = {
+  "astro",
   "jsonls",
   "marksman",
   "lua_ls",
