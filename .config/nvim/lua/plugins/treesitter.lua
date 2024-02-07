@@ -12,6 +12,8 @@ return {
     autotag = { enable = true },
     indent = { enabled = true },
     ensure_installed = {
+      "c",
+      "cpp",
       "typescript",
       "tsx",
       "svelte",
