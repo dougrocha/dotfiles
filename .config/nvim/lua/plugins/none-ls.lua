@@ -43,6 +43,7 @@ return {
         formatting.prettierd.with({
           extra_filetypes = { "svelte" },
         }), -- js/ts formatter
+          extra_filetypes = { "svelte", "toml" },
         diagnostics.eslint_d.with({
           condition = function(utils)
             return utils.root_has_file({ ".eslintrc.js", ".eslintrc.json" })
