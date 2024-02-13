@@ -14,6 +14,7 @@ return {
     local mason_null_ls = require("mason-null-ls")
     mason_null_ls.setup({
       ensure_installed = {
+        "cland-format",
         "prettierd",
         "stylua",
         "eslint_d",
@@ -38,12 +39,10 @@ return {
       log_level = "debug",
       -- setup formatters & linters
       sources = {
-        --  to disable file types use
-        --  "formatting.prettier.with({disabled_filetypes: {}})" (see null-ls docs)
+        formatting.clang_format, -- c/c++ formatter
         formatting.prettierd.with({
-          extra_filetypes = { "svelte" },
-        }), -- js/ts formatter
           extra_filetypes = { "svelte", "toml" },
+        }),
         diagnostics.eslint_d.with({
           condition = function(utils)
             return utils.root_has_file({ ".eslintrc.js", ".eslintrc.json" })

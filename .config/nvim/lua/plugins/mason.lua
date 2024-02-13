@@ -41,6 +41,7 @@ return {
     config = function()
       require("mason-tool-installer").setup({
         ensure_installed = {
+          "cland-format",
           "prettierd",
           "stylua",
           "eslint_d",
