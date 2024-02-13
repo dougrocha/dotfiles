@@ -22,9 +22,6 @@ success_symbol = '[](bold fg:purple)'
 error_symbol = '[](bold #ff5555)'
 vimcmd_symbol = '[](bold #50fa7b)'
 format = "[$branch]($style)"
-style_user = "bold #8be9fd"
-truncation_length = 6
-truncation_symbol = ''
 
 [git_status]
 format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style) "
