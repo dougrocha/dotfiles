@@ -8,7 +8,7 @@ return {
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     {
       "L3MON4D3/LuaSnip", -- snippet engine
-      event = "InsertEnter",
+      lazy = true,
       build = "make install_jsregexp",
       dependencies = {
         "rafamadriz/friendly-snippets",
@@ -21,6 +21,9 @@ return {
   config = function()
     local cmp = require("cmp")
     local luasnip = require("luasnip")
+
+    -- Set window height for completion menu
+    vim.o.pumheight = 10
 
     cmp.setup({
       preselect = "None",
@@ -44,9 +47,9 @@ return {
         }),
       }),
       sources = cmp.config.sources({
-        { name = "copilot" },
-        { name = "nvim_lsp" },
-        { name = "path" },
+        { name = "copilot", priority = 10 },
+        { name = "nvim_lsp", priority = 7 },
+        { name = "path", priority = 5 },
         { name = "luasnip" },
       }, {
         { name = "buffer" },
