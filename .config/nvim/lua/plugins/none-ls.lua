@@ -54,8 +54,6 @@ return {
         diagnostics.markdownlint, -- markdown linter
 
         formatting.stylua, -- lua formatter
-
-        formatting.rustFmt,
       },
       -- configure format on save
       on_attach = function(current_client, bufnr)

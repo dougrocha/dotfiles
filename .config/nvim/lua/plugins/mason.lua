@@ -20,16 +20,7 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = {
-          "html",
-          "tailwindcss",
-          "marksman",
-          "lua_ls",
-          "tsserver",
-          "svelte",
-          "jsonls",
-          "rust_analyzer",
-        },
+        ensure_installed = { "html", "tailwindcss", "marksman", "lua_ls", "tsserver", "svelte", "jsonls" },
         automatic_installation = true,
       })
     end,
@@ -40,14 +31,7 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-tool-installer").setup({
-        ensure_installed = {
-          "cland-format",
-          "prettierd",
-          "stylua",
-          "eslint_d",
-          "markdownlint",
-          "luacheck",
-        },
+        ensure_installed = { "cland-format", "prettierd", "stylua", "eslint_d", "markdownlint", "luacheck" },
       })
     end,
   },
