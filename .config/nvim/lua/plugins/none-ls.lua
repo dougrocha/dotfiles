@@ -28,7 +28,9 @@ return {
     local code_actions = null_ls.builtins.code_actions
 
     -- to setup format on save
-    local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+    local augroup = vim.api.nvim_create_augroup("LspFormatting", {
+      clear = false,
+    })
 
     -- configure null_ls
     null_ls.setup({

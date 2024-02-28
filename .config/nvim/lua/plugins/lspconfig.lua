@@ -42,6 +42,7 @@ local servers = {
   "lua_ls",
   "svelte",
   "tailwindcss",
+  "rust_analyzer",
 }
 
 return {
