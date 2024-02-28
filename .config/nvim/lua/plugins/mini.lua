@@ -18,12 +18,6 @@ return {
     opts = {},
   },
   {
-    "echasnovski/mini.pairs",
-    event = "VeryLazy",
-    version = "*",
-    opts = {},
-  },
-  {
     "echasnovski/mini.statusline",
     event = "VeryLazy",
     version = "*",

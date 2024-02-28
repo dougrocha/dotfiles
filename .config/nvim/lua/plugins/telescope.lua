@@ -114,7 +114,7 @@ return {
         function()
           builtin.live_grep()
         end,
-        "Grep",
+        "Grep workspace",
       },
       ["<leader>fb"] = {
         function()
@@ -141,14 +141,6 @@ return {
         end,
         "Recent files",
       },
-      ["<leader>fP"] = {
-        function()
-          builtin.find_files({
-            cwd = require("lazy.core.config").options.root,
-          })
-        end,
-        "File Plugin File",
-      },
       ["<leader>fw"] = {
         function()
           builtin.grep_string()
@@ -156,10 +148,6 @@ return {
         "Grep word under cursor",
       },
       ["<leader>fu"] = { "<cmd>Telescope undo<cr>", "Undo Tree" },
-    })
-
-    wk.register({
-      ["<leader>be"] = { "<cmd>Telescope buffers<cr>", "Show buffers" },
     })
 
     wk.register({

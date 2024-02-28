@@ -65,13 +65,12 @@ return {
         }),
       }),
       sources = cmp.config.sources({
-        { name = "copilot", priority = 10 },
-        { name = "nvim_lsp", priority = 7 },
-        { name = "luasnip" },
-        { name = "path" },
+        { name = "nvim_lsp" },
+        { name = "copilot" },
+        { name = "luasnip", max_item_count = 3 },
+        { name = "path", max_item_count = 3 },
       }, {
-        { name = "buffer" },
-        { name = "crates" },
+        { name = "buffer", max_item_count = 5 },
       }),
     })
   end,
