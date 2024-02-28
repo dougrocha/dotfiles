@@ -36,21 +36,39 @@ return {
         end,
       },
       mapping = cmp.mapping.preset.insert({
-        ["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-        ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
+        ["<C-n>"] = cmp.mapping.select_next_item(), -- next suggestion
+        ["<C-p>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+
         ["<C-b>"] = cmp.mapping.scroll_docs(-4),
         ["<C-f>"] = cmp.mapping.scroll_docs(4),
-        ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
+
+        -- <c-l> will move right in current snippet expansion.
+        ["<C-l>"] = cmp.mapping(function()
+          if luasnip.expand_or_locally_jumpable() then
+            return luasnip.expand_or_jump()
+          end
+        end, { "i", "s" }),
+        -- <c-h> will move left in current snippet expansion.
+        ["<C-h>"] = cmp.mapping(function()
+          if luasnip.locally_jumpable(-1) then
+            return luasnip.jump(-1)
+          end
+        end, { "i", "s" }),
+
         ["<C-e>"] = cmp.mapping.abort(), -- close competion window
-        ["<CR>"] = cmp.mapping.confirm({ -- confirm completion
+
+        -- manually show completion menu
+        ["<C-Space>"] = cmp.mapping.complete(),
+
+        ["<CR>"] = cmp.mapping.confirm({
           select = false,
         }),
       }),
       sources = cmp.config.sources({
         { name = "copilot", priority = 10 },
         { name = "nvim_lsp", priority = 7 },
-        { name = "path", priority = 5 },
         { name = "luasnip" },
+        { name = "path" },
       }, {
         { name = "buffer" },
         { name = "crates" },
