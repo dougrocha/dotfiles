@@ -1,13 +1,12 @@
 return {
   {
-    "dmmulroy/ts-error-translator.nvim",
-    lazy = true,
-    otps = {},
-  },
-  {
     "pmizio/typescript-tools.nvim",
     event = "VeryLazy",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "neovim/nvim-lspconfig",
+      "dmmulroy/ts-error-translator.nvim",
+    },
     keys = {
       { "<leader>tm", "<cmd>TSToolsOrganizeImports<cr>" },
       { "<leader>ta", "<cmd>TSToolsAddMissingImports<cr>" },
