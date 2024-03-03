@@ -27,9 +27,13 @@ return {
       ["g\\"] = "actions.toggle_trash",
     },
     delete_to_trash = true, -- Send delete operations to trash instead of deleting permanently
+
     -- Set to true to autosave buffers that are updated with LSP willRenameFiles
     -- Set to "unmodified" to only save unmodified buffers
     lsp_rename_autosave = false,
+
+    -- Skip the confirmation popup for simple operations (:help oil.skip_confirm_for_simple_edits)
+    skip_confirm_for_simple_edits = true,
   },
   keys = {
     {

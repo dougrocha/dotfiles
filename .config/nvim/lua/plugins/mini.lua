@@ -1,31 +1,16 @@
 return {
   {
-    "echasnovski/mini.ai",
-    event = "VeryLazy",
-    version = "*",
-    opts = {},
-  },
-  {
     "echasnovski/mini.surround",
-    event = "VeryLazy",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.statusline",
-    event = "VeryLazy",
-    version = "*",
-    opts = {},
-  },
-  {
-    "echasnovski/mini.statusline",
-    event = "VeryLazy",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.comment",
-    event = "VeryLazy",
     version = "*",
     dependencies = {
       "JoosepAlviste/nvim-ts-context-commentstring",
@@ -42,7 +27,6 @@ return {
   },
   {
     "echasnovski/mini.bufremove",
-    event = "VeryLazy",
     version = "*",
     opts = {},
     keys = {

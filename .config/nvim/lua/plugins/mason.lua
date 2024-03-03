@@ -16,7 +16,7 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    event = "VeryLazy",
+    lazy = true,
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
@@ -27,11 +27,13 @@ return {
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
-      require("mason-tool-installer").setup({
-        ensure_installed = { "cland-format", "prettierd", "stylua", "eslint_d", "markdownlint", "luacheck" },
+      local mason_tool_installer = require("mason-tool-installer")
+
+      mason_tool_installer.setup({
+        ensure_installed = { "prettierd", "stylua", "eslint_d", "markdownlint" },
+        auto_update = true,
       })
     end,
   },

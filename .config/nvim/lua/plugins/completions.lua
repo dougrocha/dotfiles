@@ -26,9 +26,11 @@ return {
     vim.o.pumheight = 10
 
     cmp.setup({
-      preselect = "None",
+      experimental = {
+        ghost_text = true,
+      },
       completion = {
-        completeopt = "menu,menuone,noinsert,noselect",
+        completeopt = "menu,menuone,preview,noselect",
       },
       snippet = {
         expand = function(args)
@@ -39,8 +41,9 @@ return {
         ["<C-n>"] = cmp.mapping.select_next_item(), -- next suggestion
         ["<C-p>"] = cmp.mapping.select_prev_item(), -- previous suggestion
 
-        ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-        ["<C-f>"] = cmp.mapping.scroll_docs(4),
+        -- scroll docs in cmp menu
+        ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+        ["<C-d>"] = cmp.mapping.scroll_docs(4),
 
         -- <c-l> will move right in current snippet expansion.
         ["<C-l>"] = cmp.mapping(function()

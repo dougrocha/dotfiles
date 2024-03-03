@@ -1,6 +1,6 @@
 return {
   "zbirenbaum/copilot-cmp",
-  event = "InsertEnter",
+  event = { "InsertEnter", "LspAttach" },
   dependencies = {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
