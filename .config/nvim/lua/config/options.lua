@@ -4,7 +4,7 @@ vim.g.maplocalleader = "\\"
 local opt = vim.opt
 
 opt.clipboard = "unnamedplus" -- Sync with system clipboard
-opt.completeopt = { "menu", "menuone", "noselect" } -- For cmp
+opt.completeopt = { "menu", "menuone", "preview", "noselect" } -- For cmp
 opt.hlsearch = true -- Highlight previous search results
 opt.incsearch = true -- ignore case in search pattern
 opt.scrolloff = 8 -- Make sure there are always 8 lines below cursor
@@ -30,5 +30,5 @@ opt.timeout = true
 opt.timeoutlen = 1000 -- Time to wait for a mapped sequence to complete (in milliseconds)
 opt.undofile = true -- Enable persistent undo
 opt.undolevels = 10000 -- Number of undo levels
-opt.updatetime = 100 -- Faster completion (4000ms Default)
+opt.updatetime = 50 -- Faster completion (4000ms Default)
 opt.wrap = false -- Turn off line wrapping

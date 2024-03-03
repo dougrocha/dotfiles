@@ -22,13 +22,10 @@ return {
     local cmp = require("cmp")
     local luasnip = require("luasnip")
 
-    -- Set window height for completion menu
+    -- Set max window height for completion menu
     vim.o.pumheight = 10
 
     cmp.setup({
-      experimental = {
-        ghost_text = true,
-      },
       completion = {
         completeopt = "menu,menuone,preview,noselect",
       },

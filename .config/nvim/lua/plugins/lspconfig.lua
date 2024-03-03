@@ -22,7 +22,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     nmap("gr", "<cmd>Telescope lsp_references<CR>", { desc = "Go to References" })
     nmap("gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
     nmap("gi", "<cmd>Telescope lsp_implementations<CR>", { desc = "Go to Implementation" })
-    nmap("gd", "<cmd>Telescope lsp_references<CR>", { desc = "Go to Definition" })
+    nmap("gd", "<cmd>Telescope lsp_definitions<CR>", { desc = "Go to Definition" })
     nmap("gt", "<cmd>Telescope lsp_type_definitions<CR>", { desc = "Go to Type Definition" })
     nmap("<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
 
@@ -36,7 +36,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local servers = {
-  "clangd",
   "jsonls",
   "marksman",
   "lua_ls",
@@ -49,16 +48,16 @@ return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    "folke/neoconf.nvim",
-    "folke/neodev.nvim",
+    { "folke/neoconf.nvim", cmd = "Neoconf", opts = {} },
+    { "folke/neodev.nvim", opts = {} },
     "williamboman/mason.nvim",
     "hrsh7th/cmp-nvim-lsp",
+    { "j-hui/fidget.nvim", opts = {} },
   },
   config = function()
     local lsp_config = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-    require("neoconf").setup({})
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
     for name, icon in pairs(signs) do
       name = "DiagnosticSign" .. name
@@ -66,7 +65,7 @@ return {
     end
 
     local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+    capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
 
     for _, server in pairs(servers) do
       local opts = {

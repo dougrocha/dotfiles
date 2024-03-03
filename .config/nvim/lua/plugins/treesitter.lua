@@ -14,9 +14,7 @@ return {
     ensure_installed = {
       "typescript",
       "tsx",
-      "markdown",
       "lua",
-      "toml",
       "rust",
     },
     incremental_selection = {

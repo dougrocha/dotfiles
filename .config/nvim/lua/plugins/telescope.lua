@@ -5,9 +5,15 @@ return {
   lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
-    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-    "nvim-tree/nvim-web-devicons",
+    {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+      cond = function()
+        return vim.fn.executable("make") == 1
+      end,
+    },
     "nvim-telescope/telescope-ui-select.nvim",
+    "nvim-tree/nvim-web-devicons",
     "debugloop/telescope-undo.nvim",
   },
   config = function()
@@ -15,23 +21,9 @@ return {
     local actions = require("telescope.actions")
 
     telescope.setup({
-      file_ignore_patterns = { "%.git/." },
       defaults = {
         prompt_prefix = " ",
         selection_caret = " ",
-        -- open files in the first window that is an actual file.
-        -- use the current window if no other window is available.
-        get_selection_window = function()
-          local wins = vim.api.nvim_list_wins()
-          table.insert(wins, 1, vim.api.nvim_get_current_win())
-          for _, win in ipairs(wins) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            if vim.bo[buf].buftype == "" then
-              return win
-            end
-          end
-          return 0
-        end,
         mappings = {
           i = {
             ["<C-j>"] = actions.cycle_history_next,
@@ -93,6 +85,9 @@ return {
         },
       },
       extensions = {
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown({}),
+        },
         fzf = {
           fuzzy = true, -- false will only do exact matching
           override_generic_sorter = true, -- override the generic sorter
@@ -110,52 +105,34 @@ return {
 
     local wk = require("which-key")
     wk.register({
-      ["<leader>/"] = {
-        function()
-          builtin.live_grep()
-        end,
-        "Grep workspace",
-      },
-      ["<leader>fb"] = {
+      ["<leader>/"] = { builtin.live_grep, "Grep workspace" },
+      ["<leader>fw"] = { builtin.grep_string, "Find word under cursor" },
+      ["<leader>fu"] = { "<cmd>Telescope undo<CR>", "Find undo Tree" },
+
+      ["<leader><leader>"] = {
         function()
           builtin.buffers({
             sort_lastused = true,
             ignore_current_buffer = true,
-            show_all_buffers = true,
           })
         end,
-        "Show buffers",
+        "Find existing buffers",
       },
-      ["<leader>ff"] = {
-        function()
-          builtin.find_files({
-            no_ignore = false,
-            hidden = true,
-          })
-        end,
-        "Find files",
-      },
-      ["<leader>fr"] = {
-        function()
-          builtin.oldfiles()
-        end,
-        "Recent files",
-      },
-      ["<leader>fw"] = {
-        function()
-          builtin.grep_string()
-        end,
-        "Grep word under cursor",
-      },
-      ["<leader>fu"] = { "<cmd>Telescope undo<cr>", "Undo Tree" },
     })
 
     wk.register({
-      ["<leader>sk"] = { "<cmd>Telescope keymaps<cr>", "Key Maps" },
-      ["<leader>sd"] = { "<cmd>Telescope diagnostics bufnr=0<cr>", "Document diagnostics" },
-      ["<leader>sh"] = { "<cmd>Telescope help_tags<cr>", "Help" },
-      ["<leader>sD"] = { "<cmd>Telescope diagnostics<cr>", "Workspace diagnostics" },
+      ["<leader>sk"] = { builtin.keymaps, "Search Keymaps" },
+      ["<leader>sh"] = { builtin.help_tags, "Search Help" },
+      ["<leader>sd"] = {
+        function()
+          builtin.diagnostics({ bufnr = 0 })
+        end,
+        "Search buffer diagnostics",
+      },
+      ["<leader>sf"] = { builtin.find_files, "Find files" },
+      ["<leader>sD"] = { builtin.diagnostics, "Search Workspace Diagnostics" },
       ["<leader>ss"] = { builtin.spell_suggest, "Spell suggestions" },
+      ["<leader>s."] = { builtin.oldfiles, "Find recently openened files" },
     })
   end,
 }

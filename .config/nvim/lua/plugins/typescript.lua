@@ -7,10 +7,6 @@ return {
       "neovim/nvim-lspconfig",
       "dmmulroy/ts-error-translator.nvim",
     },
-    keys = {
-      { "<leader>tm", "<cmd>TSToolsOrganizeImports<cr>" },
-      { "<leader>ta", "<cmd>TSToolsAddMissingImports<cr>" },
-    },
     config = function()
       local api = require("typescript-tools.api")
 
