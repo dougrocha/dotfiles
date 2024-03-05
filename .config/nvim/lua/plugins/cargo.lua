@@ -6,17 +6,17 @@ return {
     popup = {
       border = "rounded",
     },
-    keys = {
-      hide = { "q", "<esc>" },
-      open_url = { "<cr>" },
-      select = { "<cr>" },
-      select_alt = { "s" },
-      toggle_feature = { "<cr>" },
-      copy_value = { "yy" },
-      goto_item = { "gd", "K", "<C-LeftMouse>" },
-      jump_forward = { "<c-i>" },
-      jump_back = { "<c-o>", "<C-RightMouse>" },
-    },
+    -- keys = {
+    --   hide = { "q", "<esc>" },
+    --   open_url = { "<cr>" },
+    --   select = { "<cr>" },
+    --   select_alt = { "s" },
+    --   toggle_feature = { "<cr>" },
+    --   copy_value = { "yy" },
+    --   goto_item = { "gd", "K", "<C-LeftMouse>" },
+    --   jump_forward = { "<c-i>" },
+    --   jump_back = { "<c-o>", "<C-RightMouse>" },
+    -- },
   },
   config = function(_, opts)
     require("crates").setup(opts)
@@ -43,6 +43,6 @@ return {
       end
     end
 
-    vim.keymap.set("n", "k", show_documentation, { desc = "Show package details", silent = true })
+    vim.keymap.set("n", "<leader>k", show_documentation, { desc = "Show package details", silent = true })
   end,
 }

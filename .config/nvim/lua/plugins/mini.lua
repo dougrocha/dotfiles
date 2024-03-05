@@ -1,16 +1,19 @@
 return {
   {
     "echasnovski/mini.surround",
+    event = "BufReadPre",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.statusline",
+    event = "VeryLazy",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.comment",
+    event = "BufReadPre",
     version = "*",
     dependencies = {
       "JoosepAlviste/nvim-ts-context-commentstring",
@@ -27,6 +30,7 @@ return {
   },
   {
     "echasnovski/mini.bufremove",
+    event = "BufReadPre",
     version = "*",
     opts = {},
     keys = {

@@ -27,6 +27,7 @@ return {
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    lazy = true,
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       local mason_tool_installer = require("mason-tool-installer")
