@@ -23,4 +23,7 @@ alias cat='bat'
 # Git aliases
 alias lg='lazygit'
 
+# Neovim
+alias vim='nvim'
+
 starship init fish | source
