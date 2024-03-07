@@ -1,41 +1,39 @@
 return {
   "folke/which-key.nvim",
-  event = "VeryLazy",
+  event = "VimEnter",
   opts = {
+    plugins = {
+      presets = {
+        windows = false,
+      },
+    },
     window = {
       border = "single", -- none, single, double, shadow
       position = "bottom", -- bottom, top
-      margin = { 2, 0, 2, 0 }, -- extra window margin [top, right, bottom, left]
+      margin = { 0, 10, 3, 10 }, -- extra window margin [top, right, bottom, left]
       padding = { 2, 2, 2, 2 }, -- extra window padding [top, right, bottom, left]
-      winblend = 0,
-      zindex = 1000, -- positive value to position WhichKey above other floating windows.
     },
     layout = {
-      height = { min = 4, max = 25 }, -- min and max height of the columns
-      width = { min = 20, max = 50 }, -- min and max width of the columns
-      spacing = 3, -- spacing between columns
-      align = "left", -- align columns left, center or right
+      height = { min = 3, max = 25 }, -- min and max height of the columns
+      width = { min = 5, max = 50 }, -- min and max width of the columns
+      spacing = 10, -- spacing between columns
+      align = "center", -- align columns left, center or right
     },
     defaults = {
       mode = { "n", "v" },
-      ["g"] = { name = "+goto" },
       ["<leader>b"] = { name = "+buffer" },
-      ["<leader>d"] = { name = "+debug" },
-      ["<leader>f"] = { name = "+file/find" },
+      ["<leader>f"] = { name = "+find" },
       ["<leader>g"] = { name = "+git" },
+      ["<leader>l"] = { name = "+lsp" },
       ["<leader>s"] = { name = "+search" },
+      ["<leader>r"] = { name = "+replace" },
       ["<leader>w"] = { name = "+windows" },
-      ["<leader>x"] = { name = "+trouble" },
+      ["<leader>t"] = { name = "+trouble" },
     },
   },
   config = function(_, opts)
     local wk = require("which-key")
-
     wk.setup(opts)
     wk.register(opts.defaults)
-
-    wk.register({
-      ["<leader>ch"] = { "<cmd>noh<cr>", "Clear Search Highlight" },
-    })
   end,
 }

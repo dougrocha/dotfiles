@@ -1,6 +1,7 @@
 return {
   {
     "williamboman/mason.nvim",
+    lazy = true,
     build = ":MasonUpdate",
     config = function()
       require("mason").setup({
@@ -20,7 +21,15 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "html", "tailwindcss", "marksman", "lua_ls", "tsserver", "svelte", "jsonls" },
+        ensure_installed = {
+          "html",
+          "tailwindcss",
+          "marksman",
+          "lua_ls",
+          "tsserver",
+          "svelte",
+          "jsonls",
+        },
         automatic_installation = true,
       })
     end,

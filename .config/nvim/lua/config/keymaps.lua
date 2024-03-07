@@ -2,9 +2,14 @@ local map = vim.keymap.set
 
 -- Better Lines movement
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+
+-- paste over currently selected text without yanking it
+map("v", "p", '"_dp')
+map("v", "P", '"_dP')
+
+-- Cancel search highlighting with ESC
+map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Clear hlsearch and ESC" })
 
 -- Windows Keymaps
 map("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = true })
@@ -43,5 +48,6 @@ map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up", silent = true }
 map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down", silent = true })
 map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
 
+-- Center screen when jumping
 map("n", "<C-d>", "<C-d>zz", { desc = "Scroll down" })
 map("n", "<C-u>", "<C-u>zz", { desc = "Scroll up" })

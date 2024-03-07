@@ -37,6 +37,7 @@
 -- YJJJ?7!~~!!!!77?5#&&#&#G7~~~~!77!!!?JYJ?!!!7!!!~~~~~~!!!7??77!!77~^^^!BB!^^^~^!~7J!!JY7?77?YY7?JYPJJ5Y55Y555PPG@@@@@@@@@&BGGB&@@BG5JJJ?????JY55YJJYY55
 return {
   "ThePrimeagen/harpoon",
+  event = "VimEnter",
   branch = "harpoon2",
   dependencies = {
     "nvim-lua/plenary.nvim",

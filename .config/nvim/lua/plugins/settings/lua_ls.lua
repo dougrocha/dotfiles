@@ -10,15 +10,11 @@ return {
         version = "LuaJIT",
       },
       diagnostics = {
-        globals = { "vim", "spec" },
+        globals = { "vim" },
       },
       workspace = {
         checkThirdParty = false,
-        library = {
-          [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-          [vim.fn.stdpath("config") .. "/lua"] = true,
-          unpack(vim.api.nvim_get_runtime_file("", true)),
-        },
+        library = vim.api.nvim_get_runtime_file("", true),
       },
     },
   },

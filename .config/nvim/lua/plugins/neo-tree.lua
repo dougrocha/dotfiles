@@ -65,12 +65,5 @@ return {
       desc = "Explorer NeoTree (cwd)",
     },
     { "<leader>e", "<leader>fe", desc = "Explorer NeoTree (cwd)", remap = true },
-    {
-      "<leader>ge",
-      function()
-        require("neo-tree.command").execute({ source = "git_status", toggle = true })
-      end,
-      desc = "Git explorer",
-    },
   },
 }

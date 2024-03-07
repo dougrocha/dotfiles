@@ -4,6 +4,9 @@ return {
   cmd = { "ConformInfo" },
   opts = {
     formatters_by_ft = {
+      c = { "clang-format" },
+      cpp = { "clang-format" },
+
       lua = { "stylua" },
       svelte = { { "prettierd", "prettier" } },
       javascript = { { "prettierd", "prettier" } },

@@ -36,20 +36,21 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local servers = {
+  "clangd",
   "jsonls",
   "marksman",
   "lua_ls",
   "svelte",
   "tailwindcss",
-  "rust_analyzer",
 }
 
 return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    { "folke/neoconf.nvim", cmd = "Neoconf", opts = {} },
-    { "folke/neodev.nvim", opts = {} },
+    { "folke/neoconf.nvim", config = true, ft = "lua" },
+    { "folke/neodev.nvim", config = true, ft = "lua" },
+
     "williamboman/mason.nvim",
     "hrsh7th/cmp-nvim-lsp",
     { "j-hui/fidget.nvim", opts = {} },
@@ -65,7 +66,7 @@ return {
     end
 
     local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities = vim.tbl_deep_extend("force", capabilities, cmp_nvim_lsp.default_capabilities())
+    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
 
     for _, server in pairs(servers) do
       local opts = {

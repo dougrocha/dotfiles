@@ -2,7 +2,6 @@ return {
   "nvim-telescope/telescope.nvim",
   branch = "0.1.x",
   cmd = "Telescope",
-  lazy = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
     {
@@ -16,74 +15,27 @@ return {
     "nvim-tree/nvim-web-devicons",
     "debugloop/telescope-undo.nvim",
   },
+  keys = {
+    { "<leader>/", "<cmd>Telescope live_grep<CR>", desc = "Grep workspace" },
+    { "<leader>fw", "<cmd>Telescope grep_string<CR>", desc = "Find word under cursor" },
+    { "<leader>fu", "<cmd>Telescope undo<CR>", desc = "Find undo Tree" },
+    { "<leader><leader>", "<cmd>Telescope buffers<CR>", desc = "Find existing buffers" },
+    { "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<CR>", desc = "Find in current buffer" },
+
+    { "<leader>sk", "<cmd>Telescope keymaps<CR>", desc = "Search Keymaps" },
+    { "<leader>sh", "<cmd>Telescope help_tags<CR>", desc = "Search Help" },
+    { "<leader>sd", "<cmd>Telescope diagnostics<CR>", desc = "Search buffer diagnostics" },
+    { "<leader>sf", "<cmd>Telescope find_files<CR>", desc = "Search files" },
+    { "<leader>sD", "<cmd>Telescope diagnostics<CR>", desc = "Search Workspace Diagnostics" },
+    { "<leader>ss", "<cmd>Telescope spell_suggest<CR>", desc = "Spell suggestions" },
+    { "<leader>s.", "<cmd>Telescope oldfiles<CR>", desc = "Search recently opened files" },
+    { "<C-P>", "<cmd>Telescope git_files<CR>", desc = "Search git files" },
+  },
   config = function()
     local telescope = require("telescope")
     local actions = require("telescope.actions")
 
     telescope.setup({
-      defaults = {
-        prompt_prefix = " ",
-        selection_caret = " ",
-        mappings = {
-          i = {
-            ["<C-j>"] = actions.cycle_history_next,
-            ["<C-k>"] = actions.cycle_history_prev,
-            ["<C-f>"] = actions.preview_scrolling_down,
-            ["<C-b>"] = actions.preview_scrolling_up,
-
-            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
-          },
-          n = {
-            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
-            ["q"] = actions.close,
-          },
-        },
-        file_ignore_patterns = { "node_modules", ".git" },
-        path_display = { "smart" },
-      },
-      pickers = {
-        find_files = {
-          previewer = false,
-          layout_config = {
-            height = 0.4,
-            prompt_position = "top",
-            preview_cutoff = 120,
-          },
-        },
-        git_files = {
-          previewer = false,
-          layout_config = {
-            height = 0.4,
-            prompt_position = "top",
-            preview_cutoff = 120,
-          },
-        },
-        buffers = {
-          mappings = {
-            i = {
-              ["<C-d>"] = actions.delete_buffer,
-            },
-            n = {
-              ["<C-d>"] = actions.delete_buffer,
-            },
-          },
-        },
-        current_buffer_fuzzy_find = {
-          previewer = true,
-          layout_config = {
-            prompt_position = "top",
-            preview_cutoff = 120,
-          },
-        },
-        live_grep = {
-          only_sort_text = true,
-          previewer = true,
-        },
-        grep_string = {
-          only_sort_text = true,
-          previewer = true,
-        },
-      },
       extensions = {
         ["ui-select"] = {
           require("telescope.themes").get_dropdown({}),
@@ -95,44 +47,61 @@ return {
           case_mode = "smart_case", -- or "ignore_case" or "respect_case"
         },
       },
+      defaults = {
+        prompt_prefix = " ",
+        selection_caret = " ",
+        mappings = {
+          i = {
+            ["<C-j>"] = actions.cycle_history_next,
+            ["<C-k>"] = actions.cycle_history_prev,
+
+            ["<C-f>"] = actions.preview_scrolling_down,
+            ["<C-b>"] = actions.preview_scrolling_up,
+
+            ["<C-d>"] = actions.delete_buffer,
+
+            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
+
+            ["<C-c>"] = actions.close,
+          },
+          n = {
+            ["<C-d>"] = actions.delete_buffer,
+
+            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
+            ["<C-c>"] = actions.close,
+          },
+        },
+        file_ignore_patterns = { "node_modules", ".git" },
+        path_display = { "smart" },
+        preview = false,
+        layout_config = {
+          height = 0.4,
+          width = 0.6,
+          prompt_position = "top",
+          preview_cutoff = 120,
+        },
+      },
+      pickers = {
+        find_files = {
+          no_ignore = true,
+          hidden = true,
+        },
+        oldfiles = {
+          cwd_only = true,
+        },
+        buffers = {
+          sort_lastused = true,
+          ignore_current_buffer = true,
+        },
+        live_grep = {
+          only_sort_text = true,
+          preview = true,
+        },
+      },
     })
 
     telescope.load_extension("fzf")
     telescope.load_extension("undo")
     telescope.load_extension("ui-select")
-
-    local builtin = require("telescope.builtin")
-
-    local wk = require("which-key")
-    wk.register({
-      ["<leader>/"] = { builtin.live_grep, "Grep workspace" },
-      ["<leader>fw"] = { builtin.grep_string, "Find word under cursor" },
-      ["<leader>fu"] = { "<cmd>Telescope undo<CR>", "Find undo Tree" },
-
-      ["<leader><leader>"] = {
-        function()
-          builtin.buffers({
-            sort_lastused = true,
-            ignore_current_buffer = true,
-          })
-        end,
-        "Find existing buffers",
-      },
-    })
-
-    wk.register({
-      ["<leader>sk"] = { builtin.keymaps, "Search Keymaps" },
-      ["<leader>sh"] = { builtin.help_tags, "Search Help" },
-      ["<leader>sd"] = {
-        function()
-          builtin.diagnostics({ bufnr = 0 })
-        end,
-        "Search buffer diagnostics",
-      },
-      ["<leader>sf"] = { builtin.find_files, "Find files" },
-      ["<leader>sD"] = { builtin.diagnostics, "Search Workspace Diagnostics" },
-      ["<leader>ss"] = { builtin.spell_suggest, "Spell suggestions" },
-      ["<leader>s."] = { builtin.oldfiles, "Find recently openened files" },
-    })
   end,
 }
