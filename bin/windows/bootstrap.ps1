@@ -24,15 +24,11 @@ scoop install aria2
 
 # Essentials
 Write-Output '> Installing essentials...'
-scoop install gh z sudo fnm
+scoop install gh zoxide sudo fnm
 
 # Development
 Write-Output '> Installing development tools...'
-scoop install neovim pnpm eza
-
-# Installing Rust
-Write-Output '> Installing rustup...'
-scoop install rustup
+scoop install neovim-nightly eza
 
 # For neovim
 Write-Output '> Installing neovim plugins...'
@@ -40,7 +36,7 @@ scoop install extras/vcredist2022 mingw coreutils make fd ripgrep gcc wget unzip
 
 # Powershell Tools
 Write-Output '> Installing powershell and powershell tools...'
-scoop install windows-terminal starship psreadline terminal-icons powershell
+scoop install starship psreadline terminal-icons powershell wezterm
 
 Write-Output '> Installing Firefox...'
 winget install --id Mozilla.Firefox.DeveloperEdition --source winget
@@ -57,13 +53,5 @@ Move-Item -Path ".\target\release\prisma-fmt.exe" -Destination "$HOME\.config\bi
 Set-Location ..
 Remove-Item ".\prisma-engines" -Recurse -Force
 
-# Intall Nightly Rust
-Write-Output '> Installing nightly rust...'
-rustup update
-rustup toolchain install nightly
-
 Write-Output '> Uninstalling vcredist2022...'
 scoop uninstall vcredist2022
-
-Write-Output '> Adding powershell registry entry...'
-reg import "$HOME\scoop\apps\windows-terminal\current\install-context.reg"

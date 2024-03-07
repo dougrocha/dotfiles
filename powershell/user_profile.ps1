@@ -4,12 +4,12 @@
 Import-Module Terminal-Icons
 Import-Module PSReadLine
 
-Import-Module "$HOME\.config\powershell\completions\fnm.ps1"
-Import-Module "$HOME\.config\powershell\completions\rustup.ps1"
-Import-Module "$HOME\.config\powershell\alias.ps1"
-Import-Module "$HOME\.config\powershell\functions.ps1"
+Import-Module "$HOME\dotfiles\powershell\completions\fnm.ps1"
+Import-Module "$HOME\dotfiles\powershell\completions\rustup.ps1"
+Import-Module "$HOME\dotfiles\powershell\alias.ps1"
+Import-Module "$HOME\dotfiles\powershell\functions.ps1"
 # Import completions
-$files = Get-ChildItem -Path "$HOME\.config\powershell\completions\*.ps1"
+$files = Get-ChildItem -Path "$HOME\dotfiles\powershell\completions\*.ps1"
 foreach ($file in $files) {
     Import-Module $file.FullName
 }

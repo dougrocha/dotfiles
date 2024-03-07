@@ -1,7 +1,5 @@
 # Aliases
 Set-Alias vim nvim
-Set-Alias g git
-Set-Alias find which
 Set-Alias lg lazygit
 
 # Alias using Eza to replace ls
