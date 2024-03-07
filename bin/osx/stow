@@ -1,9 +1,21 @@
 #!/bin/bash
 
+git pull;
+
 mkdir -p ~/.config/
 
 folders_to_copy=(nvim neofetch fish omf wezterm)
 
 for folder in "${folders_to_copy[@]}"; do
-  	cp ~/dotfiles/"$folder"/ ~/.config/"$folder"/
+	rm -r ~/.config/"$folder"/
+	mkdir -p ~/.config/"$folder"/
+  cp -r ~/dotfiles/"$folder"/ ~/.config/"$folder"/
 done
+
+files=(starship.toml)
+
+for file in "${files[@]}"; do
+  cp ~/dotfiles/"$file" ~/.config/"$file"
+done
+
+echo "Done."
