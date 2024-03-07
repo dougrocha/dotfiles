@@ -1,5 +1,9 @@
 #!/bin/bash
 
-ln -sf ~/dotfiles/.config ~/.config
-ln -sf ~/dotfiles/.gitconfig ~/.gitconfig
-ln -sf ~/dotfiles/.gitignore_global ~/.gitignore_global
+mkdir -p ~/.config/
+
+folders_to_copy=(nvim neofetch fish omf wezterm)
+
+for folder in "${folders_to_copy[@]}"; do
+  	cp ~/dotfiles/"$folder"/ ~/.config/"$folder"/
+done
