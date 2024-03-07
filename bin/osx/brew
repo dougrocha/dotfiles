@@ -42,9 +42,7 @@ brew install docker
 # Faster node manager
 brew install fnm
 
-# Neovim
 brew install lua
-brew install neovim
 
 # git
 brew install git

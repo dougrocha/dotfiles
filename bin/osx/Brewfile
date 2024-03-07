@@ -98,8 +98,6 @@ brew "msgpack"
 brew "mysql-client"
 # Parser generator tool and incremental parsing library
 brew "tree-sitter"
-# Ambitious Vim-fork focused on extensibility and agility
-brew "neovim"
 # OpenBSD freely-licensed SSH connectivity tools
 brew "openssh"
 # Cryptography and SSL/TLS Toolkit
