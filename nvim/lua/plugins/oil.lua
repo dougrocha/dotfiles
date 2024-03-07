@@ -30,7 +30,7 @@ return {
 
     -- Set to true to autosave buffers that are updated with LSP willRenameFiles
     -- Set to "unmodified" to only save unmodified buffers
-    lsp_rename_autosave = false,
+    lsp_file_methods = { autosave_changes = true },
 
     -- Skip the confirmation popup for simple operations (:help oil.skip_confirm_for_simple_edits)
     skip_confirm_for_simple_edits = true,

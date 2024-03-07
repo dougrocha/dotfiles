@@ -7,6 +7,8 @@ return {
       c = { "clang-format" },
       cpp = { "clang-format" },
 
+      go = { "gofumpt", "goimports-reviser", "golines" },
+
       lua = { "stylua" },
       svelte = { { "prettierd", "prettier" } },
       javascript = { { "prettierd", "prettier" } },

@@ -39,6 +39,7 @@ local servers = {
   "clangd",
   "jsonls",
   "marksman",
+  "gopls",
   "lua_ls",
   "svelte",
   "tailwindcss",
