@@ -42,7 +42,8 @@ return {
       },
     },
     config = function(_, opts)
-      require("crates").setup(opts)
+      local crates = require("crates")
+      crates.setup(opts)
 
       local cmp = require("cmp")
 
@@ -61,13 +62,18 @@ return {
         elseif vim.tbl_contains({ "man" }, filetype) then
           vim.cmd("Man " .. vim.fn.expand("<cword>"))
         elseif vim.fn.expand("%:t") == "Cargo.toml" and require("crates").popup_available() then
-          require("crates").show_popup()
+          crates.show_popup()
         else
           vim.lsp.buf.hover()
         end
       end
 
-      vim.keymap.set("n", "<leader>k", show_documentation, { desc = "Show package details", silent = true })
+      vim.keymap.set(
+        "n",
+        "<leader>k",
+        show_documentation,
+        { desc = "Show package details", silent = true, noremap = true }
+      )
     end,
   },
 }
