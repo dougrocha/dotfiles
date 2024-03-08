@@ -30,7 +30,15 @@ config.colors = {
 	indexed = { [16] = "#ffa066", [17] = "#ff5d62" },
 }
 
-config.window_background_opacity = 0.95
+config.window_background_opacity = 0.85
+
+config.window_padding = {
+	top = 0,
+	bottom = 0,
+}
+
+config.use_fancy_tab_bar = false
+config.tab_bar_at_bottom = true
 
 -- Font
 config.font = wezterm.font_with_fallback({

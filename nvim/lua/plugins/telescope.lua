@@ -73,7 +73,6 @@ return {
         },
         file_ignore_patterns = { "node_modules", ".git" },
         path_display = { "smart" },
-        preview = false,
         layout_config = {
           height = 0.4,
           width = 0.6,
@@ -83,8 +82,9 @@ return {
       },
       pickers = {
         find_files = {
-          no_ignore = true,
-          hidden = true,
+          preview = false,
+          no_ignore = false,
+          hidden = false,
         },
         oldfiles = {
           cwd_only = true,
