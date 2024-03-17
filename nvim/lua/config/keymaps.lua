@@ -1,3 +1,6 @@
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 local map = vim.keymap.set
 
 -- Better Lines movement
@@ -5,8 +8,9 @@ map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true
 map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
 -- paste over currently selected text without yanking it
-map("v", "p", '"_dp')
-map("v", "P", '"_dP')
+-- map("v", "p", '"_dp')
+-- map("v", "P", '"_dP')
+map("v", "<leader>p", '"_dP', { desc = "[P]aste from blackhole register" })
 
 -- Cancel search highlighting with ESC
 map({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Clear hlsearch and ESC" })
@@ -16,7 +20,6 @@ map("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = true })
 map("n", "<leader>wd", "<C-W>c", { desc = "Delete window", remap = true })
 map("n", "<leader>w-", "<C-W>s", { desc = "Split window below", remap = true })
 map("n", "<leader>w|", "<C-W>v", { desc = "Split window right", remap = true })
-map("n", "<leader>-", "<C-W>s", { desc = "Split window below", remap = true })
 map("n", "<leader>|", "<C-W>v", { desc = "Split window right", remap = true })
 
 map("n", "<C-h>", "<C-w>h", { desc = "Go to left window", remap = true })
@@ -51,3 +54,11 @@ map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up", silent = true })
 -- Center screen when jumping
 map("n", "<C-d>", "<C-d>zz", { desc = "Scroll down" })
 map("n", "<C-u>", "<C-u>zz", { desc = "Scroll up" })
+
+-- Better indenting
+map("v", "<", "<gv", { desc = "Indent current line left" })
+map("v", ">", ">gv", { desc = "Indent current line right" })
+
+-- Buffer Movements
+map("n", "<leader>bn", "<cmd>bnext<cr>", { desc = "Next buffer" })
+map("n", "<leader>bp", "<cmd>bprevious<cr>", { desc = "Previous buffer" })

@@ -25,7 +25,6 @@ Write-Output "> Setting up $PROFILE..."
 Set-Content -Path $PROFILE.CurrentUserCurrentHost -Value ""
 Add-Content -Path $PROFILE.CurrentUserCurrentHost -Value ". $env:USERPROFILE\dotfiles\powershell\user_profile.ps1"
 
-
 # run a ps1 file from here
 Write-Output "> Adding completions..."
 . "$HOME\dotfiles\bin\windows\add-completions.ps1"

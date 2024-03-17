@@ -1,5 +1,11 @@
 return {
   {
+    "echasnovski/mini.ai",
+    event = "BufReadPre",
+    version = "*",
+    opts = { n_lines = 500 },
+  },
+  {
     "echasnovski/mini.surround",
     event = "BufReadPre",
     version = "*",
@@ -10,23 +16,6 @@ return {
     event = "VeryLazy",
     version = "*",
     opts = {},
-  },
-  {
-    "echasnovski/mini.comment",
-    event = "BufReadPre",
-    version = "*",
-    dependencies = {
-      "JoosepAlviste/nvim-ts-context-commentstring",
-    },
-    config = function()
-      require("mini.comment").setup({
-        options = {
-          custom_commentstring = function()
-            return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
-          end,
-        },
-      })
-    end,
   },
   {
     "echasnovski/mini.bufremove",

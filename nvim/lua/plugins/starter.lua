@@ -42,15 +42,10 @@ return {
 
     local starter = require("mini.starter")
 
-    --stylua: ignore
     local config = {
       evaluate_single = true,
       header = logo,
       items = {
-        new_section("Find file", "Telescope find_files", "Telescope"),
-        new_section("Recent files", "Telescope oldfiles", "Telescope"),
-        new_section("Grep text", "Telescope live_grep", "Telescope"),
-        new_section("Lazy", "Lazy", "Config"),
         new_section("New file", "ene | startinsert", "Built-in"),
         new_section("Quit", "qa", "Built-in"),
       },
@@ -75,16 +70,5 @@ return {
 
     local starter = require("mini.starter")
     starter.setup(opts)
-
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "LazyVimStarted",
-      callback = function()
-        local stats = require("lazy").stats()
-        local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-        local pad_footer = string.rep(" ", 8)
-        starter.config.footer = pad_footer .. "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms"
-        pcall(starter.refresh)
-      end,
-    })
   end,
 }
