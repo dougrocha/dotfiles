@@ -17,6 +17,7 @@ return {
       javascriptreact = { { "prettierd", "prettier" } },
       json = { { "prettierd", "prettier" } },
       markdown = { "markdownlint" },
+      toml = { "taplo" },
     },
     format_on_save = {
       lsp_fallback = true,
