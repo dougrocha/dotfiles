@@ -17,14 +17,14 @@ return {
       desc = "Toggle (Trouble)",
     },
     {
-      "[t",
+      "]t",
       function()
         require("trouble").next({ skip_groups = true, jump = true })
       end,
       desc = "Next (Trouble)",
     },
     {
-      "]t",
+      "[t",
       function()
         require("trouble").previous({ skip_groups = true, jump = true })
       end,
