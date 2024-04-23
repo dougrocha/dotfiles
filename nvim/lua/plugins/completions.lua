@@ -8,7 +8,6 @@ return {
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     {
       "L3MON4D3/LuaSnip", -- snippet engine
-      lazy = true,
       build = "make install_jsregexp",
       dependencies = {
         "rafamadriz/friendly-snippets",
