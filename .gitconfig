@@ -1,21 +1,11 @@
 [user]
-name = Douglas Rocha
-email = 79188161+dougrocha@users.noreply.github.com
-signingkey = INSERT SSH KEY OR FILE PATH
-[init]
-defaultBranch = master
+    name = Douglas Rocha
+    email = 79188161+dougrocha@users.noreply.github.com
 [commit]
-gpgsign = true
+    gpgsign = true
 [gpg]
-format = ssh
+    format = ssh
 [tag]
-gpgsign = true
-[gpg "ssh"]
-allowedSignersFile = ~/.ssh/allowed_signers
-[filter "lfs"]
-process = git-lfs filter-process
-required = true
-clean = git-lfs clean -- %f
-smudge = git-lfs smudge -- %f
+    gpgsign = true
 [core]
-excludesfile = ~/dotfiles/.gitignore_global
+    excludesfile = ~/dotfiles/.gitignore_global
