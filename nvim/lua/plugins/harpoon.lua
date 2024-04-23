@@ -52,7 +52,7 @@ return {
     })
 
     vim.keymap.set("n", "<leader>a", function()
-      harpoon:list():append()
+      harpoon:list():add()
       vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
     end, { desc = "Add current file to harpoon" })
 

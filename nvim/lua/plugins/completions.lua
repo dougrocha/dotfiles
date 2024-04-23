@@ -2,12 +2,12 @@ return {
   "hrsh7th/nvim-cmp",
   event = "InsertEnter",
   dependencies = {
-    "hrsh7th/cmp-nvim-lsp",     -- source for nvim lsp,
-    "hrsh7th/cmp-buffer",       -- source for text in buffer,
-    "hrsh7th/cmp-path",         -- source for file system paths
+    "hrsh7th/cmp-nvim-lsp", -- source for nvim lsp,
+    "hrsh7th/cmp-buffer", -- source for text in buffer,
+    "hrsh7th/cmp-path", -- source for file system paths
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     {
-      "L3MON4D3/LuaSnip",       -- snippet engine
+      "L3MON4D3/LuaSnip", -- snippet engine
       lazy = true,
       build = "make install_jsregexp",
       dependencies = {
@@ -66,7 +66,7 @@ return {
       }),
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
-        { name = "copilot" },
+        -- { name = "copilot" },
         { name = "luasnip" },
         { name = "path" },
       }, {

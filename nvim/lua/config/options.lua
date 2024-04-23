@@ -15,8 +15,8 @@ opt.relativenumber = true -- Use Relative Line Numbers
 
 opt.scrolloff = 12 -- Make sure there are always 8 lines below cursor
 opt.sidescrolloff = 8 -- Make sure there are always 8 lines to the left and right of cursor
-opt.tabstop = 2 -- Number of spaces tabs count for
-opt.shiftwidth = 2 -- Number of spaces for indent width
+opt.tabstop = 4 -- Number of spaces tabs count for
+opt.shiftwidth = 4 -- Number of spaces for indent width
 
 opt.smartcase = true -- Don't ignore case with capitals
 opt.smartindent = true -- Indent Automatically
@@ -37,5 +37,5 @@ opt.timeout = true -- Enable timeout
 opt.timeoutlen = 300 -- Time to wait for a mapped sequence to complete (in milliseconds)
 opt.undofile = true -- Enable persistent undo
 opt.undolevels = 10000 -- Number of undo levels
-opt.updatetime = 150 -- Faster completion (4000ms Default)
+opt.updatetime = 250 -- Faster completion (4000ms Default)
 opt.wrap = false -- Turn off line wrapping
