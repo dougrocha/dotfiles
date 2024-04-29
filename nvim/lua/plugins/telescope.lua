@@ -86,9 +86,6 @@ return {
           no_ignore = false,
           hidden = false,
         },
-        oldfiles = {
-          cwd_only = true,
-        },
         buffers = {
           sort_lastused = true,
           ignore_current_buffer = true,

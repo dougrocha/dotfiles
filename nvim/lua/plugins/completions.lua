@@ -6,18 +6,16 @@ return {
     "hrsh7th/cmp-buffer", -- source for text in buffer,
     "hrsh7th/cmp-path", -- source for file system paths
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
+    "rafamadriz/friendly-snippets",
     {
       "L3MON4D3/LuaSnip", -- snippet engine
+      version = "v2.*",
       build = "make install_jsregexp",
-      dependencies = {
-        "rafamadriz/friendly-snippets",
-        config = function()
-          require("luasnip.loaders.from_vscode").lazy_load()
-        end,
-      },
     },
   },
   config = function()
+    require("luasnip.loaders.from_vscode").lazy_load()
+
     local cmp = require("cmp")
     local luasnip = require("luasnip")
 

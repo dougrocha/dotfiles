@@ -57,8 +57,6 @@ return {
     { "j-hui/fidget.nvim", opts = {} },
   },
   config = function()
-    require("neodev").setup({})
-
     local lsp_config = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
@@ -79,6 +77,10 @@ return {
       local require_ok, settings = pcall(require, "plugins.settings." .. server)
       if require_ok then
         opts = vim.tbl_deep_extend("force", settings, opts)
+      end
+
+      if server == "lua_ls" then
+        require("neodev").setup({})
       end
 
       lsp_config[server].setup(opts)
