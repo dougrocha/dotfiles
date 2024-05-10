@@ -46,44 +46,46 @@ local servers = {
 }
 
 return {
-  "neovim/nvim-lspconfig",
-  event = { "BufReadPre", "BufNewFile" },
-  dependencies = {
-    { "folke/neoconf.nvim", config = true, ft = "lua" },
-    { "folke/neodev.nvim", config = true, ft = "lua" },
+  { "folke/neoconf.nvim", opts = {}, ft = "lua" },
+  {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      { "folke/neodev.nvim", opts = {}, ft = "lua" },
 
-    "williamboman/mason.nvim",
-    "hrsh7th/cmp-nvim-lsp",
-    { "j-hui/fidget.nvim", opts = {} },
+      "williamboman/mason.nvim",
+      "hrsh7th/cmp-nvim-lsp",
+      { "j-hui/fidget.nvim", opts = {} },
+    },
+    config = function()
+      local lsp_config = require("lspconfig")
+      local cmp_nvim_lsp = require("cmp_nvim_lsp")
+
+      local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+      for name, icon in pairs(signs) do
+        name = "DiagnosticSign" .. name
+        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+      end
+
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+
+      for _, server in pairs(servers) do
+        local opts = {
+          capabilities = capabilities,
+        }
+
+        local require_ok, settings = pcall(require, "plugins.settings." .. server)
+        if require_ok then
+          opts = vim.tbl_deep_extend("force", settings, opts)
+        end
+
+        if server == "lua_ls" then
+          require("neodev").setup({})
+        end
+
+        lsp_config[server].setup(opts)
+      end
+    end,
   },
-  config = function()
-    local lsp_config = require("lspconfig")
-    local cmp_nvim_lsp = require("cmp_nvim_lsp")
-
-    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-    for name, icon in pairs(signs) do
-      name = "DiagnosticSign" .. name
-      vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-    end
-
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
-
-    for _, server in pairs(servers) do
-      local opts = {
-        capabilities = capabilities,
-      }
-
-      local require_ok, settings = pcall(require, "plugins.settings." .. server)
-      if require_ok then
-        opts = vim.tbl_deep_extend("force", settings, opts)
-      end
-
-      if server == "lua_ls" then
-        require("neodev").setup({})
-      end
-
-      lsp_config[server].setup(opts)
-    end
-  end,
 }

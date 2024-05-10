@@ -5,6 +5,7 @@ return {
       telemetry = { enable = false },
       completion = {
         callSnippet = "Replace",
+        workspaceWord = true,
       },
       runtime = {
         version = "LuaJIT",
@@ -14,7 +15,6 @@ return {
       },
       workspace = {
         checkThirdParty = false,
-        library = vim.api.nvim_get_runtime_file("", true),
       },
     },
   },
