@@ -23,7 +23,6 @@ return {
       mode = { "n", "v" },
       ["<leader>b"] = { name = "+buffer" },
       ["<leader>f"] = { name = "+find" },
-      ["<leader>g"] = { name = "+git" },
       ["<leader>l"] = { name = "+lsp" },
       ["<leader>s"] = { name = "+search" },
       ["<leader>r"] = { name = "+replace" },
