@@ -60,14 +60,14 @@ return {
 
             ["<C-d>"] = actions.delete_buffer,
 
-            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
+            ["C-w"] = actions.smart_send_to_qflist + actions.open_qflist,
 
             ["<C-c>"] = actions.close,
           },
           n = {
             ["<C-d>"] = actions.delete_buffer,
 
-            ["C-w"] = actions.send_selected_to_qflist + actions.open_qflist,
+            ["C-q"] = actions.smart_send_to_qflist + actions.open_qflist,
             ["<C-c>"] = actions.close,
           },
         },
