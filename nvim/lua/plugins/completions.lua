@@ -46,6 +46,10 @@ return {
         end, { "i", "s" }),
 
         ["<C-e>"] = cmp.mapping.abort(), -- close competion window
+
+        ["<CR>"] = cmp.mapping.confirm({
+          select = false,
+        }),
       }),
     })
   end,
