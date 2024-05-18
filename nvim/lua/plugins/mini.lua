@@ -1,25 +1,21 @@
 return {
   {
     "echasnovski/mini.ai",
-    event = "BufReadPre",
     version = "*",
-    opts = { n_lines = 500 },
+    opts = {},
   },
   {
     "echasnovski/mini.surround",
-    event = "BufReadPre",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.statusline",
-    event = "VeryLazy",
     version = "*",
     opts = {},
   },
   {
     "echasnovski/mini.bufremove",
-    event = "BufReadPre",
     version = "*",
     opts = {},
     keys = {

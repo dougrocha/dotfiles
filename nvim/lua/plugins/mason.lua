@@ -1,7 +1,6 @@
 return {
   {
     "williamboman/mason.nvim",
-    event = "VeryLazy",
     build = ":MasonUpdate",
     config = function()
       require("mason").setup({
@@ -17,18 +16,12 @@ return {
   },
   {
     "williamboman/mason-lspconfig.nvim",
-    event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "html",
-          "tailwindcss",
           "marksman",
           "lua_ls",
-          "gopls",
-          "tsserver",
-          "svelte",
           "jsonls",
         },
         automatic_installation = true,
@@ -37,7 +30,6 @@ return {
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
       local mason_tool_installer = require("mason-tool-installer")
@@ -47,9 +39,6 @@ return {
           "prettierd",
           "stylua",
           "eslint_d",
-          "gofumpt",
-          "golines",
-          "goimports-reviser",
           "markdownlint",
         },
         auto_update = true,
