@@ -1,0 +1,22 @@
+{
+    "lspconfig": {
+        "lua_ls": {
+            "Lua.runtime.version": "LuaJIT",
+            "Lua.workspace.checkThirdParty": false,
+            "Lua.diagnostics.enable": true,
+            "Lua.diagnostics.globals": [
+                "user",
+                "mouse",
+                "awesome",
+                "client",
+                "screen",
+                "tag"
+            ],
+            "Lua.workspace.library": [
+                "/usr/share/awesome/lib",
+                "/usr/share/lua-lgi",
+                "/usr/lib/lua-pam/"
+            ]
+        }
+    }
+}
