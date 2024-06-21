@@ -90,6 +90,9 @@ end
 theme.notification_margin = dpi(8)
 theme.notification_icon_size = dpi(60)
 
+-- Button
+theme.button_bg = pallete.surface0.hex
+
 local mix_color = mix(theme.bg_focus, theme.fg_normal)
 
 -- Layout icons
