@@ -88,6 +88,7 @@ theme.notification_shape = function(cr, width, height)
     gears.shape.rounded_rect(cr, width, height, dpi(10))
 end
 theme.notification_margin = dpi(8)
+theme.notification_spacing = dpi(8)
 theme.notification_icon_size = dpi(60)
 
 -- Button
