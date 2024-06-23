@@ -29,6 +29,7 @@ ruled.client.connect_signal("request::rules", function()
                 "Arandr",
                 "Blueman-manager",
                 "Lxappearance",
+                "openrgb",
             },
             role = {
                 "pop-up",
