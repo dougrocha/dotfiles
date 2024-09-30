@@ -12,7 +12,30 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  import = "plugins",
+  {
+    import = "plugins",
+  },
+  {
+    "dougrocha/keytrack.nvim",
+    name = "keytrack",
+    dir = "C:/Users/dougr/Dev/keytrack-nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    enabled = true,
+    opts = {
+      keymaps = {
+        { key = "<leader>wd", desc = "Delete Window" },
+        { key = "<leader>sf", desc = "Search Files with telescope" },
+        { key = "<leader>a", desc = "Add harpoon file" },
+        { key = "<leader>fw", desc = "Search for word under cursor" },
+        { key = "<leader>/", desc = "Grep workspace" },
+        { key = "<leader>bn", desc = "Next buffer" },
+        { key = "j", desc = "Down" },
+      },
+      suffix = "Tracked",
+    },
+  },
 }, {
   install = {
     missing = true,

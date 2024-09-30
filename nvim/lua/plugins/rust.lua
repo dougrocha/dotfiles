@@ -4,15 +4,15 @@ return {
     version = "^4",
     ft = { "rust" },
     config = function()
-      vim.g.rustaceanvim = {
-        server = {
-          on_attach = function(client, bufnr)
-            if client.server_capabilities.inlayHintProvider then
-              vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-            end
-          end,
-        },
-      }
+      -- vim.g.rustaceanvim = {
+      --   server = {
+      --     on_attach = function(client, bufnr)
+      --       if client.server_capabilities.inlayHintProvider then
+      --         vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+      --       end
+      --     end,
+      --   },
+      -- }
     end,
   },
   {

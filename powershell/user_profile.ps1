@@ -17,7 +17,6 @@ foreach ($file in $files) {
 # Alias
 Set-Alias vim nvim
 Set-Alias g git
-Set-Alias find which
 Set-Alias lg lazygit
 
 # Env

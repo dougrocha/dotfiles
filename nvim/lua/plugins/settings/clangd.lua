@@ -8,14 +8,4 @@ return {
     "--function-arg-placeholders",
     "--fallback-style=llvm",
   },
-  root_dir = require("lspconfig.util").root_pattern(
-    "Makefile",
-    ".clangd",
-    ".clang-tidy",
-    ".clang-format",
-    "compile_commands.json",
-    "compile_flags.txt",
-    "configure.ac",
-    ".git"
-  ),
 }
