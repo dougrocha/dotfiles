@@ -28,8 +28,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     nmap("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", { desc = "Show Buffer Diagnostics" })
     nmap("<leader>d", vim.diagnostic.open_float, { desc = "Show Line Diagnostics" })
-    nmap("[d", vim.diagnostic.goto_prev, { desc = "Go to Previous Diagnostic" })
-    nmap("]d", vim.diagnostic.goto_next, { desc = "Go to Next Diagnostic" })
+    nmap("[d", function()
+      vim.diagnostic.jump({ count = 1, float = true })
+    end, { desc = "Go to Previous Diagnostic" })
+    nmap("]d", function()
+      vim.diagnostic.jump({ count = -1, float = true })
+    end, { desc = "Go to Next Diagnostic" })
 
     vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
   end,
@@ -46,16 +50,14 @@ local servers = {
 }
 
 return {
-  { "folke/neoconf.nvim", opts = {}, ft = "lua" },
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      { "folke/neodev.nvim", opts = {}, ft = "lua" },
-
       "williamboman/mason.nvim",
       "hrsh7th/cmp-nvim-lsp",
       { "j-hui/fidget.nvim", opts = {} },
+      { "folke/neoconf.nvim", opts = {}, ft = "lua" },
     },
     config = function()
       local lsp_config = require("lspconfig")
@@ -78,10 +80,6 @@ return {
         local require_ok, settings = pcall(require, "plugins.settings." .. server)
         if require_ok then
           opts = vim.tbl_deep_extend("force", settings, opts)
-        end
-
-        if server == "lua_ls" then
-          require("neodev").setup({})
         end
 
         lsp_config[server].setup(opts)

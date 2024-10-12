@@ -1,59 +1,29 @@
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git",
-    "clone",
-    "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", -- latest stable release
-    lazypath,
-  })
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Setup lazy.nvim
 require("lazy").setup({
-  {
-    import = "plugins",
+  spec = {
+    -- import your plugins
+    { import = "plugins" },
   },
-  {
-    "dougrocha/keytrack.nvim",
-    name = "keytrack",
-    dir = "C:/Users/dougr/Dev/keytrack-nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    enabled = true,
-    opts = {
-      keymaps = {
-        { key = "<leader>wd", desc = "Delete Window" },
-        { key = "<leader>sf", desc = "Search Files with telescope" },
-        { key = "<leader>a", desc = "Add harpoon file" },
-        { key = "<leader>fw", desc = "Search for word under cursor" },
-        { key = "<leader>/", desc = "Grep workspace" },
-        { key = "<leader>bn", desc = "Next buffer" },
-        { key = "j", desc = "Down" },
-      },
-      suffix = "Tracked",
-    },
-  },
-}, {
-  install = {
-    missing = true,
-  },
-  ui = {
-    border = "rounded",
-  },
-  checker = {
-    enabled = true,
-    notify = false,
-  },
+  checker = { enabled = true, notify = false },
   change_detection = {
     enabled = true,
     notify = false,
   },
 })
-
-P = function(v)
-  print(vim.inspect(v))
-  return v
-end

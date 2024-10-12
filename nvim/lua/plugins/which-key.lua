@@ -1,13 +1,13 @@
 return {
   "folke/which-key.nvim",
-  event = "VimEnter",
+  event = "VeryLazy",
   opts = {
     plugins = {
       presets = {
         windows = false,
       },
     },
-    window = {
+    win = {
       border = "single", -- none, single, double, shadow
       position = "bottom", -- bottom, top
       margin = { 0, 10, 3, 10 }, -- extra window margin [top, right, bottom, left]
@@ -20,19 +20,22 @@ return {
       align = "center", -- align columns left, center or right
     },
     defaults = {
+      {
       mode = { "n", "v" },
-      ["<leader>b"] = { name = "+buffer" },
-      ["<leader>f"] = { name = "+find" },
-      ["<leader>l"] = { name = "+lsp" },
-      ["<leader>s"] = { name = "+search" },
-      ["<leader>r"] = { name = "+replace" },
-      ["<leader>w"] = { name = "+windows" },
-      ["<leader>t"] = { name = "+trouble" },
-    },
+      { "<leader>b", group = "buffer" },
+      { "<leader>f", group = "find" },
+      { "<leader>l", group = "lsp" },
+      { "<leader>r", group = "replace" },
+      { "<leader>s", group = "search" },
+      { "<leader>t", group = "trouble" },
+      { "<leader>w", group = "windows" },
+      },
+      }
+    
   },
   config = function(_, opts)
     local wk = require("which-key")
     wk.setup(opts)
-    wk.register(opts.defaults)
+    wk.add(opts.defaults)
   end,
 }

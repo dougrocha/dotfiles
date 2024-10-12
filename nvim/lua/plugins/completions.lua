@@ -21,6 +21,11 @@ return {
         { name = "luasnip" },
       }, {
         { name = "buffer" },
+      }, {
+        {
+          name = "lazydev",
+          group_index = 0,
+        },
       }),
       snippet = {
         expand = function(args)

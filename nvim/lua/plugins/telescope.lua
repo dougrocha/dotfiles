@@ -4,6 +4,7 @@ return {
   cmd = "Telescope",
   dependencies = {
     "nvim-lua/plenary.nvim",
+    { "echasnovski/mini.icons", opts = {} },
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "make",
@@ -12,7 +13,6 @@ return {
       end,
     },
     "nvim-telescope/telescope-ui-select.nvim",
-    "nvim-tree/nvim-web-devicons",
     "debugloop/telescope-undo.nvim",
   },
   keys = {
@@ -100,6 +100,5 @@ return {
     telescope.load_extension("fzf")
     telescope.load_extension("undo")
     telescope.load_extension("ui-select")
-    telescope.load_extension("keytrack")
   end,
 }

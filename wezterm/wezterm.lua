@@ -6,8 +6,9 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
-config.colors = require("lua/rose-pine").colors()
-config.window_frame = require("lua/rose-pine").window_frame()
+config.color_scheme = "rose-pine"
+-- config.colors = require("lua/rose-pine").colors()
+-- config.window_frame = require("lua/rose-pine").window_frame()
 
 -- Theme
 -- config.color_scheme = "Dracula (Official)"
@@ -45,13 +46,13 @@ config.tab_bar_at_bottom = true
 -- Font
 config.font = wezterm.font_with_fallback({
 	"Monaspace Neon",
-	"Caskaydia Cove Nerd Font",
-	"monospace",
 })
 
 -- Default Shell
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	config.default_prog = { "pwsh.exe" }
+	-- config.default_prog = { "pwsh.exe" }
+	-- config.default_cwd = "D:/"
+	config.default_domain = "WSL:Ubuntu"
 else
 	-- HANDLE MACOS AND LINUX
 end
