@@ -29,10 +29,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
     nmap("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", { desc = "Show Buffer Diagnostics" })
     nmap("<leader>d", vim.diagnostic.open_float, { desc = "Show Line Diagnostics" })
     nmap("[d", function()
-      vim.diagnostic.jump({ count = 1, float = true })
+      vim.diagnostic.jump({ count = -1, float = true })
     end, { desc = "Go to Previous Diagnostic" })
     nmap("]d", function()
-      vim.diagnostic.jump({ count = -1, float = true })
+      vim.diagnostic.jump({ count = 1, float = true })
     end, { desc = "Go to Next Diagnostic" })
 
     vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Actions" })
@@ -50,40 +50,39 @@ local servers = {
 }
 
 return {
-  {
-    "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "williamboman/mason.nvim",
-      "hrsh7th/cmp-nvim-lsp",
-      { "j-hui/fidget.nvim", opts = {} },
-      { "folke/neoconf.nvim", opts = {}, ft = "lua" },
-    },
-    config = function()
-      local lsp_config = require("lspconfig")
-      local cmp_nvim_lsp = require("cmp_nvim_lsp")
-
-      local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-      for name, icon in pairs(signs) do
-        name = "DiagnosticSign" .. name
-        vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-      end
-
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
-
-      for _, server in pairs(servers) do
-        local opts = {
-          capabilities = capabilities,
-        }
-
-        local require_ok, settings = pcall(require, "plugins.settings." .. server)
-        if require_ok then
-          opts = vim.tbl_deep_extend("force", settings, opts)
-        end
-
-        lsp_config[server].setup(opts)
-      end
-    end,
+  "neovim/nvim-lspconfig",
+  event = { "BufReadPre", "BufNewFile" },
+  dependencies = {
+    "williamboman/mason.nvim",
+    "hrsh7th/cmp-nvim-lsp",
+    "j-hui/fidget.nvim",
+    "folke/neoconf.nvim",
+    { "folke/lazydev.nvim", opts = {}, ft = "lua" },
   },
+  config = function()
+    local lsp_config = require("lspconfig")
+    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+
+    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+    for name, icon in pairs(signs) do
+      name = "DiagnosticSign" .. name
+      vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
+    end
+
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
+
+    for _, server in pairs(servers) do
+      local opts = {
+        capabilities = capabilities,
+      }
+
+      local require_ok, settings = pcall(require, "plugins.settings." .. server)
+      if require_ok then
+        opts = vim.tbl_deep_extend("force", settings, opts)
+      end
+
+      lsp_config[server].setup(opts)
+    end
+  end,
 }
