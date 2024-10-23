@@ -20,9 +20,7 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "marksman",
           "lua_ls",
-          "jsonls",
         },
         automatic_installation = true,
       })
@@ -38,7 +36,6 @@ return {
         ensure_installed = {
           "prettierd",
           "stylua",
-          "eslint_d",
           "markdownlint",
         },
         auto_update = true,

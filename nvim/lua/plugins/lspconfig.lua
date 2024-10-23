@@ -40,12 +40,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 local servers = {
+  "astro",
   "clangd",
   "jsonls",
   "marksman",
   "gopls",
   "lua_ls",
   "svelte",
+  "vtsls",
   "tailwindcss",
 }
 
@@ -53,11 +55,11 @@ return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    "williamboman/mason.nvim",
     "hrsh7th/cmp-nvim-lsp",
-    "j-hui/fidget.nvim",
     "folke/neoconf.nvim",
+    { "j-hui/fidget.nvim", opts = {} },
     { "folke/lazydev.nvim", opts = {}, ft = "lua" },
+    "wuelnerdotexe/vim-astro",
   },
   config = function()
     local lsp_config = require("lspconfig")

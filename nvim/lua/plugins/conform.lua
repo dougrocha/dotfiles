@@ -10,18 +10,20 @@ return {
       go = { "gofumpt", "goimports-reviser", "golines" },
 
       lua = { "stylua" },
-      svelte = { { "prettierd", "prettier" } },
-      javascript = { { "prettierd", "prettier" } },
-      typescript = { { "prettierd", "prettier" } },
-      typescriptreact = { { "prettierd", "prettier" } },
-      javascriptreact = { { "prettierd", "prettier" } },
-      json = { { "prettierd", "prettier" } },
+
+      astro = { "prettierd", "prettier", stop_after_first = true },
+      svelte = { "prettierd", "prettier", stop_after_first = true },
+      javascript = { "prettierd", "prettier", stop_after_first = true },
+      typescript = { "prettierd", "prettier", stop_after_first = true },
+      typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+      javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+      json = { "prettierd", "prettier", stop_after_first = true },
       markdown = { "markdownlint" },
       toml = { "taplo" },
     },
     format_on_save = {
-      lsp_fallback = true,
-      timeout_ms = 1000,
+      lsp_format = "fallback",
+      timeout_ms = 500,
     },
   },
 }

@@ -2,25 +2,33 @@ return {
   "hrsh7th/nvim-cmp",
   dependencies = {
     "hrsh7th/cmp-nvim-lsp",
+    { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
     "hrsh7th/cmp-buffer",
     "hrsh7th/cmp-path",
-    { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
     "saadparwaiz1/cmp_luasnip",
   },
   config = function()
     local cmp = require("cmp")
     local luasnip = require("luasnip")
 
+    require("luasnip.loaders.from_vscode").lazy_load()
+
     -- Set max window height for completion menu
     vim.o.pumheight = 10
+
+    cmp.setup.cmdline("/", {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = "buffer" },
+      },
+    })
 
     cmp.setup({
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
+        { name = "luasnip", keyword_length = 2 },
+        { name = "buffer", keyword_length = 3 },
         { name = "path" },
-        { name = "luasnip" },
-      }, {
-        { name = "buffer" },
       }, {
         {
           name = "lazydev",
