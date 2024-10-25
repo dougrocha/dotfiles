@@ -4,7 +4,6 @@ return {
   cmd = "Telescope",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    { "echasnovski/mini.icons", opts = {} },
     {
       "nvim-telescope/telescope-fzf-native.nvim",
       build = "make",
