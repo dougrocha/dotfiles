@@ -51,10 +51,11 @@ return {
       },
     })
 
-    vim.keymap.set("n", "<leader>a", function()
-      harpoon:list():add()
-      vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
-    end, { desc = "Add current file to harpoon" })
+    -- TODO: Fix eventually, replaced it for lsp code actions
+    -- vim.keymap.set("n", "<leader>a", function()
+    --   harpoon:list():add()
+    --   vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
+    -- end, { desc = "Add current file to harpoon" })
 
     vim.keymap.set("n", "<C-b>", function()
       harpoon:list():select(1)

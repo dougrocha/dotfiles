@@ -1,7 +1,28 @@
 return {
   {
+    "wincent/base16-nvim",
+    lazy = false, -- load at start
+    priority = 1000, -- load first
+    enabled = true,
+    config = function()
+      vim.cmd([[colorscheme base16-gruvbox-dark-hard]])
+      vim.o.background = "dark"
+      -- Make comments more prominent -- they are important.
+      local bools = vim.api.nvim_get_hl(0, { name = "Boolean" })
+      vim.api.nvim_set_hl(0, "Comment", bools)
+      -- Make it clearly visible which argument we're at.
+      local marked = vim.api.nvim_get_hl(0, { name = "PMenu" })
+      vim.api.nvim_set_hl(
+        0,
+        "LspSignatureActiveParameter",
+        { fg = marked.fg, bg = marked.bg, ctermfg = marked.ctermfg, ctermbg = marked.ctermbg, bold = true }
+      )
+    end,
+  },
+  {
     "rose-pine/neovim",
     name = "rose-pine",
+    enabled = false,
     config = function()
       require("rose-pine").setup({
         variant = "auto",
