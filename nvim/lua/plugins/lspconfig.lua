@@ -26,14 +26,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
     nmap("gt", vim.lsp.buf.type_definition, { desc = "Go to Type Definition" })
     nmap("<leader>r", vim.lsp.buf.rename, { desc = "Rename Symbol" })
 
-    nmap("<leader>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add Workspace Folder" })
-    nmap("<leader>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Workspace Folder" })
-    nmap("<leader>wl", function()
-      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-    end, { desc = "List Workspace Folders" })
-
-    nmap("<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", { desc = "Show Buffer Diagnostics" })
-    nmap("<leader>d", vim.diagnostic.open_float, { desc = "Show Line Diagnostics" })
+    nmap(
+      "<leader>D",
+      "<cmd>Telescope diagnostics bufnr=0<CR>",
+      { desc = "Show Buffer Diagnostics" }
+    )
+    nmap(
+      "<leader>d",
+      vim.diagnostic.open_float,
+      { desc = "Show Line Diagnostics" }
+    )
     nmap("[d", function()
       vim.diagnostic.jump({ count = -1, float = true })
     end, { desc = "Go to Previous Diagnostic" })
@@ -41,7 +43,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
       vim.diagnostic.jump({ count = 1, float = true })
     end, { desc = "Go to Next Diagnostic" })
 
-    vim.keymap.set({ "n", "v" }, "<leader>a", vim.lsp.buf.code_action, { desc = "Code Actions" })
+    vim.keymap.set(
+      { "n", "v" },
+      "<leader>a",
+      vim.lsp.buf.code_action,
+      { desc = "Code Actions" }
+    )
   end,
 })
 
@@ -57,6 +64,29 @@ local servers = {
   "tailwindcss",
 }
 
+local icons = { ERROR = " ", WARN = " ", HINT = "󰠠 ", INFO = " " }
+
+vim.diagnostic.config({
+  float = {
+    source = true,
+    severity_sort = true,
+    prefix = function(diagnostic)
+      local level = vim.diagnostic.severity[diagnostic.severity]
+      local prefix = string.format(" %s ", icons[level])
+      return prefix, "Diagnostic" .. level:gsub("^%l", string.upper)
+    end,
+  },
+  virtual_text = {
+    prefix = "",
+    spacing = 2,
+    format = function(diagnostic)
+      local icon = icons[vim.diagnostic.severity[diagnostic.severity]]
+      return string.format("%s %s ", icon, diagnostic.message)
+    end,
+  },
+  signs = false,
+})
+
 return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
@@ -65,17 +95,10 @@ return {
     "folke/neoconf.nvim",
     { "j-hui/fidget.nvim", opts = {} },
     { "folke/lazydev.nvim", opts = {}, ft = "lua" },
-    "wuelnerdotexe/vim-astro",
   },
   config = function()
     local lsp_config = require("lspconfig")
     local cmp_nvim_lsp = require("cmp_nvim_lsp")
-
-    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-    for name, icon in pairs(signs) do
-      name = "DiagnosticSign" .. name
-      vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-    end
 
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = cmp_nvim_lsp.default_capabilities(capabilities)

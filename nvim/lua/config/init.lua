@@ -1,4 +1,4 @@
--- autocms
+-- autocommands
 require("config.autocmds")
 
 -- options

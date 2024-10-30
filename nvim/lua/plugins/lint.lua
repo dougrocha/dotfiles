@@ -12,7 +12,12 @@ local function conditionally_try_lint(conditional_linters)
   ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
   names = vim.tbl_filter(function(name)
     local linter = conditional_linters[name]
-    return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
+    return linter
+      and not (
+        type(linter) == "table"
+        and linter.condition
+        and not linter.condition(ctx)
+      )
   end, names)
   -- Run linters.
   if #names > 0 then
@@ -49,7 +54,10 @@ return {
     local conditional_linters = {
       selene = {
         condition = function(ctx)
-          return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1]
+          return vim.fs.find(
+            { "selene.toml" },
+            { path = ctx.filename, upward = true }
+          )[1]
         end,
       },
     }
