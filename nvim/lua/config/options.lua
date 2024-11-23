@@ -1,47 +1,61 @@
-local opt = vim.opt
+vim.o.mouse = 'a'               -- Enable mouse support
+vim.o.backup = false            -- Creates a backup file
+vim.o.switchbuf = 'usetab'      -- Use already opened buffer
+vim.o.undofile = true           -- Enable persistent undo
 
-opt.mouse = "a" -- Enable mouse support
+vim.o.timeoutlen = 300          -- Time to wait for a mapped sequence to complete (in milliseconds)
+vim.o.updatetime = 250          -- Faster completion (4000ms Default)
 
-opt.listchars = "tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•"
+vim.o.clipboard = 'unnamedplus' -- Sync with system clipboard
 
-opt.clipboard = "unnamedplus" -- Sync with system clipboard
--- opt.completeopt = { "menu", "menuone", "noselect" } -- For cmp
+vim.o.hlsearch = true           -- Highlight previous search results
+vim.o.inccommand = 'split'      -- Show live preview of substitution, as you type
 
--- opt.timeoutlen = 300 -- Time to wait for a mapped sequence to complete (in milliseconds)
--- opt.updatetime = 250 -- Faster completion (4000ms Default)
+vim.o.scrolloff = 4             -- Make sure there are always 2 lines below cursor
+vim.o.sidescrolloff = 8         -- Make sure there are always 8 lines to the left and right of cursor
 
-opt.hlsearch = true -- Highlight previous search results
-opt.incsearch = true -- ignore case in search pattern
-opt.inccommand = "split" -- Show live preview of substitution, as you type
+vim.o.showmode = false          -- Don't show since I use a custom status line
+vim.o.termguicolors = true      -- True color support
+vim.o.signcolumn = 'yes'        -- Always show the sign column
+vim.o.number = true             -- Use Line Numbers
+vim.o.relativenumber = true     -- Use Relative Line Numbers
+vim.o.pumheight = 10            -- Max completion items
+vim.o.splitbelow = true         -- Force all horizontal splits to go below current window
+vim.o.splitright = true         -- Force all vertical splits to go to the right of current window
+vim.o.wrap = false              -- Turn off line wrapping
+vim.o.ruler = false             -- Do not show cursor position
 
-opt.signcolumn = "yes" -- Always show the sign column
-opt.number = true -- Use Line Numbers
-opt.relativenumber = true -- Use Relative Line Numbers
+vim.o.autoindent = true         -- Copy indent from current line when starting a new line
+vim.o.expandtab = true          -- Use spaces instead of tabs
+vim.o.ignorecase = true         -- Ignore case while searching
+vim.o.incsearch = true          -- Ignore case in search pattern
+vim.o.infercase = true          -- Infer letter cases while searching
+vim.o.formatoptions = 'rqnl1j'  -- Improve comment editing
+vim.o.tabstop = 2               -- Number of spaces tabs count for
+vim.o.shiftwidth = 2            -- Number of spaces for indent width
+vim.o.smartcase = true          -- Don't ignore case with capitals
+vim.o.smartindent = true        -- Indent Automatically
 
-opt.scrolloff = 2 -- Make sure there are always 2 lines below cursor
-opt.sidescrolloff = 8 -- Make sure there are always 8 lines to the left and right of cursor
-opt.tabstop = 4 -- Number of spaces tabs count for
-opt.shiftwidth = 4 -- Number of spaces for indent width
+vim.o.colorcolumn = '120'
 
-opt.smartcase = true -- Don't ignore case with capitals
-opt.smartindent = true -- Indent Automatically
+-- Spelling
+vim.o.spelllang = 'en'
+vim.o.spelloptions = 'camel'
 
-opt.showmode = false -- Don't show since I use a custom status line
-opt.spelllang = { "en" } -- Spelling language
-opt.termguicolors = true -- True color support
-opt.shiftround = true -- Round indent
-opt.expandtab = true -- Use spaces instead of tabs
-opt.autoindent = true -- Copy indent from current line when starting a new line
+if vim.fn.has('nvim-0.11') == 1 then
+  vim.opt.completeopt:append('fuzzy')   -- Use fuzzy matching for built-in completion
+end
 
-opt.splitbelow = true -- Force all horizontal splits to go below current window
-opt.splitright = true -- Force all vertical splits to go to the right of current window
-
-opt.colorcolumn = "80"
-
-opt.backup = false -- creates a backup file
-opt.swapfile = false -- No swap file
-opt.timeout = true -- Enable timeout
-opt.undofile = true -- Enable persistent undo
-opt.undolevels = 10000 -- Number of undo levels
-
-opt.wrap = false -- Turn off line wrapping
+-- Thank you to
+-- https://github.com/echasnovski/nvim/blob/a732d0a79dfb2145cb934310016cc580a18a0c8f/src/settings.lua#L26
+local augroup = vim.api.nvim_create_augroup('CustomSettings', {})
+vim.api.nvim_create_autocmd('FileType', {
+  group = augroup,
+  callback = function()
+    -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
+    -- If don't do this on `FileType`, this keeps reappearing due to being set in
+    -- filetype plugins.
+    vim.cmd('setlocal formatoptions-=c formatoptions-=o')
+  end,
+  desc = [[Ensure proper 'formatoptions']],
+})

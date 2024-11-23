@@ -16,18 +16,46 @@ return {
   },
   keys = {
     { "<leader>/", "<cmd>Telescope live_grep<CR>", desc = "Grep workspace" },
-    { "<leader>fw", "<cmd>Telescope grep_string<CR>", desc = "Find word under cursor" },
+    {
+      "<leader>fw",
+      "<cmd>Telescope grep_string<CR>",
+      desc = "Find word under cursor",
+    },
     { "<leader>fu", "<cmd>Telescope undo<CR>", desc = "Find undo Tree" },
-    { "<leader><leader>", "<cmd>Telescope buffers<CR>", desc = "Find existing buffers" },
-    { "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<CR>", desc = "Find in current buffer" },
+    {
+      "<leader><leader>",
+      "<cmd>Telescope buffers<CR>",
+      desc = "Find existing buffers",
+    },
+    {
+      "<C-f>",
+      "<cmd>Telescope current_buffer_fuzzy_find<CR>",
+      desc = "Find in current buffer",
+    },
 
     { "<leader>sk", "<cmd>Telescope keymaps<CR>", desc = "Search Keymaps" },
     { "<leader>sh", "<cmd>Telescope help_tags<CR>", desc = "Search Help" },
-    { "<leader>sd", "<cmd>Telescope diagnostics<CR>", desc = "Search buffer diagnostics" },
+    {
+      "<leader>sd",
+      "<cmd>Telescope diagnostics<CR>",
+      desc = "Search buffer diagnostics",
+    },
     { "<leader>sf", "<cmd>Telescope find_files<CR>", desc = "Search files" },
-    { "<leader>sD", "<cmd>Telescope diagnostics<CR>", desc = "Search Workspace Diagnostics" },
-    { "<leader>ss", "<cmd>Telescope spell_suggest<CR>", desc = "Spell suggestions" },
-    { "<leader>s.", "<cmd>Telescope oldfiles<CR>", desc = "Search recently opened files" },
+    {
+      "<leader>sD",
+      "<cmd>Telescope diagnostics<CR>",
+      desc = "Search Workspace Diagnostics",
+    },
+    {
+      "<leader>ss",
+      "<cmd>Telescope spell_suggest<CR>",
+      desc = "Spell suggestions",
+    },
+    {
+      "<leader>s.",
+      "<cmd>Telescope oldfiles<CR>",
+      desc = "Search recently opened files",
+    },
     { "<C-P>", "<cmd>Telescope git_files<CR>", desc = "Search git files" },
   },
   config = function()

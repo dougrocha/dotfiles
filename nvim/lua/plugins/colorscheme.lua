@@ -12,11 +12,13 @@ return {
       vim.api.nvim_set_hl(0, "Comment", bools)
       -- Make it clearly visible which argument we're at.
       local marked = vim.api.nvim_get_hl(0, { name = "PMenu" })
-      vim.api.nvim_set_hl(
-        0,
-        "LspSignatureActiveParameter",
-        { fg = marked.fg, bg = marked.bg, ctermfg = marked.ctermfg, ctermbg = marked.ctermbg, bold = true }
-      )
+      vim.api.nvim_set_hl(0, "LspSignatureActiveParameter", {
+        fg = marked.fg,
+        bg = marked.bg,
+        ctermfg = marked.ctermfg,
+        ctermbg = marked.ctermbg,
+        bold = true,
+      })
     end,
   },
   {
@@ -66,10 +68,19 @@ return {
             TelescopeTitle = { fg = theme.ui.special, bold = true },
             TelescopePromptNormal = { bg = theme.ui.bg_p1 },
             TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
-            TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
-            TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
+            TelescopeResultsNormal = {
+              fg = theme.ui.fg_dim,
+              bg = theme.ui.bg_m1,
+            },
+            TelescopeResultsBorder = {
+              fg = theme.ui.bg_m1,
+              bg = theme.ui.bg_m1,
+            },
             TelescopePreviewNormal = { bg = theme.ui.bg_dim },
-            TelescopePreviewBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
+            TelescopePreviewBorder = {
+              bg = theme.ui.bg_dim,
+              fg = theme.ui.bg_dim,
+            },
             Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
             PmenuSel = { fg = "NONE", bg = theme.ui.bg_p2 },
             PmenuSbar = { bg = theme.ui.bg_m1 },
