@@ -1,7 +1,10 @@
-vim.o.mouse = 'a'               -- Enable mouse support
-vim.o.backup = false            -- Creates a backup file
-vim.o.switchbuf = 'usetab'      -- Use already opened buffer
-vim.o.undofile = true           -- Enable persistent undo
+vim.o.mouse = 'a'          -- Enable mouse support
+vim.o.backup = false       -- Creates a backup file
+vim.o.switchbuf = 'usetab' -- Use already opened buffer
+vim.o.undofile = true      -- Enable persistent undo
+vim.o.swapfile = false     -- Disable swap files
+
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 vim.o.timeoutlen = 300          -- Time to wait for a mapped sequence to complete (in milliseconds)
 vim.o.updatetime = 250          -- Faster completion (4000ms Default)
@@ -43,19 +46,5 @@ vim.o.spelllang = 'en'
 vim.o.spelloptions = 'camel'
 
 if vim.fn.has('nvim-0.11') == 1 then
-  vim.opt.completeopt:append('fuzzy')   -- Use fuzzy matching for built-in completion
+  vim.opt.completeopt:append('fuzzy') -- Use fuzzy matching for built-in completion
 end
-
--- Thank you to
--- https://github.com/echasnovski/nvim/blob/a732d0a79dfb2145cb934310016cc580a18a0c8f/src/settings.lua#L26
-local augroup = vim.api.nvim_create_augroup('CustomSettings', {})
-vim.api.nvim_create_autocmd('FileType', {
-  group = augroup,
-  callback = function()
-    -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
-    -- If don't do this on `FileType`, this keeps reappearing due to being set in
-    -- filetype plugins.
-    vim.cmd('setlocal formatoptions-=c formatoptions-=o')
-  end,
-  desc = [[Ensure proper 'formatoptions']],
-})

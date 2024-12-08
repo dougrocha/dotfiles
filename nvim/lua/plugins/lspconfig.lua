@@ -16,7 +16,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     nmap('gd', vim.lsp.buf.definition, 'Definition')
     nmap('gt', vim.lsp.buf.type_definition, 'Type Definition')
     nmap('<leader>r', vim.lsp.buf.rename, 'Rename')
-    nmap('<C-k>', vim.lsp.buf.signature_help, 'Arguments popup')
+    -- nmap('<C-k>', vim.lsp.buf.signature_help, 'Arguments popup')
 
     local format_cmd = '<Cmd>lua require("conform").format({ lsp_fallback = true })<CR>'
     nmap('<leader>lf', format_cmd, 'Format')
@@ -57,11 +57,11 @@ vim.diagnostic.config({
     end,
   },
   virtual_text = {
-    prefix = "",
+    prefix = '',
     spacing = 2,
     format = function(diagnostic)
       local icon = icons[vim.diagnostic.severity[diagnostic.severity]]
-      return string.format("%s %s ", icon, diagnostic.message)
+      return string.format('%s %s ', icon, diagnostic.message)
     end,
   },
   signs = false,
@@ -70,15 +70,29 @@ vim.diagnostic.config({
 
 return {
   'neovim/nvim-lspconfig',
-  event = { 'BufReadPre', 'BufNewFile' },
+  event = { 'BufReadPost' },
   dependencies = {
     'folke/neoconf.nvim',
     { 'folke/lazydev.nvim', opts = {}, ft = 'lua' },
+    { 'j-hui/fidget.nvim', opts = {} },
+    'hrsh7th/cmp-nvim-lsp',
+    { 'williamboman/mason.nvim', build = ':MasonUpdate' },
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
   },
   config = function()
+    require('mason').setup()
+    require('mason-tool-installer').setup({
+      ensure_installed = {
+        'prettierd',
+        'stylua',
+        'markdownlint',
+      },
+      auto_update = true,
+    })
+
     local lsp_config = require('lspconfig')
 
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
     for _, server in pairs(servers) do
       local opts = {

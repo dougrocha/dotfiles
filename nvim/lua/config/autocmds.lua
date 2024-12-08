@@ -30,3 +30,16 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     vim.opt_local.spell = true
   end,
 })
+
+-- Thank you to
+-- https://github.com/echasnovski/nvim/blob/a732d0a79dfb2145cb934310016cc580a18a0c8f/src/settings.lua#L26
+vim.api.nvim_create_autocmd('FileType', {
+  group = augroup('custom_settings'),
+  callback = function()
+    -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
+    -- If don't do this on `FileType`, this keeps reappearing due to being set in
+    -- filetype plugins.
+    vim.cmd('setlocal formatoptions-=c formatoptions-=o')
+  end,
+  desc = [[Ensure proper 'formatoptions']],
+})

@@ -1,3 +1,48 @@
+return {
+  "ThePrimeagen/harpoon",
+  event = "VimEnter",
+  branch = "harpoon2",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+  },
+  config = function()
+    local harpoon = require("harpoon")
+
+    harpoon:setup({
+      settings = {
+        save_on_toggle = true,
+      },
+    })
+
+    vim.keymap.set("n", "<leader>ha", function()
+      harpoon:list():add()
+      vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
+    end, { desc = "Add current file to harpoon" })
+
+    vim.keymap.set("n", "<C-b>", function()
+      harpoon:list():select(1)
+    end, { desc = "Select harpoon item 1" })
+
+    vim.keymap.set("n", "<C-n>", function()
+      harpoon:list():select(2)
+    end, { desc = "Select harpoon item 2" })
+
+    vim.keymap.set("n", "<C-m>", function()
+      harpoon:list():select(3)
+    end, { desc = "Select harpoon item 3" })
+
+    vim.keymap.set("n", "<C-S-P>", function()
+      harpoon:list():prev()
+    end, { desc = "Select previous harpoon item" })
+    vim.keymap.set("n", "<C-S-N>", function()
+      harpoon:list():next()
+    end, { desc = "Select next harpoon item" })
+
+    vim.keymap.set("n", "<C-e>", function()
+      harpoon.ui:toggle_quick_menu(harpoon:list())
+    end, { desc = "Toggle harpoon menu" })
+  end,
+}
 -- ~!~~:..:~^:..  :.          .BG  ..       ..^~~:  ..      ..  ..  :.      . .78:.:                            ....:..^J5J~:^~!!!J?^.^JYYYYJ?!77??77??YG
 -- 7:^!^:~!~:...              :#Y.:^....      .::.          .::.   ..          ~:  ^~^:..                          :~::!JJ?~::^^^~!!~^^~^^~~77~~7?JYYY5PG
 -- Y5Y7~~~~^:..:.             ~&?.......           .. ....:^:...    ..             .~!^.                           .:....:^^~7!^:~~~~^^:..^^^!JYJ?JJYY5GG
@@ -35,49 +80,3 @@
 -- 7~~~^!7!~^^^!?7!!?JJP#GY!^^^^~^^~~~^^~7??7!~~~~^^^^^^~~~~~~~~~^^~~^^::!G#Y::^~^^^~!!!!!?J!77JJ??7JYJ7?JYJ?JJ555B@@@@@@@@@#GG#&&&BG5???777777JYYJ~^^?Y5
 -- J7777???!~~~!!~~?GB#&&&B!~~~~~~~~!~~!7JJ7!!!~~~~~~~~~~~~~!777!~~~~^^^^5#P^^^^^^!~~!J7J?77?J77?JJ7JYJJJYJJJJYP5P&@@@@@@@@&GBB#&@@BGY???????7?YYYY^^^755
 -- YJJJ?7!~~!!!!77?5#&&#&#G7~~~~!77!!!?JYJ?!!!7!!!~~~~~~!!!7??77!!77~^^^!BB!^^^~^!~7J!!JY7?77?YY7?JYPJJ5Y55Y555PPG@@@@@@@@@&BGGB&@@BG5JJJ?????JY55YJJYY55
-return {
-  "ThePrimeagen/harpoon",
-  event = "VimEnter",
-  branch = "harpoon2",
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-  },
-  config = function()
-    local harpoon = require("harpoon")
-
-    harpoon:setup({
-      settings = {
-        save_on_toggle = true,
-      },
-    })
-
-    -- TODO: Fix eventually, replaced it for lsp code actions
-    -- vim.keymap.set("n", "<leader>a", function()
-    --   harpoon:list():add()
-    --   vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
-    -- end, { desc = "Add current file to harpoon" })
-
-    vim.keymap.set("n", "<C-b>", function()
-      harpoon:list():select(1)
-    end, { desc = "Select harpoon item 1" })
-
-    vim.keymap.set("n", "<C-n>", function()
-      harpoon:list():select(2)
-    end, { desc = "Select harpoon item 2" })
-
-    vim.keymap.set("n", "<C-m>", function()
-      harpoon:list():select(3)
-    end, { desc = "Select harpoon item 3" })
-
-    vim.keymap.set("n", "<C-S-P>", function()
-      harpoon:list():prev()
-    end, { desc = "Select previous harpoon item" })
-    vim.keymap.set("n", "<C-S-N>", function()
-      harpoon:list():next()
-    end, { desc = "Select next harpoon item" })
-
-    vim.keymap.set("n", "<C-e>", function()
-      harpoon.ui:toggle_quick_menu(harpoon:list())
-    end, { desc = "Toggle harpoon menu" })
-  end,
-}

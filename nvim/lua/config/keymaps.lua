@@ -7,9 +7,10 @@ map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true
 map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
 -- paste over currently selected text without yanking it
--- map("v", "p", '"_dp')
+map("v", "p", '"_dp')
 -- map("v", "P", '"_dP')
-map('v', '<leader>p', '"_dP', { desc = '[P]aste from blackhole register' })
+map('x', '<leader>p', [["_dP]], { desc = '[P]aste from blackhole register' })
+map('x', '<leader>d', [["_d]], { desc = 'Delete to blackhole register' })
 
 -- Cancel search highlighting with ESC
 map({ 'i', 'n' }, '<esc>', '<cmd>noh<cr><esc>', { desc = 'Clear hlsearch and ESC' })
@@ -42,14 +43,6 @@ map('n', '<C-Right>', '<cmd>vertical resize +2<cr>', { desc = 'Increase window w
 -- Select all
 map('n', '<C-a>', 'ggVG', { desc = 'Select all', silent = true })
 
--- Move Lines
-map('n', '<A-j>', '<cmd>m .+1<cr>==', { desc = 'Move down', silent = true })
-map('n', '<A-k>', '<cmd>m .-2<cr>==', { desc = 'Move up', silent = true })
-map('i', '<A-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move down', silent = true })
-map('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move up', silent = true })
-map('v', '<A-j>', ":m '>+1<cr>gv=gv", { desc = 'Move down', silent = true })
-map('v', '<A-k>', ":m '<-2<cr>gv=gv", { desc = 'Move up', silent = true })
-
 -- Center screen when jumping
 map('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down' })
 map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
@@ -57,8 +50,3 @@ map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
 -- Better indenting
 map('v', '<', '<gv', { desc = 'Indent current line left' })
 map('v', '>', '>gv', { desc = 'Indent current line right' })
-
--- Buffer Movements
-map('n', '<leader>bn', '<cmd>bnext<cr>', { desc = 'Next buffer' })
-map('n', '<leader>bp', '<cmd>bprevious<cr>', { desc = 'Previous buffer' })
-
