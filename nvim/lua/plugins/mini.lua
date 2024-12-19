@@ -1,11 +1,10 @@
 return {
   'echasnovski/mini.nvim',
-  event = "VeryLazy",
+  event = 'VeryLazy',
   version = false,
   config = function()
     require('mini.ai').setup()
     require('mini.surround').setup()
-    require('mini.statusline').setup()
     require('mini.move').setup()
     require('mini.icons').setup({
       filetype = { astro = { glyph = '' } },

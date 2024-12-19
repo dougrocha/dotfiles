@@ -1,12 +1,12 @@
 return {
-  "ThePrimeagen/harpoon",
-  event = "VimEnter",
-  branch = "harpoon2",
+  'ThePrimeagen/harpoon',
+  event = 'VimEnter',
+  branch = 'harpoon2',
   dependencies = {
-    "nvim-lua/plenary.nvim",
+    'nvim-lua/plenary.nvim',
   },
   config = function()
-    local harpoon = require("harpoon")
+    local harpoon = require('harpoon')
 
     harpoon:setup({
       settings = {
@@ -14,33 +14,24 @@ return {
       },
     })
 
-    vim.keymap.set("n", "<leader>ha", function()
+    vim.keymap.set('n', '<leader>ha', function()
       harpoon:list():add()
-      vim.notify("󱡅 file marked" .. vim.fn.expand("%:t"), vim.log.levels.INFO)
-    end, { desc = "Add current file to harpoon" })
+      vim.notify('󱡅 file marked' .. vim.fn.expand('%:t'), vim.log.levels.INFO)
+    end, { desc = 'Add current file to harpoon' })
 
-    vim.keymap.set("n", "<C-b>", function()
-      harpoon:list():select(1)
-    end, { desc = "Select harpoon item 1" })
+    vim.keymap.set('n', '<C-b>', function() harpoon:list():select(1) end, { desc = 'Select harpoon item 1' })
+    vim.keymap.set('n', '<C-n>', function() harpoon:list():select(2) end, { desc = 'Select harpoon item 2' })
+    vim.keymap.set('n', '<C-m>', function() harpoon:list():select(3) end, { desc = 'Select harpoon item 3' })
 
-    vim.keymap.set("n", "<C-n>", function()
-      harpoon:list():select(2)
-    end, { desc = "Select harpoon item 2" })
+    vim.keymap.set('n', '<C-S-P>', function() harpoon:list():prev() end, { desc = 'Select previous harpoon item' })
+    vim.keymap.set('n', '<C-S-N>', function() harpoon:list():next() end, { desc = 'Select next harpoon item' })
 
-    vim.keymap.set("n", "<C-m>", function()
-      harpoon:list():select(3)
-    end, { desc = "Select harpoon item 3" })
-
-    vim.keymap.set("n", "<C-S-P>", function()
-      harpoon:list():prev()
-    end, { desc = "Select previous harpoon item" })
-    vim.keymap.set("n", "<C-S-N>", function()
-      harpoon:list():next()
-    end, { desc = "Select next harpoon item" })
-
-    vim.keymap.set("n", "<C-e>", function()
-      harpoon.ui:toggle_quick_menu(harpoon:list())
-    end, { desc = "Toggle harpoon menu" })
+    vim.keymap.set(
+      'n',
+      '<C-e>',
+      function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
+      { desc = 'Toggle harpoon menu' }
+    )
   end,
 }
 -- ~!~~:..:~^:..  :.          .BG  ..       ..^~~:  ..      ..  ..  :.      . .78:.:                            ....:..^J5J~:^~!!!J?^.^JYYYYJ?!77??77??YG

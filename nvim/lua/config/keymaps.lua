@@ -7,7 +7,7 @@ map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true
 map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
 -- paste over currently selected text without yanking it
-map("v", "p", '"_dp')
+map('v', 'p', '"_dp')
 -- map("v", "P", '"_dP')
 map('x', '<leader>p', [["_dP]], { desc = '[P]aste from blackhole register' })
 map('x', '<leader>d', [["_d]], { desc = 'Delete to blackhole register' })

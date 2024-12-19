@@ -1,5 +1,5 @@
 return {
-  "stevearc/oil.nvim",
+  'stevearc/oil.nvim',
   opts = {
     float = {
       max_height = 20,
@@ -17,9 +17,9 @@ return {
   },
   keys = {
     {
-      "<leader>-",
-      "<cmd>Oil --float<cr>",
-      desc = "Open parent diretory (Oil)",
+      '<leader>-',
+      '<cmd>Oil --float<cr>',
+      desc = 'Open parent diretory (Oil)',
     },
   },
 }

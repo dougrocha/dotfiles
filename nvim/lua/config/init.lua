@@ -1,11 +1,11 @@
 -- autocommands
-require("config.autocmds")
+require('config.autocmds')
 
 -- options
-require("config.options")
+require('config.options')
 
 -- keymaps
-require("config.keymaps")
+require('config.keymaps')
 
 -- lazy config
-require("config.lazy")
+require('config.lazy')

@@ -1,15 +1,15 @@
 return {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
+  'nvim-treesitter/nvim-treesitter',
+  build = ':TSUpdate',
   opts = {
     ensure_installed = {
-      "lua",
-      "rust",
+      'lua',
+      'vimdoc',
+      'rust',
     },
-    auto_install = true,
     highlight = { enable = true },
+    indent = { enabled = true },
     incremental_selection = { enable = false },
     textobjects = { enable = false },
-    indent = { enabled = false },
   },
 }

@@ -1,24 +1,24 @@
 return {
-  "mrcjkb/rustaceanvim",
-  ft = { "rust" },
-  version = "^5",
+  'mrcjkb/rustaceanvim',
+  version = '^5',
+  ft = { 'rust' },
   lazy = false,
   config = function()
     vim.g.rustfmt_autosave = 1
     vim.g.rustfmt_emit_files = 1
     vim.g.rustfmt_fail_silently = 0
-    vim.g.rust_clip_command = "wl-copy"
 
     vim.g.rustaceanvim = {
-      -- Plugin configuration
-      tools = {},
-      -- LSP configuration
       server = {
         default_settings = {
           -- rust-analyzer language server configuration
-          ["rust-analyzer"] = {
+          ['rust-analyzer'] = {
             cargo = {
               allFeatures = true,
+              loadOutDirsFromCheck = true,
+              buildScripts = {
+                enable = true,
+              },
             },
             imports = {
               group = {
@@ -30,11 +30,17 @@ return {
                 enable = false,
               },
             },
+            procMacro = {
+              enable = true,
+              ignored = {
+                ['async-trait'] = { 'async_trait' },
+                ['napi-derive'] = { 'napi' },
+                ['async-recursion'] = { 'async_recursion' },
+              },
+            },
           },
         },
       },
-      -- DAP configuration
-      dap = {},
     }
   end,
 }
