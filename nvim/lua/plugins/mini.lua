@@ -10,5 +10,6 @@ return {
       filetype = { astro = { glyph = '' } },
     })
     require('mini.bracketed').setup()
+    require('mini.statuslines').setup()
   end,
 }

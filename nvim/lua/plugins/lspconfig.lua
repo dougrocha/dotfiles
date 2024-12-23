@@ -33,18 +33,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-local servers = {
-  'astro',
-  'clangd',
-  'jsonls',
-  'marksman',
-  'gopls',
-  'lua_ls',
-  'svelte',
-  'vtsls',
-  'tailwindcss',
-}
-
 local icons = { ERROR = ' ', WARN = ' ', HINT = '󰠠 ', INFO = ' ' }
 
 vim.diagnostic.config({
@@ -73,11 +61,11 @@ return {
   'neovim/nvim-lspconfig',
   event = { 'BufReadPost' },
   dependencies = {
-    'saghen/blink.cmp',
     { 'folke/lazydev.nvim', opts = {}, ft = 'lua' },
     { 'williamboman/mason.nvim', build = ':MasonUpdate' },
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     { 'j-hui/fidget.nvim', opts = {} },
+    'saghen/blink.cmp',
   },
   opts = {
     servers = {

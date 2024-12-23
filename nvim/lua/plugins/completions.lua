@@ -8,11 +8,11 @@ return {
       'rafamadriz/friendly-snippets',
     },
     opts = {
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = 'mono',
+      },
       completion = {
-        appereance = {
-          use_nvim_cmp_as_default = true,
-          nerd_font_variant = 'mono',
-        },
         documentation = {
           auto_show = true,
           auto_show_delay_ms = 200,
@@ -45,13 +45,14 @@ return {
         jump = function(direction) require('luasnip').jump(direction) end,
       },
       sources = {
-        completion = {
-          enabled_providers = { 'lsp', 'path', 'buffer', 'snippets', 'lazydev' },
-        },
+        default = { 'lazydev', 'lsp', 'path', 'buffer', 'snippets' },
         providers = {
-          -- dont show LuaLS require statements when lazydev has items
-          lsp = { fallback_for = { 'lazydev' } },
-          lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            -- make lazydev completions top priority (see `:h blink.cmp`)
+            score_offset = 100,
+          },
         },
       },
     },
