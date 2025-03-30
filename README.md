@@ -2,8 +2,10 @@
 
 ## Setup
 
-```bash
+```sh
 git clone git@github.com:dougrocha/dotfiles.git
+
+./install
 ```
 
 ## Useful Links

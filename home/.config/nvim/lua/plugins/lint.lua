@@ -20,7 +20,7 @@ end
 
 return {
   'mfussenegger/nvim-lint',
-  event = { 'BufReadPre', 'BufNewFile' },
+  event = 'VeryLazy',
   keys = {
     {
       '<leader>ll',
@@ -28,10 +28,8 @@ return {
       desc = 'Lint current buffer',
     },
   },
-  config = function()
-    local lint = require('lint')
-
-    lint.linters_by_ft = {
+  opts = {
+    linters_by_ft = {
       javascript = { 'eslint_d' },
       typescript = { 'eslint_d' },
       javascriptreact = { 'eslint_d' },
@@ -39,7 +37,11 @@ return {
       lua = { 'selene' },
       svelte = { 'eslint_d' },
       markdown = { 'markdownlint-cli2' },
-    }
+    },
+  },
+  config = function(_, opts)
+    local lint = require('lint')
+    lint.linters_by_ft = opts.linters_by_ft
 
     -- Conditional Linters only for auto lint, do not use for manual key bind
     local conditional_linters = {

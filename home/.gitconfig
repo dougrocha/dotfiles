@@ -1,5 +1,14 @@
 [user]
   name = Douglas Rocha
   email = 79188161+dougrocha@users.noreply.github.com
+  signingkey = ~/.ssh/id_ed25519_github
 [pull]
   ff = only
+[commit]
+  gpgsign = true
+[gpg]
+  format = ssh
+[tag]
+  gpgsign = true
+[gpg "ssh"]
+  allowedSignersFile = ~/.ssh/allowed_signers

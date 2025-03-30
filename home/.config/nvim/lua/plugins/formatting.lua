@@ -6,7 +6,7 @@ return {
     formatters_by_ft = {
       c = { 'clang-format' },
       cpp = { 'clang-format' },
-
+      cs = { 'csharpier' },
       go = { 'gofumpt', 'goimports-reviser', 'golines' },
 
       lua = { 'stylua' },

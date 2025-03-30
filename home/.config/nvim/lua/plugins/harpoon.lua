@@ -14,12 +14,12 @@ return {
       },
     })
 
-    vim.keymap.set('n', '<leader>ha', function()
+    vim.keymap.set('n', '<leader>h', function()
       harpoon:list():add()
       vim.notify('󱡅 file marked' .. vim.fn.expand('%:t'), vim.log.levels.INFO)
     end, { desc = 'Add current file to harpoon' })
 
-    for i = 1, 4 do
+    for i = 1, 5 do
       vim.keymap.set(
         'n',
         '<leader>' .. i,

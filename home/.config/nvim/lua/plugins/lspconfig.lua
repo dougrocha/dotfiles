@@ -9,64 +9,40 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set('n', keys, rhs, opts)
     end
 
-    nmap('K', vim.lsp.buf.hover, 'Information')
-    nmap('gr', require('telescope.builtin').lsp_references, 'References')
+    nmap('gd', '<cmd>FzfLua lsp_definitions<CR>', 'Goto Definition')
+    nmap('gr', '<cmd>FzfLua lsp_references<CR>', 'References', { nowait = true })
     nmap('gD', vim.lsp.buf.declaration, 'Declaration')
-    nmap('gi', require('telescope.builtin').lsp_implementations, 'Implementation')
-    nmap('gd', require('telescope.builtin').lsp_definitions, 'Definition')
-    nmap('gt', require('telescope.builtin').lsp_type_definitions, 'Type Definition')
-    nmap('<leader>r', vim.lsp.buf.rename, 'Rename')
+    nmap('gI', '<cmd>FzfLua lsp_implementations<CR>', 'Goto implementation')
+    nmap('gt', '<cmd>FzfLua lsp_typedefs ignore_current_line=true<CR>', 'Goto Type Definition')
 
-    nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Workspace Symbols')
+    nmap('K', vim.lsp.buf.hover, 'Hover Information')
+    nmap('<leader>rn', vim.lsp.buf.rename, 'Rename')
 
     local format_cmd = '<Cmd>lua require("conform").format({ lsp_fallback = true })<CR>'
     nmap('<leader>lf', format_cmd, 'Format')
-    vim.keymap.set('x', '<leader>lf', format_cmd, { desc = 'Format selection' })
+    vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
 
-    nmap('<leader>D', '<cmd>Telescope diagnostics bufnr=0<CR>', 'Show Buffer Diagnostics')
+    nmap('<leader>D', '<cmd>FzfLua diagnostics_document<CR>', 'Document Diagnostic')
     nmap('<leader>d', vim.diagnostic.open_float, 'Show Line Diagnostics')
 
     nmap('[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, 'Previous diagnostic')
     nmap(']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, 'Next diagnostic')
 
-    vim.keymap.set({ 'n', 'v' }, '<leader>a', vim.lsp.buf.code_action, { desc = 'Code Actions' })
+    vim.keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>FzfLua lsp_code_actions<CR>', { desc = 'Code Actions' })
   end,
-})
-
-local icons = { ERROR = ' ', WARN = ' ', HINT = '󰠠 ', INFO = ' ' }
-
-vim.diagnostic.config({
-  float = {
-    source = true,
-    severity_sort = true,
-    prefix = function(diagnostic)
-      local level = vim.diagnostic.severity[diagnostic.severity]
-      local prefix = string.format(' %s ', icons[level])
-      return prefix, 'Diagnostic' .. level:gsub('^%l', string.upper)
-    end,
-  },
-  virtual_text = {
-    prefix = '',
-    spacing = 2,
-    format = function(diagnostic)
-      local icon = icons[vim.diagnostic.severity[diagnostic.severity]]
-      return string.format('%s %s ', icon, diagnostic.message)
-    end,
-  },
-  signs = false,
-  update_in_insert = false,
 })
 
 return {
   {
     'nvim-treesitter/nvim-treesitter',
     version = false,
-    build = ':TSUpdate',
     event = 'VeryLazy',
+    build = ':TSUpdate',
     opts = {
       ensure_installed = {
         'lua',
         'markdown',
+        'markdown_inline',
         'regex',
         'rust',
         'toml',
@@ -83,10 +59,29 @@ return {
     'neovim/nvim-lspconfig',
     event = { 'BufReadPost' },
     dependencies = {
-      { 'folke/lazydev.nvim', opts = {}, ft = 'lua' },
-      { 'williamboman/mason.nvim', build = ':MasonUpdate' },
+      {
+        'folke/lazydev.nvim',
+        opts = {
+          library = {
+            { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+          },
+        },
+        ft = 'lua',
+      },
+      {
+        'williamboman/mason.nvim',
+        build = ':MasonUpdate',
+        opts = {},
+      },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      { 'j-hui/fidget.nvim', opts = {} },
+      {
+        'j-hui/fidget.nvim',
+        opts = {
+          notification = {
+            window = { winblend = 0 },
+          },
+        },
+      },
       'saghen/blink.cmp',
     },
     opts = {
@@ -103,12 +98,32 @@ return {
           },
         },
         gopls = {},
-        marksman = {},
+        -- marksman = {},
         lua_ls = {
           settings = {
             Lua = {
               completion = {
                 callSnippet = 'Replace',
+              },
+            },
+          },
+        },
+        vtsls = {
+          filetypes = {
+            'javascript',
+            'javascriptreact',
+            'javascript.jsx',
+            'typescript',
+            'typescriptreact',
+            'typescript.tsx',
+          },
+          settings = {
+            vtsls = {
+              autoUseWorkspaceTsdk = true,
+              experimental = {
+                completion = {
+                  enableServerSideFuzzyMatch = true,
+                },
               },
             },
           },
@@ -126,7 +141,6 @@ return {
       },
     },
     config = function(_, opts)
-      require('mason').setup()
       require('mason-tool-installer').setup({
         ensure_installed = {
           'prettierd',

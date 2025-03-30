@@ -1,6 +1,69 @@
-local home = vim.fn.expand('~/second-brain')
+local function find_resources()
+  local resources_path = vim.env.ZK_NOTEBOOK_DIR .. '/resources'
+
+  require('fzf-lua').fzf_exec(vim.fn.globpath(resources_path, '*', 0, 1), {
+    prompt = 'Select Resource> ',
+    previewer = false,
+    actions = {
+      ['default'] = function(selected)
+        local resource_file = selected[1]
+        vim.cmd('Open ' .. resource_file)
+      end,
+    },
+  })
+end
+
+local function pick_school_notes()
+  local areas_path = vim.env.ZK_NOTEBOOK_DIR .. '/school'
+
+  require('fzf-lua').fzf_exec(vim.fn.globpath(areas_path, '*', 0, 1), {
+    prompt = 'Select Class> ',
+    previewer = false,
+    actions = {
+      ['default'] = function(selected)
+        local class_folder = selected[1]
+
+        require('zk.commands').get('ZkNotes')({ hrefs = { class_folder } })
+      end,
+    },
+  })
+end
 
 return {
+  {
+    'zk-org/zk-nvim',
+    event = 'VeryLazy',
+    opts = {
+      picker = 'fzf_lua',
+    },
+    keys = {
+      { '<leader>zc', pick_school_notes, desc = 'Select Class & Open Note' },
+      { '<leader>zr', find_resources, desc = 'Open resource' },
+      {
+        '<leader>zn',
+        function() require('zk').new({ title = vim.fn.input('Title: ') }) end,
+        desc = 'New Note',
+      },
+      { '<leader>zf', '<cmd>ZkNotes { sort = { "modified" } }<CR>', desc = 'Find Notes' },
+      { '<leader>zt', '<cmd>ZkTags<CR>', desc = 'Search by Tag' },
+      { '<leader>zl', '<cmd>ZkLinks<CR>', desc = 'Follow Link' },
+      { '<leader>zb', '<cmd>ZkBack<CR>', desc = 'Go Back' },
+      { '<leader>zi', '<cmd>ZkInsertLink<CR>', desc = 'Insert Link' },
+      {
+        '<leader>znt',
+        ":ZkNewFromTitleSelection { dir = vim.fn.expand('%:p:h') }<CR>",
+        desc = 'New note from title',
+        mode = 'v',
+      },
+      {
+        '<leader>znc',
+        ":ZkNewFromContentSelection { dir = vim.fn.expand('%:p:h'), title = vim.fn.input('Title: ') }<CR>",
+        desc = 'New note from content',
+        mode = 'v',
+      },
+    },
+    config = function(_, opts) require('zk').setup(opts) end,
+  },
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
@@ -17,41 +80,24 @@ return {
     },
   },
   {
-    'renerocksai/telekasten.nvim',
-    dependencies = { 'nvim-telescope/telescope.nvim' },
-    cmd = { 'Telekasten' },
-    ft = { 'markdown' },
-    keys = {
-      { '<leader>zb', '<cmd>Telekasten show_backlinks<CR>', desc = 'Show backlinks' },
-      { '<leader>zd', '<cmd>Telekasten goto_today<CR>', desc = 'Go to today' },
-      { '<leader>zf', function() require('telekasten').find_notes({ with_live_grep = true }) end, desc = 'Find notes' },
-      { '<leader>zg', '<cmd>Telekasten search_notes<CR>', desc = 'Search notes' },
-      { '<leader>zi', '<cmd>Telekasten insert_img_link<CR>', desc = 'Insert image link' },
-      { '<leader>zn', '<cmd>Telekasten new_note<CR>', desc = 'New note' },
-      { '<leader>zz', '<cmd>Telekasten follow_link<CR>', desc = 'Follow link' },
-    },
-    opts = {
-      home = home,
-      dailies = home .. '/daily',
-      templates = home .. '/templates',
-      template_new_daily = home .. '/templates/daily.md',
-      template_new_weekly = home .. '/templates/weekly.md',
-      enable_create_new = false,
-      auto_set_filetype = false,
-    },
-  },
-  {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
     ft = { 'markdown' },
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {
+      completions = { blink = { enabled = true } },
       code = {
         sign = false,
-        position = 'right',
         width = 'block',
-        right_pad = 10,
+        right_pad = 1,
+      },
+      html = {
+        enabled = false,
+      },
+      heading = {
+        sign = false,
+        icons = {},
       },
       latex = {
         enabled = false,

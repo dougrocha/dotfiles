@@ -22,7 +22,6 @@ sessionizer.config.additional_directories = {
 	HOME_DIR .. "/school",
 	HOME_DIR .. "/second-brain",
 }
-sessionizer.config.show_default = true
 
 config.max_fps = 120
 config.window_background_opacity = 0.9
@@ -64,11 +63,11 @@ config.keys = {
 	{ key = "w", mods = "CTRL|SHIFT", action = action.CloseCurrentPane({ confirm = false }) },
 	{ key = "z", mods = "CTRL|SHIFT", action = action.TogglePaneZoomState },
 
-	{ key = "p", mods = "ALT|SHIFT", action = action.ActivateCommandPalette },
+	{ key = "p", mods = "CTRL|SHIFT", action = action.ActivateCommandPalette },
 
 	-- { key = "w", mods = "CTRL|SHIFT", action = action.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
 
-	{ key = "p", mods = "CTRL|SHIFT", action = sessionizer.show },
+	{ key = "g", mods = "CTRL|SHIFT", action = sessionizer.show },
 }
 
 config.status_update_interval = 1000

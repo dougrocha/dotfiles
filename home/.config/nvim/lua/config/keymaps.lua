@@ -6,6 +6,9 @@ local map = vim.keymap.set
 map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 
+-- Replicate <Esc>
+map('i', '<C-c>', '<Esc>')
+
 -- paste over currently selected text without yanking it
 map('v', 'p', '"_dp')
 -- map("v", "P", '"_dP')
