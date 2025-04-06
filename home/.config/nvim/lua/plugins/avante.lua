@@ -19,11 +19,11 @@ return {
   },
   opts = {
     provider = 'copilot',
-    -- copilot = {
-    --   endpoint = 'https://api.githubcopilot.com/',
-    --   -- model = 'o1',
-    --   model = "claude-3.7-sonnet",
-    -- },
+    copilot = {
+      endpoint = 'https://api.githubcopilot.com/',
+      -- model = 'o1',
+      model = 'claude-3.5-sonnet',
+    },
     hints = { enabled = false },
     behavior = {
       auto_set_keymaps = false,

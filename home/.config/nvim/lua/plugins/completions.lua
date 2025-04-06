@@ -19,24 +19,6 @@ return {
     ---@module 'blink-cmp'
     ---@type blink.cmp.Config
     opts = {
-      appearance = {
-        use_nvim_cmp_as_default = true,
-        nerd_font_variant = 'mono',
-      },
-      completion = {
-        documentation = {
-          auto_show = true,
-          auto_show_delay_ms = 200,
-        },
-        menu = {
-          draw = {
-            treesitter = { 'lsp' },
-          },
-        },
-        list = {
-          selection = { preselect = false, auto_insert = false },
-        },
-      },
       keymap = {
         ['<C-n>'] = { 'select_next', 'fallback' },
         ['<C-p>'] = { 'select_prev', 'fallback' },
@@ -46,6 +28,18 @@ return {
         ['<C-h>'] = { 'snippet_backward', 'fallback' },
         ['<C-e>'] = { 'hide', 'fallback' },
         ['<CR>'] = { 'accept', 'fallback' },
+      },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        nerd_font_variant = 'mono',
+      },
+      completion = {
+        documentation = {
+          auto_show = true,
+        },
+        list = {
+          selection = { preselect = false, auto_insert = true },
+        },
       },
       snippets = {
         preset = 'mini_snippets',
@@ -68,4 +62,9 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    require('blink-cmp').setup(opts)
+
+    vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities(nil, true) })
+  end,
 }
