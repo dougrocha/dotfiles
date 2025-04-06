@@ -9,3 +9,6 @@ require('config.keymaps')
 
 -- lazy config
 require('config.lazy')
+
+-- lsp config
+require('config.lsp')

@@ -5,7 +5,8 @@ vim.opt.undofile = true
 vim.opt.swapfile = false
 vim.opt.writebackup = false
 
-vim.opt.completeopt = 'menu,menuone,noselect'
+vim.o.pumheight = 15
+vim.o.completeopt = 'menu,menuone,noselect'
 
 vim.opt.timeoutlen = 300
 vim.opt.updatetime = 50
@@ -43,26 +44,3 @@ vim.opt.spelloptions = 'camel'
 vim.g.markdown_recommended_style = 0
 
 if vim.fn.has('nvim-0.11') == 1 then vim.opt.completeopt:append('fuzzy') end
-
-local icons = { ERROR = ' ', WARN = ' ', HINT = '󰠠 ', INFO = ' ' }
-
-vim.diagnostic.config({
-  float = {
-    source = true,
-    severity_sort = true,
-    prefix = function(diagnostic)
-      local level = vim.diagnostic.severity[diagnostic.severity]
-      local prefix = string.format(' %s ', icons[level])
-      return prefix, 'Diagnostic' .. level:gsub('^%l', string.upper)
-    end,
-  },
-  virtual_text = {
-    prefix = '',
-    spacing = 2,
-    format = function(diagnostic)
-      local icon = icons[vim.diagnostic.severity[diagnostic.severity]]
-      return string.format('%s %s ', icon, diagnostic.message)
-    end,
-  },
-  signs = false,
-})
