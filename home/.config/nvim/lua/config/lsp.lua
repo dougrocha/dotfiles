@@ -106,8 +106,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
 
     vim.lsp.enable({
       'clangd',
-      'gopls',
       'eslint',
+      'gopls',
       'lua_ls',
       'marksman',
       'tailwindcss',

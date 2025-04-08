@@ -14,22 +14,19 @@ return {
     },
   },
   config = function()
-    local gen_spec = require('mini.ai').gen_spec
     local gen_ai_spec = require('mini.extra').gen_ai_spec
 
     require('mini.ai').setup({
       n_lines = 500,
       custom_textobjects = {
-        d = gen_ai_spec.number(),
         g = gen_ai_spec.buffer(),
         e = { -- Word with case
           { '%u[%l%d]+%f[^%l%d]', '%f[%S][%l%d]+%f[^%l%d]', '%f[%P][%l%d]+%f[^%l%d]', '^[%l%d]+%f[^%l%d]' },
           '^().*()$',
         },
         t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags
-        u = gen_spec.function_call(), -- u for "Usage"
-        U = gen_spec.function_call({ name_pattern = '[%w_]' }), -- without dot in function name
       },
+      search_method = 'cover',
     })
 
     require('mini.align').setup()

@@ -1,14 +1,17 @@
 ---@type vim.lsp.Config
 return {
   cmd = { 'vscode-eslint-language-server', '--stdio' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'graphql' },
-  root_markers = { '.eslintrc', '.eslintrc.js', '.eslintrc.json', 'eslint.config.js', 'eslint.config.mjs' },
   settings = {
     validate = 'on',
     packageManager = 'pnpm',
     useESLintClass = false,
-    experimental = { useFlatConfig = false },
-    codeActionOnSave = { enable = false, mode = 'all' },
+    experimental = {
+      useFlatConfig = false,
+    },
+    codeActionOnSave = {
+      enable = false,
+      mode = 'all',
+    },
     format = false,
     quiet = false,
     onIgnoredFiles = 'off',
@@ -17,11 +20,39 @@ return {
     run = 'onType',
     problems = { shortenToSingleLine = false },
     nodePath = '',
+    workingDirectory = { mode = 'location' },
     codeAction = {
       disableRuleComment = { enable = true, location = 'separateLine' },
       showDocumentation = { enable = true },
     },
   },
+  filetypes = {
+    'javascript',
+    'javascriptreact',
+    'javascript.jsx',
+    'typescript',
+    'typescriptreact',
+    'typescript.tsx',
+    'vue',
+    'svelte',
+    'astro',
+  },
+  root_markers = {
+    '.eslintrc',
+    '.eslintrc.js',
+    '.eslintrc.cjs',
+    '.eslintrc.yaml',
+    '.eslintrc.yml',
+    '.eslintrc.json',
+    'eslint.config.js',
+  },
+  before_init = function(params, config)
+    config.settings.workspaceFolder = {
+      uri = params.rootPath,
+      name = vim.fn.fnamemodify(params.rootPath, ':t'),
+    }
+  end,
+  ---@type table<string, lsp.Handler>
   handlers = {
     ['eslint/openDoc'] = function(_, params)
       vim.ui.open(params.url)
