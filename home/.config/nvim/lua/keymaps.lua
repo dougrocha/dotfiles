@@ -1,10 +1,8 @@
-vim.g.mapleader = ' '
-
 local map = vim.keymap.set
 
--- Better Lines movement
-map({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-map({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+-- Better line movement
+map({ 'n', 'x' }, 'j', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'j']], { expr = true })
+map({ 'n', 'x' }, 'k', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'k']], { expr = true })
 
 -- Replicate <Esc>
 map('i', '<C-c>', '<Esc>')
@@ -30,25 +28,17 @@ map('n', '<C-j>', '<C-w>j', { desc = 'Go to lower window', remap = true })
 map('n', '<C-k>', '<C-w>k', { desc = 'Go to upper window', remap = true })
 map('n', '<C-l>', '<C-w>l', { desc = 'Go to right window', remap = true })
 
+-- Center screen when jumping
+map('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down' })
+map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
 map('n', 'n', 'nzz', { desc = 'Move to next search match', silent = true, noremap = true })
 map('n', 'N', 'Nzz', { desc = 'Move to previous search match', silent = true, noremap = true })
-map('n', '*', '*zz', { desc = 'Move to next search match', silent = true, noremap = true })
-map('n', '#', '#zz', { desc = 'Move to previous search match', silent = true, noremap = true })
-map('n', 'g*', 'g*zz', { desc = 'Move to next search match', silent = true, noremap = true })
-map('n', 'g#', 'g#zz', { desc = 'Move to previous search match', silent = true, noremap = true })
 
 -- Move Lines
 map('n', '<C-Up>', '<cmd>resize +6<cr>', { desc = 'Increase window height' })
 map('n', '<C-Down>', '<cmd>resize 2<cr>', { desc = 'Decrease window height' })
 map('n', '<C-Left>', '<cmd>vertical resize 2<cr>', { desc = 'Decrease window width' })
 map('n', '<C-Right>', '<cmd>vertical resize +6<cr>', { desc = 'Increase window width' })
-
--- Select all
--- map('n', '<C-a>', 'ggVG', { desc = 'Select all', silent = true })
-
--- Center screen when jumping
-map('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down' })
-map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
 
 -- Better indenting
 map('v', '<', '<gv', { desc = 'Indent current line left' })

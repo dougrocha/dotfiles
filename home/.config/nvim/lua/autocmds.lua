@@ -4,8 +4,8 @@ local function augroup(name) return vim.api.nvim_create_augroup(name, { clear = 
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = augroup('highlight_yank'),
   callback = function()
-    vim.highlight.on_yank({
-      higroup = 'IncSearch',
+    vim.hl.on_yank({
+      higroup = 'Visual',
       timeout = 300,
     })
   end,
@@ -21,7 +21,6 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
   end,
 })
 
--- Thank you to
 -- https://github.com/echasnovski/nvim/blob/a732d0a79dfb2145cb934310016cc580a18a0c8f/src/settings.lua#L26
 vim.api.nvim_create_autocmd('FileType', {
   group = augroup('custom_settings'),

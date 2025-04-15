@@ -1,21 +1,33 @@
-vim.opt.mouse = 'a'
-vim.opt.backup = false
-vim.opt.switchbuf = 'usetab'
-vim.opt.undofile = true
-vim.opt.swapfile = false
-vim.opt.writebackup = false
+vim.g.maplocalleader = ' '
+vim.g.mapleader = ' '
 
+-- Enable mouse support
+vim.o.mouse = 'a'
+
+vim.o.undofile = true
+vim.opt.undodir = vim.fn.stdpath('cache') .. '/undo'
+vim.o.swapfile = false
+
+-- Completion menu
 vim.o.pumheight = 15
 vim.o.completeopt = 'menu,menuone,noselect'
 
-vim.opt.timeoutlen = 300
-vim.opt.updatetime = 50
+-- Update time
+vim.opt.timeoutlen = 500
+vim.opt.updatetime = 150
+vim.o.ttimeoutlen = 10
 
+-- Use system clipboard
 vim.opt.clipboard = 'unnamedplus'
 
+-- Search
 vim.opt.hlsearch = true
 vim.opt.inccommand = 'split'
+vim.opt.ignorecase = true
+vim.opt.incsearch = true
+vim.opt.infercase = true
 
+-- Scroll size
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
 
@@ -27,20 +39,18 @@ vim.opt.relativenumber = true
 vim.opt.splitbelow = true
 vim.opt.wrap = false
 
+-- Enable auto indentation
 vim.opt.autoindent = true
 vim.opt.expandtab = true
-vim.opt.formatoptions = 'rqnl1j'
-vim.opt.ignorecase = true
-vim.opt.incsearch = true
-vim.opt.infercase = true
 vim.opt.shiftwidth = 2
 vim.opt.smartindent = true
 
-vim.opt.colorcolumn = '120'
-
+-- Spell checking
 vim.opt.spelllang = 'en'
 vim.opt.spelloptions = 'camel'
 
+-- Disable markdown style auto-formatting
 vim.g.markdown_recommended_style = 0
 
+-- Add fuzzy completion option if Neovim >= 0.11
 if vim.fn.has('nvim-0.11') == 1 then vim.opt.completeopt:append('fuzzy') end

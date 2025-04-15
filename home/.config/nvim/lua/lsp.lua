@@ -1,3 +1,5 @@
+local diagnostic_icons = require('icons').diagnostic_icons
+
 local methods = vim.lsp.protocol.Methods
 
 local function on_attach(client, bufnr)
@@ -5,9 +7,11 @@ local function on_attach(client, bufnr)
   ---@param rhs string|function
   ---@param desc string
   ---@param mode? string|string[]
+  ---@param opts? table
   local function keymap(lhs, rhs, desc, mode, opts)
-    mode = mode or 'n'
-    vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts or {}))
+    if type(mode) == 'nil' then mode = 'n' end
+    opts = opts or {}
+    vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts))
   end
 
   keymap('gr', '<cmd>FzfLua lsp_references<CR>', 'References', { 'n', 'x' }, { nowait = true })
@@ -25,7 +29,7 @@ local function on_attach(client, bufnr)
   keymap('[d', function() vim.diagnostic.jump({ count = -1 }) end, 'Previous diagnostic')
   keymap(']d', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
 
-  local format_cmd = '<Cmd>lua require("conform").format({ lsp_fallback = true })<CR>'
+  local format_cmd = function() require('conform').format({ lsp_fallback = true }) end
   keymap('<leader>lf', format_cmd, 'Format')
   vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
 
@@ -60,7 +64,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-local diagnostic_icons = { ERROR = ' ', WARN = ' ', HINT = '󰠠 ', INFO = ' ' }
 for severity, icon in pairs(diagnostic_icons) do
   local hl = 'DiagnosticSign' .. severity:sub(1, 1) .. severity:sub(2):lower()
   vim.fn.sign_define(hl, { text = icon, texthl = hl })
@@ -110,6 +113,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
       'gopls',
       'lua_ls',
       'marksman',
+      'rust_analyzer',
       'tailwindcss',
       'vtsls',
     })
