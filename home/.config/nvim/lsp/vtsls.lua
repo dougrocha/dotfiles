@@ -11,19 +11,15 @@ local settings = {
 ---@type vim.lsp.Config
 return {
   cmd = { 'vtsls', '--stdio' },
-  filetypes = {
-    'javascript',
-    'javascriptreact',
-    'typescript',
-    'typescriptreact',
-  },
-  root_markers = { 'tsconfig.json', 'package.json' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'tsconfig.json' },
   settings = {
     vtsls = {
       autoUseWorkspaceTsdk = true,
       experimental = {
         completion = {
           enableServerSideFuzzyMatch = true,
+          enableProjectDiagnostics = true,
         },
       },
     },

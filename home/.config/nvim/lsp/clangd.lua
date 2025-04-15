@@ -10,24 +10,9 @@ return {
     '--completion-style=detailed',
     '--function-arg-placeholders=false',
     '--fallback-style=llvm',
-    '--enable-config',
-    '--pretty',
   },
-  root_markers = { 'compile_commands.json', '.clangd' },
+  root_markers = { '.clangd' },
   filetypes = { 'c', 'cpp' },
-  capabilities = {
-    textDocument = {
-      completion = {
-        editsNearCursor = true,
-      },
-    },
-    offsetEncoding = { 'utf-8', 'utf-16' },
-  },
-  init_options = {
-    usePlaceholders = true,
-    completeUnimported = true,
-    clangdFileStatus = true,
-  },
   on_attach = function(_, buf)
     vim.keymap.set(
       'n',

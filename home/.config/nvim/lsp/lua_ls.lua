@@ -13,6 +13,9 @@ return {
       completion = {
         callSnippet = 'Replace',
       },
+      format = {
+        enabled = false,
+      },
       telemetry = { enable = false },
       hint = {
         enable = true,
