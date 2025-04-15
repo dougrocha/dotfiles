@@ -1,0 +1,11 @@
+{
+  "Log to the console": {
+    "prefix": "log",
+    "body": ["console.log($1);$0"]
+  },
+  "Function Statement": {
+    "prefix": "function",
+    "body": ["function ${1:name}($2) {", "  $0", "}"]
+  }
+}
+

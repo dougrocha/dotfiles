@@ -8,21 +8,34 @@ return {
     'nvim-lua/plenary.nvim',
     'MunifTanjim/nui.nvim',
     'zbirenbaum/copilot.lua',
-    {
-      -- Make sure to set this up properly if you have lazy=true
-      'MeanderingProgrammer/render-markdown.nvim',
-      opts = {
-        file_types = { 'markdown', 'Avante' },
-      },
-      ft = { 'markdown', 'Avante' },
-    },
   },
   opts = {
     provider = 'copilot',
     copilot = {
       endpoint = 'https://api.githubcopilot.com/',
-      -- model = 'o1',
-      model = 'claude-3.5-sonnet',
+      model = 'gpt-4o',
+    },
+    vendors = {
+      ['copilot:claude-3.7-thought'] = {
+        __inherited_from = 'copilot',
+        model = 'claude-3.7-sonnet-thought',
+      },
+      ['copilot:claude-3.7'] = {
+        __inherited_from = 'copilot',
+        model = 'claude-3.7-sonnet',
+      },
+      ['copilot:claude-3.5'] = {
+        __inherited_from = 'copilot',
+        model = 'claude-3.5-sonnet',
+      },
+      ['copilot:gpt-4.1'] = {
+        __inherited_from = 'copilot',
+        model = 'gpt-4.1',
+      },
+      ['copilot:gpt-4o'] = {
+        __inherited_from = 'copilot',
+        model = 'gpt-4o',
+      },
     },
     hints = { enabled = false },
     behavior = {
