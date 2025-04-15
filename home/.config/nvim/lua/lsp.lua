@@ -103,19 +103,10 @@ vim.diagnostic.config({
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   once = true,
   callback = function()
-    vim.lsp.config('*', {
-      root_markers = { '.git' },
-    })
-
-    vim.lsp.enable({
-      'clangd',
-      'eslint',
-      'gopls',
-      'lua_ls',
-      'marksman',
-      'rust_analyzer',
-      'tailwindcss',
-      'vtsls',
-    })
+    local server_configs = vim
+      .iter(vim.api.nvim_get_runtime_file('lsp/*.lua', true))
+      :map(function(file) return vim.fn.fnamemodify(file, ':t:r') end)
+      :totable()
+    vim.lsp.enable(server_configs)
   end,
 })
