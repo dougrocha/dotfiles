@@ -2,6 +2,9 @@ use std "path add"
 
 $env.EDITOR = 'nvim'
 
+$env.PNPM_HOME = $"($env.HOME)/Library/pnpm"
+path add $env.PNPM_HOME
+
 path add /usr/local/bin/
 path add ($env.HOME | path join .cargo bin)
 $env.PATH = ($env.PATH | uniq)
