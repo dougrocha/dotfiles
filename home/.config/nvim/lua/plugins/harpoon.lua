@@ -17,9 +17,14 @@ return {
             vim.notify('󱡅 marked ' .. vim.fn.expand('%:t'), vim.log.levels.INFO)
         end, { desc = 'Add current file to harpoon' })
 
-        vim.keymap.set('n', '<C-b>', function() harpoon:list():select(1) end, { desc = 'Select harpoon item 1' })
-        vim.keymap.set('n', '<C-n>', function() harpoon:list():select(2) end, { desc = 'Select harpoon item 2' })
-        vim.keymap.set('n', '<C-m>', function() harpoon:list():select(3) end, { desc = 'Select harpoon item 3' })
+        for i = 1, 5 do
+            vim.keymap.set(
+                'n',
+                '<C-b>',
+                function() harpoon:list():select(i) end,
+                { desc = 'Select harpoon item ' .. i }
+            )
+        end
 
         vim.keymap.set(
             'n',
