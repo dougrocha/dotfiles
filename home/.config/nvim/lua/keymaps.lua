@@ -17,16 +17,14 @@ map('x', '<leader>d', [["_d]], { desc = 'Delete to blackhole register' })
 map({ 'i', 'n' }, '<esc>', '<cmd>noh<cr><esc>', { desc = 'Clear hlsearch and ESC' })
 
 -- Windows Keymaps
-map('n', '<leader>ww', '<C-W>p', { desc = 'Other window', remap = true })
-map('n', '<leader>wd', '<C-W>c', { desc = 'Delete window', remap = true })
-map('n', '<leader>w-', '<C-W>s', { desc = 'Split window below', remap = true })
-map('n', '<leader>w|', '<C-W>v', { desc = 'Split window right', remap = true })
-map('n', '<leader>|', '<C-W>v', { desc = 'Split window right', remap = true })
-
 map('n', '<C-h>', '<C-w>h', { desc = 'Go to left window', remap = true })
 map('n', '<C-j>', '<C-w>j', { desc = 'Go to lower window', remap = true })
 map('n', '<C-k>', '<C-w>k', { desc = 'Go to upper window', remap = true })
 map('n', '<C-l>', '<C-w>l', { desc = 'Go to right window', remap = true })
+map('n', '<leader>wd', '<C-W>c', { desc = 'Delete window', remap = true })
+map('n', '<leader>w-', '<C-W>s', { desc = 'Split window below', remap = true })
+map('n', '<leader>w|', '<C-W>v', { desc = 'Split window right', remap = true })
+map('n', '<leader>|', '<C-W>v', { desc = 'Split window right', remap = true })
 
 -- Center screen when jumping
 map('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down' })
@@ -41,5 +39,5 @@ map('n', '<C-Left>', '<cmd>vertical resize 2<cr>', { desc = 'Decrease window wid
 map('n', '<C-Right>', '<cmd>vertical resize +6<cr>', { desc = 'Increase window width' })
 
 -- Better indenting
-map('v', '<', '<gv', { desc = 'Indent current line left' })
-map('v', '>', '>gv', { desc = 'Indent current line right' })
+map('v', '<', '<gv')
+map('v', '>', '>gv')

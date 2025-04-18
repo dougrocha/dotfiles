@@ -28,8 +28,8 @@ vim.opt.incsearch = true
 vim.opt.infercase = true
 
 -- Scroll size
-vim.opt.scrolloff = 8
-vim.opt.sidescrolloff = 8
+vim.opt.scrolloff = 4
+vim.opt.sidescrolloff = 4
 
 vim.opt.showmode = false
 vim.opt.termguicolors = true
@@ -40,9 +40,11 @@ vim.opt.splitbelow = true
 vim.opt.wrap = false
 
 -- Enable auto indentation
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+vim.o.et = true
 vim.opt.autoindent = true
 vim.opt.expandtab = true
-vim.opt.shiftwidth = 2
 vim.opt.smartindent = true
 
 -- Spell checking
