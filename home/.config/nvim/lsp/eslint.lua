@@ -17,7 +17,7 @@ return {
         run = 'onType',
         problems = { shortenToSingleLine = false },
         nodePath = '',
-        workingDirectory = { mode = 'location' },
+        workingDirectory = { mode = 'auto' },
         codeAction = {
             disableRuleComment = { enable = true, location = 'separateLine' },
             showDocumentation = { enable = true },

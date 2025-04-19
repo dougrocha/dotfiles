@@ -24,8 +24,18 @@ local function on_attach(client, bufnr)
 
     keymap('<leader>ca', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
 
-    keymap('[d', function() vim.diagnostic.jump({ count = -1 }) end, 'Previous diagnostic')
-    keymap(']d', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
+    keymap('[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, 'Previous diagnostic')
+    keymap(']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, 'Next diagnostic')
+    keymap(
+        '[e',
+        function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
+        'Previous error'
+    )
+    keymap(
+        ']e',
+        function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
+        'Next error'
+    )
 
     local format_cmd = function() require('conform').format({ lsp_fallback = true }) end
     keymap('<leader>lf', format_cmd, 'Format')
