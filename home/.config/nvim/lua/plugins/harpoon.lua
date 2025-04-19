@@ -20,7 +20,7 @@ return {
         for i = 1, 5 do
             vim.keymap.set(
                 'n',
-                '<C-b>',
+                '<Space>' .. i,
                 function() harpoon:list():select(i) end,
                 { desc = 'Select harpoon item ' .. i }
             )

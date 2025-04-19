@@ -3,6 +3,7 @@ return {
     lazy = false,
     priority = 1000,
     name = 'catppuccin',
+    ---@module 'catppuccin'
     ---@type CatppuccinOptions
     opts = {
         flavour = 'mocha',
