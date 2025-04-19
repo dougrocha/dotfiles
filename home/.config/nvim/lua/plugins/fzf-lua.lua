@@ -4,9 +4,9 @@ return {
     cmd = 'FzfLua',
     keys = {
         { '<leader>/', '<cmd>FzfLua live_grep<CR>', desc = 'Grep' },
-        { '<leader>/', '<cmd>FzfLua live_grep<CR>', desc = 'Grep', mode = 'x' },
+        { '<leader>/', '<cmd>FzfLua grep_visual<CR>', desc = 'Grep', mode = 'x' },
         {
-            '<leader>sb',
+            '<leader>fb',
             function()
                 require('fzf-lua').lgrep_curbuf({
                     winopts = {
@@ -20,14 +20,20 @@ return {
             end,
             desc = 'Find in current buffer',
         },
-        { '<leader>sk', '<cmd>FzfLua keymaps<CR>', desc = 'Search keymaps' },
-        { '<leader>sh', '<cmd>FzfLua help_tags<cr>', desc = 'Search help tags' },
-        { '<leader>sf', '<cmd>FzfLua files<CR>', desc = 'Find files' },
-        { '<leader>sd', '<cmd>FzfLua lsp_document_diagnostics<CR>', desc = 'Search document diagnostics' },
-        { '<leader>sD', '<cmd>FzfLua lsp_workspace_diagnostics<CR>', desc = 'Search workspace diagnostics' },
-        { '<leader>s.', '<cmd>FzfLua oldfiles<CR>', desc = 'Search recently opened files' },
-        { '<C-p>', '<cmd>FzfLua git_files<CR>', desc = 'Search git files' },
-        { '<leader>gbr', '<cmd>FzfLua git_branches<CR>', desc = 'Git branches' },
+        { '<leader>fk', '<cmd>FzfLua keymaps<CR>', desc = 'Find keymaps' },
+        { '<leader>fh', '<cmd>FzfLua help_tags<CR>', desc = 'Find help tags' },
+        { '<leader>ff', '<cmd>FzfLua files<CR>', desc = 'Find files' },
+        { '<leader>fd', '<cmd>FzfLua lsp_document_diagnostics<CR>', desc = 'Find document diagnostics' },
+        { '<leader>fD', '<cmd>FzfLua lsp_workspace_diagnostics<CR>', desc = 'Find workspace diagnostics' },
+        {
+            '<leader>fr',
+            function()
+                -- Read from ShaDa to include files that were already deleted from the buffer list.
+                vim.cmd('rshada!')
+                require('fzf-lua').oldfiles()
+            end,
+            desc = 'Recently opened files',
+        },
         { 'z=', '<cmd>FzfLua spell_suggest<CR>', desc = 'Spell suggestions' },
     },
     opts = function()
@@ -35,6 +41,7 @@ return {
 
         return {
             fzf_opts = {
+                ['--info'] = 'default',
                 ['--layout'] = 'reverse-list',
             },
             actions = {

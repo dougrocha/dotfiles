@@ -3,6 +3,13 @@ return {
     event = 'VeryLazy',
     opts = {
         jump = { nohlsearch = true },
+        prompt = {
+            win_config = {
+                border = 'none',
+                -- Place the prompt above the statusline.
+                row = -3,
+            },
+        },
         search = {
             exclude = {
                 'flash_prompt',
@@ -19,6 +26,26 @@ return {
         modes = {
             -- Enable flash when searching with ? or /
             search = { enabled = true },
+        },
+    },
+    keys = {
+        {
+            's',
+            mode = { 'n', 'x', 'o' },
+            function() require('flash').jump() end,
+            desc = 'Flash',
+        },
+        {
+            'r',
+            mode = 'o',
+            function() require('flash').remote() end,
+            desc = 'Remote Flash',
+        },
+        {
+            'R',
+            mode = { 'o', 'x' },
+            function() require('flash').treesitter_search() end,
+            desc = 'Treesitter Search',
         },
     },
 }
