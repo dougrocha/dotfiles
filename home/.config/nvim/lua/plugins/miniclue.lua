@@ -1,6 +1,6 @@
 return {
     'echasnovski/mini.clue',
-    event = 'VeryLazy',
+    version = false,
     opts = function()
         local miniclue = require('mini.clue')
         -- Add a-z/A-Z marks.

@@ -16,13 +16,12 @@ local function on_attach(client, bufnr)
         vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts))
     end
 
-    keymap('gr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
+    keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
+    keymap('graa', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
     keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
 
     keymap('K', function() vim.lsp.buf.hover({ border = 'rounded' }) end, 'Hover Information')
-    keymap('<leader>rn', vim.lsp.buf.rename, 'Rename')
-
-    keymap('<leader>ca', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
+    keymap('<leader>rn', vim.lsp.buf.rename, 'vim.lsp.rename()')
 
     keymap('[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, 'Previous diagnostic')
     keymap(']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, 'Next diagnostic')

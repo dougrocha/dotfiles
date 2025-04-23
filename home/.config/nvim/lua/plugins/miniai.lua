@@ -1,5 +1,6 @@
 return {
     'echasnovski/mini.ai',
+    version = false,
     event = 'VeryLazy',
     dependencies = 'echasnovski/mini.extra',
     opts = function()

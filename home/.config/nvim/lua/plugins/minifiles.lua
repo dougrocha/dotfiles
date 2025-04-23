@@ -20,7 +20,8 @@ end
 
 return {
     'echasnovski/mini.files',
-    event = 'VeryLazy',
+    version = false,
+    lazy = false,
     keys = {
         {
             '<leader>e',

@@ -26,6 +26,11 @@ return {
                 enabled = true,
             },
         },
+        color_overrides = {
+            mocha = {
+                base = '#0E1419',
+            },
+        },
     },
     config = function(_, opts)
         require('catppuccin').setup(opts)
