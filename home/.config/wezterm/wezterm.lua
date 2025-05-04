@@ -12,11 +12,12 @@ if wezterm.config_builder then
 end
 
 sessionizer.apply_to_config(config)
-sessionizer.config.command_options.fd_path = "/opt/homebrew/bin/fd"
 sessionizer.config.paths = {
 	HOME_DIR .. "/dev",
 	HOME_DIR .. "/school",
 }
+sessionizer.config.command_options.fd_path = "/opt/homebrew/bin/fd"
+sessionizer.config.show_additional_before_paths = true
 sessionizer.config.additional_directories = {
 	HOME_DIR .. "/dev",
 	HOME_DIR .. "/school",
@@ -29,15 +30,10 @@ config.window_decorations = "RESIZE"
 config.font_size = 18.0
 config.command_palette_font_size = 18.0
 
-config.window_padding = {
-	left = 2,
-	right = 2,
-	top = 0,
-	bottom = 0,
-}
+config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = true
-config.default_workspace = "~"
+config.default_workspace = "default"
 
 config.color_scheme = "Gruvbox dark, hard (base16)"
 config.font = wezterm.font("Monaspace Neon")
@@ -52,20 +48,18 @@ config.unix_domains = { { name = "unix" } }
 config.default_gui_startup_args = { "connect", "unix" }
 
 config.keys = {
-	{ key = "_", mods = "CTRL|SHIFT", action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },
-	{ key = "|", mods = "CTRL|SHIFT", action = action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "s", mods = "CTRL|SHIFT", action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "v", mods = "CTRL|SHIFT", action = action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 
 	{ key = "h", mods = "CTRL|SHIFT", action = action.ActivatePaneDirection("Left") },
 	{ key = "j", mods = "CTRL|SHIFT", action = action.ActivatePaneDirection("Down") },
 	{ key = "k", mods = "CTRL|SHIFT", action = action.ActivatePaneDirection("Up") },
 	{ key = "l", mods = "CTRL|SHIFT", action = action.ActivatePaneDirection("Right") },
 
-	{ key = "w", mods = "CTRL|SHIFT", action = action.CloseCurrentPane({ confirm = false }) },
+	{ key = "q", mods = "CTRL|SHIFT", action = action.CloseCurrentPane({ confirm = false }) },
 	{ key = "z", mods = "CTRL|SHIFT", action = action.TogglePaneZoomState },
 
 	{ key = "p", mods = "CTRL|SHIFT", action = action.ActivateCommandPalette },
-
-	-- { key = "w", mods = "CTRL|SHIFT", action = action.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
 
 	{ key = "g", mods = "CTRL|SHIFT", action = sessionizer.show },
 }

@@ -17,11 +17,10 @@ local function on_attach(client, bufnr)
     end
 
     keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
-    keymap('graa', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
+    keymap('gra', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
     keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
 
     keymap('K', function() vim.lsp.buf.hover({ border = 'rounded' }) end, 'Hover Information')
-    keymap('<leader>rn', vim.lsp.buf.rename, 'vim.lsp.rename()')
 
     keymap('[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, 'Previous diagnostic')
     keymap(']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, 'Next diagnostic')
@@ -44,6 +43,8 @@ local function on_attach(client, bufnr)
         keymap('gd', function() require('fzf-lua').lsp_definitions({ jump1 = true }) end, 'Go to definition')
         keymap('gD', function() require('fzf-lua').lsp_definitions({ jump1 = false }) end, 'Peek definition')
     end
+
+    if client:supports_method(methods.textDocument_documentColor) then vim.lsp.document_color.enable(true, bufnr) end
 end
 
 -- Update mappings when registering dynamic capabilities.

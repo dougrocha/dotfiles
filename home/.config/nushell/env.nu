@@ -1,6 +1,7 @@
 use std "path add"
 
 $env.EDITOR = 'nvim'
+$env.VISUAL = 'nvim'
 
 $env.PNPM_HOME = $"($env.HOME)/Library/pnpm"
 path add $env.PNPM_HOME

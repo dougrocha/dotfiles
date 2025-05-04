@@ -5,7 +5,7 @@ return {
     root_markers = { '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', 'eslint.config.js' },
     settings = {
         validate = 'on',
-        packageManager = 'pnpm',
+        packageManager = nil,
         useESLintClass = false,
         experimental = { useFlatConfig = false },
         codeActionOnSave = { enable = false, mode = 'all' },
