@@ -18,20 +18,14 @@ return {
         end, { desc = 'Add current file to harpoon' })
 
         for i = 1, 5 do
-            vim.keymap.set(
-                'n',
-                '<Space>' .. i,
-                function() harpoon:list():select(i) end,
-                { desc = 'Select harpoon item ' .. i }
-            )
+            vim.keymap.set('n', '<Space>' .. i, function()
+                harpoon:list():select(i)
+            end, { desc = 'Select harpoon item ' .. i })
         end
 
-        vim.keymap.set(
-            'n',
-            '<C-e>',
-            function() harpoon.ui:toggle_quick_menu(harpoon:list()) end,
-            { desc = 'Toggle harpoon menu' }
-        )
+        vim.keymap.set('n', '<C-e>', function()
+            harpoon.ui:toggle_quick_menu(harpoon:list())
+        end, { desc = 'Toggle harpoon menu' })
     end,
 }
 -- ~!~~:..:~^:..  :.          .BG  ..       ..^~~:  ..      ..  ..  :.      . .78:.:                            ....:..^J5J~:^~!!!J?^.^JYYYYJ?!77??77??YG

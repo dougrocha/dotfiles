@@ -11,47 +11,63 @@ local function on_attach(client, bufnr)
     ---@param mode? string|string[]
     ---@param opts? table
     local function keymap(lhs, rhs, desc, mode, opts)
-        if type(mode) == 'nil' then mode = 'n' end
+        if type(mode) == 'nil' then
+            mode = 'n'
+        end
         opts = opts or {}
         vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts))
     end
 
     keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
-    keymap('gra', '<cmd>FzfLua lsp_code_actions<CR>', 'vim.lsp.buf.code_action()', { 'n', 'x' })
+    keymap('gra', function()
+        -- Use "silent" to stop the warning from fzf-lua
+        require('fzf-lua').lsp_code_actions({ silent = true })
+    end, 'vim.lsp.buf.code_action()', { 'n', 'x' })
+
     keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
 
-    keymap('K', function() vim.lsp.buf.hover({ border = 'rounded' }) end, 'Hover Information')
+    keymap('K', function()
+        vim.lsp.buf.hover({ border = 'rounded' })
+    end, 'Hover Information')
 
-    keymap('[d', function() vim.diagnostic.jump({ count = -1, float = true }) end, 'Previous diagnostic')
-    keymap(']d', function() vim.diagnostic.jump({ count = 1, float = true }) end, 'Next diagnostic')
-    keymap(
-        '[e',
-        function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
-        'Previous error'
-    )
-    keymap(
-        ']e',
-        function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true }) end,
-        'Next error'
-    )
+    keymap('[d', function()
+        vim.diagnostic.jump({ count = -1, float = true })
+    end, 'Previous diagnostic')
+    keymap(']d', function()
+        vim.diagnostic.jump({ count = 1, float = true })
+    end, 'Next diagnostic')
+    keymap('[e', function()
+        vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true })
+    end, 'Previous error')
+    keymap(']e', function()
+        vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true })
+    end, 'Next error')
 
-    local format_cmd = function() require('conform').format({ lsp_fallback = true }) end
+    local format_cmd = function()
+        require('conform').format({ lsp_fallback = true })
+    end
     keymap('<leader>lf', format_cmd, 'Format')
     vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
 
-    if client:supports_method(methods.textDocument_definition) then
-        keymap('gd', function() require('fzf-lua').lsp_definitions({ jump1 = true }) end, 'Go to definition')
-        keymap('gD', function() require('fzf-lua').lsp_definitions({ jump1 = false }) end, 'Peek definition')
-    end
+    vim.lsp.document_color.enable(true, bufnr)
 
-    if client:supports_method(methods.textDocument_documentColor) then vim.lsp.document_color.enable(true, bufnr) end
+    if client:supports_method(methods.textDocument_definition) then
+        keymap('gd', function()
+            require('fzf-lua').lsp_definitions({ jump1 = true })
+        end, 'Go to definition')
+        keymap('gD', function()
+            require('fzf-lua').lsp_definitions({ jump1 = false })
+        end, 'Peek definition')
+    end
 end
 
 -- Update mappings when registering dynamic capabilities.
 local register_capability = vim.lsp.handlers[methods.client_registerCapability]
 vim.lsp.handlers[methods.client_registerCapability] = function(err, res, ctx)
     local client = vim.lsp.get_client_by_id(ctx.client_id)
-    if not client then return end
+    if not client then
+        return
+    end
 
     on_attach(client, vim.api.nvim_get_current_buf())
 
@@ -62,7 +78,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     desc = 'Setup LSP keymaps',
     callback = function(event)
         local client = vim.lsp.get_client_by_id(event.data.client_id)
-        if not client then return end
+        if not client then
+            return
+        end
 
         local bufnr = event.buf
         on_attach(client, bufnr)
@@ -89,7 +107,9 @@ vim.diagnostic.config({
             if diagnostic.source then
                 message = string.format('%s %s', message, special_sources[diagnostic.source] or diagnostic.source)
             end
-            if diagnostic.code then message = string.format('%s[%s]', message, diagnostic.code) end
+            if diagnostic.code then
+                message = string.format('%s[%s]', message, diagnostic.code)
+            end
 
             return message .. ' '
         end,
@@ -101,6 +121,7 @@ vim.diagnostic.config({
             local prefix = string.format(' %s ', diagnostic_icons[level])
             return prefix, 'Diagnostic' .. level:gsub('^%l', string.upper)
         end,
+        border = 'rounded',
     },
     signs = false,
 })
@@ -109,7 +130,9 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
     once = true,
     callback = function()
         local server_configs = vim.iter(vim.api.nvim_get_runtime_file('lsp/*.lua', true))
-            :map(function(file) return vim.fn.fnamemodify(file, ':t:r') end)
+            :map(function(file)
+                return vim.fn.fnamemodify(file, ':t:r')
+            end)
             :totable()
         vim.lsp.enable(server_configs)
     end,

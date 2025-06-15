@@ -12,12 +12,14 @@ return {
             cs = { 'csharpier' },
             go = { 'gofumpt', 'goimports-reviser', 'golines' },
             lua = { 'stylua' },
-            astro = { 'prettierd' },
             svelte = { 'prettierd' },
-            javascript = { 'prettierd', lsp_format = 'fallback' },
-            javascriptreact = { 'prettierd', lsp_format = 'fallback' },
-            typescript = { 'prettierd', lsp_format = 'fallback' },
-            typescriptreact = { 'prettierd', lsp_format = 'fallback' },
+            astro = { 'prettierd' },
+            css = { 'prettierd' },
+            javascript = { 'prettierd' },
+            javascriptreact = { 'prettierd' },
+            typescript = { 'prettierd' },
+            typescriptreact = { 'prettierd' },
+            rust = { name = 'rust_analyzer', timeout_ms = 500, lsp_format = 'prefer' },
             json = { 'prettierd', lsp_format = 'prefer' },
             jsonc = { 'prettierd', lsp_format = 'prefer' },
             markdown = { 'prettierd' },
@@ -30,10 +32,14 @@ return {
         format_on_save = function()
             -- Don't format when minifiles is open, since that triggers the "confirm without
             -- synchronization" message.
-            if vim.g.minifiles_active then return nil end
+            if vim.g.minifiles_active then
+                return nil
+            end
 
             -- Stop if we disabled auto-formatting.
-            if not vim.g.autoformat then return nil end
+            if not vim.g.autoformat then
+                return nil
+            end
 
             return {}
         end,

@@ -1,7 +1,9 @@
 local map_split = function(buf_id, lhs, direction)
     local rhs = function()
         local cur_target = MiniFiles.get_explorer_state().target_window
-        if cur_target == nil or MiniFiles.get_fs_entry().fs_type == 'directory' then return end
+        if cur_target == nil or MiniFiles.get_fs_entry().fs_type == 'directory' then
+            return
+        end
 
         local new_target = vim.api.nvim_win_call(cur_target, function()
             vim.cmd(direction .. ' split')
@@ -30,7 +32,9 @@ return {
                 local path = vim.fn.fnamemodify(bufname, ':p')
 
                 -- Noop if the buffer isn't valid.
-                if path and vim.uv.fs_stat(path) then require('mini.files').open(bufname, false) end
+                if path and vim.uv.fs_stat(path) then
+                    require('mini.files').open(bufname, false)
+                end
             end,
             desc = 'Open file diretory',
         },
@@ -40,6 +44,11 @@ return {
             close = '<C-c>',
             go_in_plus = '<cr>',
             go_out_plus = '<tab>',
+        },
+        content = {
+            filter = function(entry)
+                return entry.fs_type ~= 'file' or entry.name ~= '.DS_Store'
+            end,
         },
         options = { permanent_delete = false },
     },
@@ -52,12 +61,16 @@ return {
         vim.api.nvim_create_autocmd('User', {
             group = minifiles_explorer_group,
             pattern = 'MiniFilesExplorerOpen',
-            callback = function() vim.g.minifiles_active = true end,
+            callback = function()
+                vim.g.minifiles_active = true
+            end,
         })
         vim.api.nvim_create_autocmd('User', {
             group = minifiles_explorer_group,
             pattern = 'MiniFilesExplorerClose',
-            callback = function() vim.g.minifiles_active = false end,
+            callback = function()
+                vim.g.minifiles_active = false
+            end,
         })
 
         vim.api.nvim_create_autocmd('User', {

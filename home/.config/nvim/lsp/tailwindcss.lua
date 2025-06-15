@@ -10,6 +10,7 @@ return {
         'postcss.config.cjs',
         'postcss.config.mjs',
         'postcss.config.ts',
+        'package.json',
     },
     filetypes = {
         'astro',
@@ -21,6 +22,7 @@ return {
         'typescriptreact',
         'svelte',
     },
+    workspace_required = true,
     settings = {
         tailwindCSS = {
             validate = true,

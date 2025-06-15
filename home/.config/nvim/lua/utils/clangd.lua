@@ -3,7 +3,9 @@
 ---@class util.clangd
 local M = {}
 
-local function get_client(bufnr) return vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1] end
+local function get_client(bufnr)
+    return vim.lsp.get_clients({ bufnr = bufnr, name = 'clangd' })[1]
+end
 
 function M.switch_source_header(bufnr)
     local method_name = 'textDocument/switchSourceHeader'
@@ -17,7 +19,9 @@ function M.switch_source_header(bufnr)
     end
     local params = vim.lsp.util.make_text_document_params(bufnr)
     client:request(method_name, params, function(err, result)
-        if err then error(tostring(err)) end
+        if err then
+            error(tostring(err))
+        end
         if not result then
             vim.notify('corresponding file cannot be determined')
             return

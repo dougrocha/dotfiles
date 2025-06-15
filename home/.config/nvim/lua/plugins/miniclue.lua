@@ -14,7 +14,9 @@ return {
                     local key = mark.mark:sub(2, 2)
 
                     -- Just look at letter marks.
-                    if not string.match(key, '^%a') then return nil end
+                    if not string.match(key, '^%a') then
+                        return nil
+                    end
 
                     -- For global marks, use the file as a description.
                     -- For local marks, use the line number and content.
@@ -29,7 +31,9 @@ return {
                         end
                     end
 
-                    if desc then return { mode = 'n', keys = string.format('`%s', key), desc = desc } end
+                    if desc then
+                        return { mode = 'n', keys = string.format('`%s', key), desc = desc }
+                    end
                 end)
                 :totable()
         end

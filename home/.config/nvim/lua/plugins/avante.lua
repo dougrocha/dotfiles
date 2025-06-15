@@ -14,11 +14,11 @@ return {
     ---@diagnostic disable-next-line: missing-fields
     opts = {
         provider = 'copilot',
-        copilot = {
-            endpoint = 'https://api.githubcopilot.com/',
-            model = 'gpt-4o-mini',
-        },
-        vendors = {
+        providers = {
+            copilot = {
+                endpoint = 'https://api.githubcopilot.com/',
+                model = 'gpt-4o-mini',
+            },
             ['copilot:claude-3.7-thought'] = {
                 __inherited_from = 'copilot',
                 model = 'claude-3.7-sonnet-thought',

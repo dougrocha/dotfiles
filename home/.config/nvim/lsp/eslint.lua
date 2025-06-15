@@ -1,13 +1,13 @@
 ---@type vim.lsp.Config
 return {
     cmd = { 'vscode-eslint-language-server', '--stdio' },
-    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    filetypes = { 'astro', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
     root_markers = { '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', 'eslint.config.js' },
     settings = {
         validate = 'on',
         packageManager = nil,
         useESLintClass = false,
-        experimental = { useFlatConfig = false },
+        experimental = { useFlatConfig = true },
         codeActionOnSave = { enable = false, mode = 'all' },
         format = false,
         quiet = false,
@@ -17,7 +17,7 @@ return {
         run = 'onType',
         problems = { shortenToSingleLine = false },
         nodePath = '',
-        workingDirectory = { mode = 'auto' },
+        workingDirectory = { mode = 'location' },
         codeAction = {
             disableRuleComment = { enable = true, location = 'separateLine' },
             showDocumentation = { enable = true },

@@ -1,58 +1,75 @@
 vim.g.maplocalleader = ' '
 vim.g.mapleader = ' '
 
+vim.o.winborder = 'rounded'
+
 -- Enable mouse support
 vim.o.mouse = 'a'
 
 vim.o.undofile = true
-vim.opt.undodir = vim.fn.stdpath('cache') .. '/undo'
-vim.o.swapfile = false
+vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
+vim.opt.wildignore:append({ '.DS_Store' })
 
 -- Completion menu
 vim.o.pumheight = 15
 vim.o.completeopt = 'menu,menuone,noselect'
 
 -- Update time
-vim.opt.timeoutlen = 500
-vim.opt.updatetime = 150
+vim.o.timeoutlen = 500
+vim.o.updatetime = 150
 vim.o.ttimeoutlen = 10
 
 -- Use system clipboard
-vim.opt.clipboard = 'unnamedplus'
+vim.o.clipboard = 'unnamedplus'
 
 -- Search
-vim.opt.hlsearch = true
-vim.opt.inccommand = 'split'
-vim.opt.ignorecase = true
-vim.opt.incsearch = true
-vim.opt.infercase = true
+vim.o.hlsearch = true
+vim.o.inccommand = 'split'
+vim.o.ignorecase = true
+vim.o.incsearch = true
+vim.o.infercase = true
 
 -- Scroll size
-vim.opt.scrolloff = 4
-vim.opt.sidescrolloff = 4
+vim.o.scrolloff = 4
+vim.o.sidescrolloff = 4
 
-vim.opt.showmode = false
-vim.opt.termguicolors = true
-vim.opt.signcolumn = 'yes'
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.splitbelow = true
-vim.opt.wrap = false
+vim.o.showmode = false
+vim.o.termguicolors = true
+vim.o.signcolumn = 'yes'
 
--- Enable auto indentation
+-- Line Numbers
+vim.wo.number = true
+
+-- Wrap long lines using words
+vim.o.linebreak = true
+
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.et = true
-vim.opt.autoindent = true
-vim.opt.expandtab = true
-vim.opt.smartindent = true
+
+-- Enable auto indentation
+vim.o.autoindent = true
+vim.o.expandtab = true
+vim.o.smartindent = true
 
 -- Spell checking
-vim.opt.spelllang = 'en'
-vim.opt.spelloptions = 'camel'
+vim.o.spelllang = 'en'
+vim.o.spelloptions = 'camel'
+
+-- Status line
+vim.o.laststatus = 3
+vim.o.cmdheight = 1
 
 -- Disable markdown style auto-formatting
 vim.g.markdown_recommended_style = 0
 
 -- Add fuzzy completion option if Neovim >= 0.11
-if vim.fn.has('nvim-0.11') == 1 then vim.opt.completeopt:append('fuzzy') end
+if vim.fn.has('nvim-0.11') == 1 then
+    vim.opt.completeopt:append('fuzzy')
+end
+
+-- Disable certain healthchecks
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0

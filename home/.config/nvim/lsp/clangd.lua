@@ -14,11 +14,8 @@ return {
     root_markers = { '.clangd' },
     filetypes = { 'c', 'cpp' },
     on_attach = function(_, buf)
-        vim.keymap.set(
-            'n',
-            '<leader>ch',
-            function() util.clangd.switch_source_header(buf) end,
-            { buffer = buf, desc = 'Switch Source/Header (C/C++)' }
-        )
+        vim.keymap.set('n', '<leader>ch', function()
+            util.clangd.switch_source_header(buf)
+        end, { buffer = buf, desc = 'Switch Source/Header (C/C++)' })
     end,
 }

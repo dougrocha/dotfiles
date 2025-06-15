@@ -32,6 +32,7 @@ end
 return {
     {
         'zk-org/zk-nvim',
+        enabled = false,
         event = 'VeryLazy',
         opts = {
             picker = 'fzf_lua',
@@ -41,7 +42,9 @@ return {
             { '<leader>zr', find_resources, desc = 'Open resource' },
             {
                 '<leader>zn',
-                function() require('zk').new({ title = vim.fn.input('Title: ') }) end,
+                function()
+                    require('zk').new({ title = vim.fn.input('Title: ') })
+                end,
                 desc = 'New Note',
             },
             { '<leader>zf', '<cmd>ZkNotes { sort = { "modified" } }<CR>', desc = 'Find Notes' },
@@ -62,14 +65,18 @@ return {
                 mode = 'v',
             },
         },
-        config = function(_, opts) require('zk').setup(opts) end,
+        config = function(_, opts)
+            require('zk').setup(opts)
+        end,
     },
     {
         'iamcco/markdown-preview.nvim',
         cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
         ft = { 'markdown' },
         build = 'cd app && npm install && git restore .',
-        init = function() vim.g.mkdp_filetypes = { 'markdown' } end,
+        init = function()
+            vim.g.mkdp_filetypes = { 'markdown' }
+        end,
         keys = {
             {
                 '<leader>cp',
@@ -81,8 +88,9 @@ return {
     },
     {
         'MeanderingProgrammer/render-markdown.nvim',
+        enabled = false,
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
-        ft = { 'markdown', 'Avante' },
+        ft = { 'Avante' },
         ---@module 'render-markdown'
         ---@type render.md.UserConfig
         opts = {
@@ -93,7 +101,7 @@ return {
                     },
                 },
             },
-            file_types = { 'markdown', 'Avante' },
+            file_types = { 'Avante' },
             completions = {
                 blink = { enabled = true },
                 lsp = { enabled = true },

@@ -40,19 +40,14 @@ return {
     },
     on_attach = function(_, bufnr)
         local opts = { buffer = bufnr }
-        vim.keymap.set(
-            'n',
-            '<leader>co',
-            function()
-                vim.lsp.buf.code_action({
-                    apply = true,
-                    context = {
-                        only = { 'source.organizeImports' },
-                        diagnostics = {},
-                    },
-                })
-            end,
-            vim.tbl_extend('force', opts, { desc = 'Organize Imports' })
-        )
+        vim.keymap.set('n', '<leader>co', function()
+            vim.lsp.buf.code_action({
+                apply = true,
+                context = {
+                    only = { 'source.organizeImports' },
+                    diagnostics = {},
+                },
+            })
+        end, vim.tbl_extend('force', opts, { desc = 'Organize Imports' }))
     end,
 }
