@@ -42,6 +42,7 @@ return {
                 'classList',
                 'ngClass',
             },
+            classFunctions = { 'cva', 'cn' },
         },
     },
 }

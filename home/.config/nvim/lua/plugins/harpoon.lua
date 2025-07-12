@@ -15,7 +15,7 @@ return {
         vim.keymap.set('n', '<leader>h', function()
             harpoon:list():add()
             vim.notify('󱡅 marked ' .. vim.fn.expand('%:t'), vim.log.levels.INFO)
-        end, { desc = 'Add current file to harpoon' })
+        end, { desc = 'Harpoon file' })
 
         for i = 1, 5 do
             vim.keymap.set('n', '<Space>' .. i, function()

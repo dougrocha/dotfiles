@@ -46,7 +46,7 @@ local progress_status = {
 }
 
 vim.api.nvim_create_autocmd('LspProgress', {
-    group = vim.api.nvim_create_augroup('dougrocha/statusline', { clear = true }),
+    group = vim.api.nvim_create_augroup('dougrocha/lsp', { clear = true }),
     desc = 'Update LSP progress in statusline',
     pattern = { 'begin', 'end' },
     callback = function(args)
@@ -72,6 +72,19 @@ vim.api.nvim_create_autocmd('LspProgress', {
         end
     end,
 })
+
+--- Git status.
+---@return string
+function M.git_component()
+    local head = vim.b._git_head or ''
+    if head == '' then
+        return ''
+    end
+
+    local component = string.format(' %s', head)
+
+    return component
+end
 
 --- The latest LSP progress message.
 ---@return string
@@ -120,6 +133,7 @@ function M.render()
     return table.concat({
         concat_components({
             M.mode_component(),
+            M.git_component(),
             M.lsp_progress_component(),
         }),
         '%#StatusLine#%=',

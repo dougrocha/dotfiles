@@ -10,13 +10,22 @@ return {
             end,
             desc = 'Delete current buffer',
         },
+        {
+            '<leader>cj',
+            function()
+                require('mini.splitjoin').toggle()
+            end,
+            desc = 'Split/join code block',
+        },
     },
     config = function()
         require('mini.align').setup()
         require('mini.surround').setup()
         require('mini.move').setup()
         require('mini.icons').setup({
-            filetype = { astro = { glyph = '' } },
+            filetype = {
+                astro = { glyph = '' },
+            },
         })
         require('mini.splitjoin').setup()
         require('mini.bracketed').setup()

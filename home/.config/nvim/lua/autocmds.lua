@@ -1,3 +1,5 @@
+local git = require('git')
+
 local function augroup(name)
     return vim.api.nvim_create_augroup(name, { clear = true })
 end
@@ -6,7 +8,7 @@ end
 vim.api.nvim_create_autocmd('TextYankPost', {
     group = augroup('highlight_yank'),
     callback = function()
-        vim.hl.on_yank({ higroup = 'Visual', timeout = 250 })
+        vim.hl.on_yank({ higroup = 'Visual' })
     end,
 })
 
@@ -58,14 +60,4 @@ vim.api.nvim_create_autocmd('FileType', {
         vim.cmd('setlocal formatoptions-=c formatoptions-=o')
     end,
     desc = [[Ensure proper 'formatoptions']],
-})
-
--- Automatically rename all files
-vim.api.nvim_create_autocmd('User', {
-    pattern = 'OilActionsPost',
-    callback = function(event)
-        if event.data.actions.type == 'move' then
-            Snacks.rename.on_rename_file(event.data.actions.src_url, event.data.actions.dest_url)
-        end
-    end,
 })

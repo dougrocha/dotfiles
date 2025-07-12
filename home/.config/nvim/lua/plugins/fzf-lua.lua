@@ -26,7 +26,6 @@ return {
         { '<leader>ff', '<cmd>FzfLua files<CR>', desc = 'Find files' },
         { '<leader>fc', '<cmd>FzfLua highlights<CR>', desc = 'Find highlights' },
         { '<leader>fd', '<cmd>FzfLua lsp_document_diagnostics<CR>', desc = 'Find document diagnostics' },
-        { '<leader>fD', '<cmd>FzfLua lsp_workspace_diagnostics<CR>', desc = 'Find workspace diagnostics' },
         {
             '<leader>fr',
             function()

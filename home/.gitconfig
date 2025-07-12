@@ -1,14 +1,33 @@
 [user]
-  name = Douglas Rocha
-  email = 79188161+dougrocha@users.noreply.github.com
-  signingkey = ~/.ssh/id_ed25519_github
+    name = Douglas Rocha
+    email = 79188161+dougrocha@users.noreply.github.com
+    signingkey = ~/.ssh/id_ed25519_github
 [pull]
-  ff = only
+    ff = only
 [commit]
-  gpgsign = true
+    gpgsign = true
 [gpg]
-  format = ssh
+    format = ssh
 [tag]
-  gpgsign = true
+    gpgsign = true
 [gpg "ssh"]
-  allowedSignersFile = ~/.ssh/allowed_signers
+    allowedSignersFile = ~/.ssh/allowed_signers
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[init]
+	defaultBranch = main
+[diff]
+	algorithm = histogram
+	mnemonicPrefix = true
+	renames = true
+[push]
+	default = simple
+	autoSetupRemote = true
+[fetch]
+	prune = true
+[maintenance]
+	repo = /Users/douglasrocha/dev/dotfiles
+[rerere]
+	enabled = true
