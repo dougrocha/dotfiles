@@ -9,7 +9,7 @@ return {
         }
         return {
             snippets = {
-                gen_loader.from_lang({ lang_patterns = lang_patterns }),
+                gen_loader.from_lang { lang_patterns = lang_patterns },
             },
         }
     end,

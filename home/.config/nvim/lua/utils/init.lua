@@ -1,4 +1,4 @@
-local clangd = require('utils.clangd')
+local clangd = require 'utils.clangd'
 
 ---@class util
 ---@field clangd util.clangd

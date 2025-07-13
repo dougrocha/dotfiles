@@ -4,17 +4,17 @@ return {
     branch = 'harpoon2',
     dependencies = 'nvim-lua/plenary.nvim',
     config = function()
-        local harpoon = require('harpoon')
+        local harpoon = require 'harpoon'
 
-        harpoon:setup({
+        harpoon:setup {
             settings = {
                 save_on_toggle = true,
             },
-        })
+        }
 
         vim.keymap.set('n', '<leader>h', function()
             harpoon:list():add()
-            vim.notify('󱡅 marked ' .. vim.fn.expand('%:t'), vim.log.levels.INFO)
+            vim.notify('󱡅 marked ' .. vim.fn.expand '%:t', vim.log.levels.INFO)
         end, { desc = 'Harpoon file' })
 
         for i = 1, 5 do

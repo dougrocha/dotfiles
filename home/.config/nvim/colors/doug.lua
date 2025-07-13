@@ -2,9 +2,9 @@
 -- while I figure out my own colors
 
 -- reset highlighting
-vim.cmd.highlight('clear')
-if vim.fn.exists('syntax_on') then
-    vim.cmd.syntax('reset')
+vim.cmd.highlight 'clear'
+if vim.fn.exists 'syntax_on' then
+    vim.cmd.syntax 'reset'
 end
 vim.o.termguicolors = true
 vim.g.colors_name = 'doug'
@@ -68,14 +68,14 @@ vim.g.terminal_color_foreground = colors.fg
 -- Groups used for my statusline.
 ---@type table<string, vim.api.keyset.highlight>
 local statusline_groups = {}
-for mode, color in pairs({
+for mode, color in pairs {
     Normal = colors.purple,
     Pending = colors.pink,
     Visual = colors.yellow,
     Insert = colors.green,
     Command = colors.cyan,
     Other = colors.orange,
-}) do
+} do
     statusline_groups['StatuslineMode' .. mode] = { fg = colors.mantle, bg = color }
     statusline_groups['StatuslineModeSeparator' .. mode] = { fg = color, bg = colors.mantle }
 end

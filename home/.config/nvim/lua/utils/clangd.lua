@@ -23,7 +23,7 @@ function M.switch_source_header(bufnr)
             error(tostring(err))
         end
         if not result then
-            vim.notify('corresponding file cannot be determined')
+            vim.notify 'corresponding file cannot be determined'
             return
         end
         vim.cmd.edit(vim.uri_to_fname(result))
@@ -34,7 +34,7 @@ function M.symbol_info()
     local bufnr = vim.api.nvim_get_current_buf()
     local clangd_client = get_client(bufnr)
 
-    if not clangd_client or not clangd_client:supports_method('textDocument/symbolInfo') then
+    if not clangd_client or not clangd_client:supports_method 'textDocument/symbolInfo' then
         return vim.notify('Clangd client not found', vim.log.levels.ERROR)
     end
     local win = vim.api.nvim_get_current_win()

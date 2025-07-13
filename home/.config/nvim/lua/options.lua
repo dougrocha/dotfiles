@@ -9,8 +9,8 @@ vim.o.mouse = 'a'
 vim.o.backup = false
 vim.o.swapfile = false
 vim.o.undofile = true
-vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
-vim.opt.wildignore:append({ '.DS_Store' })
+vim.o.undodir = vim.fn.stdpath 'cache' .. '/undo'
+vim.opt.wildignore:append { '.DS_Store' }
 
 -- Completion menu
 vim.o.pumheight = 15
@@ -74,12 +74,12 @@ vim.o.cmdheight = 1
 vim.g.markdown_recommended_style = 0
 
 -- Add fuzzy completion option if Neovim >= 0.11
-if vim.fn.has('nvim-0.11') == 1 then
-    vim.opt.completeopt:append('fuzzy')
+if vim.fn.has 'nvim-0.11' == 1 then
+    vim.opt.completeopt:append 'fuzzy'
 end
 
 -- Make words with dash be one word
-vim.opt.iskeyword:append('-')
+vim.opt.iskeyword:append '-'
 
 -- Disable certain healthchecks
 vim.g.loaded_python3_provider = 0

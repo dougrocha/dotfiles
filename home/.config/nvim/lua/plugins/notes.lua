@@ -23,7 +23,7 @@ local function pick_school_notes()
             ['default'] = function(selected)
                 local class_folder = selected[1]
 
-                require('zk.commands').get('ZkNotes')({ hrefs = { class_folder } })
+                require('zk.commands').get 'ZkNotes' { hrefs = { class_folder } }
             end,
         },
     })
@@ -43,7 +43,7 @@ return {
             {
                 '<leader>zn',
                 function()
-                    require('zk').new({ title = vim.fn.input('Title: ') })
+                    require('zk').new { title = vim.fn.input 'Title: ' }
                 end,
                 desc = 'New Note',
             },

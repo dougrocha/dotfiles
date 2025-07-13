@@ -7,12 +7,6 @@ map({ 'n', 'x' }, 'k', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'k']], { expr = 
 -- Replicate <Esc>
 map('i', '<C-c>', '<Esc>')
 
--- paste over currently selected text without yanking it
-map('v', 'p', '"_dp')
--- map("v", "P", '"_dP')
-map('x', '<leader>p', [["_dP]], { desc = '[P]aste from blackhole register' })
-map('x', '<leader>d', [["_d]], { desc = 'Delete to blackhole register' })
-
 -- Cancel search highlighting with ESC
 map({ 'i', 'n' }, '<esc>', '<cmd>noh<cr><esc>', { desc = 'Clear hlsearch and ESC' })
 
@@ -29,14 +23,8 @@ map('n', '<leader>|', '<C-W>v', { desc = 'Split window right', remap = true })
 -- Center screen when jumping
 map('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down' })
 map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
-map('n', 'n', 'nzz', { desc = 'Move to next search match', silent = true, noremap = true })
-map('n', 'N', 'Nzz', { desc = 'Move to previous search match', silent = true, noremap = true })
-
--- Move Lines
-map('n', '<C-Up>', '<cmd>resize +6<cr>', { desc = 'Increase window height' })
-map('n', '<C-Down>', '<cmd>resize 2<cr>', { desc = 'Decrease window height' })
-map('n', '<C-Left>', '<cmd>vertical resize 2<cr>', { desc = 'Decrease window width' })
-map('n', '<C-Right>', '<cmd>vertical resize +6<cr>', { desc = 'Increase window width' })
+map('n', 'n', 'nzzzv', { desc = 'Move to next search match', silent = true, noremap = true })
+map('n', 'N', 'Nzzzv', { desc = 'Move to previous search match', silent = true, noremap = true })
 
 -- Better indenting
 map('v', '<', '<gv')

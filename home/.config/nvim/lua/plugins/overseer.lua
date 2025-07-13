@@ -17,14 +17,14 @@ return {
         {
             '<leader>o<',
             function()
-                local overseer = require('overseer')
+                local overseer = require 'overseer'
 
-                local tasks = overseer.list_tasks({ recent_first = true })
+                local tasks = overseer.list_tasks { recent_first = true }
                 if vim.tbl_isempty(tasks) then
                     vim.notify('No tasks found', vim.log.levels.WARN)
                 else
                     overseer.run_action(tasks[1], 'restart')
-                    overseer.open({ enter = false })
+                    overseer.open { enter = false }
                 end
             end,
             desc = 'Restart last task',
@@ -32,11 +32,11 @@ return {
         {
             '<leader>or',
             function()
-                local overseer = require('overseer')
+                local overseer = require 'overseer'
 
                 overseer.run_template({}, function(task)
                     if task then
-                        overseer.open({ enter = false })
+                        overseer.open { enter = false }
                     end
                 end)
             end,

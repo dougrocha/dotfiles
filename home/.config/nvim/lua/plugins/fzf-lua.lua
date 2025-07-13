@@ -8,7 +8,7 @@ return {
         {
             '<leader>fb',
             function()
-                require('fzf-lua').lgrep_curbuf({
+                require('fzf-lua').lgrep_curbuf {
                     winopts = {
                         height = 0.6,
                         width = 0.5,
@@ -17,7 +17,7 @@ return {
                     fzf_opts = {
                         ['--layout'] = 'reverse',
                     },
-                })
+                }
             end,
             desc = 'Find in current buffer',
         },
@@ -30,7 +30,7 @@ return {
             '<leader>fr',
             function()
                 -- Read from ShaDa to include files that were already deleted from the buffer list.
-                vim.cmd('rshada!')
+                vim.cmd 'rshada!'
                 require('fzf-lua').oldfiles()
             end,
             desc = 'Recently opened files',

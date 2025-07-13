@@ -22,30 +22,30 @@ local function on_attach(client, bufnr)
     keymap('gra', function()
         -- Use "silent" to stop the warning from fzf-lua
         -- require('fzf-lua').lsp_code_actions({ silent = true })
-        require('tiny-code-action').code_action({})
+        require('tiny-code-action').code_action {}
     end, 'vim.lsp.buf.code_action()', { 'n', 'x' })
 
     keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
 
     keymap('K', function()
-        vim.lsp.buf.hover({ border = 'rounded' })
+        vim.lsp.buf.hover { border = 'rounded' }
     end, 'Hover Information')
 
     keymap('[d', function()
-        vim.diagnostic.jump({ count = -1, float = true })
+        vim.diagnostic.jump { count = -1, float = true }
     end, 'Previous diagnostic')
     keymap(']d', function()
-        vim.diagnostic.jump({ count = 1, float = true })
+        vim.diagnostic.jump { count = 1, float = true }
     end, 'Next diagnostic')
     keymap('[e', function()
-        vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true })
+        vim.diagnostic.jump { count = -1, severity = vim.diagnostic.severity.ERROR, float = true }
     end, 'Previous error')
     keymap(']e', function()
-        vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true })
+        vim.diagnostic.jump { count = 1, severity = vim.diagnostic.severity.ERROR, float = true }
     end, 'Next error')
 
     local format_cmd = function()
-        require('conform').format({ lsp_fallback = true })
+        require('conform').format { lsp_fallback = true }
     end
     keymap('<leader>lf', format_cmd, 'Format')
     vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
@@ -58,10 +58,10 @@ local function on_attach(client, bufnr)
 
     if client:supports_method(methods.textDocument_definition) then
         keymap('gd', function()
-            require('fzf-lua').lsp_definitions({ jump1 = true })
+            require('fzf-lua').lsp_definitions { jump1 = true }
         end, 'Go to definition')
         keymap('gD', function()
-            require('fzf-lua').lsp_definitions({ jump1 = false })
+            require('fzf-lua').lsp_definitions { jump1 = false }
         end, 'Peek definition')
     end
 end
@@ -97,7 +97,7 @@ for severity, icon in pairs(diagnostic_icons) do
     vim.fn.sign_define(hl, { text = icon, texthl = hl })
 end
 
-vim.diagnostic.config({
+vim.diagnostic.config {
     virtual_text = {
         prefix = '',
         spacing = 2,
@@ -129,7 +129,7 @@ vim.diagnostic.config({
         border = 'rounded',
     },
     signs = false,
-})
+}
 
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
     once = true,

@@ -2,7 +2,7 @@ return {
     'echasnovski/mini.clue',
     version = false,
     opts = function()
-        local miniclue = require('mini.clue')
+        local miniclue = require 'mini.clue'
         -- Add a-z/A-Z marks.
         local function mark_clues()
             local marks = {}

@@ -2,9 +2,9 @@ local M = {}
 
 ---@return string
 function M.render()
-    local buffer_name = vim.fn.expand('%:t')
+    local buffer_name = vim.fn.expand '%:t'
 
-    return table.concat({ ' ', string.format('%%#Winbar#%s', buffer_name) })
+    return table.concat { ' ', string.format('%%#Winbar#%s', buffer_name) }
 end
 
 vim.api.nvim_create_autocmd('BufWinEnter', {

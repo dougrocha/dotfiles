@@ -18,24 +18,24 @@ function M.mode_component()
 
     -- Set the highlight group.
     local hl = 'Other'
-    if mode:find('NORMAL') then
+    if mode:find 'NORMAL' then
         hl = 'Normal'
-    elseif mode:find('PENDING') then
+    elseif mode:find 'PENDING' then
         hl = 'Pending'
-    elseif mode:find('VISUAL') then
+    elseif mode:find 'VISUAL' then
         hl = 'Visual'
-    elseif mode:find('INSERT') or mode:find('SELECT') then
+    elseif mode:find 'INSERT' or mode:find 'SELECT' then
         hl = 'Insert'
-    elseif mode:find('COMMAND') or mode:find('TERMINAL') or mode:find('EX') then
+    elseif mode:find 'COMMAND' or mode:find 'TERMINAL' or mode:find 'EX' then
         hl = 'Command'
     end
 
     -- Construct the bubble-like component.
-    return table.concat({
+    return table.concat {
         string.format('%%#StatuslineModeSeparator%s#', hl),
         string.format('%%#StatuslineMode%s#%s', hl, mode),
         string.format('%%#StatuslineModeSeparator%s#', hl),
-    })
+    }
 end
 
 ---@type table<string, string?>
@@ -98,25 +98,25 @@ function M.lsp_progress_component()
         return ''
     end
 
-    return table.concat({
+    return table.concat {
         '%#StatuslineSpinner#󱥸 ',
         string.format('%%#StatuslineTitle#%s  ', progress_status.client),
         string.format('%%#StatuslineItalic#%s...', progress_status.title),
-    })
+    }
 end
 
 --- The current line, total line count, and column position.
 ---@return string
 function M.position_component()
-    local line = vim.fn.line('.')
+    local line = vim.fn.line '.'
     local line_count = vim.api.nvim_buf_line_count(0)
-    local col = vim.fn.virtcol('.')
+    local col = vim.fn.virtcol '.'
 
-    return table.concat({
+    return table.concat {
         '%#StatuslineItalic#l: ',
         string.format('%%#StatuslineTitle#%d', line),
         string.format('%%#StatuslineItalic#/%d c: %d', line_count, col),
-    })
+    }
 end
 
 --- Renders the statusline.
@@ -130,18 +130,18 @@ function M.render()
         end)
     end
 
-    return table.concat({
-        concat_components({
+    return table.concat {
+        concat_components {
             M.mode_component(),
             M.git_component(),
             M.lsp_progress_component(),
-        }),
+        },
         '%#StatusLine#%=',
-        concat_components({
+        concat_components {
             M.position_component(),
-        }),
+        },
         ' ',
-    })
+    }
 end
 vim.o.statusline = "%!v:lua.require'statusline'.render()"
 
