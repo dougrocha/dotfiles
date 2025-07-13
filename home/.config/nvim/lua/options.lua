@@ -18,7 +18,7 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Update time
 vim.o.timeoutlen = 500
-vim.o.updatetime = 150
+vim.o.updatetime = 300
 vim.o.ttimeoutlen = 10
 vim.o.autoread = true
 
@@ -45,8 +45,7 @@ vim.o.signcolumn = 'yes'
 vim.wo.number = true
 
 -- Wrap long lines using words
-vim.o.wrap = false
-vim.o.linebreak = false
+vim.o.linebreak = true
 
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
