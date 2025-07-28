@@ -7,4 +7,9 @@ M.diagnostic_icons = {
     INFO = '',
 }
 
+M.misc = {
+    vertical_bar = '│',
+    dashed_bar = '┊',
+}
+
 return M

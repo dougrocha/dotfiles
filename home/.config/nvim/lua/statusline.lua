@@ -76,8 +76,8 @@ vim.api.nvim_create_autocmd('LspProgress', {
 --- Git status.
 ---@return string
 function M.git_component()
-    local head = vim.b._git_head or ''
-    if head == '' then
+    local head = vim.b.gitsigns_head
+    if not head or head == '' then
         return ''
     end
 

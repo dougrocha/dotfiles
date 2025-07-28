@@ -69,6 +69,7 @@ return {
                 { mode = 'n', keys = '<leader>f', desc = '+find' },
                 { mode = 'x', keys = '<leader>f', desc = '+find' },
                 { mode = 'n', keys = '<leader>g', desc = '+git' },
+                { mode = 'x', keys = '<leader>g', desc = '+git' },
                 { mode = 'n', keys = '<leader>l', desc = '+lsp' },
                 { mode = 'n', keys = '<leader>o', desc = '+overseer' },
                 { mode = 'n', keys = '<leader>r', desc = '+replace' },
