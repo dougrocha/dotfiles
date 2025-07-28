@@ -5,6 +5,12 @@ return {
     root_markers = { 'Cargo.toml' },
     settings = {
         ['rust-analyzer'] = {
+            check = {
+                command = 'clippy',
+            },
+            diagnostics = {
+                enable = true,
+            },
             inlayHints = {
                 chainingHints = { enable = false },
             },
