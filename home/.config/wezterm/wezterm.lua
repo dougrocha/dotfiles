@@ -1,9 +1,10 @@
 local wezterm = require("wezterm")
 local sessionizer = wezterm.plugin.require("https://github.com/mikkasendke/sessionizer.wezterm")
+local history = wezterm.plugin.require("https://github.com/mikkasendke/sessionizer-history")
 
 local action = wezterm.action
 
-local HOME_DIR = os.getenv("HOME")
+local HOME_DIR = wezterm.home_dir
 
 local config = {}
 
@@ -11,17 +12,23 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
-sessionizer.apply_to_config(config)
-sessionizer.config.paths = {
-	HOME_DIR .. "/dev",
-	HOME_DIR .. "/school",
-}
-sessionizer.config.command_options.fd_path = "/opt/homebrew/bin/fd"
-sessionizer.config.show_additional_before_paths = true
-sessionizer.config.additional_directories = {
+local fd_path = "/opt/homebrew/bin/fd"
+
+local schema = {
+	options = { callback = history.Wrapper(sessionizer.DefaultCallback) },
+	sessionizer.DefaultWorkspace({}),
+	history.MostRecentWorkspace({}),
+
 	HOME_DIR .. "/dev",
 	HOME_DIR .. "/school",
 	HOME_DIR .. "/second-brain",
+
+	sessionizer.FdSearch({ HOME_DIR .. "/dev", include_submodules = true, fd_path = fd_path }),
+	sessionizer.FdSearch({ HOME_DIR .. "/school", include_submodules = true, fd_path = fd_path }),
+
+	processing = sessionizer.for_each_entry(function(entry)
+		entry.label = entry.label:gsub(wezterm.home_dir, "~")
+	end),
 }
 
 config.max_fps = 120
@@ -41,7 +48,7 @@ config.adjust_window_size_when_changing_font_size = false
 
 config.set_environment_variables = {
 	XDG_CONFIG_HOME = HOME_DIR .. "/.config",
-	PATH = "/opt/homebrew/bin:" .. os.getenv("PATH"),
+	PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:" .. os.getenv("PATH"),
 }
 config.default_prog = { "nu", "-l" }
 config.unix_domains = { { name = "unix" } }
@@ -61,7 +68,7 @@ config.keys = {
 
 	{ key = "p", mods = "CTRL|SHIFT", action = action.ActivateCommandPalette },
 
-	{ key = "g", mods = "CTRL|SHIFT", action = sessionizer.show },
+	{ key = "g", mods = "CTRL|SHIFT", action = sessionizer.show(schema) },
 }
 
 config.status_update_interval = 1000
