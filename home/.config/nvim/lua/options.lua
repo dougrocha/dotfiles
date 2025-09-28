@@ -41,6 +41,11 @@ vim.o.showmode = false
 vim.o.termguicolors = true
 vim.o.signcolumn = 'yes'
 
+-- Fold
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldlevel = 99
+
 -- Line Numbers
 vim.wo.number = true
 
@@ -62,8 +67,7 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 
 -- Spell checking
-vim.o.spelllang = 'en'
-vim.o.spelloptions = 'camel'
+vim.o.spelllang = 'en_us'
 
 -- Status line
 vim.o.laststatus = 3

@@ -3,7 +3,15 @@ return {
     priority = 1000,
     lazy = false,
     ---@type snacks.Config
-    opts = {},
+    opts = {
+        input = {
+            enabled = true,
+            win = {
+                relative = 'cursor',
+                title_pos = 'left',
+            },
+        },
+    },
     keys = {
         {
             '<leader>gg',

@@ -21,9 +21,8 @@ local map_split = function(buf_id, lhs, direction)
 end
 
 return {
-    'echasnovski/mini.files',
+    'nvim-mini/mini.files',
     version = false,
-    lazy = false,
     keys = {
         {
             '<leader>e',

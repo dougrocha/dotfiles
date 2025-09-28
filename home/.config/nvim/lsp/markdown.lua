@@ -4,6 +4,6 @@ return {
     -- cmd = { 'rust_markdown_lsp' },
     -- cmd = { 'marksman', 'server' },
     filetypes = { 'markdown', 'markdown.mdx' },
-    -- root_markers = { '.markdown.toml', '.marksman.toml' },
+    root_markers = { 'rust_markdown_lsp.toml', '.git' },
     root_dir = vim.fs.root(0, '.git'),
 }

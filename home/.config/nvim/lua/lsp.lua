@@ -31,6 +31,10 @@ local function on_attach(client, bufnr)
         vim.lsp.buf.hover { border = 'rounded' }
     end, 'Hover Information')
 
+    keymap('<leader>D', function()
+        vim.diagnostic.open_float()
+    end, 'View Diagnostic')
+
     keymap('[d', function()
         vim.diagnostic.jump { count = -1, float = true }
     end, 'Previous diagnostic')

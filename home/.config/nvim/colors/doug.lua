@@ -325,6 +325,16 @@ local extras = {
     FzfLuaLiveSym = { fg = colors.fuchsia },
     FzfLuaPreviewTitle = { fg = colors.fg },
     FzfLuaSearch = { bg = colors.transparent_red },
+    -- Gitsigns
+    GitSignsAdd = { fg = colors.bright_green },
+    GitSignsChange = { fg = colors.cyan },
+    GitSignsCurrentLineBlame = { fg = colors.lavender },
+    GitSignsDelete = { fg = colors.bright_red },
+    GitSignsStagedAdd = { fg = colors.orange },
+    GitSignsStagedChange = { fg = colors.orange },
+    GitSignsStagedDelete = { fg = colors.orange },
+    -- Links
+    HighlightUrl = { underline = true, fg = colors.neon_cyan, sp = colors.neon_cyan },
     -- Quickfix Window
     QuickFixLine = { bg = colors.transparent_red, bold = true, italic = true },
     -- Yanky

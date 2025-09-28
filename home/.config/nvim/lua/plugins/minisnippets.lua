@@ -1,5 +1,5 @@
 return {
-    'echasnovski/mini.snippets',
+    'nvim-mini/mini.snippets',
     version = false,
     event = 'InsertEnter',
     opts = function()

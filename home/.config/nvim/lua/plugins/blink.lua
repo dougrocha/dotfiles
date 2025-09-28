@@ -2,14 +2,14 @@ return {
     'saghen/blink.cmp',
     event = 'InsertEnter',
     dependencies = {
-        'echasnovski/mini.snippets',
+        'nvim-mini/mini.snippets',
         {
             'folke/lazydev.nvim',
             opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } },
             ft = 'lua',
         },
     },
-    version = '*',
+    version = '1.*',
     ---@module 'blink-cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -41,6 +41,9 @@ return {
         sources = {
             default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' },
             providers = {
+                lsp = {
+                    score_offset = 3,
+                },
                 lazydev = {
                     name = 'LazyDev',
                     module = 'lazydev.integrations.blink',

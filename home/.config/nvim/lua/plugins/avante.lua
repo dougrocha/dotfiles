@@ -3,8 +3,6 @@ return {
     event = 'VeryLazy',
     version = false,
     dependencies = {
-        'nvim-treesitter/nvim-treesitter',
-        'stevearc/dressing.nvim',
         'nvim-lua/plenary.nvim',
         'MunifTanjim/nui.nvim',
         'zbirenbaum/copilot.lua',
@@ -44,6 +42,9 @@ return {
                 model = 'gpt-4o',
             },
         },
-        hints = { enabled = false },
+        selection = {
+            enabled = true,
+            hint_display = 'none',
+        },
     },
 }

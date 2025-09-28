@@ -1,8 +1,8 @@
 return {
-    'echasnovski/mini.ai',
+    'nvim-mini/mini.ai',
     version = false,
     event = 'BufReadPre',
-    dependencies = 'echasnovski/mini.extra',
+    dependencies = 'nvim-mini/mini.extra',
     opts = function()
         local gen_ai_spec = require('mini.extra').gen_ai_spec
 
