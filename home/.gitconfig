@@ -4,6 +4,7 @@
     signingkey = ~/.ssh/id_ed25519_github
 [pull]
     ff = only
+	rebase = true
 [commit]
     gpgsign = true
 [gpg]

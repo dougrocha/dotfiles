@@ -16,6 +16,6 @@ $env.ZK_NOTEBOOK_DIR = ($env.HOME | path join second-brain)
 
 use ./fnm.nu
 
-mkdir ~/.cache/starship
-starship init nu | save -f ~/.cache/starship/init.nu
+# mkdir ~/.cache/starship
+# starship init nu | save -f ~/.cache/starship/init.nu
 zoxide init nushell | save -f ~/.cache/.zoxide.nu

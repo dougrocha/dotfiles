@@ -46,11 +46,11 @@ config.color_scheme = "Gruvbox dark, hard (base16)"
 config.font = wezterm.font("Monaspace Neon")
 config.adjust_window_size_when_changing_font_size = false
 
-config.set_environment_variables = {
-	XDG_CONFIG_HOME = HOME_DIR .. "/.config",
-	PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:" .. os.getenv("PATH"),
-}
-config.default_prog = { "nu", "-l" }
+-- config.set_environment_variables = {
+-- 	-- XDG_CONFIG_HOME = HOME_DIR .. "/.config",
+-- 	-- PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:" .. os.getenv("PATH"),
+-- }
+-- config.default_prog = { "nu", "-l" }
 config.unix_domains = { { name = "unix" } }
 config.default_gui_startup_args = { "connect", "unix" }
 
