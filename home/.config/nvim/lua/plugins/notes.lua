@@ -48,24 +48,14 @@ return {
                 },
             },
             notes_subdir = 'inbox',
-            new_notes_location = 'notes_subdir',
             legacy_commands = false,
             templates = {
                 folder = 'templates',
                 date_format = '%Y-%m-%d',
             },
-            completion = {
-                nvim_cmp = false,
-                blink = true,
-                min_chars = 2,
-            },
-            picker = {
-                name = 'fzf-lua',
-            },
-            attachments = {
-                img_folder = 'assets/imgs',
-                confirm_img_paste = true,
-            },
+            -- picker = {
+            --     name = 'fzf-lua',
+            -- },
             ---@param title string|?
             ---@return string
             note_id_func = function(title)
