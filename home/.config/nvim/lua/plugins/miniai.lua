@@ -14,8 +14,8 @@ return {
             n_lines = 500,
             silent = true,
             custom_textobjects = {
-                f = gen_spec.treesitter({ a = '@function.outer', i = '@function.inner' }, {}), -- function
-                g = gen_ai_spec.buffer(), -- buffer
+                f = gen_spec.treesitter({ a = '@function.outer', i = '@function.inner' }, {}),
+                g = gen_ai_spec.buffer(),
                 t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags
             },
         }
