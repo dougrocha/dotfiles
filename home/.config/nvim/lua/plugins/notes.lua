@@ -34,13 +34,15 @@ return {
         'obsidian-nvim/obsidian.nvim',
         version = '*',
         lazy = false,
-        ft = 'markdown',
-        enabled = function()
-            return not vim.g.minifiles_active
+        cond = function()
+            local cwd = vim.fn.getcwd()
+            local second_brain = vim.fn.expand '~/second-brain'
+            return vim.startswith(cwd, second_brain) and not vim.g.minifiles_active
         end,
         ---@module 'obsidian'
         ---@type obsidian.config
         opts = {
+            legacy_commands = false,
             workspaces = {
                 {
                     name = 'second-brain',
@@ -48,7 +50,6 @@ return {
                 },
             },
             notes_subdir = 'inbox',
-            legacy_commands = false,
             templates = {
                 folder = 'templates',
                 date_format = '%Y-%m-%d',

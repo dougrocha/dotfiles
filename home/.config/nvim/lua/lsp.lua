@@ -21,11 +21,8 @@ local function on_attach(client, bufnr)
     keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
     keymap('gra', function()
         -- Use "silent" to stop the warning from fzf-lua
-        -- require('fzf-lua').lsp_code_actions({ silent = true })
-        require('tiny-code-action').code_action {}
+        require('fzf-lua').lsp_code_actions { silent = true }
     end, 'vim.lsp.buf.code_action()', { 'n', 'x' })
-
-    keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
 
     keymap('K', function()
         vim.lsp.buf.hover { border = 'rounded' }
@@ -56,9 +53,15 @@ local function on_attach(client, bufnr)
 
     vim.lsp.document_color.enable(true, bufnr)
 
-    keymap('grc', function()
-        vim.lsp.document_color.color_presentation()
-    end, 'vim.lsp.document_color.color_presentation()', { 'n', 'x' })
+    if client:supports_method(methods.textDocument_documentColor) then
+        keymap('grc', function()
+            vim.lsp.document_color.color_presentation()
+        end, 'vim.lsp.document_color.color_presentation()', { 'n', 'x' })
+    end
+
+    if client:supports_method(methods.textDocument_typeDefinition) then
+        keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
+    end
 
     if client:supports_method(methods.textDocument_definition) then
         keymap('gd', function()

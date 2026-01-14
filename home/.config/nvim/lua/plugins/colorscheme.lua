@@ -22,7 +22,6 @@ return {
                     information = { 'undercurl' },
                 },
             },
-            overseer = true,
             snacks = {
                 enabled = true,
             },

@@ -263,7 +263,7 @@ local lsp = {
     DiagnosticVirtualTextInfo = { fg = colors.cyan, bg = colors.transparent_blue },
     DiagnosticVirtualTextWarn = { fg = colors.yellow, bg = colors.transparent_yellow },
     DiagnosticWarn = { fg = colors.yellow },
-    LspCodeLens = { fg = colors.cyan },
+    LspCodeLens = { fg = colors.cyan, underline = true },
     LspFloatWinBorder = { fg = colors.comment },
     LspInlayHint = { fg = colors.lavender, italic = true },
     LspReferenceRead = { bg = colors.transparent_blue },
@@ -310,13 +310,23 @@ local blink = {
 -- Winbar
 ---@type table<string, vim.api.keyset.highlight>
 local winbar = {
-    WinBar = { fg = colors.text, bg = colors.transparent_black },
+    WinBar = { fg = colors.fg, bg = colors.transparent_black },
     WinBarNC = { bg = colors.transparent_black },
     WinBarDir = { fg = colors.bright_magenta, bg = colors.transparent_black, italic = true },
     WinBarSeparator = { fg = colors.green, bg = colors.transparent_black },
 }
 
 local extras = {
+    -- Diffs
+    DiffAdd = { fg = colors.green, bg = colors.transparent_green },
+    DiffChange = { fg = colors.white, bg = colors.transparent_yellow },
+    DiffDelete = { fg = colors.red, bg = colors.transparent_red },
+    DiffText = { fg = colors.orange, bg = colors.transparent_yellow, bold = true },
+    DiffviewFolderSign = { fg = colors.cyan },
+    DiffviewNonText = { fg = colors.lilac },
+    diffAdded = { fg = colors.bright_green, bold = true },
+    diffChanged = { fg = colors.bright_yellow, bold = true },
+    diffRemoved = { fg = colors.bright_red, bold = true },
     -- Fzf-lua
     FzfLuaBorder = { fg = colors.comment },
     FzfLuaHeaderBind = { fg = colors.lavender },
@@ -336,7 +346,7 @@ local extras = {
     -- Links
     HighlightUrl = { underline = true, fg = colors.neon_cyan, sp = colors.neon_cyan },
     -- Quickfix Window
-    QuickFixLine = { bg = colors.transparent_red, bold = true, italic = true },
+    QuickFixLine = { italic = true, bg = colors.transparent_red },
     -- Yanky
     YankyPut = { link = 'Visual' },
     YankyYanked = { link = 'Visual' },
@@ -344,8 +354,6 @@ local extras = {
     MoreMsg = { fg = colors.bright_white, bold = true },
     MsgArea = { fg = colors.cyan },
     MsgSeparator = { fg = colors.lilac },
-    -- Overseeer.
-    OverseerComponent = { link = '@keyword' },
 }
 
 ---@type table<string, vim.api.keyset.highlight>

@@ -3,7 +3,7 @@ local M = {}
 M.diagnostic_icons = {
     ERROR = '',
     WARN = '',
-    HINT = '󰠠',
+    HINT = '',
     INFO = '',
 }
 

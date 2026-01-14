@@ -40,23 +40,20 @@ return {
 
         return {
             triggers = {
-                -- Leader triggers
-                { mode = 'n', keys = '<leader>' },
-                { mode = 'x', keys = '<leader>' },
+                -- Leader triggers.
+                { mode = { 'n', 'x' }, keys = '<leader>' },
 
-                { mode = 'i', keys = '<C-x>' },
-                { mode = 'n', keys = 'g' },
-                { mode = 'x', keys = 'g' },
-                { mode = 'n', keys = "'" },
-                { mode = 'n', keys = '`' },
-                { mode = 'x', keys = "'" },
-                { mode = 'x', keys = '`' },
-                { mode = 'n', keys = '"' },
-                { mode = 'x', keys = '"' },
-                { mode = 'i', keys = '<C-r>' },
-                { mode = 'c', keys = '<C-r>' },
+                -- Builtins.
+                { mode = { 'n', 'x' }, keys = 'g' },
+                { mode = { 'n', 'x' }, keys = '`' },
+                { mode = { 'n', 'x' }, keys = '"' },
+                { mode = { 'i', 'c' }, keys = '<C-r>' },
                 { mode = 'n', keys = '<C-w>' },
+                { mode = 'i', keys = '<C-x>' },
                 { mode = 'n', keys = 'z' },
+                -- Leader triggers.
+                { mode = { 'n', 'x' }, keys = '<leader>' },
+                -- Moving between stuff.
                 { mode = 'n', keys = '[' },
                 { mode = 'n', keys = ']' },
             },
@@ -64,14 +61,9 @@ return {
             clues = {
                 { mode = 'n', keys = '<leader>a', desc = '+ai' },
                 { mode = 'n', keys = '<leader>b', desc = '+buffers' },
-                { mode = 'n', keys = '<leader>c', desc = '+code' },
-                { mode = 'x', keys = '<leader>c', desc = '+code' },
-                { mode = 'n', keys = '<leader>f', desc = '+find' },
-                { mode = 'x', keys = '<leader>f', desc = '+find' },
-                { mode = 'n', keys = '<leader>g', desc = '+git' },
-                { mode = 'x', keys = '<leader>g', desc = '+git' },
+                { mode = { 'n', 'x' }, keys = '<leader>c', desc = '+code' },
+                { mode = { 'n', 'x' }, keys = '<leader>f', desc = '+find' },
                 { mode = 'n', keys = '<leader>l', desc = '+lsp' },
-                { mode = 'n', keys = '<leader>o', desc = '+overseer' },
                 { mode = 'n', keys = '<leader>r', desc = '+replace' },
                 { mode = 'n', keys = '<leader>s', desc = '+search' },
                 { mode = 'n', keys = '<leader>t', desc = '+trouble' },
@@ -80,6 +72,8 @@ return {
                 { mode = 'n', keys = '<leader>z', desc = '+notes' },
                 { mode = 'n', keys = '[', desc = '+prev' },
                 { mode = 'n', keys = ']', desc = '+next' },
+                { mode = 'n', keys = '[s', desc = 'Prev spelling mistake' },
+                { mode = 'n', keys = ']s', desc = 'Next spelling mistake' },
                 -- Enhance this by adding descriptions for <Leader> mapping groups
                 miniclue.gen_clues.builtin_completion(),
                 miniclue.gen_clues.g(),

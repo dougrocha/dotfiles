@@ -5,7 +5,11 @@ return {
         'nvim-mini/mini.snippets',
         {
             'folke/lazydev.nvim',
-            opts = { library = { { path = '${3rd}/luv/library', words = { 'vim%.uv' } } } },
+            opts = {
+                library = {
+                    { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+                },
+            },
             ft = 'lua',
         },
     },

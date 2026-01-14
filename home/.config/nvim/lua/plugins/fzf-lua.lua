@@ -25,15 +25,7 @@ return {
         { '<leader>ff', '<cmd>FzfLua files<CR>', desc = 'Find files' },
         { '<leader>fc', '<cmd>FzfLua highlights<CR>', desc = 'Find highlights' },
         { '<leader>fd', '<cmd>FzfLua lsp_document_diagnostics<CR>', desc = 'Find document diagnostics' },
-        {
-            '<leader>fr',
-            function()
-                -- Read from ShaDa to include files that were already deleted from the buffer list.
-                vim.cmd 'rshada!'
-                require('fzf-lua').oldfiles()
-            end,
-            desc = 'Recently opened files',
-        },
+        { '<leader>fr', '<cmd>FzfLua oldfiles<CR>', desc = 'Recently opened files' },
         { '<leader>f<', '<cmd>FzfLua resume<cr>', desc = 'Resume last fzf command' },
         { 'z=', '<cmd>FzfLua spell_suggest<CR>', desc = 'Spell suggestions' },
     },
@@ -41,7 +33,14 @@ return {
         local actions = require('fzf-lua').actions
 
         return {
-            'border-fused',
+            { 'border-fused', 'hide' },
+            fzf_colors = {
+                bg = { 'bg', 'Normal' },
+                gutter = { 'bg', 'Normal' },
+                info = { 'fg', 'Conditional' },
+                scrollbar = { 'bg', 'Normal' },
+                separator = { 'fg', 'Comment' },
+            },
             fzf_opts = {
                 ['--info'] = 'default',
                 ['--layout'] = 'reverse-list',
@@ -63,10 +62,24 @@ return {
                     vertical = 'up:40%',
                 },
             },
-            grep = {
-                actions = {
-                    ['ctrl-r'] = { actions.toggle_hidden },
+            lsp = {
+                code_actions = {
+                    winopts = {
+                        width = 70,
+                        height = 20,
+                        relative = 'cursor',
+                        preview = {
+                            hidden = true,
+                            vertical = 'down:50%',
+                        },
+                    },
                 },
+            },
+            previewers = {
+                codeaction = { toggle_behavior = 'extend' },
+            },
+            grep = {
+                hidden = true,
             },
             files = {
                 winopts = {

@@ -5,9 +5,9 @@ return {
     root_markers = { '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', 'eslint.config.js' },
     settings = {
         validate = 'on',
-        packageManager = nil,
+        packageManager = vim.NIL,
         useESLintClass = false,
-        experimental = { useFlatConfig = true },
+        experimental = { useFlatConfig = false },
         codeActionOnSave = { enable = false, mode = 'all' },
         format = false,
         quiet = false,

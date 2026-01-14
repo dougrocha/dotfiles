@@ -55,7 +55,6 @@ vim.o.linebreak = true
 vim.o.shiftwidth = 4
 vim.o.tabstop = 4
 vim.o.softtabstop = 4
-vim.o.et = true
 
 -- Enable auto indentation
 vim.o.autoindent = true
@@ -67,7 +66,7 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 
 -- Spell checking
-vim.o.spelllang = 'en_us'
+vim.o.spelllang = 'en'
 
 -- Status line
 vim.o.laststatus = 3
@@ -75,6 +74,11 @@ vim.o.cmdheight = 1
 
 -- Disable markdown style auto-formatting
 vim.g.markdown_recommended_style = 0
+
+vim.opt.shortmess:append {
+    w = true,
+    s = true,
+}
 
 -- Add fuzzy completion option if Neovim >= 0.11
 if vim.fn.has 'nvim-0.11' == 1 then

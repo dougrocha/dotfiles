@@ -40,7 +40,7 @@ return {
     },
     opts = {
         mappings = {
-            close = '<C-c>',
+            show_help = '?',
             go_in_plus = '<cr>',
             go_out_plus = '<tab>',
         },

@@ -4,8 +4,8 @@ local util = require 'utils'
 return {
     cmd = {
         'clangd',
-        '--background-index',
         '--clang-tidy',
+        '--background-index',
         '--header-insertion=iwyu',
         '--completion-style=detailed',
         '--function-arg-placeholders=false',

@@ -10,12 +10,8 @@ return {
     },
     settings = {
         Lua = {
-            completion = {
-                callSnippet = 'Replace',
-            },
-            format = {
-                enabled = false,
-            },
+            completion = { callSnippet = 'Replace' },
+            format = { enabled = false },
             telemetry = { enable = false },
             hint = {
                 enable = true,

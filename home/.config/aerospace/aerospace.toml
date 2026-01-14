@@ -1,10 +1,12 @@
-start-at-login = true
+start-at-login = false
 enable-normalization-flatten-containers = true
 enable-normalization-opposite-orientation-for-nested-containers = true
 
-accordion-padding = 30
-default-root-container-layout = 'tiles'
+accordion-padding = 16
+default-root-container-layout = 'accordion'
 default-root-container-orientation = 'auto'
+
+on-focus-changed = ['move-mouse monitor-lazy-center']
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 automatically-unhide-macos-hidden-apps = false
@@ -33,10 +35,10 @@ cmd-alt-h = []
 alt-slash = 'layout tiles horizontal vertical'
 alt-comma = 'layout accordion horizontal vertical'
 
-alt-h = 'focus left'
-alt-l = 'focus right'
-# alt-j = 'focus down'
-# alt-k = 'focus up'
+cmd-shift-h = 'focus --boundaries-action wrap-around-the-workspace left'
+cmd-shift-l = 'focus --boundaries-action wrap-around-the-workspace right'
+cmd-shift-j = 'focus --boundaries-action wrap-around-the-workspace down'
+cmd-shift-k = 'focus --boundaries-action wrap-around-the-workspace up'
 
 alt-shift-h = 'move left'
 alt-shift-j = 'move down'
@@ -53,6 +55,7 @@ alt-4 = 'workspace 4'
 alt-5 = 'workspace 5'
 alt-6 = 'workspace 6'
 alt-7 = 'workspace 7'
+alt-d = 'workspace D'
 alt-m = 'workspace M'
 alt-s = 'workspace S'
 
@@ -63,6 +66,7 @@ alt-shift-4 = 'move-node-to-workspace 4'
 alt-shift-5 = 'move-node-to-workspace 5'
 alt-shift-6 = 'move-node-to-workspace 6'
 alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-d = 'move-node-to-workspace D'
 alt-shift-s = 'move-node-to-workspace S'
 
 alt-tab = 'workspace-back-and-forth'
@@ -93,15 +97,15 @@ if.app-id = 'com.apple.safari'
 run = 'move-node-to-workspace 1'
 
 [[on-window-detected]]
-if.app-id = 'com.github.wez.wezterm'
+if.app-name-regex-substring = 'wezterm|ghostty'
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.hnc.Discord'
-run = 'move-node-to-workspace 3'
+run = 'move-node-to-workspace D'
 
 [[on-window-detected]]
-if.app-name-regex-substring = 'finder|maps|notes|calender|reminders|photos|messages|mail'
+if.app-name-regex-substring = 'finder|maps|notes|calendar|reminders|photos|messages|mail|system settings|system preferences|calculator|preview|facetime|contacts|books|app store|activity monitor|disk utility|font book'
 run = 'layout floating'
 
 [[on-window-detected]]
