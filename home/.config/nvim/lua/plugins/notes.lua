@@ -34,13 +34,14 @@ return {
         'obsidian-nvim/obsidian.nvim',
         version = '*',
         lazy = false,
+        enabled = false,
         cond = function()
             local cwd = vim.fn.getcwd()
             local second_brain = vim.fn.expand '~/second-brain'
             return vim.startswith(cwd, second_brain) and not vim.g.minifiles_active
         end,
         ---@module 'obsidian'
-        ---@type obsidian.config
+        ---@type obsidian.config.ClientOpts
         opts = {
             legacy_commands = false,
             workspaces = {
@@ -54,9 +55,6 @@ return {
                 folder = 'templates',
                 date_format = '%Y-%m-%d',
             },
-            -- picker = {
-            --     name = 'fzf-lua',
-            -- },
             ---@param title string|?
             ---@return string
             note_id_func = function(title)

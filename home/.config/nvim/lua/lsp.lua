@@ -18,11 +18,15 @@ local function on_attach(client, bufnr)
         vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts))
     end
 
-    keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
-    keymap('gra', function()
-        -- Use "silent" to stop the warning from fzf-lua
-        require('fzf-lua').lsp_code_actions { silent = true }
-    end, 'vim.lsp.buf.code_action()', { 'n', 'x' })
+    if client:supports_method(methods.textDocument_references) then
+        keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
+    end
+    if client:supports_method(methods.textDocument_codeAction) then
+        keymap('gra', function()
+            -- Use "silent" to stop the warning from fzf-lua
+            require('fzf-lua').lsp_code_actions { silent = true }
+        end, 'vim.lsp.buf.code_action()', { 'n', 'x' })
+    end
 
     keymap('K', function()
         vim.lsp.buf.hover { border = 'rounded' }
@@ -57,6 +61,15 @@ local function on_attach(client, bufnr)
         keymap('grc', function()
             vim.lsp.document_color.color_presentation()
         end, 'vim.lsp.document_color.color_presentation()', { 'n', 'x' })
+    end
+
+    if client:supports_method(methods.textDocument_signatureHelp) then
+        keymap('<C-k>', function()
+            if require('blink.cmp.completion.windows.menu').win:is_open() then
+                require('blink.cmp').hide()
+            end
+            vim.lsp.buf.signature_help()
+        end, 'Signature help', { 'i' })
     end
 
     if client:supports_method(methods.textDocument_typeDefinition) then

@@ -2,7 +2,7 @@ function sync-obsidian
     # Obsidian to iCloud Sync Script
     # Set your paths here
     set SOURCE_DIR ~/second-brain/
-    set DEST_DIR ~/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/second-brain/
+    set DEST_DIR "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/second-brain/"
 
     # Colors for output
     set GREEN (set_color green)
@@ -12,7 +12,7 @@ function sync-obsidian
     echo "🔄 Starting Obsidian sync to iCloud..."
 
     # Create destination if it doesn't exist
-    mkdir -p $DEST_DIR
+    mkdir -p "$DEST_DIR"
 
     # Rsync with options:
     # -a: archive mode (preserves permissions, timestamps, etc)
@@ -25,7 +25,7 @@ function sync-obsidian
         --exclude='*.un~' \
         --exclude='.DS_Store' \
         --exclude='.git/' \
-        $SOURCE_DIR $DEST_DIR
+        "$SOURCE_DIR" "$DEST_DIR"
 
     if test $status -eq 0
         echo "$GREEN✅ Sync completed successfully!$NORMAL"

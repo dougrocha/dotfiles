@@ -11,6 +11,15 @@ return {
                 title_pos = 'left',
             },
         },
+        lazygit = {
+            config = {
+                os = { editPreset = 'nvim-remote' },
+                gui = {
+                    -- set to an empty string "" to disable icons
+                    nerdFontsVersion = '3',
+                },
+            },
+        },
     },
     keys = {
         {

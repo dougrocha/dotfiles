@@ -59,7 +59,7 @@ return {
             },
 
             clues = {
-                { mode = 'n', keys = '<leader>a', desc = '+ai' },
+                { mode = { 'n', 'x' }, keys = '<leader>a', desc = '+ai' },
                 { mode = 'n', keys = '<leader>b', desc = '+buffers' },
                 { mode = { 'n', 'x' }, keys = '<leader>c', desc = '+code' },
                 { mode = { 'n', 'x' }, keys = '<leader>f', desc = '+find' },
