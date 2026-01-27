@@ -29,7 +29,6 @@ return {
         }
         require('mini.splitjoin').setup()
         require('mini.bracketed').setup()
-        require('mini.pairs').setup()
 
         local hipatterns = require 'mini.hipatterns'
         local hi_words = require('mini.extra').gen_highlighter.words

@@ -34,7 +34,6 @@ return {
         'obsidian-nvim/obsidian.nvim',
         version = '*',
         lazy = false,
-        enabled = false,
         cond = function()
             local cwd = vim.fn.getcwd()
             local second_brain = vim.fn.expand '~/second-brain'

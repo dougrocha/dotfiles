@@ -4,16 +4,18 @@ return {
     dependencies = {
         'nvim-mini/mini.snippets',
         {
-            'folke/lazydev.nvim',
+            'saghen/blink.pairs',
+            build = 'cargo build --release',
+            --- @module 'blink.pairs'
+            --- @type blink.cmp.Config
             opts = {
-                library = {
-                    { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+                highlights = {
+                    enabled = false,
                 },
             },
-            ft = 'lua',
         },
     },
-    version = '1.*',
+    build = 'cargo +nightly build --release',
     ---@module 'blink-cmp'
     ---@type blink.cmp.Config
     opts = {
@@ -26,6 +28,7 @@ return {
             ['<C-h>'] = { 'snippet_backward', 'fallback' },
             ['<C-e>'] = { 'hide', 'fallback' },
             ['<CR>'] = { 'accept', 'fallback' },
+            ['<C-x><C-o>'] = { 'show', 'fallback' },
         },
         appearance = {
             use_nvim_cmp_as_default = true,
@@ -43,17 +46,7 @@ return {
             preset = 'mini_snippets',
         },
         sources = {
-            default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' },
-            providers = {
-                lsp = {
-                    score_offset = 3,
-                },
-                lazydev = {
-                    name = 'LazyDev',
-                    module = 'lazydev.integrations.blink',
-                    score_offset = 100,
-                },
-            },
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
         },
     },
 }
