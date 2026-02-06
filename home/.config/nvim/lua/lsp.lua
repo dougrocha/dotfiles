@@ -1,9 +1,9 @@
 local diagnostic_icons = require('icons').diagnostic_icons
 
-local methods = vim.lsp.protocol.Methods
-
 vim.g.inlay_hints = false
 
+---@param client vim.lsp.Client
+---@param bufnr integer
 local function on_attach(client, bufnr)
     ---@param lhs string
     ---@param rhs string|function
@@ -18,10 +18,10 @@ local function on_attach(client, bufnr)
         vim.keymap.set(mode, lhs, rhs, vim.tbl_extend('force', { buffer = bufnr, desc = desc }, opts))
     end
 
-    if client:supports_method(methods.textDocument_references) then
+    if client:supports_method 'textDocument/references' then
         keymap('grr', '<cmd>FzfLua lsp_references<CR>', 'vim.lsp.buf.references()')
     end
-    if client:supports_method(methods.textDocument_codeAction) then
+    if client:supports_method 'textDocument/codeAction' then
         keymap('gra', function()
             -- Use "silent" to stop the warning from fzf-lua
             require('fzf-lua').lsp_code_actions { silent = true }
@@ -57,13 +57,13 @@ local function on_attach(client, bufnr)
 
     vim.lsp.document_color.enable(true, bufnr)
 
-    if client:supports_method(methods.textDocument_documentColor) then
+    if client:supports_method 'textDocument/documentColor' then
         keymap('grc', function()
             vim.lsp.document_color.color_presentation()
         end, 'vim.lsp.document_color.color_presentation()', { 'n', 'x' })
     end
 
-    if client:supports_method(methods.textDocument_signatureHelp) then
+    if client:supports_method 'textDocument/signatureHelp' then
         keymap('<C-k>', function()
             if require('blink.cmp.completion.windows.menu').win:is_open() then
                 require('blink.cmp').hide()
@@ -72,11 +72,11 @@ local function on_attach(client, bufnr)
         end, 'Signature help', { 'i' })
     end
 
-    if client:supports_method(methods.textDocument_typeDefinition) then
+    if client:supports_method 'textDocument/typeDefinition' then
         keymap('gy', '<cmd>FzfLua lsp_typedefs<CR>', 'Go to type definition')
     end
 
-    if client:supports_method(methods.textDocument_definition) then
+    if client:supports_method 'textDocument/definition' then
         keymap('gd', function()
             require('fzf-lua').lsp_definitions { jump1 = true }
         end, 'Go to definition')
@@ -87,8 +87,9 @@ local function on_attach(client, bufnr)
 end
 
 -- Update mappings when registering dynamic capabilities.
-local register_capability = vim.lsp.handlers[methods.client_registerCapability]
-vim.lsp.handlers[methods.client_registerCapability] = function(err, res, ctx)
+local register_capability = vim.lsp.handlers['client/registerCapability']
+---@diagnostic disable-next-line: duplicate-set-field
+vim.lsp.handlers['client/registerCapability'] = function(err, res, ctx)
     local client = vim.lsp.get_client_by_id(ctx.client_id)
     if not client then
         return
@@ -101,13 +102,13 @@ end
 
 vim.api.nvim_create_autocmd('LspAttach', {
     desc = 'Setup LSP keymaps',
-    callback = function(event)
-        local client = vim.lsp.get_client_by_id(event.data.client_id)
+    callback = function(args)
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
         if not client then
             return
         end
 
-        local bufnr = event.buf
+        local bufnr = args.buf
         on_attach(client, bufnr)
     end,
 })

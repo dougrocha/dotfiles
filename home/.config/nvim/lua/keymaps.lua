@@ -29,3 +29,6 @@ map('n', 'N', 'Nzzzv', { desc = 'Move to previous search match', silent = true, 
 -- Better indenting
 map('v', '<', '<gv')
 map('v', '>', '>gv')
+
+-- Mark management
+map('c', 'dm', 'delmarks', { desc = 'Delete marks' })

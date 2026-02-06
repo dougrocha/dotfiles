@@ -11,7 +11,7 @@ return {
         '--function-arg-placeholders=false',
         '--fallback-style=llvm',
     },
-    root_markers = { '.clangd' },
+    root_markers = { '.clangd', 'compile_commands.json', '.git' },
     filetypes = { 'c', 'cpp' },
     capabilities = {
         textDocument = {

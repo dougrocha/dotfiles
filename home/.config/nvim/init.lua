@@ -22,6 +22,7 @@ require 'commands'
 require 'autocmds'
 require 'statusline'
 require 'winbar'
+require 'marks'
 require 'lsp'
 
 require('lazy').setup(plugins, {
@@ -41,7 +42,7 @@ require('lazy').setup(plugins, {
                 'rplugin',
                 'tarPlugin',
                 'tohtml',
-                'tutor',
+                -- 'tutor',
                 'zipPlugin',
             },
         },

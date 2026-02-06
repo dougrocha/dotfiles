@@ -28,7 +28,6 @@ return {
             ['<C-h>'] = { 'snippet_backward', 'fallback' },
             ['<C-e>'] = { 'hide', 'fallback' },
             ['<CR>'] = { 'accept', 'fallback' },
-            ['<C-x><C-o>'] = { 'show', 'fallback' },
         },
         appearance = {
             use_nvim_cmp_as_default = true,

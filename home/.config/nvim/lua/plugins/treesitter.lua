@@ -1,9 +1,9 @@
 return {
     'nvim-treesitter/nvim-treesitter',
-    version = false,
+    lazy = false,
     build = ':TSUpdate',
     opts = {
-        ensure_installed = {
+        langs = {
             'bash',
             'cpp',
             'gitcommit',
@@ -18,11 +18,28 @@ return {
             'toml',
             'tsx',
         },
-        highlight = { enable = true },
-        indent = { enable = true },
-        folds = { enabled = true },
     },
     config = function(_, opts)
-        require('nvim-treesitter.configs').setup(opts)
+        local treesitter = require 'nvim-treesitter'
+        treesitter.install {
+            opts.langs,
+        }
+
+        local group = vim.api.nvim_create_augroup('dougrocha/treesitter', { clear = true })
+        vim.api.nvim_create_autocmd('FileType', {
+            group = group,
+            pattern = opts.langs,
+            callback = function(args)
+                -- Enable highlighting for the buffer
+                vim.treesitter.start(args.buf)
+
+                -- Enable indentation for the buffer
+                vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+
+                -- Enable fold
+                vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+                vim.wo[0][0].foldmethod = 'expr'
+            end,
+        })
     end,
 }
