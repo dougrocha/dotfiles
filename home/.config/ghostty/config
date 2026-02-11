@@ -1,34 +1,18 @@
 # Font
-font-family = "Monaspace Neon"
-font-size = 16
+# font-family = "Monaspace Neon"
+font-size = 14
 
 # Theme
 theme = Dracula
 background = 0E1419
 
-# Cursor
-cursor-style = block
-cursor-style-blink = false
-shell-integration-features = no-cursor
-
-shell-integration = "fish"
+shell-integration-features = no-cursor,no-sudo,no-title
 
 confirm-close-surface = false
-
-split-divider-color = F6F6F5
-
-title = " "
-window-padding-balance = true
-
-confirm-close-surface = false
-
-# Keybinds
-keybind = cmd+b>r=reload_config
-keybind = cmd+b>x=close_surface
 
 macos-option-as-alt = true
 macos-titlebar-style = transparent
-macos-window-shadow = false
+
 # Completly close ghostty
 quit-after-last-window-closed = true
 
