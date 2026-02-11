@@ -50,4 +50,4 @@ require('lazy').setup(plugins, {
 })
 
 -- New command line nightly feature
-require('vim._extui').enable {}
+require('vim._core.ui2').enable {}
