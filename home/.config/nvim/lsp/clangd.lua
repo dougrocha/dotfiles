@@ -4,12 +4,9 @@ local util = require 'utils'
 return {
     cmd = {
         'clangd',
-        '--clang-tidy',
         '--background-index',
-        '--header-insertion=iwyu',
         '--completion-style=detailed',
         '--function-arg-placeholders=false',
-        '--fallback-style=llvm',
     },
     root_markers = { '.clangd', 'compile_commands.json', '.git' },
     filetypes = { 'c', 'cpp' },

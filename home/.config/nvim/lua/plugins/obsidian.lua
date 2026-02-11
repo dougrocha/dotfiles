@@ -1,17 +1,7 @@
-vim.api.nvim_create_autocmd('BufNewFile', {
-    pattern = '*.md',
-    callback = function()
-        if package.loaded['obsidian'] then
-            vim.bo.filetype = 'markdown'
-        end
-    end,
-})
-
 return {
     {
         'obsidian-nvim/obsidian.nvim',
         version = '*',
-        cmd = { 'Obsidian' },
         cond = function()
             local cwd = vim.fn.getcwd()
             local second_brain = vim.fn.expand '~/second-brain'
@@ -47,7 +37,7 @@ return {
                 end
                 return suffix
             end,
-
+            ---@diagnostic disable-next-line: missing-fields
             ui = {
                 enable = false,
             },

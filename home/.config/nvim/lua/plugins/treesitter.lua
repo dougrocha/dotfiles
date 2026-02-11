@@ -9,7 +9,6 @@ return {
             'gitcommit',
             'json',
             'json5',
-            'jsonc',
             'lua',
             'markdown',
             'markdown_inline',
@@ -21,9 +20,7 @@ return {
     },
     config = function(_, opts)
         local treesitter = require 'nvim-treesitter'
-        treesitter.install {
-            opts.langs,
-        }
+        treesitter.install(opts.langs)
 
         local group = vim.api.nvim_create_augroup('dougrocha/treesitter', { clear = true })
         vim.api.nvim_create_autocmd('FileType', {

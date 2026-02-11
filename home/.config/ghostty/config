@@ -1,19 +1,24 @@
 # Font
-# font-family = "Monaspace Neon"
+font-family = "Monaspace Neon"
 font-size = 14
+font-thicken = true
 
 # Theme
 theme = Dracula
 background = 0E1419
 
-shell-integration-features = no-cursor,no-sudo,no-title
+shell-integration-features = no-cursor
 
 confirm-close-surface = false
 
 macos-option-as-alt = true
-macos-titlebar-style = transparent
+macos-window-buttons = hidden
+macos-titlebar-style = hidden
+macos-window-shadow = false
 
 # Completly close ghostty
 quit-after-last-window-closed = true
 
 mouse-hide-while-typing = true
+
+# vim: set ft=conf

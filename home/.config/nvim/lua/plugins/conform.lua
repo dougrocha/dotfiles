@@ -1,34 +1,31 @@
 return {
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
-    cmd = { 'ConformInfo' },
     ---@module 'conform'
     ---@type conform.setupOpts
     opts = {
         notify_on_error = false,
+        notify_no_formatters = false,
         formatters_by_ft = {
-            astro = { 'prettierd' },
+            astro = { 'prettier' },
             c = { name = 'clangd', lsp_format = 'prefer' },
             cpp = { name = 'clangd', lsp_format = 'prefer' },
             cs = { 'csharpier' },
-            css = { 'prettierd' },
+            css = { 'prettier' },
             go = { 'gopls', lsp_format = 'prefer' },
-            javascript = { 'prettierd', lsp_format = 'fallback' },
-            javascriptreact = { 'prettierd', lsp_format = 'fallback' },
-            json = { 'prettierd', lsp_format = 'fallback' },
-            jsonc = { 'prettierd', lsp_format = 'fallback' },
+            javascript = { 'prettier', lsp_format = 'fallback' },
+            javascriptreact = { 'prettier', lsp_format = 'fallback' },
+            json = { 'prettier', lsp_format = 'fallback' },
+            jsonc = { 'prettier', lsp_format = 'fallback' },
             lua = { 'stylua' },
-            markdown = { 'prettierd' },
+            markdown = { 'prettier' },
             python = { 'ruff_format' },
             rust = { name = 'rust_analyzer', timeout_ms = 500, lsp_format = 'prefer' },
-            svelte = { 'prettierd' },
+            svelte = { 'prettier' },
             toml = { 'taplo' },
-            typescript = { 'prettierd', lsp_format = 'fallback' },
-            typescriptreact = { 'prettierd', lsp_format = 'fallback' },
+            typescript = { 'prettier', lsp_format = 'fallback' },
+            typescriptreact = { 'prettier', lsp_format = 'fallback' },
             ['_'] = { 'trim_whitespace', 'trim_newlines' },
-        },
-        default_format_opts = {
-            lsp_format = 'fallback',
         },
         format_on_save = function()
             -- Don't format when minifiles is open, since that triggers the "confirm without
@@ -44,6 +41,11 @@ return {
 
             return {}
         end,
+
+        prettier = {
+            -- Require prettier file to format
+            require_cwd = true,
+        },
     },
     init = function()
         vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"

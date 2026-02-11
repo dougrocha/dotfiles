@@ -76,8 +76,8 @@ for mode, color in pairs {
     Command = colors.cyan,
     Other = colors.orange,
 } do
-    statusline_groups['StatuslineMode' .. mode] = { fg = colors.mantle, bg = color }
-    statusline_groups['StatuslineModeSeparator' .. mode] = { fg = color, bg = colors.mantle }
+    statusline_groups['StatuslineMode' .. mode] = { fg = colors.transparent_black, bg = color }
+    statusline_groups['StatuslineModeSeparator' .. mode] = { fg = color, bg = colors.transparent_black }
 end
 statusline_groups = vim.tbl_extend('error', statusline_groups, {
     StatusLine = { fg = colors.white, bg = colors.transparent_black }, -- Status line background
@@ -134,7 +134,7 @@ local builtins = {
     Special = { fg = colors.green, italic = true },
     SpecialComment = { fg = colors.comment, italic = true },
     SpecialKey = { fg = colors.nontext },
-    SpellBad = { sp = colors.bright_red, underline = true },
+    SpellBad = { sp = colors.bright_red, undercurl = true },
     SpellCap = { sp = colors.yellow, underline = true },
     SpellLocal = { sp = colors.yellow, underline = true },
     SpellRare = { sp = colors.yellow, underline = true },
@@ -147,7 +147,7 @@ local builtins = {
     Type = { fg = colors.cyan },
     TypeDef = { fg = colors.yellow },
     Underlined = { fg = colors.cyan, underline = true },
-    VertSplit = { fg = colors.white },
+    WinSeparator = { fg = colors.white },
     Visual = { bg = colors.visual },
     VisualNOS = { fg = colors.visual },
     WarningMsg = { fg = colors.yellow },

@@ -3,6 +3,7 @@ return {
     version = false,
     opts = function()
         local miniclue = require 'mini.clue'
+
         -- Add a-z/A-Z marks.
         local function mark_clues()
             local marks = {}
@@ -59,28 +60,24 @@ return {
             },
 
             clues = {
-                { mode = { 'n', 'x' }, keys = '<leader>a', desc = '+ai' },
-                { mode = 'n', keys = '<leader>b', desc = '+buffers' },
                 { mode = { 'n', 'x' }, keys = '<leader>c', desc = '+code' },
                 { mode = { 'n', 'x' }, keys = '<leader>f', desc = '+find' },
+                { mode = 'n', keys = '<leader>b', desc = '+buffers' },
+                { mode = 'n', keys = '<leader>d', desc = '+debug' },
                 { mode = 'n', keys = '<leader>l', desc = '+lsp' },
-                { mode = 'n', keys = '<leader>r', desc = '+replace' },
-                { mode = 'n', keys = '<leader>s', desc = '+search' },
-                { mode = 'n', keys = '<leader>t', desc = '+trouble' },
                 { mode = 'n', keys = '<leader>w', desc = '+window' },
                 { mode = 'n', keys = '<leader>x', desc = '+loclist/quickfix' },
-                { mode = 'n', keys = '<leader>z', desc = '+notes' },
                 { mode = 'n', keys = '[', desc = '+prev' },
                 { mode = 'n', keys = ']', desc = '+next' },
-                { mode = 'n', keys = '[s', desc = 'Prev spelling mistake' },
-                { mode = 'n', keys = ']s', desc = 'Next spelling mistake' },
-                -- Enhance this by adding descriptions for <Leader> mapping groups
-                miniclue.gen_clues.builtin_completion(),
+
+                -- Builtins
                 miniclue.gen_clues.g(),
                 miniclue.gen_clues.marks(),
                 miniclue.gen_clues.registers(),
                 miniclue.gen_clues.windows(),
                 miniclue.gen_clues.z(),
+
+                -- custom
                 mark_clues,
             },
             window = {
