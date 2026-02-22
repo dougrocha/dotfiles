@@ -1,7 +1,7 @@
 ---@type vim.lsp.Config
 return {
     cmd = { 'vscode-eslint-language-server', '--stdio' },
-    filetypes = { 'astro', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+    filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
     workspace_required = true,
     root_markers = { '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json', 'eslint.config.js' },
     settings = {

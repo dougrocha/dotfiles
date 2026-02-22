@@ -1,3 +1,5 @@
+local icons = require 'icons'
+
 return {
     'ibhagwan/fzf-lua',
     cmd = 'FzfLua',
@@ -80,6 +82,13 @@ return {
             },
             grep = {
                 hidden = true,
+                header_prefix = icons.misc.search .. ' ',
+                rg_opts = '--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "!.git" -e',
+                rg_glob_fn = function(query, opts)
+                    local regex, flags = query:match(string.format('^(.*)%s(.*)$', opts.glob_separator))
+                    -- Return the original query if there's no separator.
+                    return (regex or query), flags
+                end,
             },
             files = {
                 winopts = {

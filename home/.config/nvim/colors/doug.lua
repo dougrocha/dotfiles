@@ -134,7 +134,7 @@ local builtins = {
     Special = { fg = colors.green, italic = true },
     SpecialComment = { fg = colors.comment, italic = true },
     SpecialKey = { fg = colors.nontext },
-    SpellBad = { sp = colors.bright_red, undercurl = true },
+    SpellBad = { sp = colors.bright_red, underline = true },
     SpellCap = { sp = colors.yellow, underline = true },
     SpellLocal = { sp = colors.yellow, underline = true },
     SpellRare = { sp = colors.yellow, underline = true },

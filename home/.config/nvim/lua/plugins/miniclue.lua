@@ -52,8 +52,6 @@ return {
                 { mode = 'n', keys = '<C-w>' },
                 { mode = 'i', keys = '<C-x>' },
                 { mode = 'n', keys = 'z' },
-                -- Leader triggers.
-                { mode = { 'n', 'x' }, keys = '<leader>' },
                 -- Moving between stuff.
                 { mode = 'n', keys = '[' },
                 { mode = 'n', keys = ']' },

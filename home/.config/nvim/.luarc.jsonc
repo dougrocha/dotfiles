@@ -12,6 +12,7 @@
       // Extra configuration helpers.
       "lua/icons.lua",
       // Plugin Completion
+      "$XDG_DATA_HOME/nvim/lazy/99/lua",
       "$XDG_DATA_HOME/nvim/lazy/blink.cmp/lua",
       "$XDG_DATA_HOME/nvim/lazy/blink.pairs/lua",
       "$XDG_DATA_HOME/nvim/lazy/conform.nvim/lua",

@@ -22,11 +22,7 @@ return {
         require('mini.align').setup()
         require('mini.surround').setup()
         require('mini.move').setup()
-        require('mini.icons').setup {
-            filetype = {
-                astro = { glyph = '' },
-            },
-        }
+        require('mini.icons').setup()
         require('mini.splitjoin').setup()
         require('mini.bracketed').setup()
 

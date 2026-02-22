@@ -13,14 +13,11 @@ return {
         'package.json',
     },
     filetypes = {
-        'astro',
-        'astro-markdown',
         'css',
         'javascript',
         'javascriptreact',
         'typescript',
         'typescriptreact',
-        'svelte',
     },
     workspace_required = true,
     settings = {

@@ -32,10 +32,10 @@ local schema = {
 }
 
 config.max_fps = 120
-config.window_background_opacity = 0.9
+config.window_background_opacity = 1.0
 config.window_decorations = "RESIZE"
-config.font_size = 18.0
-config.command_palette_font_size = 18.0
+config.font_size = 14.0
+config.command_palette_font_size = 14.0
 
 config.window_padding = { left = 0, right = 0, top = 0, bottom = 0 }
 config.use_fancy_tab_bar = false
@@ -51,8 +51,6 @@ config.adjust_window_size_when_changing_font_size = false
 -- 	-- PATH = "/opt/homebrew/bin:/opt/homebrew/sbin:" .. os.getenv("PATH"),
 -- }
 -- config.default_prog = { "nu", "-l" }
-config.unix_domains = { { name = "unix" } }
-config.default_gui_startup_args = { "connect", "unix" }
 
 config.keys = {
 	{ key = "s", mods = "CTRL|SHIFT", action = action.SplitVertical({ domain = "CurrentPaneDomain" }) },

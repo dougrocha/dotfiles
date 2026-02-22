@@ -42,14 +42,13 @@ vim.o.termguicolors = true
 vim.o.signcolumn = 'yes'
 
 -- Fold
-vim.o.foldmethod = 'expr'
-vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.o.foldlevel = 99
 
 -- Line Numbers
 vim.wo.number = true
 
--- Wrap long lines using words
+-- Do not Wrap long lines using words
+vim.o.wrap = false
 vim.o.linebreak = true
 
 vim.o.shiftwidth = 4

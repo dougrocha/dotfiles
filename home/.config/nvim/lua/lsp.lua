@@ -155,14 +155,18 @@ vim.diagnostic.config {
 vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
     once = true,
     callback = function()
-        -- Extend neovim's client capabilities with the completion ones.
-        vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities(nil, true) })
+        -- Defer to avoid racing with filetype detection on the triggering buffer
+        -- (e.g. ObsidianNew creating a markdown file as the very first BufNewFile)
+        vim.schedule(function()
+            -- Extend neovim's client capabilities with the completion ones.
+            vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities(nil, true) })
 
-        local server_configs = vim.iter(vim.api.nvim_get_runtime_file('lsp/*.lua', true))
-            :map(function(file)
-                return vim.fn.fnamemodify(file, ':t:r')
-            end)
-            :totable()
-        vim.lsp.enable(server_configs)
+            local server_configs = vim.iter(vim.api.nvim_get_runtime_file('lsp/*.lua', true))
+                :map(function(file)
+                    return vim.fn.fnamemodify(file, ':t:r')
+                end)
+                :totable()
+            vim.lsp.enable(server_configs)
+        end)
     end,
 })

@@ -1,8 +1,10 @@
 return {
     'saghen/blink.cmp',
     lazy = false,
-    event = 'InsertEnter',
-    dependencies = { 'nvim-mini/mini.snippets' },
+    dependencies = {
+        { 'nvim-mini/mini.snippets' },
+        { 'saghen/blink.compat', version = '2.*', lazy = true, opts = {} },
+    },
     build = 'cargo +nightly build --release',
     ---@module 'blink-cmp'
     ---@type blink.cmp.Config

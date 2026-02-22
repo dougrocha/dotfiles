@@ -1,7 +1,7 @@
 function sync-obsidian
     # Obsidian to iCloud Sync Script
     # Set your paths here
-    set SOURCE_DIR ~/second-brain/
+    set SOURCE_DIR "$SECOND_BRAIN/"
     set DEST_DIR "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/second-brain/"
 
     # Colors for output

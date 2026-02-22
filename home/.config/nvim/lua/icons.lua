@@ -8,6 +8,7 @@ M.diagnostic_icons = {
 }
 
 M.misc = {
+    search = '',
     vertical_bar = '│',
     dashed_bar = '┊',
     ellipsis = '…',
