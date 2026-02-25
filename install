@@ -1,3 +1,16 @@
 #!/bin/bash
 
-stow -R -v -t ~ -d "$(dirname "$0")/home" .
+set -euo pipefail
+
+DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if ! command -v stow &> /dev/null; then
+    echo "Error: GNU stow is not installed."
+    echo "Install it with: sudo apt install stow (Debian/Ubuntu) or brew install stow (macOS)"
+    exit 1
+fi
+
+echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
+stow -R -v -t ~ -d "$DOTFILES_DIR" home
+
+echo "Dotfiles installed successfully!"
