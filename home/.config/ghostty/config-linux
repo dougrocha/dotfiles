@@ -1,0 +1,6 @@
+font-family = "JetBrainsMono Nerd Font"
+
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+
+# vim: set ft=conf

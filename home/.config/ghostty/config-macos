@@ -1,0 +1,11 @@
+font-family = "Monaspace Neon"
+font-size = 14
+
+macos-option-as-alt = true
+macos-window-buttons = hidden
+macos-titlebar-style = hidden
+macos-window-shadow = false
+
+mouse-hide-while-typing = true
+
+# vim: set ft=conf
