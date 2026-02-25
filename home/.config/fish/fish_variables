@@ -1,5 +1,0 @@
-# This file contains fish universal variable definitions.
-# VERSION: 3.0
-SETUVAR __fish_initialized:4300
-SETUVAR fish_greeting:\x1d
-SETUVAR fish_user_paths:/Users/douglasrocha/Library/Android/sdk/platform\x2dtools\x1e/Users/douglasrocha/Library/Android/sdk/emulator\x1e/Users/douglasrocha/\x2elocal/bin\x1e/opt/homebrew/sbin\x1e/opt/homebrew/bin
