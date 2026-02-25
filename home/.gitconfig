@@ -1,9 +1,8 @@
 [user]
     name = Douglas Rocha
     email = 79188161+dougrocha@users.noreply.github.com
-    signingkey = ~/.ssh/id_ed25519_github
+    signingkey = ~/.ssh/id_ed25519
 [pull]
-    ff = only
 	rebase = true
 [commit]
     gpgsign = true
@@ -11,8 +10,6 @@
     format = ssh
 [tag]
     gpgsign = true
-[gpg "ssh"]
-    allowedSignersFile = ~/.ssh/allowed_signers
 [column]
 	ui = auto
 [branch]
@@ -23,19 +20,13 @@
 	algorithm = histogram
 	mnemonicPrefix = true
 	renames = true
+    colorMoved = true
 [push]
-	default = simple
 	autoSetupRemote = true
 [fetch]
 	prune = true
-[maintenance]
-	repo = /Users/douglasrocha/dev/dotfiles
 [rerere]
 	enabled = true
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+    autoupdate = true
 [core]
 	editor = nvim
