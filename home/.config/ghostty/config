@@ -13,7 +13,7 @@ font-feature = -calt
 # Completly close ghostty
 quit-after-last-window-closed = true
 
-config-file = ?config-linux
 config-file = ?config-macos
+config-file = ?config-linux
 
-# vim: set ft=conf
+# vim: set ft=conf:
