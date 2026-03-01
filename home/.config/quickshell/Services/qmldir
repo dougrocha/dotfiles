@@ -1,0 +1,5 @@
+module Services
+singleton AudioService 1.0 AudioService.qml
+singleton CpuService 1.0 CpuService.qml
+singleton Players 1.0 Players.qml
+singleton StreamingService 1.0 StreamingService.qml

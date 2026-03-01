@@ -1,0 +1,2 @@
+module Widgets
+ClockWidget 1.0 ClockWidget.qml

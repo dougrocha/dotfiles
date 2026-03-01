@@ -1,0 +1,3 @@
+module Components
+singleton Theme Theme.qml
+Streaming 1.0 Streaming.qml
