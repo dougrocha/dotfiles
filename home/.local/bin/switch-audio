@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Create a temporary markdown file to display options
+TEMP_MD=$(mktemp --suffix=.md)
+trap 'rm -f "$TEMP_MD"' EXIT
+
+# Parse wpctl status output to get sinks (only actual output devices)
+readarray -t SINKS < <(wpctl status | sed -n '/Sinks:/,/Sources:/p' | grep -E '^\s+│\s+[\*]?\s+[0-9]+\.' | sed 's/^[[:space:]│]*//')
+
+if [[ ${#SINKS[@]} -eq 0 ]]; then
+    echo "No audio output devices found!"
+    exit 1
+fi
+
+# Get current default sink (marked with *)
+CURRENT_DEFAULT=$(echo "${SINKS[@]}" | grep '^\*' | sed 's/^\*[[:space:]]*//' | cut -d'.' -f1 | xargs)
+
+# Build markdown content
+cat > "$TEMP_MD" << 'EOF'
+# Audio Output Devices
+
+Select an audio device to set as default:
+
+EOF
+
+# Add each sink to the markdown
+INDEX=1
+declare -a SINK_IDS
+for sink in "${SINKS[@]}"; do
+    # Extract ID and name
+    IS_DEFAULT=$(echo "$sink" | grep -q '^\*' && echo "true" || echo "false")
+    SINK_CLEAN=$(echo "$sink" | sed 's/^\*[[:space:]]*//')
+    SINK_ID=$(echo "$SINK_CLEAN" | cut -d'.' -f1 | xargs)
+    SINK_NAME=$(echo "$SINK_CLEAN" | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
+    
+    SINK_IDS+=("$SINK_ID")
+    
+    if [[ "$IS_DEFAULT" == "true" ]]; then
+        echo "**${INDEX}. ✓ ${SINK_NAME}** (current)" >> "$TEMP_MD"
+    else
+        echo "${INDEX}. ${SINK_NAME}" >> "$TEMP_MD"
+    fi
+    
+    ((INDEX++))
+done
+
+echo "" >> "$TEMP_MD"
+echo "---" >> "$TEMP_MD"
+echo "" >> "$TEMP_MD"
+echo "Press \`q\` to quit, then enter your choice (1-${#SINKS[@]})" >> "$TEMP_MD"
+
+# Display with glow
+glow "$TEMP_MD"
+
+# Get user input
+echo -n "Enter choice (1-${#SINKS[@]}) or q to quit: "
+read -r CHOICE
+
+# Validate input
+if [[ "$CHOICE" == "q" || "$CHOICE" == "Q" ]]; then
+    echo "Cancelled."
+    exit 0
+fi
+
+if ! [[ "$CHOICE" =~ ^[0-9]+$ ]] || [ "$CHOICE" -lt 1 ] || [ "$CHOICE" -gt "${#SINKS[@]}" ]; then
+    echo "Invalid choice!"
+    exit 1
+fi
+
+# Set the default sink
+SELECTED_INDEX=$((CHOICE - 1))
+SELECTED_ID="${SINK_IDS[$SELECTED_INDEX]}"
+
+wpctl set-default "$SELECTED_ID"
+
+if [ $? -eq 0 ]; then
+    SELECTED_NAME=$(echo "${SINKS[$SELECTED_INDEX]}" | sed 's/^\*[[:space:]]*//' | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
+    echo "✓ Default audio device set to: $SELECTED_NAME"
+else
+    echo "Failed to set default audio device!"
+    exit 1
+fi
+
+# vim: ft=sh
