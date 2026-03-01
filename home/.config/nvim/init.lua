@@ -53,4 +53,4 @@ require('lazy').setup(plugins, {
 vim.cmd.packadd 'nvim.undotree'
 
 -- New command line nightly feature
--- require('vim._core.ui2').enable {}
+require('vim._core.ui2').enable {}
