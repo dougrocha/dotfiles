@@ -1,0 +1,81 @@
+#!/bin/bash
+
+set -e
+
+ICON_DIR="$HOME/.local/share/icons/webapps"
+
+if (( $# < 2 )); then
+  echo -e "\e[32mLet's create a web app launcher.\n\e[0m"
+  APP_NAME=$(gum input --prompt "Name> " --placeholder "My favorite web app")
+  APP_URL=$(gum input --prompt "URL> " --placeholder "https://example.com")
+
+  if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
+    APP_URL="https://$APP_URL"
+  fi
+
+  # Try to fetch favicon automatically
+  FAVICON_URL="https://www.google.com/s2/favicons?domain=${APP_URL}&sz=128"
+  mkdir -p "$ICON_DIR"
+  if curl -fsSL -o "$ICON_DIR/$APP_NAME.png" "$FAVICON_URL" && [[ -s $ICON_DIR/$APP_NAME.png ]]; then
+    ICON_PATH="$ICON_DIR/$APP_NAME.png"
+  else
+    ICON_URL=$(gum input --prompt "Icon URL> " --placeholder "Could not fetch favicon (see https://dashboardicons.com)")
+    if [[ -n $ICON_URL ]]; then
+      curl -fsSL -o "$ICON_DIR/$APP_NAME.png" "$ICON_URL" || ICON_PATH="web-browser"
+      ICON_PATH="${ICON_PATH:-$ICON_DIR/$APP_NAME.png}"
+    else
+      ICON_PATH="web-browser"
+    fi
+  fi
+else
+  APP_NAME="$1"
+  APP_URL="$2"
+
+  if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
+    APP_URL="https://$APP_URL"
+  fi
+
+  mkdir -p "$ICON_DIR"
+
+  if [[ -n $3 ]]; then
+    if [[ $3 =~ ^https?:// ]]; then
+      ICON_PATH="$ICON_DIR/$APP_NAME.png"
+      curl -fsSL -o "$ICON_PATH" "$3" || ICON_PATH="web-browser"
+    else
+      ICON_PATH="$3"
+    fi
+  else
+    # Try favicon
+    FAVICON_URL="https://www.google.com/s2/favicons?domain=${APP_URL}&sz=128"
+    if curl -fsSL -o "$ICON_DIR/$APP_NAME.png" "$FAVICON_URL" && [[ -s $ICON_DIR/$APP_NAME.png ]]; then
+      ICON_PATH="$ICON_DIR/$APP_NAME.png"
+    else
+      ICON_PATH="web-browser"
+    fi
+  fi
+fi
+
+mkdir -p "$HOME/.local/share/applications"
+
+# Create desktop file
+DESKTOP_FILE="$HOME/.local/share/applications/$APP_NAME.desktop"
+
+EXEC_CMD="launch-webapp $APP_URL"
+
+cat >"$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=$APP_NAME
+Comment=$APP_NAME
+Exec=$EXEC_CMD
+Icon=$ICON_PATH
+Terminal=false
+StartupNotify=true
+EOF
+
+chmod +x "$DESKTOP_FILE"
+
+echo -e "\e[32m✓ $APP_NAME installed\e[0m"
+
+# vim: ft=sh

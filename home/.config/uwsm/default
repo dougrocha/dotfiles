@@ -1,0 +1,2 @@
+# Use NVIM for editor
+export EDITOR=nvim

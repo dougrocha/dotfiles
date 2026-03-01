@@ -13,4 +13,6 @@ fi
 echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
 stow -R -v -t ~ -d "$DOTFILES_DIR" home
 
+"$DOTFILES_DIR/scripts/setup-ghostty-config.sh"
+
 echo "Dotfiles installed successfully!"

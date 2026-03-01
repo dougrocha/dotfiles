@@ -1,0 +1,7 @@
+#!/bin/bash
+
+browser=chromium
+
+exec setsid uwsm-app -- "$browser" --app="$1"
+
+# vim: ft=sh

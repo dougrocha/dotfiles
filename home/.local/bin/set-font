@@ -1,0 +1,86 @@
+#!/bin/bash
+
+font_name="$1"
+category="$2"
+
+if [[ -z "$font_name" || -z "$category" ]]; then
+    echo "Usage: $0 <font-name> <category>"
+    echo "Example: $0 'JetBrainsMono Nerd Font' 'monospace'"
+    echo "Example: $0 'Inter' 'sans-serif'"
+    exit 1
+fi
+
+FONT_DIR="$HOME/.config/fontconfig"
+FONT_CONF="$FONT_DIR/fonts.conf"
+
+mkdir -p "$FONT_DIR"
+
+if [[ ! -s "$FONT_CONF" ]]; then
+    echo "Initializing optimized fonts.conf..."
+    cat <<EOF > "$FONT_CONF"
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <match target="pattern">
+    <test name="family" qual="any"><string>sans-serif</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>Liberation Sans</string></edit>
+  </match>
+
+  <match target="pattern">
+    <test name="family" qual="any"><string>serif</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>Liberation Serif</string></edit>
+  </match>
+
+  <match target="pattern">
+    <test name="family" qual="any"><string>monospace</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>fixed</string></edit>
+  </match>
+
+  <alias>
+    <family>system-ui</family>
+    <prefer><family>sans-serif</family></prefer>
+  </alias>
+
+  <alias>
+    <family>ui-monospace</family>
+    <prefer><family>monospace</family></prefer>
+  </alias>
+
+  <alias>
+    <family>-apple-system</family>
+    <prefer><family>sans-serif</family></prefer>
+  </alias>
+
+  <alias>
+    <family>BlinkMacSystemFont</family>
+    <prefer><family>sans-serif</family></prefer>
+  </alias>
+
+  <match target="pattern">
+    <test name="family" qual="any"><string>sans-serif</string></test>
+    <edit name="family" mode="append" binding="weak"><string>Noto Color Emoji</string></edit>
+  </match>
+
+  <match target="pattern">
+    <test name="family" qual="any"><string>serif</string></test>
+    <edit name="family" mode="append" binding="weak"><string>Noto Color Emoji</string></edit>
+  </match>
+
+  <match target="pattern">
+    <test name="family" qual="any"><string>monospace</string></test>
+    <edit name="family" mode="append" binding="weak"><string>Noto Color Emoji</string></edit>
+  </match>
+</fontconfig>
+EOF
+fi
+
+xmlstarlet ed -L \
+  -u "//match[test/string='$category']/edit[@name='family']/string" \
+  -v "$font_name" \
+  "$FONT_CONF"
+
+fc-cache -f
+
+echo "Successfully updated $category font to: $font_name"
+
+# vim: ft=sh
