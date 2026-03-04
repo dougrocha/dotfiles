@@ -1,2 +1,4 @@
 # Use NVIM for editor
 export EDITOR=nvim
+
+export TERMINAL=xdg-terminal-exec

@@ -10,6 +10,13 @@ export SDL_VIDEODRIVER="wayland,x11"
 export MOZ_ENABLE_WAYLAND=1
 export ELECTRON_OZONE_PLATFORM_HINT=wayland
 
+# Set defaults
+source ~/.config/uwsm/default
+
 export PATH="$PATH:$HOME/.local/bin"
+
+if command -v mise &> /dev/null && [[ "$SHELL" == "/bin/bash" ]]; then
+  eval "$(mise activate bash)"
+fi
 
 # vim: ft=sh
