@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Used because Cider is an electron app
+# and electron apps set their name to chromium by force...
+
+pid=$(pgrep -x Cider | head -1) || exit 1
+echo "chromium.instance$pid"

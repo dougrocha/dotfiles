@@ -27,5 +27,6 @@ fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cargo/bin"
 
 fzf --fish | source
+mise activate fish | source
 starship init fish | source
 zoxide init fish | source
