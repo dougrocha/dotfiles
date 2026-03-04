@@ -1,15 +1,15 @@
 [user]
-    name = Douglas Rocha
-    email = 79188161+dougrocha@users.noreply.github.com
-    signingkey = ~/.ssh/id_ed25519
+	name = Douglas Rocha
+  email = 79188161+dougrocha@users.noreply.github.com
+  signingkey = ~/.ssh/id_ed25519
 [pull]
 	rebase = true
 [commit]
-    gpgsign = true
+	gpgsign = true
 [gpg]
-    format = ssh
+	format = ssh
 [tag]
-    gpgsign = true
+  gpgsign = true
 [column]
 	ui = auto
 [branch]
@@ -20,13 +20,13 @@
 	algorithm = histogram
 	mnemonicPrefix = true
 	renames = true
-    colorMoved = true
+  colorMoved = true
 [push]
 	autoSetupRemote = true
 [fetch]
 	prune = true
 [rerere]
 	enabled = true
-    autoupdate = true
+  autoupdate = true
 [core]
 	editor = nvim
