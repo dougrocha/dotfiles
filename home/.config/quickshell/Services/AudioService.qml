@@ -7,130 +7,126 @@ pragma Singleton
 Singleton {
     id: root
 
+    readonly property var nodes: Pipewire.nodes.values.reduce((acc, node) => {
+        if (!node.isStream) {
+            if (node.isSink)
+                acc.sinks.push(node);
+            else if (node.audio)
+                acc.sources.push(node);
+        } else if (node.isStream && node.audio) {
+            // Application streams (output streams)
+            acc.streams.push(node);
+        }
+        return acc;
+    }, {
+        sources: [],
+        sinks: [],
+        streams: []
+    })
+
+    readonly property var sinks: nodes.sinks
+    readonly property var sources: nodes.sources
+    readonly property var streams: nodes.streams
+
+    // Default sink and source
+    readonly property var sink: Pipewire.defaultAudioSink
+    readonly property var source: Pipewire.defaultAudioSource
+
     // Sink (output/speakers/headphones) properties
-    property real sinkVolume: 0
-    property bool sinkMuted: false
+    readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
+    readonly property real volume: sink && sink.audio ? (sink.audio.volume ?? 0) : 0
+
     // Source (input/microphone) properties
-    property real sourceVolume: 0
-    property bool sourceMuted: false
+    readonly property bool sourceMuted: source && source.audio ? source.audio.muted : false
+    readonly property real sourceVolume: source && source.audio ? (source.audio.volume ?? 0) : 0
 
-    function updateSink() {
-        var sink = Pipewire.defaultAudioSink;
-        if (!sink || !sink.audio) {
-            sinkVolume = 0;
-            sinkMuted = false;
-            return ;
+    // === Sink (Output) Functions ===
+
+    function setVolume(newVolume) {
+        if (sink?.ready && sink?.audio) {
+            sink.audio.muted = false;
+            sink.audio.volume = Math.max(0, Math.min(1.5, newVolume));
         }
-        var vol = sink.audio.volume;
-        if (vol !== undefined && vol !== null && !isNaN(vol))
-            sinkVolume = vol * 100;
-        else
-            sinkVolume = 0;
-        sinkMuted = sink.audio.muted || false;
     }
 
-    function updateSource() {
-        var source = Pipewire.defaultAudioSource;
-        if (!source || !source.audio) {
-            sourceVolume = 0;
-            sourceMuted = false;
-            return ;
+    function incrementVolume(amount) {
+        setVolume(volume + (amount || 0.05));
+    }
+
+    function decrementVolume(amount) {
+        setVolume(volume - (amount || 0.05));
+    }
+
+    function toggleMute() {
+        if (sink?.ready && sink?.audio) {
+            sink.audio.muted = !sink.audio.muted;
         }
-        var vol = source.audio.volume;
-        if (vol !== undefined && vol !== null && !isNaN(vol))
-            sourceVolume = vol * 100;
-        else
-            sourceVolume = 0;
-        sourceMuted = source.audio.muted || false;
     }
 
-    // Set sink (speaker) volume (0-100)
-    function setSinkVolume(volume) {
-        var sink = Pipewire.defaultAudioSink;
-        if (!sink || !sink.audio)
-            return ;
+    // === Source (Input) Functions ===
 
-        sink.audio.volume = volume / 100;
+    function setSourceVolumeValue(newVolume) {
+        if (source?.ready && source?.audio) {
+            source.audio.muted = false;
+            source.audio.volume = Math.max(0, Math.min(1.5, newVolume));
+        }
     }
 
-    // Toggle sink (speaker) mute
-    function toggleSinkMute() {
-        var sink = Pipewire.defaultAudioSink;
-        if (!sink || !sink.audio)
-            return ;
-
-        sink.audio.muted = !sink.audio.muted;
+    function incrementSourceVolume(amount) {
+        setSourceVolumeValue(sourceVolume + (amount || 0.05));
     }
 
-    // Set source (mic) volume (0-100)
-    function setSourceVolume(volume) {
-        var source = Pipewire.defaultAudioSource;
-        if (!source || !source.audio)
-            return ;
-
-        source.audio.volume = volume / 100;
+    function decrementSourceVolume(amount) {
+        setSourceVolumeValue(sourceVolume - (amount || 0.05));
     }
 
-    // Toggle source (mic) mute
     function toggleSourceMute() {
-        var source = Pipewire.defaultAudioSource;
-        if (!source || !source.audio)
-            return ;
-
-        source.audio.muted = !source.audio.muted;
+        if (source?.ready && source?.audio) {
+            source.audio.muted = !source.audio.muted;
+        }
     }
 
-    Component.onCompleted: {
-        updateSink();
-        updateSource();
+    // === Device Selection Functions ===
+
+    function setAudioSink(newSink) {
+        Pipewire.preferredDefaultAudioSink = newSink;
+    }
+
+    function setAudioSource(newSource) {
+        Pipewire.preferredDefaultAudioSource = newSource;
+    }
+
+    // === Stream (Application) Functions ===
+
+    function setStreamVolume(stream, newVolume) {
+        if (stream?.ready && stream?.audio) {
+            stream.audio.muted = false;
+            stream.audio.volume = Math.max(0, Math.min(1.5, newVolume));
+        }
+    }
+
+    function setStreamMuted(stream, muted) {
+        if (stream?.ready && stream?.audio) {
+            stream.audio.muted = muted;
+        }
+    }
+
+    function getStreamVolume(stream) {
+        return stream?.audio?.volume ?? 0;
+    }
+
+    function getStreamMuted(stream) {
+        return !!stream?.audio?.muted;
+    }
+
+    function getStreamName(stream) {
+        if (!stream)
+            return "Unknown";
+        // Try application name first, then description, then name
+        return stream.applicationName || stream.description || stream.name || "Unknown Application";
     }
 
     PwObjectTracker {
-        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
+        objects: [...root.sinks, ...root.sources, ...root.streams]
     }
-
-    // Watch for default sink device changes
-    Connections {
-        function onDefaultAudioSinkChanged() {
-            root.updateSink();
-        }
-
-        target: Pipewire
-    }
-
-    // Watch for default source device changes
-    Connections {
-        function onDefaultAudioSourceChanged() {
-            root.updateSource();
-        }
-
-        target: Pipewire
-    }
-
-    // Watch for sink (output) changes
-    Connections {
-        function onVolumeChanged() {
-            root.updateSink();
-        }
-
-        function onMutedChanged() {
-            root.updateSink();
-        }
-
-        target: Pipewire.defaultAudioSink ? Pipewire.defaultAudioSink.audio : null
-    }
-
-    // Watch for source (input) changes
-    Connections {
-        function onVolumeChanged() {
-            root.updateSource();
-        }
-
-        function onMutedChanged() {
-            root.updateSource();
-        }
-
-        target: Pipewire.defaultAudioSource ? Pipewire.defaultAudioSource.audio : null
-    }
-
 }

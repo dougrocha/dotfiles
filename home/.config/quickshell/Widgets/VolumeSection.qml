@@ -1,4 +1,4 @@
-import "./Services"
+import "../Services"
 import QtQuick
 import QtQuick.Layouts
 
@@ -15,8 +15,8 @@ RowLayout {
 
     Text {
         text: {
-            var volText = "Vol: " + Math.round(AudioService.sinkVolume) + "%";
-            if (AudioService.sinkMuted)
+            var volText = "Vol: " + Math.round(AudioService.volume * 100) + "%";
+            if (AudioService.muted)
                 volText += " (Muted)";
 
             return volText;

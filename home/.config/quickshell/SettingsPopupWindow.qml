@@ -19,7 +19,7 @@ Item {
     Text {
         id: settingsIcon
 
-        text: "󰒓" // Settings gear icon
+        text: "󰒓"
         color: root.iconColor
         font.pixelSize: root.iconSize
         font.family: root.fontFamily
@@ -29,11 +29,9 @@ Item {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                // Load the panel if not already loaded
                 if (!settingPanelPopupLoader.loading)
                     settingPanelPopupLoader.loading = true;
 
-                // Toggle visibility once loaded
                 if (settingPanelPopupLoader.item)
                     settingPanelPopupLoader.item.visible = !settingPanelPopupLoader.item.visible;
 
@@ -181,10 +179,10 @@ Item {
 
                         Layout.fillWidth: true
                         from: 0
-                        to: 150
-                        value: AudioService.sinkVolume
+                        to: 1.5
+                        value: AudioService.volume
                         onMoved: {
-                            AudioService.setSinkVolume(value);
+                            AudioService.setVolume(value);
                         }
 
                         background: Rectangle {
@@ -234,7 +232,7 @@ Item {
                     }
 
                     Text {
-                        text: Math.round(AudioService.sinkVolume) + "%"
+                        text: Math.round(AudioService.volume * 100) + "%"
                         color: "#8b7a6a"
                         font.pixelSize: 14
                         font.family: "JetBrainsMono Nerd Font"
@@ -242,7 +240,7 @@ Item {
                     }
 
                     Text {
-                        text: AudioService.sinkMuted ? "󰖁" : "󰕾"
+                        text: AudioService.muted ? "󰖁" : "󰕾"
                         color: "#d4a574"
                         font.pixelSize: 20
                         font.family: "JetBrainsMono Nerd Font"
@@ -250,7 +248,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: AudioService.toggleSinkMute()
+                            onClicked: AudioService.toggleMute()
                         }
 
                     }
@@ -282,10 +280,10 @@ Item {
 
                         Layout.fillWidth: true
                         from: 0
-                        to: 100
+                        to: 1.5
                         value: AudioService.sourceVolume
                         onMoved: {
-                            AudioService.setSourceVolume(value);
+                            AudioService.setSourceVolumeValue(value);
                         }
 
                         background: Rectangle {
@@ -326,7 +324,7 @@ Item {
                     }
 
                     Text {
-                        text: Math.round(AudioService.sourceVolume) + "%"
+                        text: Math.round(AudioService.sourceVolume * 100) + "%"
                         color: "#8b7a6a"
                         font.pixelSize: 14
                         font.family: "JetBrainsMono Nerd Font"
@@ -455,22 +453,19 @@ Item {
             Process {
                 id: shutdownProcess
 
-                running: false
-                command: ["sh", "-c", "nohup hyprshutdown -t 'Shutting Down...' --post-cmd 'shutdown -P 0' &"]
+                command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'\""]
             }
 
             Process {
                 id: rebootProcess
 
-                running: false
-                command: ["sh", "-c", "nohup hyprshutdown -t 'Rebooting...' --post-cmd 'reboot' &"]
+                command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot'\""]
             }
 
             Process {
                 id: logoutProcess
 
-                running: false
-                command: ["sh", "-c", "nohup hyprshutdown -t 'Logging out...' &"]
+                command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Logging out...'\""]
             }
 
             mask: Region {

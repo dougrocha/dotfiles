@@ -33,19 +33,8 @@ makepkg -si --noconfirm
 
 cd "$HOME"
 
-# Main Applications
-
-paru -S --noconfirm --needed man-db man-pages
-paru -S --noconfirm --needed hyprland hypridle hyprlock hyprshot hyprpaper hyprpicker hyprpolkitagent hyprshutdown hyprsunset uwsm xdg-desktop-portal-hyprland sddm ddcutil hyprland-preview-share-picker-git hyprland-guiutils
-paru -S --noconfirm --needed quickshell walker mako playerctl cliphist elephant elephant-desktopapplications elephant-providerlist elephant-clipboard elephant-websearch elephant-symbols
-paru -S --noconfirm --needed nautilus
-paru -S --noconfirm --needed ghostty fish starship tmux opencode
-paru -S --noconfirm --needed bat btop chafa fd fzf ripgrep zoxide fastfetch lazygit dust ffmpeg tlrc imagemagick
-paru -S --noconfirm --needed chromium imv mpv glow gum
-paru -S --noconfirm --needed bluetui wiremix
-paru -S --noconfirm --needed xmlstarlet ttf-jetbrains-mono-nerd noto-fonts noto-fonts-cjk noto-fonts-emoji
-paru -S --noconfirm --needed yaru-icon-theme
-paru -S --noconfirm --needed gpu-screen-recorder
+mapfile -t packages < <(grep -v '^#' "./install/packages" | grep -v '^$')
+paru -S --noconfirm --needed "${packages[@]}"
 
 cargo install matugen
 
@@ -66,13 +55,14 @@ sudo make install
 cd "$HOME"
 
 # SDDM Setup
-sudo systemctl enable sddm
 sudo mkdir -p /etc/sddm.conf.d
 sudo tee /etc/sddm.conf.d/autologin.conf > /dev/null << EOF
 [Autologin]
 User=$USER
 Session=hyprland-uwsm
 EOF
+
+sudo systemctl enable sddm
 
 # Hyprland
 systemctl --user enable --now hyprpaper.service

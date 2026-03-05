@@ -1,0 +1,79 @@
+# Man
+man-db
+man-pages
+tlrc
+
+uwsm
+sddm
+
+# Hyprland
+hyprland
+hypridle
+hyprlock
+hyprshot
+hyprpaper
+hyprpicker
+hyprpolkitagent
+hyprshutdown
+hyprsunset
+hyprland-guiutils
+xdg-desktop-portal-hyprland
+hyprland-preview-share-picker-git
+
+# Shell
+quickshell
+walker
+mako
+cliphist
+elephant
+elephant-desktopapplications
+elephant-providerlist
+elephant-clipboard
+elephant-websearch
+elephant-symbols
+
+# Brightness
+ddcutil
+
+# Apps
+chromium
+ffmpeg
+imv
+mpv
+nautilus
+
+# Terminal Stuff
+bat
+btop
+chafa
+dust
+fastfetch
+fd
+fish
+fzf
+ghostty
+glow
+gum
+imagemagick
+lazygit
+opencode
+ripgrep
+starship
+tmux
+zoxide
+
+bluetui
+wiremix
+
+ttf-jetbrains-mono-nerd
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+yaru-icon-theme
+
+gpu-screen-recorder
+
+playerctl
+xmlstarlet
+
+# vim: set filetype=conf:

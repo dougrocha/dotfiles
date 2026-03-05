@@ -1,5 +1,7 @@
 module Services
 singleton AudioService 1.0 AudioService.qml
+singleton CiderRpcService 1.0 CiderRpcService.qml
 singleton CpuService 1.0 CpuService.qml
-singleton Players 1.0 Players.qml
+singleton MediaControlService 1.0 MediaControlService.qml
+singleton MprisService 1.0 MprisService.qml
 singleton StreamingService 1.0 StreamingService.qml

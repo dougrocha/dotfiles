@@ -1,2 +1,5 @@
 module Widgets
 ClockWidget 1.0 ClockWidget.qml
+VolumeSection 1.0 VolumeSection.qml
+MediaSection 1.0 MediaSection.qml
+MediaPopupWindow 1.0 MediaPopupWindow.qml
