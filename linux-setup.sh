@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
+
 ansi_art='
  ______   _______           _______
 (  __  \ (  ___  )|\     /|(  ____ \
@@ -15,41 +17,15 @@ ansi_art='
 clear
 echo -e "\n$ansi_art\n"
 
-export BUILD_DIR="$HOME/builds"
 mkdir -p "$BUILD_DIR"
 
-./scripts/install-paru.sh
+"$DOTFILES_DIR/stow"
 
-mapfile -t packages < <(grep -v '^#' "./install/packages" | grep -v '^$' | sed 's/[[:space:]]*#.*$//' | awk 'NF')
-paru -S --noconfirm --needed "${packages[@]}"
-
-cargo install matugen
-
-./scripts/install-neovim.sh
-
-# SDDM Setup
-sudo mkdir -p /etc/sddm.conf.d
-sudo tee /etc/sddm.conf.d/autologin.conf > /dev/null << EOF
-[Autologin]
-User=$USER
-Session=hyprland-uwsm
-EOF
-
-sudo systemctl enable sddm
+"$DOTFILES_DIR/install/base.sh"
 
 systemctl --user enable --now hyprpaper.service
 systemctl --user enable --now hyprpolkitagent.service
 systemctl --user enable --now hypridle.service
 systemctl --user enable --now hyprsunset.service
 
-./scripts/set-defaults.sh
-./scripts/hide-apps.sh
-
-# Set Fish as default shell
-if [[ "$SHELL" != "/usr/bin/fish" ]]; then
-    echo "Setting Fish as default shell..."
-    sudo grep -q '/usr/bin/fish' /etc/shells || echo '/usr/bin/fish' | sudo tee -a /etc/shells
-    chsh -s /usr/bin/fish
-fi
-
-echo -e "\n✓ Setup complete! Please reboot to start Hyprland."
+echo -e "Setup complete! Please reboot to start Hyprland."

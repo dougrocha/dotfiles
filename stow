@@ -2,17 +2,17 @@
 
 set -euo pipefail
 
-DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if ! command -v stow &> /dev/null; then
     echo "Error: GNU stow is not installed."
-    echo "Install it with: sudo apt install stow (Debian/Ubuntu) or brew install stow (macOS)"
+    echo "Install it with: paru -S stow (Arch) or brew install stow (macOS)"
     exit 1
 fi
 
 echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
 stow -R -v --no-folding -t ~ -d "$DOTFILES_DIR" home
 
-"$DOTFILES_DIR/scripts/setup-ghostty-config.sh"
+"$DOTFILES_DIR/install/tools/setup-ghostty-config.sh"
 
 echo "Dotfiles installed successfully!"

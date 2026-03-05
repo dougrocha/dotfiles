@@ -1,84 +1,63 @@
 #!/bin/bash
 
-# Create a temporary markdown file to display options
-TEMP_MD=$(mktemp --suffix=.md)
-trap 'rm -f "$TEMP_MD"' EXIT
+WPCTL_OUTPUT=$(wpctl status)
+DEFAULT_SINK=$(echo "$WPCTL_OUTPUT" | sed -n '/Settings/,/^$/p' | grep 'Audio/Sink' | awk '{print $NF}')
+declare -a SINK_IDS SINK_NAMES OPTIONS
 
-# Parse wpctl status output to get sinks (only actual output devices)
-readarray -t SINKS < <(wpctl status | sed -n '/Sinks:/,/Sources:/p' | grep -E '^\s+│\s+[\*]?\s+[0-9]+\.' | sed 's/^[[:space:]│]*//')
+readarray -t SINKS < <(echo "$WPCTL_OUTPUT" | sed -n '/Sinks:/,/Sources:/p' | grep -E '^\s+│\s+[\*]?\s+[0-9]+\.' | sed 's/^[[:space:]│]*//' || true)
 
-if [[ ${#SINKS[@]} -eq 0 ]]; then
-    echo "No audio output devices found!"
-    exit 1
-fi
-
-# Get current default sink (marked with *)
-CURRENT_DEFAULT=$(echo "${SINKS[@]}" | grep '^\*' | sed 's/^\*[[:space:]]*//' | cut -d'.' -f1 | xargs)
-
-# Build markdown content
-cat > "$TEMP_MD" << 'EOF'
-# Audio Output Devices
-
-Select an audio device to set as default:
-
-EOF
-
-# Add each sink to the markdown
-INDEX=1
-declare -a SINK_IDS
 for sink in "${SINKS[@]}"; do
-    # Extract ID and name
-    IS_DEFAULT=$(echo "$sink" | grep -q '^\*' && echo "true" || echo "false")
-    SINK_CLEAN=$(echo "$sink" | sed 's/^\*[[:space:]]*//')
-    SINK_ID=$(echo "$SINK_CLEAN" | cut -d'.' -f1 | xargs)
-    SINK_NAME=$(echo "$SINK_CLEAN" | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
+    [[ -z "$sink" ]] && continue
+    [[ "$sink" =~ ^\* ]] && sink=$(echo "$sink" | sed 's/^\*[[:space:]]*//')
+
+    SINK_ID=$(echo "$sink" | cut -d'.' -f1 | xargs)
+    wpctl inspect "$SINK_ID" 2>/dev/null | grep -q 'media.class = "Audio/Sink/Internal"' && continue
+    
+    INSPECT=$(wpctl inspect "$SINK_ID" 2>/dev/null)
+    NODE_NAME=$(echo "$INSPECT" | grep 'node.name = ' | cut -d'"' -f2)
+    SINK_NAME=$(echo "$sink" | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
+    
+    PREFIX=""
+    [[ "$NODE_NAME" == "$DEFAULT_SINK" ]] && PREFIX="✓ "
     
     SINK_IDS+=("$SINK_ID")
-    
-    if [[ "$IS_DEFAULT" == "true" ]]; then
-        echo "**${INDEX}. ✓ ${SINK_NAME}** (current)" >> "$TEMP_MD"
-    else
-        echo "${INDEX}. ${SINK_NAME}" >> "$TEMP_MD"
-    fi
-    
-    ((INDEX++))
+    SINK_NAMES+=("$SINK_NAME")
+    OPTIONS+=("${PREFIX}${SINK_NAME}")
 done
 
-echo "" >> "$TEMP_MD"
-echo "---" >> "$TEMP_MD"
-echo "" >> "$TEMP_MD"
-echo "Press \`q\` to quit, then enter your choice (1-${#SINKS[@]})" >> "$TEMP_MD"
+while IFS= read -r line; do
+    if [[ "$line" =~ ^[[:space:]│\*]+([0-9]+)\.[[:space:]]+(.+)[[:space:]]+\[Audio/Sink\][[:space:]]*$ ]]; then
+        FILTER_ID="${BASH_REMATCH[1]}"
+        FILTER_NAME="${BASH_REMATCH[2]}"
+        
+        [[ " ${SINK_IDS[@]} " =~ " ${FILTER_ID} " ]] && continue
 
-# Display with glow
-glow "$TEMP_MD"
+        INSPECT=$(wpctl inspect "${FILTER_ID}" 2>/dev/null)
+        echo "$INSPECT" | grep -q 'media.class = "Audio/Sink/Internal"' && continue
+        
+        NODE_NAME=$(echo "$INSPECT" | grep 'node.name = ' | cut -d'"' -f2)
+        DESC=$(echo "$INSPECT" | grep 'node.description = ' | cut -d'"' -f2)
+        [[ -z "$DESC" ]] && DESC="$FILTER_NAME"
+        
+        PREFIX=""
+        [[ "$NODE_NAME" == "$DEFAULT_SINK" ]] && PREFIX="✓ "
 
-# Get user input
-echo -n "Enter choice (1-${#SINKS[@]}) or q to quit: "
-read -r CHOICE
+        SINK_IDS+=("$FILTER_ID")
+        SINK_NAMES+=("$DESC")
+        OPTIONS+=("${PREFIX}${DESC}")
+    fi
+done <<< "$WPCTL_OUTPUT"
 
-# Validate input
-if [[ "$CHOICE" == "q" || "$CHOICE" == "Q" ]]; then
-    echo "Cancelled."
-    exit 0
-fi
+[[ ${#SINK_IDS[@]} -eq 0 ]] && echo "No audio output devices found!" && exit 1
 
-if ! [[ "$CHOICE" =~ ^[0-9]+$ ]] || [ "$CHOICE" -lt 1 ] || [ "$CHOICE" -gt "${#SINKS[@]}" ]; then
-    echo "Invalid choice!"
-    exit 1
-fi
+SELECTED=$(printf '%s\n' "${OPTIONS[@]}" | gum choose --header "Select audio output device")
+[[ -z "$SELECTED" ]] && exit 0
 
-# Set the default sink
-SELECTED_INDEX=$((CHOICE - 1))
-SELECTED_ID="${SINK_IDS[$SELECTED_INDEX]}"
-
-wpctl set-default "$SELECTED_ID"
-
-if [ $? -eq 0 ]; then
-    SELECTED_NAME=$(echo "${SINKS[$SELECTED_INDEX]}" | sed 's/^\*[[:space:]]*//' | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
-    echo "✓ Default audio device set to: $SELECTED_NAME"
-else
-    echo "Failed to set default audio device!"
-    exit 1
-fi
+for i in "${!OPTIONS[@]}"; do
+    if [[ "${OPTIONS[$i]}" == "$SELECTED" ]]; then
+        wpctl set-default "${SINK_IDS[$i]}" && echo "✓ Default audio device set to: ${SINK_NAMES[$i]}" || { echo "Failed to set default audio device!"; exit 1; }
+        exit 0
+    fi
+done
 
 # vim: ft=sh

@@ -1,4 +1,4 @@
-# Android SDK
+# Android SDK Setup
 if test (uname) = "Darwin"
     # macOS
     set -gx JAVA_HOME /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
@@ -9,7 +9,7 @@ else if test (uname) = "Linux"
 end
 
 if test -d "$ANDROID_HOME"
+    fish_add_path -m "$ANDROID_HOME/cmdline-tools/latest/bin"
     fish_add_path "$ANDROID_HOME/emulator"
     fish_add_path "$ANDROID_HOME/platform-tools"
-    fish_add_path "$ANDROID_HOME/cmdline-tools/latest/bin"
 end

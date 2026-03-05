@@ -15,49 +15,52 @@ if (( $# < 1 )); then
     exit 1
   fi
 
-  # Extract app names from desktop files
+  # Extract app names from desktop files that are webapps (use launch-webapp)
   APP_OPTIONS=()
   for file in "$DESKTOP_DIR"/*.desktop; do
-    basename="${file##*/}"
-    app_name="${basename%.desktop}"
-    APP_OPTIONS+=("$app_name")
+    [[ -f "$file" ]] || continue
+    if grep -q "^Exec=launch-webapp" "$file"; then
+      basename="${file##*/}"
+      app_name="${basename%.desktop}"
+      APP_OPTIONS+=("$app_name")
+    fi
   done
 
-  if command -v gum &>/dev/null; then
-    APP_NAME=$(printf '%s\n' "${APP_OPTIONS[@]}" | gum choose --header "Select app to remove")
-  else
-    echo "Available apps:"
-    select APP_NAME in "${APP_OPTIONS[@]}"; do
-      if [[ -n $APP_NAME ]]; then
-        break
-      fi
-    done
-  fi
-
-  if [[ -z $APP_NAME ]]; then
-    echo -e "\e[31mNo app selected.\e[0m"
+  readarray -t SELECTED_APPS < <(printf '%s\n' "${APP_OPTIONS[@]}" | gum choose --no-limit --header "Select apps to remove (space to select, enter to confirm)")
+  
+  if [[ ${#SELECTED_APPS[@]} -eq 0 ]]; then
+    echo -e "\e[31mNo apps selected.\e[0m"
     exit 1
   fi
 else
-  APP_NAME="$1"
+  SELECTED_APPS=("$@")
 fi
 
-DESKTOP_FILE="$DESKTOP_DIR/$APP_NAME.desktop"
-ICON_FILE="$ICON_DIR/$APP_NAME.png"
+# Process each selected app
+for APP_NAME in "${SELECTED_APPS[@]}"; do
+  DESKTOP_FILE="$DESKTOP_DIR/$APP_NAME.desktop"
+  ICON_FILE="$ICON_DIR/$APP_NAME.png"
 
-if [[ ! -f $DESKTOP_FILE ]]; then
-  echo -e "\e[31mError: Web app '$APP_NAME' not found.\e[0m"
-  exit 1
-fi
+  if [[ ! -f $DESKTOP_FILE ]]; then
+    echo -e "\e[31mError: Web app '$APP_NAME' not found.\e[0m"
+    continue
+  fi
 
-rm -f "$DESKTOP_FILE"
-echo -e "\e[32m✓ Removed desktop entry for $APP_NAME\e[0m"
+  # Confirm removal
+  if ! gum confirm "Remove '$APP_NAME'?"; then
+    echo -e "\e[33m⊘ Skipped $APP_NAME\e[0m"
+    continue
+  fi
 
-if [[ -f $ICON_FILE ]]; then
-  rm -f "$ICON_FILE"
-  echo -e "\e[32m✓ Removed icon for $APP_NAME\e[0m"
-fi
+  rm -f "$DESKTOP_FILE"
+  echo -e "\e[32m✓ Removed desktop entry for $APP_NAME\e[0m"
 
-echo -e "\e[32m✓ $APP_NAME uninstalled\e[0m"
+  if [[ -f $ICON_FILE ]]; then
+    rm -f "$ICON_FILE"
+    echo -e "\e[32m✓ Removed icon for $APP_NAME\e[0m"
+  fi
+
+  echo -e "\e[32m✓ $APP_NAME uninstalled\e[0m"
+done
 
 # vim: ft=sh

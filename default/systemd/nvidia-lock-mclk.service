@@ -1,0 +1,12 @@
+[Unit]
+Description=Lock NVIDIA memory clock
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nvidia-smi -pm 1
+ExecStart=/usr/bin/nvidia-smi --lock-memory-clocks=<MIN_FREQ>,<MAX_FREQ>
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

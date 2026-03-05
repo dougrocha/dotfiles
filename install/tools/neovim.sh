@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/../../env.sh"
+
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 
 if [[ -d "$TPM_DIR" ]]; then
@@ -12,7 +14,6 @@ else
     git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
 fi
 
-BUILD_DIR="${BUILD_DIR:-$HOME/builds}"
 NEOVIM_DIR="$BUILD_DIR/neovim"
 
 mkdir -p "$BUILD_DIR"
