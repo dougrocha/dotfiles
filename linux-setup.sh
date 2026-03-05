@@ -37,8 +37,19 @@ EOF
 
 sudo systemctl enable sddm
 
-# Hyprland
 systemctl --user enable --now hyprpaper.service
 systemctl --user enable --now hyprpolkitagent.service
 systemctl --user enable --now hypridle.service
 systemctl --user enable --now hyprsunset.service
+
+./scripts/set-defaults.sh
+./scripts/hide-apps.sh
+
+# Set Fish as default shell
+if [[ "$SHELL" != "/usr/bin/fish" ]]; then
+    echo "Setting Fish as default shell..."
+    sudo grep -q '/usr/bin/fish' /etc/shells || echo '/usr/bin/fish' | sudo tee -a /etc/shells
+    chsh -s /usr/bin/fish
+fi
+
+echo -e "\n✓ Setup complete! Please reboot to start Hyprland."

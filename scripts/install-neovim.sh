@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+
+if [[ -d "$TPM_DIR" ]]; then
+    cd "$TPM_DIR"
+    git pull
+else
+    mkdir -p "$HOME/.tmux/plugins"
+    git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+fi
+
 BUILD_DIR="${BUILD_DIR:-$HOME/builds}"
 NEOVIM_DIR="$BUILD_DIR/neovim"
 
@@ -21,4 +31,4 @@ fi
 make CMAKE_BUILD_RELEASE=Release
 sudo make install
 
-echo "Neovim installation complete!"
+cargo install tree-sitter-cli

@@ -3,6 +3,13 @@ man-db
 man-pages
 tlrc
 
+# Boot
+limine
+limine-mkinitcpio-hook
+
+# System Utilities
+xdg-desktop-portal-gtk
+
 uwsm
 sddm
 
@@ -22,6 +29,7 @@ hyprland-preview-share-picker-git
 
 # Shell
 quickshell
+qt6-websockets
 walker
 mako
 cliphist
@@ -37,15 +45,18 @@ ddcutil
 
 # Apps
 chromium
+zen-browser-bin
 ffmpeg
 imv
 mpv
 nautilus
+nautilus-python
 
 # Terminal Stuff
 bat
 btop
 chafa
+clang
 dust
 fastfetch
 fd
@@ -56,16 +67,19 @@ glow
 gum
 imagemagick
 lazygit
+mise
 opencode
 ripgrep
 starship
 tmux
+xdg-terminal-exec
 zoxide
 
 bluetui
 wiremix
 
 ttf-jetbrains-mono-nerd
+ttf-liberation
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
