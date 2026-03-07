@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Launch or focus a web app identified by its name
+# Usage: launch-or-focus-webapp [app-name] [url]
+
+if (($# < 2)); then
+  echo "Usage: launch-or-focus-webapp [app-name] [url]"
+  exit 1
+fi
+
+APP_NAME="$1"
+APP_URL="$2"
+
+exec launch-or-focus "$APP_NAME" "launch-webapp $APP_URL"
+
+# vim: ft=sh

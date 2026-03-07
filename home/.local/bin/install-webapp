@@ -60,7 +60,7 @@ mkdir -p "$HOME/.local/share/applications"
 # Create desktop file
 DESKTOP_FILE="$HOME/.local/share/applications/$APP_NAME.desktop"
 
-EXEC_CMD="launch-webapp $APP_URL"
+EXEC_CMD="launch-or-focus-webapp \"$APP_NAME\" \"$APP_URL\""
 
 cat >"$DESKTOP_FILE" <<EOF
 [Desktop Entry]
@@ -72,6 +72,7 @@ Exec=$EXEC_CMD
 Icon=$ICON_PATH
 Terminal=false
 StartupNotify=true
+StartupWMClass=$APP_NAME
 EOF
 
 chmod +x "$DESKTOP_FILE"

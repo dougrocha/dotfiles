@@ -1,0 +1,5 @@
+#!/bin/bash
+
+exec setsid uwsm-app -- xdg-terminal-exec --app-id=org.arsene.$(basename "$1") -e "$1" "${@:2}"
+
+# vim: ft=sh
