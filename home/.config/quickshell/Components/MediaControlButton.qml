@@ -9,8 +9,7 @@ Item {
     property bool isPrimary: false
     property string iconColor: "#ffffff"
     property bool enabled: true
-    property var onClicked: function() {
-    }
+    property var onClicked: function () {}
 
     implicitWidth: size
     implicitHeight: size
@@ -40,7 +39,6 @@ Item {
             onClicked: {
                 if (root.onClicked)
                     root.onClicked();
-
             }
             onContainsMouseChanged: {
                 if (containsMouse && root.enabled)
@@ -49,7 +47,5 @@ Item {
                     buttonBackground.color = "transparent";
             }
         }
-
     }
-
 }

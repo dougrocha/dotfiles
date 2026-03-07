@@ -26,7 +26,6 @@ Item {
 
             if (mediaPanelPopupLoader.item)
                 mediaPanelPopupLoader.item.visible = !mediaPanelPopupLoader.item.visible;
-
         }
     }
 
@@ -70,7 +69,6 @@ Item {
                 onActiveChanged: {
                     if (!active && mediaPanel.visible)
                         mediaPanel.visible = false;
-
                 }
             }
 
@@ -112,7 +110,6 @@ Item {
                     onClicked: {
                         if (!CiderRpcService.inLibrary)
                             CiderRpcService.addToLibrary();
-
                     }
 
                     Text {
@@ -122,9 +119,7 @@ Item {
                         font.pixelSize: 24
                         font.family: parent.parent.fontFamily
                     }
-
                 }
-
             }
 
             RowLayout {
@@ -156,7 +151,6 @@ Item {
                         font.family: root.fontFamily
                         visible: !CiderRpcService.trackArtUrl || CiderRpcService.trackArtUrl.length === 0
                     }
-
                 }
 
                 // Right side - Track info and controls
@@ -205,7 +199,7 @@ Item {
                             icon: "󰒮"
                             size: 24
                             iconColor: "#ffffff"
-                            onClicked: function() {
+                            onClicked: function () {
                                 MediaControlService.previous();
                             }
                         }
@@ -215,7 +209,7 @@ Item {
                             size: 44
                             isPrimary: true
                             iconColor: "#ffffff"
-                            onClicked: function() {
+                            onClicked: function () {
                                 MediaControlService.playpause();
                             }
                         }
@@ -224,7 +218,7 @@ Item {
                             icon: "󰒭"
                             size: 24
                             iconColor: "#ffffff"
-                            onClicked: function() {
+                            onClicked: function () {
                                 MediaControlService.next();
                             }
                         }
@@ -232,7 +226,6 @@ Item {
                         Item {
                             Layout.fillWidth: true
                         }
-
                     }
 
                     // Debounce timer for seek slider - prevents websocket updates right after release
@@ -277,7 +270,6 @@ Item {
                                     color: "#d4a574"
                                     radius: 2
                                 }
-
                             }
 
                             handle: Rectangle {
@@ -288,7 +280,6 @@ Item {
                                 radius: 6
                                 color: seekSlider.pressed ? "#e8c89a" : "#d4a574"
                             }
-
                         }
 
                         // Time labels
@@ -312,25 +303,18 @@ Item {
                                 font.pixelSize: 12
                                 font.family: root.fontFamily
                             }
-
                         }
-
                     }
 
                     Item {
                         Layout.fillHeight: true
                     }
-
                 }
-
             }
 
             mask: Region {
                 item: contentRect
             }
-
         }
-
     }
-
 }

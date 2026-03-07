@@ -1,9 +1,9 @@
+pragma Singleton
 import QtQml
 import QtQuick
 import QtWebSockets
 import Quickshell
 import Quickshell.Io
-pragma Singleton
 
 Singleton {
     id: root
@@ -79,7 +79,7 @@ Singleton {
         running: false
 
         stdout: SplitParser {
-            onRead: (data) => {
+            onRead: data => {
                 try {
                     var response = JSON.parse(data);
                     if (response.status === "ok" && response.info) {
@@ -91,11 +91,9 @@ Singleton {
                         position = info.currentPlaybackTime || 0;
                         duration = (info.durationInMillis || 0) / 1000;
                     }
-                } catch (e) {
-                }
+                } catch (e) {}
             }
         }
-
     }
 
     WebSocket {
@@ -112,11 +110,11 @@ Singleton {
                 isOnline = false;
             }
         }
-        onTextMessageReceived: function(message) {
+        onTextMessageReceived: function (message) {
             // Socket.IO heart beat msg
             if (message === "2") {
                 sendTextMessage("3");
-                return ;
+                return;
             }
             if (message.startsWith("42")) {
                 var payload = JSON.parse(message.substring(2));
@@ -202,5 +200,4 @@ Singleton {
         command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/add-to-library"]
         running: false
     }
-
 }

@@ -51,7 +51,6 @@ PanelWindow {
                     source: "file:///home/doug/.config/user-img.jpg"
                     fillMode: Image.PreserveAspectFit
                 }
-
             }
 
             Item {
@@ -64,7 +63,7 @@ PanelWindow {
 
                 Rectangle {
                     property var workspace: {
-                        var ws = Hyprland.workspaces.values.find(function(w) {
+                        var ws = Hyprland.workspaces.values.find(function (w) {
                             return w.id === index + 1;
                         });
                         return ws !== undefined ? ws : null;
@@ -97,9 +96,7 @@ PanelWindow {
                         anchors.fill: parent
                         onClicked: Hyprland.dispatch("workspace " + (index + 1))
                     }
-
                 }
-
             }
 
             // Spacer
@@ -116,8 +113,7 @@ PanelWindow {
             }
 
             // Streaming Status
-            Streaming {
-            }
+            Streaming {}
 
             Rectangle {
                 Layout.preferredWidth: StreamingService.isStreaming ? 1 : 0
@@ -175,9 +171,6 @@ PanelWindow {
             Item {
                 width: 8
             }
-
         }
-
     }
-
 }

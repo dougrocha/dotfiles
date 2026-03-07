@@ -1,7 +1,7 @@
+pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-pragma Singleton
 
 Singleton {
     id: root
@@ -18,17 +18,16 @@ Singleton {
         onExited: (exitCode, exitStatus) => {
             if (exitCode !== 0)
                 console.warn("CpuService: Process exited with code", exitCode);
-
         }
 
         stdout: SplitParser {
-            onRead: (data) => {
+            onRead: data => {
                 if (!data || !data.startsWith("cpu "))
-                    return ;
+                    return;
 
                 var parts = data.trim().split(/\s+/);
                 if (parts.length < 8)
-                    return ;
+                    return;
 
                 var user = parseInt(parts[1]) || 0;
                 var nice = parseInt(parts[2]) || 0;
@@ -54,7 +53,6 @@ Singleton {
                 _lastCpuIdle = idleTime;
             }
         }
-
     }
 
     Timer {
@@ -64,5 +62,4 @@ Singleton {
         triggeredOnStart: true
         onTriggered: cpuProc.running = true
     }
-
 }

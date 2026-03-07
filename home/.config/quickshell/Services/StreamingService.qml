@@ -1,7 +1,7 @@
+pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
-pragma Singleton
 
 Singleton {
     id: root
@@ -10,7 +10,7 @@ Singleton {
 
     function updateStreaming() {
         if (!Pipewire.ready || !Pipewire.nodes || !Pipewire.nodes.values)
-            return ;
+            return;
 
         let foundStreaming = false;
         let nodesList = Pipewire.nodes.values;
@@ -41,7 +41,6 @@ Singleton {
         function onReadyChanged() {
             if (Pipewire.ready)
                 root.updateStreaming();
-
         }
 
         target: Pipewire
@@ -58,5 +57,4 @@ Singleton {
 
         target: Pipewire.nodes
     }
-
 }

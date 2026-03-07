@@ -12,9 +12,6 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
 
-        Panel {
-        }
-
+        Panel {}
     }
-
 }

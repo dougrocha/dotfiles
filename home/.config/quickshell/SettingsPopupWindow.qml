@@ -34,10 +34,8 @@ Item {
 
                 if (settingPanelPopupLoader.item)
                     settingPanelPopupLoader.item.visible = !settingPanelPopupLoader.item.visible;
-
             }
         }
-
     }
 
     LazyLoader {
@@ -71,7 +69,6 @@ Item {
                 onActiveChanged: {
                     if (!active && settingsPanel.visible)
                         settingsPanel.visible = false;
-
                 }
             }
 
@@ -114,9 +111,7 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: settingsPanel.visible = false
                         }
-
                     }
-
                 }
 
                 // User Profile
@@ -136,7 +131,6 @@ Item {
                             source: "file:///home/doug/.config/user-img.jpg"
                             fillMode: Image.PreserveAspectCrop
                         }
-
                     }
 
                     Text {
@@ -145,7 +139,6 @@ Item {
                         font.pixelSize: 18
                         font.family: "JetBrainsMono Nerd Font"
                     }
-
                 }
 
                 Rectangle {
@@ -204,11 +197,8 @@ Item {
                                         duration: 100
                                         easing.type: Easing.OutCubic
                                     }
-
                                 }
-
                             }
-
                         }
 
                         handle: Rectangle {
@@ -224,11 +214,8 @@ Item {
                                     duration: 100
                                     easing.type: Easing.OutCubic
                                 }
-
                             }
-
                         }
-
                     }
 
                     Text {
@@ -250,9 +237,7 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: AudioService.toggleMute()
                         }
-
                     }
-
                 }
 
                 // Microphone Section
@@ -300,7 +285,6 @@ Item {
                                 color: "#d4a574"
                                 radius: 2
                             }
-
                         }
 
                         handle: Rectangle {
@@ -316,11 +300,8 @@ Item {
                                     duration: 100
                                     easing.type: Easing.OutCubic
                                 }
-
                             }
-
                         }
-
                     }
 
                     Text {
@@ -342,9 +323,7 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: AudioService.toggleSourceMute()
                         }
-
                     }
-
                 }
 
                 Item {
@@ -387,7 +366,6 @@ Item {
                                 shutdownProcess.running = true;
                             }
                         }
-
                     }
 
                     // Reboot Button
@@ -415,7 +393,6 @@ Item {
                                 rebootProcess.running = true;
                             }
                         }
-
                     }
 
                     // Logout Button
@@ -443,11 +420,8 @@ Item {
                                 logoutProcess.running = true;
                             }
                         }
-
                     }
-
                 }
-
             }
 
             Process {
@@ -471,9 +445,6 @@ Item {
             mask: Region {
                 item: contentRect
             }
-
         }
-
     }
-
 }

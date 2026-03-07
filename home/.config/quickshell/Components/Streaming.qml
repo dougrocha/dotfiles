@@ -19,5 +19,4 @@ RowLayout {
         font.bold: true
         Layout.rightMargin: 8
     }
-
 }

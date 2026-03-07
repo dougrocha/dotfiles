@@ -41,7 +41,6 @@ PopupWindow {
         onActiveChanged: {
             if (!active && root.visible)
                 root.visible = false;
-
         }
     }
 
@@ -68,7 +67,6 @@ PopupWindow {
                 blurMax: 32
                 blur: 1
             }
-
         }
 
         Rectangle {
@@ -128,9 +126,7 @@ PopupWindow {
                         hideSource: true
                         live: false
                     }
-
                 }
-
             }
 
             ColumnLayout {
@@ -151,7 +147,6 @@ PopupWindow {
                         elide: Text.ElideRight
                         maximumLineCount: 1
                     }
-
                 }
 
                 Text {
@@ -208,7 +203,6 @@ PopupWindow {
                                 color: "#DEE2E6"
                                 radius: 8
                             }
-
                         }
 
                         handle: Rectangle {
@@ -218,7 +212,6 @@ PopupWindow {
                             radius: 8
                             color: "transparent"
                         }
-
                     }
 
                     RowLayout {
@@ -241,9 +234,7 @@ PopupWindow {
                             font.pixelSize: 12
                             font.family: "JetBrainsMono Nerd Font"
                         }
-
                     }
-
                 }
 
                 RowLayout {
@@ -273,7 +264,6 @@ PopupWindow {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: MediaControlService.previous()
                         }
-
                     }
 
                     Rectangle {
@@ -298,7 +288,6 @@ PopupWindow {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: MediaControlService.playpause()
                         }
-
                     }
 
                     Rectangle {
@@ -323,13 +312,9 @@ PopupWindow {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: MediaControlService.next()
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         Rectangle {
@@ -349,9 +334,6 @@ PopupWindow {
                 hideSource: true
                 live: false
             }
-
         }
-
     }
-
 }

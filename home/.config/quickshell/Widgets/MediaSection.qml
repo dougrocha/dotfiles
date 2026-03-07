@@ -30,7 +30,6 @@ Item {
 
             if (popupLoader.item)
                 popupLoader.item.visible = !popupLoader.item.visible;
-
         }
 
         RowLayout {
@@ -64,9 +63,7 @@ Item {
                 Layout.rightMargin: 8
                 color: root.colMuted
             }
-
         }
-
     }
 
     LazyLoader {
@@ -76,13 +73,10 @@ Item {
         onItemChanged: {
             if (item)
                 item.visible = true;
-
         }
 
         MusicPopup {
             anchorItem: root
         }
-
     }
-
 }

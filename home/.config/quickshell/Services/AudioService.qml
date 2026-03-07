@@ -1,8 +1,8 @@
+pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
-pragma Singleton
 
 Singleton {
     id: root
@@ -14,7 +14,6 @@ Singleton {
             else if (node.audio)
                 acc.sources.push(node);
         } else if (node.isStream && node.audio) {
-            // Application streams (output streams)
             acc.streams.push(node);
         }
         return acc;
@@ -40,8 +39,6 @@ Singleton {
     readonly property bool sourceMuted: source && source.audio ? source.audio.muted : false
     readonly property real sourceVolume: source && source.audio ? (source.audio.volume ?? 0) : 0
 
-    // === Sink (Output) Functions ===
-
     function setVolume(newVolume) {
         if (sink?.ready && sink?.audio) {
             sink.audio.muted = false;
@@ -62,8 +59,6 @@ Singleton {
             sink.audio.muted = !sink.audio.muted;
         }
     }
-
-    // === Source (Input) Functions ===
 
     function setSourceVolumeValue(newVolume) {
         if (source?.ready && source?.audio) {
@@ -86,8 +81,6 @@ Singleton {
         }
     }
 
-    // === Device Selection Functions ===
-
     function setAudioSink(newSink) {
         Pipewire.preferredDefaultAudioSink = newSink;
     }
@@ -95,8 +88,6 @@ Singleton {
     function setAudioSource(newSource) {
         Pipewire.preferredDefaultAudioSource = newSource;
     }
-
-    // === Stream (Application) Functions ===
 
     function setStreamVolume(stream, newVolume) {
         if (stream?.ready && stream?.audio) {
@@ -122,7 +113,6 @@ Singleton {
     function getStreamName(stream) {
         if (!stream)
             return "Unknown";
-        // Try application name first, then description, then name
         return stream.applicationName || stream.description || stream.name || "Unknown Application";
     }
 

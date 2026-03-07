@@ -14,5 +14,4 @@ Text {
         repeat: true
         onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), clockWidget.format)
     }
-
 }

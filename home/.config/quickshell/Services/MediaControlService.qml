@@ -1,6 +1,6 @@
+pragma Singleton
 import QtQml
 import Quickshell
-pragma Singleton
 
 Singleton {
     id: root
