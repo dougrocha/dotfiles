@@ -20,3 +20,5 @@ cd dotfiles
 ## Useful Links
 
 - [Portfolio](https://www.dougrocha.com)
+- [Omarchy](https://omarchy.org/)
+- [Maria Solano](https://www.mariasolos.com/)
