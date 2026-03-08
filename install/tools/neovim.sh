@@ -29,7 +29,8 @@ else
     cd "$NEOVIM_DIR"
 fi
 
-make CMAKE_BUILD_RELEASE=Release
-sudo make install
+make distclean
+
+sudo make CMAKE_BUILD_TYPE=RelWithDebInfo install
 
 cargo install tree-sitter-cli
