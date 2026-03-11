@@ -1,6 +1,10 @@
 import "../Services"
+
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
+import Quickshell.Widgets
 
 RowLayout {
     id: root
@@ -13,27 +17,41 @@ RowLayout {
 
     spacing: 0
 
-    Text {
-        text: {
-            var volText = "Vol: " + Math.round(AudioService.volume * 100) + "%";
-            if (AudioService.muted)
-                volText += " (Muted)";
-
-            return volText;
+    WrapperMouseArea {
+        id: clickWrapper
+        cursorShape: Qt.PointingHandCursor
+        hoverEnabled: true
+        onClicked: {
+            switchAudioProcess.running = true;
         }
-        color: root.textColor
-        font.pixelSize: root.fontSize
-        font.family: root.fontFamily
-        font.bold: true
-        Layout.rightMargin: 8
+
+        Text {
+            text: {
+                var volText = "Vol: " + Math.round(AudioService.volume * 100) + "%";
+                if (AudioService.muted)
+                    volText += " (Muted)";
+
+                return volText;
+            }
+            color: root.textColor
+            font.pixelSize: root.fontSize
+            font.family: root.fontFamily
+            font.bold: true
+        }
     }
 
     Rectangle {
         Layout.preferredWidth: 1
         Layout.preferredHeight: 16
         Layout.alignment: Qt.AlignVCenter
-        Layout.leftMargin: 0
+        Layout.leftMargin: 8
         Layout.rightMargin: 8
         color: root.separatorColor
+    }
+
+    Process {
+        id: switchAudioProcess
+
+        command: ["launch-or-focus-tui", "wiremix"]
     }
 }

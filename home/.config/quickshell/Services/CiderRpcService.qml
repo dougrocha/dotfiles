@@ -8,14 +8,15 @@ import Quickshell.Io
 Singleton {
     id: root
 
+    property bool isOnline: ciderSocket.status === WebSocket.Open
+    property bool isPlaying: false
+
     property string trackTitle: ""
     property string trackArtist: ""
     property string albumName: ""
     property string trackArtUrl: ""
     property bool inFavorites: false
     property bool inLibrary: false
-    property bool isOnline: ciderSocket.status === WebSocket.Open
-    property bool isPlaying: false
     property real position: 0
     property real duration: 0
 

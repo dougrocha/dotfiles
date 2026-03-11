@@ -1,5 +1,8 @@
 module Widgets
 ClockWidget 1.0 ClockWidget.qml
-VolumeSection 1.0 VolumeSection.qml
-MediaSection 1.0 MediaSection.qml
+CpuSection 1.0 CpuSection.qml
 MediaPopupWindow 1.0 MediaPopupWindow.qml
+MediaSection 1.0 MediaSection.qml
+TrayItem 1.0 TrayItem.qml
+TraySection 1.0 TraySection.qml
+VolumeSection 1.0 VolumeSection.qml

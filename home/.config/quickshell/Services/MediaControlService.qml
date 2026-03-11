@@ -9,7 +9,6 @@ Singleton {
         return CiderRpcService.isOnline;
     }
 
-    // Control: Next track
     function next() {
         if (shouldUseCiderRpc()) {
             console.log("[MediaControl] Routing next() to CiderRPC");
@@ -20,7 +19,6 @@ Singleton {
         }
     }
 
-    // Control: Previous track (or restart if past 3 seconds)
     function previous() {
         if (shouldUseCiderRpc()) {
             if (CiderRpcService.position > 3) {
@@ -36,7 +34,6 @@ Singleton {
         }
     }
 
-    // Control: Pause
     function pause() {
         if (shouldUseCiderRpc()) {
             console.log("[MediaControl] Routing pause() to CiderRPC");
@@ -47,7 +44,6 @@ Singleton {
         }
     }
 
-    // Control: Play
     function play() {
         if (shouldUseCiderRpc()) {
             console.log("[MediaControl] Routing play() to CiderRPC");
@@ -58,7 +54,6 @@ Singleton {
         }
     }
 
-    // Control: Play/Pause toggle
     function playpause() {
         if (shouldUseCiderRpc()) {
             console.log("[MediaControl] Routing playpause() to CiderRPC");
@@ -69,7 +64,6 @@ Singleton {
         }
     }
 
-    // Control: Seek to position
     function seek(seconds) {
         if (shouldUseCiderRpc()) {
             console.log("[MediaControl] Routing seek() to CiderRPC");

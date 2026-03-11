@@ -13,7 +13,6 @@ if (( $# < 2 )); then
     APP_URL="https://$APP_URL"
   fi
 
-  # Try to fetch favicon automatically
   FAVICON_URL="https://www.google.com/s2/favicons?domain=${APP_URL}&sz=128"
   mkdir -p "$ICON_DIR"
   if curl -fsSL -o "$ICON_DIR/$APP_NAME.png" "$FAVICON_URL" && [[ -s $ICON_DIR/$APP_NAME.png ]]; then
@@ -45,7 +44,6 @@ else
       ICON_PATH="$3"
     fi
   else
-    # Try favicon
     FAVICON_URL="https://www.google.com/s2/favicons?domain=${APP_URL}&sz=128"
     if curl -fsSL -o "$ICON_DIR/$APP_NAME.png" "$FAVICON_URL" && [[ -s $ICON_DIR/$APP_NAME.png ]]; then
       ICON_PATH="$ICON_DIR/$APP_NAME.png"

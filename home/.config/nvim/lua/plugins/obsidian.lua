@@ -4,6 +4,12 @@ return {
     version = '*',
     ft = 'markdown',
     cmd = 'Obsidian',
+    cond = function()
+        local cwd = vim.fn.getcwd()
+        local second_brain = vim.fn.expand '~/second-brain'
+        return vim.startswith(cwd, second_brain) and not vim.g.minifiles_active
+    end,
+
     ---@module 'obsidian'
     ---@type obsidian.config
     opts = {

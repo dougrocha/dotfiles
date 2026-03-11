@@ -35,12 +35,27 @@ PopupWindow {
 
     HyprlandFocusGrab {
         id: focusGrab
-
-        active: root.visible
+        active: false
         windows: [root]
         onActiveChanged: {
             if (!active && root.visible)
                 root.visible = false;
+        }
+    }
+
+    Timer {
+        id: grabDelay
+        interval: 50
+        repeat: false
+        onTriggered: focusGrab.active = true
+    }
+
+    onVisibleChanged: {
+        if (visible) {
+            grabDelay.restart();
+        } else {
+            grabDelay.stop();
+            focusGrab.active = false;
         }
     }
 

@@ -25,7 +25,6 @@ return {
             toml = { 'taplo' },
             typescript = { 'prettier', lsp_format = 'fallback' },
             typescriptreact = { 'prettier', lsp_format = 'fallback' },
-            qml = { 'qmlformat' },
             ['_'] = { 'trim_whitespace', 'trim_newlines' },
         },
         format_on_save = function()

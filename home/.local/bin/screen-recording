@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Only show indicator for active screen sharing (Discord/browser via portal)
-# Don't show for replay buffer (always running in background)
-if pw-dump | grep -q "xdph-streaming"; then
-  echo '{"text": "󰻂", "tooltip": "Screen Sharing Active", "class": "active"}'
+if pgrep -f "^gup-screen-recorder" >/dev/null; then
+  echo '{"text": "󰻂", "tooltip": "Stop recording", "class": "active"}'
 else
   echo '{"text": ""}'
 fi

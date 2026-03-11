@@ -104,6 +104,9 @@ PanelWindow {
                 Layout.fillWidth: true
             }
 
+            // System Tray
+            TraySection {}
+
             // Media Section
             MediaSection {
                 colYellow: Theme.yellow
@@ -125,14 +128,7 @@ PanelWindow {
             }
 
             // CPU Usage
-            Text {
-                text: "CPU: " + CpuService.usage + "%"
-                color: Theme.yellow
-                font.pixelSize: Theme.fontSize
-                font.family: Theme.fontFamily
-                font.bold: true
-                Layout.rightMargin: 8
-            }
+            CpuSection {}
 
             // Separator
             Rectangle {

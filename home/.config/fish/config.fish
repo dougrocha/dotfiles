@@ -5,6 +5,7 @@ set -U fish_greeting
 set -gx EDITOR nvim
 set -gx GIT_EDITOR nvim
 set -gx VISUAL nvim
+set -gx MANPAGER "nvim +Man!"
 
 # Extra - XDG Base Directory
 set -gx XDG_CACHE_HOME "$HOME/.cache"

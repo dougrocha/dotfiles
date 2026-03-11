@@ -4,7 +4,7 @@ set -euo pipefail
 
 source "$(dirname "${BASH_SOURCE[0]}")/../../env.sh"
 
-SERVICE_FILE="$DOTFILES_DIR/default/systemd/nvidia-lock-mclk.service"
+SERVICE_FILE="$DOTFILES_DIR/default/systemd/nvidia/nvidia-lock-mclk.service"
 
 echo "NVIDIA Memory Clock Locking Setup"
 echo "═══════════════════════════════════════════════════════════════════════════"

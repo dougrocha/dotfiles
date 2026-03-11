@@ -25,11 +25,7 @@ Item {
         cursorShape: showCider ? Qt.PointingHandCursor : Qt.ArrowCursor
         enabled: showCider
         onClicked: {
-            if (!popupLoader.loading)
-                popupLoader.loading = true;
-
-            if (popupLoader.item)
-                popupLoader.item.visible = !popupLoader.item.visible;
+            musicPopup.visible = true;
         }
 
         RowLayout {
@@ -66,17 +62,8 @@ Item {
         }
     }
 
-    LazyLoader {
-        id: popupLoader
-
-        loading: false
-        onItemChanged: {
-            if (item)
-                item.visible = true;
-        }
-
-        MusicPopup {
-            anchorItem: root
-        }
+    MusicPopup {
+        id: musicPopup
+        anchorItem: root
     }
 }

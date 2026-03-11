@@ -1,4 +1,5 @@
 import "./Services"
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -326,6 +327,129 @@ Item {
                     }
                 }
 
+                // Utility Buttons Row
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 12
+
+                    // Toggle Idle Button
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+                        color: toggleIdleButton.containsMouse ? "#3d3027" : "transparent"
+                        radius: 8
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            Text {
+                                text: "󱫖"
+                                color: "#9ece6a"
+                                font.pixelSize: 18
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+
+                            Text {
+                                text: "Toggle Idle"
+                                color: "#8b7a6a"
+                                font.pixelSize: 13
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+                        }
+
+                        MouseArea {
+                            id: toggleIdleButton
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                toggleIdleProcess.running = true;
+                                settingsPanel.visible = false;
+                            }
+                        }
+                    }
+
+                    // Switch Audio Button
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+                        color: switchAudioButton.containsMouse ? "#3d3027" : "transparent"
+                        radius: 8
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            Text {
+                                text: "󰓃"
+                                color: "#7aa2f7"
+                                font.pixelSize: 18
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+
+                            Text {
+                                text: "Switch Audio"
+                                color: "#8b7a6a"
+                                font.pixelSize: 13
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+                        }
+
+                        MouseArea {
+                            id: switchAudioButton
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                switchAudioProcess.running = true;
+                                settingsPanel.visible = false;
+                            }
+                        }
+                    }
+
+                    // Bluetooth Button
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 40
+                        color: bluetoothButton.containsMouse ? "#3d3027" : "transparent"
+                        radius: 8
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            Text {
+                                text: "󰂯"
+                                color: "#bb9af7"
+                                font.pixelSize: 18
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+
+                            Text {
+                                text: "Bluetooth"
+                                color: "#8b7a6a"
+                                font.pixelSize: 13
+                                font.family: "JetBrainsMono Nerd Font"
+                            }
+                        }
+
+                        MouseArea {
+                            id: bluetoothButton
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                bluetoothProcess.running = true;
+                                settingsPanel.visible = false;
+                            }
+                        }
+                    }
+                }
+
                 Item {
                     Layout.fillHeight: true
                 }
@@ -425,9 +549,27 @@ Item {
             }
 
             Process {
+                id: toggleIdleProcess
+
+                command: ["toggle-idle"]
+            }
+
+            Process {
+                id: switchAudioProcess
+
+                command: ["launch-or-focus-tui", "switch-audio"]
+            }
+
+            Process {
+                id: bluetoothProcess
+
+                command: ["launch-or-focus-tui", "bluetui"]
+            }
+
+            Process {
                 id: shutdownProcess
 
-                command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'\""]
+                command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Shutting down...' --post-cmd 'systemctl poweroff'\""]
             }
 
             Process {
