@@ -8,6 +8,9 @@ xdg-mime default zen.desktop x-scheme-handler/http
 xdg-mime default zen.desktop x-scheme-handler/https
 xdg-mime default zen.desktop text/html
 
+# PDF defaults
+xdg-mime default zen.desktop application/pdf
+
 # File manager defaults
 xdg-mime default org.gnome.Nautilus.desktop inode/directory
 
