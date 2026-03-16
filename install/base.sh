@@ -13,6 +13,7 @@ paru -S --noconfirm --needed "${packages[@]}"
 
 # "$DOTFILES_DIR/install/tools/neovim.sh"
 "$DOTFILES_DIR/install/system/sddm.sh"
+"$DOTFILES_DIR/install/config/fast-shutdown.sh"
 
 if lspci | grep -i nvidia &> /dev/null; then
     "$DOTFILES_DIR/install/system/nvidia.sh"
