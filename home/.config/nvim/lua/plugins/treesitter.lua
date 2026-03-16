@@ -7,6 +7,7 @@ return {
             'bash',
             'cpp',
             'gitcommit',
+            'java',
             'json',
             'json5',
             'lua',
@@ -16,16 +17,26 @@ return {
             'rust',
             'toml',
             'tsx',
+            'typescript',
         },
     },
     config = function(_, opts)
         local treesitter = require 'nvim-treesitter'
         treesitter.install(opts.langs)
 
+        local parser_to_filetype = {
+            tsx = 'typescriptreact',
+        }
+
+        local patterns = {}
+        for _, lang in ipairs(opts.langs) do
+            table.insert(patterns, parser_to_filetype[lang] or lang)
+        end
+
         local group = vim.api.nvim_create_augroup('dougrocha/treesitter', { clear = true })
         vim.api.nvim_create_autocmd('FileType', {
             group = group,
-            pattern = opts.langs,
+            pattern = patterns,
             callback = function(args)
                 -- Enable highlighting for the buffer
                 vim.treesitter.start(args.buf)

@@ -10,7 +10,7 @@ case "$OS" in
     Darwin)
         cat > "$CONFIG_DIR/config-macos" << 'EOF'
 font-family = "Monaspace Neon"
-font-size = 13
+font-size = 14
 
 macos-option-as-alt = true
 macos-window-buttons = hidden
