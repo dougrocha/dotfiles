@@ -1,8 +1,9 @@
-import "../Modules/Popups"
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Widgets
 import Quickshell.Services.SystemTray
+import qs.Modules.Popups
 
 Rectangle {
     id: root
@@ -19,12 +20,13 @@ Rectangle {
         menu: root.trayItem.menu
     }
 
-    Image {
+    IconImage {
         anchors.centerIn: parent
         width: 16
         height: 16
         source: root.trayItem.icon
         visible: status === Image.Ready
+        mipmap: true
     }
 
     TrayMenuPopup {

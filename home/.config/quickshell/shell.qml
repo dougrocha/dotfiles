@@ -1,8 +1,8 @@
 //@ pragma UseQApplication
-import "./Components"
-import "./Modules"
-import "./Services"
-import "./Widgets"
+import qs.Modules.Bar
+import qs.Components
+import qs.Services
+import qs.Widgets
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -13,6 +13,6 @@ ShellRoot {
     Variants {
         model: Quickshell.screens
 
-        Panel {}
+        Bar {}
     }
 }

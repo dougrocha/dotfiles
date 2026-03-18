@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if systemctl --user is-active --quiet hyprsunset.service; then
+  systemctl --user stop hyprsunset.service
+  notify-send "$(printf '\ue430')    Night color off"
+else
+  systemctl --user start hyprsunset.service
+  notify-send "$(printf '\ue51c')    Night color on"
+fi
+
+# vim: ft=sh

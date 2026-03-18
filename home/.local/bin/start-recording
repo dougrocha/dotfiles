@@ -1,0 +1,14 @@
+#!/bin/bash
+
+TARGET="${1:-screen}" # "screen", "DP-1", "DP-2"
+RECORDING_DIR="${HOME}/Videos"
+mkdir -p "$RECORDING_DIR"
+
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+OUTPUT_FILE="$RECORDING_DIR/recording_${TIMESTAMP}.mp4"
+
+gpu-screen-recorder -w "$TARGET" -f 60 -q high -c mp4 -r 60 -o "$OUTPUT_FILE" &
+
+notify-send "Recording Started" "Target: $TARGET\nSaving to: $(basename "$OUTPUT_FILE")" -t 5000 -a "GPU Screen Recorder"
+
+# vim: ft=sh

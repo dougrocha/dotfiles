@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# set-wallpaper <image-path>
+# Runs matugen which writes $image into colors.conf, then restarts hyprpaper.
+# post-hooks: hyprctl reload, makoctl reload
+# quickshell auto-reloads Colors.qml via pragma Singleton
+
+set -euo pipefail
+
+image="${1:-}"
+
+if [[ -z "$image" ]]; then
+    echo "Usage: set-wallpaper <image-path>" >&2
+    exit 1
+fi
+
+image="$(realpath "$image")"
+
+if [[ ! -f "$image" ]]; then
+    echo "Error: file not found: $image" >&2
+    exit 1
+fi
+
+# Run matugen — writes $image + all color vars into colors.conf
+# post-hooks handle: hyprctl reload, makoctl reload
+matugen image -m dark --source-color-index 0 "$image"
+
+# Restart hyprpaper so it picks up the new $image from colors.conf
+pkill -x hyprpaper || true
+sleep 0.1
+uwsm-app -- hyprpaper &>/dev/null &
+disown
+
+echo "Wallpaper set: $image"

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import qs.Components
 
 Item {
     id: root
@@ -7,7 +8,7 @@ Item {
     property string icon: ""
     property int size: 24
     property bool isPrimary: false
-    property string iconColor: "#ffffff"
+    property color iconColor: Colors.on_surface
     property bool enabled: true
     property var onClicked: function () {}
 
@@ -26,7 +27,7 @@ Item {
         Text {
             anchors.centerIn: parent
             text: root.icon
-            color: root.enabled ? root.iconColor : root.iconColor + "66"
+            color: root.enabled ? root.iconColor : Qt.rgba(root.iconColor.r, root.iconColor.g, root.iconColor.b, 0.4)
             font.pixelSize: root.size
             font.family: "JetBrainsMono Nerd Font"
             font.bold: true
@@ -42,7 +43,7 @@ Item {
             }
             onContainsMouseChanged: {
                 if (containsMouse && root.enabled)
-                    buttonBackground.color = "#ffffff20";
+                    buttonBackground.color = Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.12);
                 else
                     buttonBackground.color = "transparent";
             }

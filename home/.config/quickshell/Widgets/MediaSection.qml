@@ -1,11 +1,11 @@
-import "../Components"
-import "../Modules/Popups"
-import "../Services"
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
+import qs.Components
+import qs.Modules.Popups
+import qs.Services
 
 Item {
     id: root

@@ -1,4 +1,3 @@
-import "../../Services"
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
@@ -6,6 +5,9 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Constants
+import qs.Components
+import qs.Services
 
 PopupWindow {
     id: root
@@ -64,9 +66,9 @@ PopupWindow {
 
         anchors.fill: parent
         radius: 12
-        color: "#141313"
+        color: Colors.surface_container_low
         border.width: 1
-        border.color: "#202020"
+        border.color: Colors.outline_variant
         layer.enabled: true
 
         Image {
@@ -86,7 +88,7 @@ PopupWindow {
 
         Rectangle {
             anchors.fill: parent
-            color: Qt.rgba(0, 0, 0, 0.45)
+            color: Qt.rgba(Colors.scrim.r, Colors.scrim.g, Colors.scrim.b, 0.45)
             visible: backgroundImage.status === Image.Ready
         }
 
@@ -94,7 +96,7 @@ PopupWindow {
             id: contentLayout
 
             anchors.centerIn: parent
-            width: parent.width - 24 // TODO: Add padding
+            width: parent.width - 24
             spacing: 24
 
             Rectangle {
@@ -104,7 +106,7 @@ PopupWindow {
                 Layout.preferredHeight: 140
                 Layout.alignment: Qt.AlignVCenter
                 radius: 12
-                color: "#131314"
+                color: Colors.surface_container
                 layer.enabled: true
 
                 Rectangle {
@@ -126,10 +128,10 @@ PopupWindow {
 
                 Text {
                     anchors.centerIn: parent
-                    text: "󰝚"
-                    font.family: "JetBrainsMono Nerd Font"
+                    text: Icons.musicNote2
+                    font.family: Fonts.iconFont
                     font.pixelSize: 40
-                    color: "#8b7a6a"
+                    color: Colors.on_surface_variant
                     visible: coverArt.status !== Image.Ready
                 }
 
@@ -155,9 +157,9 @@ PopupWindow {
                     Text {
                         Layout.fillWidth: true
                         text: CiderRpcService.trackTitle || "Unknown Title"
-                        color: "#DEE2E6"
+                        color: Colors.on_surface
                         font.pixelSize: 20
-                        font.family: "JetBrainsMono Nerd Font"
+                        font.family: Fonts.font
                         font.weight: Font.Bold
                         elide: Text.ElideRight
                         maximumLineCount: 1
@@ -167,9 +169,9 @@ PopupWindow {
                 Text {
                     Layout.fillWidth: true
                     text: CiderRpcService.trackArtist || "Unknown Artist"
-                    color: "#CAC4D0"
+                    color: Colors.on_surface_variant
                     font.pixelSize: 14
-                    font.family: "JetBrainsMono Nerd Font"
+                    font.family: Fonts.font
                     elide: Text.ElideRight
                     maximumLineCount: 1
                 }
@@ -210,12 +212,12 @@ PopupWindow {
                             width: seekSlider.availableWidth
                             height: 6
                             radius: 8
-                            color: Qt.rgba(0.79, 0.77, 0.82, 0.3)
+                            color: Qt.rgba(Colors.on_surface_variant.r, Colors.on_surface_variant.g, Colors.on_surface_variant.b, 0.3)
 
                             Rectangle {
                                 width: seekSlider.visualPosition * parent.width
                                 height: parent.height
-                                color: "#DEE2E6"
+                                color: Colors.on_surface
                                 radius: 8
                             }
                         }
@@ -234,9 +236,9 @@ PopupWindow {
 
                         Text {
                             text: (seekSlider.pressed || seekDebounce.running) ? formatTime(seekSlider.value) : formatTime(CiderRpcService.position)
-                            color: "#98989f"
+                            color: Colors.on_surface_variant
                             font.pixelSize: 12
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Fonts.font
                         }
 
                         Item {
@@ -245,9 +247,9 @@ PopupWindow {
 
                         Text {
                             text: formatTime(CiderRpcService.duration)
-                            color: "#98989f"
+                            color: Colors.on_surface_variant
                             font.pixelSize: 12
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Fonts.font
                         }
                     }
                 }
@@ -264,10 +266,10 @@ PopupWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "󰒮"
-                            color: "#fff"
+                            text: Icons.skipPrevious
+                            color: Colors.on_surface
                             font.pixelSize: 32
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Fonts.iconFont
                             font.bold: true
                         }
 
@@ -288,10 +290,10 @@ PopupWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: CiderRpcService.isPlaying ? "󰏤" : "󰐊"
-                            color: "#fff"
+                            text: CiderRpcService.isPlaying ? Icons.pause : Icons.play
+                            color: Colors.on_surface
                             font.pixelSize: 48
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Fonts.iconFont
                             font.bold: true
                         }
 
@@ -312,10 +314,10 @@ PopupWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "󰒭"
-                            color: "#fff"
+                            text: Icons.skipNext
+                            color: Colors.on_surface
                             font.pixelSize: 32
-                            font.family: "JetBrainsMono Nerd Font"
+                            font.family: Fonts.iconFont
                             font.bold: true
                         }
 

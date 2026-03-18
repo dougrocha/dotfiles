@@ -5,6 +5,7 @@ return {
     opts = {
         langs = {
             'bash',
+            'css',
             'cpp',
             'gitcommit',
             'java',
@@ -18,6 +19,7 @@ return {
             'toml',
             'tsx',
             'typescript',
+            'qmljs',
         },
     },
     config = function(_, opts)
@@ -26,6 +28,7 @@ return {
 
         local parser_to_filetype = {
             tsx = 'typescriptreact',
+            qmljs = 'qml',
         }
 
         local patterns = {}
@@ -42,7 +45,9 @@ return {
                 vim.treesitter.start(args.buf)
 
                 -- Enable indentation for the buffer
-                vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                if vim.bo[args.buf].filetype ~= 'qml' then
+                    vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                end
 
                 -- Enable fold
                 vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'

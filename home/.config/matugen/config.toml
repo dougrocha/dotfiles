@@ -1,0 +1,18 @@
+[config]
+reload_apps = false
+set_wallpaper = false
+mode = "dark"
+
+[templates.hyprland-colors]
+input_path = "~/.config/matugen/templates/hyprland-colors.conf"
+output_path = "~/dev/dotfiles/home/.config/hypr/colors.conf"
+post_hook = "hyprctl reload"
+
+[templates.quickshell-colors]
+input_path = "~/.config/matugen/templates/quickshell-colors.qml"
+output_path = "~/dev/dotfiles/home/.config/quickshell/Components/Colors.qml"
+
+[templates.mako]
+input_path = "~/.config/matugen/templates/mako.conf"
+output_path = "~/dev/dotfiles/home/.config/mako/config"
+post_hook = "makoctl reload"

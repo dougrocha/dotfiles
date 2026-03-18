@@ -1,11 +1,11 @@
-import "../Components"
-import "../Services"
-
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
+import qs.Constants
+import qs.Components
+import qs.Services
 
 RowLayout {
     id: root
@@ -21,9 +21,9 @@ RowLayout {
 
         Text {
             text: "CPU: " + CpuService.usage + "%"
-            color: Theme.yellow
-            font.pixelSize: Theme.fontSize
-            font.family: Theme.fontFamily
+            color: Colors.tertiary
+            font.pixelSize: Fonts.p
+            font.family: Fonts.font
             font.bold: true
         }
     }

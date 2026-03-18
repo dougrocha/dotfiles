@@ -5,7 +5,7 @@ return {
 
         ---@type _99.Options
         _99.setup {
-            model = 'anthropic/claude-sonnet-4-5',
+            model = 'anthropic/claude-haiku-4-5',
             completion = {
                 custom_rules = {
                     '.agents/skills/',

@@ -3,5 +3,4 @@
 
 QMLFORMAT="/usr/lib/qt6/bin/qmlformat"
 
-# Find and format all .qml files
 find . -name "*.qml" -type f -exec $QMLFORMAT -i -f {} \;

@@ -3,30 +3,31 @@
     email = 79188161+dougrocha@users.noreply.github.com
     signingkey = ~/.ssh/id_ed25519
 [pull]
-	rebase = true
+    rebase = true
 [commit]
-	gpgsign = true
+    gpgsign = true
 [gpg]
-	format = ssh
+    format = ssh
 [tag]
     gpgsign = true
 [column]
-	ui = auto
+    ui = auto
 [branch]
-	sort = -committerdate
+    sort = -committerdate
 [init]
-	defaultBranch = main
+    defaultBranch = main
 [diff]
-	algorithm = histogram
-	mnemonicPrefix = true
-	renames = true
+    algorithm = histogram
+    mnemonicPrefix = true
+    renames = true
     colorMoved = true
+    tool = nvim
 [push]
-	autoSetupRemote = true
+    autoSetupRemote = true
 [fetch]
-	prune = true
+    prune = true
 [rerere]
-	enabled = true
+    enabled = true
     autoupdate = true
 [core]
-	editor = nvim
+    editor = nvim

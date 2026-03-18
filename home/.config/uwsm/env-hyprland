@@ -1,5 +1,7 @@
 export XCURSOR_SIZE=24
 export HYPRCURSOR_SIZE=24
+export XCURSOR_THEME=Yaru
+export HYPRCURSOR_THEME=Yaru
 
 export GDK_BACKEND="wayland,x11,*"
 export QT_QPA_PLATFORM="wayland;xcb"

@@ -55,8 +55,6 @@ local function on_attach(client, bufnr)
     keymap('<leader>lf', format_cmd, 'Format')
     vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
 
-    vim.lsp.document_color.enable(true, bufnr)
-
     if client:supports_method 'textDocument/documentColor' then
         keymap('grc', function()
             vim.lsp.document_color.color_presentation()

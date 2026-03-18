@@ -30,7 +30,7 @@ return {
         local hi_words = require('mini.extra').gen_highlighter.words
         hipatterns.setup {
             highlighters = {
-                todo = hi_words({ 'TODO' }, 'MiniHipatternsTodo'),
+                todo = { pattern = 'TODO[^:%s]*', group = 'MiniHipatternsTodo' },
                 hex_color = hipatterns.gen_highlighter.hex_color(),
             },
         }

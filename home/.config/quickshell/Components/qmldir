@@ -1,4 +1,0 @@
-module Components
-singleton Theme Theme.qml
-MediaControlButton 1.0 MediaControlButton.qml
-Streaming 1.0 Streaming.qml
