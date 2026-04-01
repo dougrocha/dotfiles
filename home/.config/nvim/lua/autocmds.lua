@@ -31,6 +31,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'Cmdline
         end
     end,
 })
+
 vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'CmdlineEnter', 'WinLeave' }, {
     group = line_numbers_group,
     desc = 'Toggle relative line numbers off',

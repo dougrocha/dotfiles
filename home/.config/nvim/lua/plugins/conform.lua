@@ -9,7 +9,6 @@ return {
         formatters_by_ft = {
             c = { lsp_format = 'prefer' },
             cpp = { lsp_format = 'prefer' },
-            cs = { 'csharpier' },
             css = { 'prettier' },
             go = { lsp_format = 'prefer' },
             html = { 'prettier' },

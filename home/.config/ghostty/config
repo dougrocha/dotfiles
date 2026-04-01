@@ -1,5 +1,5 @@
 # Theme
-theme = Dracula
+theme = Chalk
 background = 0E1419
 
 shell-integration-features = no-cursor, ssh-env

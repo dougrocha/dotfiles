@@ -1,0 +1,10 @@
+[tools]
+"aqua:LuaLS/lua-language-server" = "latest"
+biome = "latest"
+bun = "latest"
+go = "latest"
+java = "17"
+node = "lts"
+"npm:@tailwindcss/language-server" = "latest"
+taplo = "latest"
+usage = "latest"

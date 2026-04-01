@@ -49,12 +49,6 @@ local function on_attach(client, bufnr)
         vim.diagnostic.jump { count = 1, severity = vim.diagnostic.severity.ERROR, float = true }
     end, 'Next error')
 
-    local format_cmd = function()
-        require('conform').format { lsp_fallback = true }
-    end
-    keymap('<leader>lf', format_cmd, 'Format')
-    vim.keymap.set('v', '<leader>lf', format_cmd, { desc = 'Format selection' })
-
     if client:supports_method 'textDocument/documentColor' then
         keymap('grc', function()
             vim.lsp.document_color.color_presentation()

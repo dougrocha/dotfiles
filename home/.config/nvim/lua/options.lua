@@ -1,9 +1,11 @@
 vim.g.maplocalleader = ' '
 vim.g.mapleader = ' '
 
+-- Popup menus
+vim.o.pumheight = 15
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.o.winborder = 'rounded'
 
--- Enable mouse support
 vim.o.mouse = 'a'
 
 vim.o.backup = false
@@ -11,10 +13,6 @@ vim.o.swapfile = false
 vim.o.undofile = true
 vim.o.undodir = vim.fn.stdpath 'cache' .. '/undo'
 vim.opt.wildignore:append { '.DS_Store' }
-
--- Completion menu
-vim.o.pumheight = 15
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Update time
 vim.o.timeoutlen = 500

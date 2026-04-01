@@ -16,12 +16,14 @@
     sort = -committerdate
 [init]
     defaultBranch = main
+[difftool "nvim_difftool"]
+    cmd = nvim -c \"packadd nvim.difftool\" -d \"$LOCAL\" \"$REMOTE\"
 [diff]
     algorithm = histogram
     mnemonicPrefix = true
     renames = true
     colorMoved = true
-    tool = nvim
+    tool = nvim_difftool
 [push]
     autoSetupRemote = true
 [fetch]

@@ -25,7 +25,8 @@ alias cd z
 
 # My scripts
 fish_add_path "$HOME/.local/bin"
-fish_add_path "$HOME/.cargo/bin"
+
+source "$HOME/.cargo/env.fish"
 
 fzf --fish | source
 mise activate fish | source

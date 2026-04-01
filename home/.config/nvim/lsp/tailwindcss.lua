@@ -14,9 +14,7 @@ return {
     },
     filetypes = {
         'css',
-        'javascript',
         'javascriptreact',
-        'typescript',
         'typescriptreact',
     },
     workspace_required = true,
