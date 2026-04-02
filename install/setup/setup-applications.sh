@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/../../env.sh"
-
 APP_DIR="$DOTFILES_DIR/default/applications"
 
 echo "Installing applications and web app shortcuts..."

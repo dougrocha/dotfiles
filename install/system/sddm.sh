@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/../../env.sh"
-
 SDDM_CONF_TEMPLATE="$DOTFILES_DIR/default/sddm/autologin.conf"
 
 echo "Configuring SDDM display manager..."

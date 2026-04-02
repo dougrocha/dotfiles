@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/../env.sh"
-
 set-font 'JetBrainsMono Nerd Font' 'monospace'
 
 "$DOTFILES_DIR/install/tools/paru.sh"

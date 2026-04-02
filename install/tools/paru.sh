@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/../../env.sh"
-
 PARU_DIR="$BUILD_DIR/paru"
 
 mkdir -p "$BUILD_DIR"

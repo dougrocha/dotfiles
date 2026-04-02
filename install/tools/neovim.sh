@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source "$(dirname "$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")")/env.sh"
-
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 
 if [[ -d "$TPM_DIR" ]]; then

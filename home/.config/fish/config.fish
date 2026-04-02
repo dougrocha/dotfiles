@@ -1,3 +1,7 @@
+if test -f "$HOME/.config/env"
+    source "$HOME/.config/env"
+end
+
 # Disable greeting
 set -U fish_greeting
 

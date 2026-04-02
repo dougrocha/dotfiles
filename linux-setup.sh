@@ -2,7 +2,15 @@
 
 set -euo pipefail
 
-source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export BUILD_DIR="${BUILD_DIR:-$HOME/builds}"
+
+# Write env to ~/.config/env so the interactive shell picks it up
+mkdir -p "$HOME/.config"
+cat > "$HOME/.config/env" <<EOF
+export DOTFILES_DIR="$DOTFILES_DIR"
+export BUILD_DIR="$BUILD_DIR"
+EOF
 
 ansi_art='
  ______   _______           _______
