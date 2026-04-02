@@ -1,0 +1,102 @@
+@import "colors.css";
+
+* {
+  all: unset;
+}
+
+* {
+  font-family: monospace;
+  font-size: 16px;
+  color: @text;
+}
+
+scrollbar {
+  opacity: 0;
+}
+
+.box-wrapper {
+  background: alpha(@background, 0.95);
+  padding: 16px;
+  border: 1px solid @border;
+  border-radius: 8px;
+}
+
+.search-container {
+  background: @surface_container;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.input placeholder {
+  opacity: 0.5;
+}
+
+.input {
+  background: transparent;
+}
+
+.input:focus,
+.input:active {
+  box-shadow: none;
+  outline: none;
+}
+
+.scroll {
+  min-height: 200px;
+}
+
+.list {
+}
+
+child,
+child > * {
+}
+
+child:hover .item-box {
+  background: alpha(@primary, 0.1);
+}
+
+child:selected .item-box {
+  background: alpha(@primary, 0.2);
+}
+
+child:selected .item-box * {
+  color: @primary;
+}
+
+.item-box {
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+.item-text-box {
+  all: unset;
+}
+
+.item-text {
+}
+
+.item-subtext {
+  font-size: 0px;
+  min-height: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+.item-image {
+  margin-right: 12px;
+  -gtk-icon-size: 20px;
+}
+
+.placeholder {
+  opacity: 0.5;
+}
+
+.keybind-hints {
+  display: none;
+}
+
+.preview {
+  display: none;
+}

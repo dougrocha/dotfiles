@@ -16,3 +16,7 @@ output_path = "~/dev/dotfiles/home/.config/quickshell/Components/Colors.qml"
 input_path = "~/.config/matugen/templates/mako.conf"
 output_path = "~/dev/dotfiles/home/.config/mako/config"
 post_hook = "makoctl reload"
+
+[templates.walker]
+input_path = "~/.config/matugen/templates/walker.css"
+output_path = "~/dev/dotfiles/home/.config/walker/themes/default/colors.css"
