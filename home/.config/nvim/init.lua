@@ -1,5 +1,11 @@
 vim.cmd.colorscheme 'doug'
 
+vim.pack.add{
+  { src = 'https://github.com/neovim/nvim-lspconfig' },
+}
+vim.cmd.packadd 'nvim.undotree'
+vim.cmd.packadd 'nvim.difftool'
+
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
     vim.fn.system {
@@ -48,8 +54,5 @@ require('lazy').setup(plugins, {
         },
     },
 })
-
-vim.cmd.packadd 'nvim.undotree'
-vim.cmd.packadd 'nvim.difftool'
 
 require('vim._core.ui2').enable {}
