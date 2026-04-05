@@ -2,7 +2,13 @@
 
 if pgrep -f "^gpu-screen-recorder" >/dev/null; then
   pkill -f "^gpu-screen-recorder"
-  notify-send "Recording Stopped" "Screen recording saved" -t 5000 -a "GPU Screen Recorder"
+  sleep 0.5
+  LATEST=$(ls -t ~/Videos/recording_*.mp4 2>/dev/null | head -1)
+  if [ -n "$LATEST" ]; then
+    notify-send "Saved to Videos" "$(basename "$LATEST")" -t 5000 -a "GPU Screen Recorder"
+  else
+    notify-send "Recording Stopped" -t 3000 -a "GPU Screen Recorder"
+  fi
 else
   start-recording screen
 fi
