@@ -11,7 +11,7 @@ if ! command -v stow &> /dev/null; then
 fi
 
 echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
-stow -R -v --no-folding -t ~ -d "$DOTFILES_DIR" home
+stow -R -v -t ~ -d "$DOTFILES_DIR" home
 
 "$DOTFILES_DIR/install/tools/setup-ghostty-config.sh"
 
