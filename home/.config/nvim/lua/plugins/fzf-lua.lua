@@ -31,17 +31,20 @@ return {
         { '<leader>f<', '<cmd>FzfLua resume<cr>', desc = 'Resume last fzf command' },
         { 'z=', '<cmd>FzfLua spell_suggest<CR>', desc = 'Spell suggestions' },
     },
+    ---@module "fzf-lua"
+    ---@type fzf-lua.Config|{}
+    ---@diagnostic disable: missing-fields
     opts = function()
         local actions = require('fzf-lua').actions
 
         return {
             { 'border-fused', 'hide' },
             fzf_colors = {
-                bg = { 'bg', 'Normal' },
-                gutter = { 'bg', 'Normal' },
-                info = { 'fg', 'Conditional' },
-                scrollbar = { 'bg', 'Normal' },
-                separator = { 'fg', 'Comment' },
+                ['bg'] = { 'bg', 'Normal' },
+                ['gutter'] = { 'bg', 'Normal' },
+                ['info'] = { 'fg', 'Conditional' },
+                ['scrollbar'] = { 'bg', 'Normal' },
+                ['separator'] = { 'fg', 'Comment' },
             },
             fzf_opts = {
                 ['--info'] = 'default',

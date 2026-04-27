@@ -14,7 +14,7 @@ uwsm
 sddm
 
 # Hyprland
-hyprland
+hyprland-git
 hypridle
 hyprlock
 hyprshot
@@ -23,7 +23,7 @@ hyprpicker
 hyprpolkitagent
 hyprshutdown
 hyprsunset
-hyprland-guiutils
+hyprland-guiutils-git
 xdg-desktop-portal-hyprland
 hyprland-preview-share-picker-git
 

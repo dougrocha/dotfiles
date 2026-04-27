@@ -1,0 +1,16 @@
+hl.config({
+    input = {
+        kb_layout = "us",
+        kb_options = "compose:caps",
+
+        repeat_delay = 600,
+
+        sensitivity = 0,
+        accel_profile = "flat",
+    },
+
+    misc = {
+        key_press_enables_dpms = true, -- key press will trigger wake
+        mouse_move_enables_dpms = true, -- mouse move will trigger wake
+    },
+})

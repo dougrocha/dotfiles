@@ -33,20 +33,42 @@ local function on_attach(client, bufnr)
     end, 'Hover Information')
 
     keymap('<leader>D', function()
-        vim.diagnostic.open_float()
+        vim.diagnostic.open_float { scope = 'line' }
     end, 'View Diagnostic')
 
     keymap('[d', function()
-        vim.diagnostic.jump { count = -1, float = true }
+        vim.diagnostic.jump {
+            count = -1,
+            on_jump = function()
+                vim.diagnostic.open_float { scope = 'cursor', focus = false }
+            end,
+        }
     end, 'Previous diagnostic')
     keymap(']d', function()
-        vim.diagnostic.jump { count = 1, float = true }
+        vim.diagnostic.jump {
+            count = 1,
+            on_jump = function()
+                vim.diagnostic.open_float { scope = 'cursor', focus = false }
+            end,
+        }
     end, 'Next diagnostic')
     keymap('[e', function()
-        vim.diagnostic.jump { count = -1, severity = vim.diagnostic.severity.ERROR, float = true }
+        vim.diagnostic.jump {
+            count = -1,
+            severity = vim.diagnostic.severity.ERROR,
+            on_jump = function()
+                vim.diagnostic.open_float { scope = 'cursor', focus = false }
+            end,
+        }
     end, 'Previous error')
     keymap(']e', function()
-        vim.diagnostic.jump { count = 1, severity = vim.diagnostic.severity.ERROR, float = true }
+        vim.diagnostic.jump {
+            count = 1,
+            severity = vim.diagnostic.severity.ERROR,
+            on_jump = function()
+                vim.diagnostic.open_float { scope = 'cursor', focus = false }
+            end,
+        }
     end, 'Next error')
 
     if client:supports_method 'textDocument/documentColor' then
@@ -105,11 +127,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
-for severity, icon in pairs(diagnostic_icons) do
-    local hl = 'DiagnosticSign' .. severity:sub(1, 1) .. severity:sub(2):lower()
-    vim.fn.sign_define(hl, { text = icon, texthl = hl })
-end
-
 vim.diagnostic.config {
     virtual_text = {
         prefix = '',
@@ -117,8 +134,8 @@ vim.diagnostic.config {
         format = function(diagnostic)
             -- Use shorter, nicer names for some sources:
             local special_sources = {
-                ['Lua Diagnostics.'] = 'lua',
-                ['Lua Syntax Check.'] = 'lua',
+                ['Lua Diagnostics'] = 'lua',
+                ['Lua Syntax Check'] = 'lua',
             }
 
             local message = diagnostic_icons[vim.diagnostic.severity[diagnostic.severity]]

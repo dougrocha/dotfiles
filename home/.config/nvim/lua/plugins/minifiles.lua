@@ -72,12 +72,39 @@ return {
             end,
         })
 
-        vim.api.nvim_create_autocmd('User', {
-            pattern = 'MiniFilesActionRename',
-            callback = function(event)
-                Snacks.rename.on_rename_file(event.data.from, event.data.to)
-            end,
-        })
+        -- is built in with commit 4f6f84a
+        -- vim.api.nvim_create_autocmd('User', {
+        --     pattern = { 'MiniFilesActionRename', 'MiniFilesActionMove' },
+        --     callback = function(args)
+        --         local will_rename_method = 'workspace/willRenameFiles'
+        --         local did_rename_method = 'workspace/didRenameFiles'
+        --
+        --         local params = {
+        --             files = {
+        --                 {
+        --                     oldUri = vim.uri_from_fname(args.data.from),
+        --                     newUri = vim.uri_from_fname(args.data.to),
+        --                 },
+        --             },
+        --         }
+        --
+        --         local lsp_clients = vim.lsp.get_clients()
+        --         for _, client in ipairs(lsp_clients) do
+        --             if client:supports_method(will_rename_method) then
+        --                 local res = client:request_sync(will_rename_method, params, 1000, 0)
+        --                 if res and res.result then
+        --                     vim.lsp.util.apply_workspace_edit(res.result, client.offset_encoding)
+        --                 end
+        --             end
+        --         end
+        --
+        --         for _, client in ipairs(lsp_clients) do
+        --             if client:supports_method(did_rename_method) then
+        --                 client:notify(did_rename_method, params)
+        --             end
+        --         end
+        --     end,
+        -- })
 
         vim.api.nvim_create_autocmd('User', {
             desc = 'Add MiniFiles split keymaps',

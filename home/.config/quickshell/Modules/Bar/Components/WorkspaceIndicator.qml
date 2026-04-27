@@ -7,7 +7,7 @@ import qs.Components
 import qs.Constants
 
 Repeater {
-    model: 9
+    model: 10
 
     Rectangle {
         property var workspace: {

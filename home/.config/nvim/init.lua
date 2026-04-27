@@ -1,7 +1,7 @@
 vim.cmd.colorscheme 'doug'
 
-vim.pack.add{
-  { src = 'https://github.com/neovim/nvim-lspconfig' },
+vim.pack.add {
+    { src = 'https://github.com/neovim/nvim-lspconfig' },
 }
 vim.cmd.packadd 'nvim.undotree'
 vim.cmd.packadd 'nvim.difftool'
@@ -56,3 +56,5 @@ require('lazy').setup(plugins, {
 })
 
 require('vim._core.ui2').enable {}
+
+vim.o.exrc = true

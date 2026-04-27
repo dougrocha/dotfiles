@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "keytrack.nvim": {
+      "rev": "3ef8c04ebca71bf4f7ab4796e9d04f235d502a82",
+      "src": "https://github.com/dougrocha/keytrack.nvim"
+    },
+    "nvim-lspconfig": {
+      "rev": "9ccd58a7949091c0cc2777d4e92a45a209c808c1",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-treesitter": {
+      "rev": "4916d6592ede8c07973490d9322f187e07dfefac",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter"
+    }
+  }
+}

@@ -3,7 +3,7 @@ vim.g.mapleader = ' '
 
 -- Popup menus
 vim.o.pumheight = 15
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'fuzzy' }
 vim.o.winborder = 'rounded'
 
 vim.o.mouse = 'a'
@@ -11,7 +11,8 @@ vim.o.mouse = 'a'
 vim.o.backup = false
 vim.o.swapfile = false
 vim.o.undofile = true
-vim.o.undodir = vim.fn.stdpath 'cache' .. '/undo'
+vim.o.undodir = vim.fn.stdpath 'data' .. '/undo'
+
 vim.opt.wildignore:append { '.DS_Store' }
 
 -- Update time
@@ -56,7 +57,6 @@ vim.o.softtabstop = 4
 -- Enable auto indentation
 vim.o.autoindent = true
 vim.o.expandtab = true
-vim.o.smartindent = true
 
 -- Window
 vim.o.splitright = true
@@ -76,11 +76,6 @@ vim.opt.shortmess:append {
     w = true,
     s = true,
 }
-
--- Add fuzzy completion option if Neovim >= 0.11
-if vim.fn.has 'nvim-0.11' == 1 then
-    vim.opt.completeopt:append 'fuzzy'
-end
 
 -- Make words with dash be one word
 vim.opt.iskeyword:append '-'
