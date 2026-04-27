@@ -12,9 +12,9 @@ layer=overlay
 history=1
 sort=-time
 group-by=summary
-background-color=#202018
-text-color=#e5e3d6
-border-color=#47483b
+background-color=#271e19
+text-color=#f0dfd8
+border-color=#52443d
 
 [urgency=high]
 border-color=#93000a

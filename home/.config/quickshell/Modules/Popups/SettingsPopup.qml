@@ -477,17 +477,17 @@ PopupWindow {
 
     Process {
         id: shutdownProcess
-        command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'\""]
+        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""]
     }
 
     Process {
         id: rebootProcess
-        command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot'\""]
+        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""]
     }
 
     Process {
         id: logoutProcess
-        command: ["sh", "-c", "hyprctl dispatch exec \"hyprshutdown -t 'Logging out...'\""]
+        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""]
     }
 
     mask: Region {
