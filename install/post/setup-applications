@@ -19,3 +19,5 @@ echo "  • Installing web app shortcuts..."
 "$HOME/.local/bin/install-webapp" "Discord" "https://discord.com/app" "https://discord.com/assets/f9bb9c4af2b9c32a2c5ee0014661546d.png"
 
 echo "✓ Applications and web app shortcuts installed"
+
+# vim: ft=sh

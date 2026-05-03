@@ -12,7 +12,7 @@ git clone git@github.com:dougrocha/dotfiles.git
 cd dotfiles
 
 # Linux
-./linux-setup.sh
+./setup
 
 # Macos
 ./stow

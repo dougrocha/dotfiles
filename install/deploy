@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -euo pipefail
+
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if ! command -v stow &> /dev/null; then
+    echo "Error: GNU stow is not installed."
+    exit 1
+fi
+
+echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
+stow -R -v -t ~ -d "$DOTFILES_DIR" home
+
+echo "Dotfiles deployed successfully!"
+
+# vim: ft=sh

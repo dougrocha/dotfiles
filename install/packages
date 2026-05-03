@@ -15,16 +15,16 @@ sddm
 
 # Hyprland
 hyprland-git
-hypridle
-hyprlock
-hyprshot
-hyprpaper
-hyprpicker
-hyprpolkitagent
-hyprshutdown
-hyprsunset
+hypridle-git
+hyprlock-git
+hyprshot-git
+hyprpaper-git
+hyprpicker-git
+hyprpolkitagent-git
+hyprshutdown-git
+hyprsunset-git
 hyprland-guiutils-git
-xdg-desktop-portal-hyprland
+xdg-desktop-portal-hyprland-git
 hyprland-preview-share-picker-git
 
 # Shell

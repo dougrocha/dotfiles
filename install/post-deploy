@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -euo pipefail
+
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "Running post-deploy configuration..."
+
+"$DOTFILES_DIR/install/post/setup-ghostty-config"
+"$DOTFILES_DIR/install/post/fonts"
+"$DOTFILES_DIR/install/post/defaults"
+"$DOTFILES_DIR/install/post/desktop-prefs"
+"$DOTFILES_DIR/install/post/nautilus-python"
+"$DOTFILES_DIR/install/post/setup-applications"
+"$DOTFILES_DIR/install/post/fast-shutdown"
+
+systemctl --user enable --now hyprpaper.service
+systemctl --user enable --now hyprpolkitagent.service
+systemctl --user enable --now hypridle.service
+systemctl --user enable --now hyprsunset.service
+
+echo "Post-deploy complete!"
+
+# vim: ft=sh

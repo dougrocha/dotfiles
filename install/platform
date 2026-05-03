@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+PLATFORM_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+PLATFORM_GPU="none"
+
+if command -v lspci >/dev/null 2>&1 && lspci | grep -i nvidia >/dev/null 2>&1; then
+    PLATFORM_GPU="nvidia"
+fi
+
+export PLATFORM_OS
+export PLATFORM_GPU
+
+# vim: ft=sh

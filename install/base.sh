@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-set-font 'JetBrainsMono Nerd Font' 'monospace'
+source "$DOTFILES_DIR/install/platform"
 
 "$DOTFILES_DIR/install/tools/paru.sh"
 
@@ -11,15 +11,9 @@ paru -S --noconfirm --needed "${packages[@]}"
 
 "$DOTFILES_DIR/install/tools/neovim.sh"
 "$DOTFILES_DIR/install/system/sddm.sh"
-"$DOTFILES_DIR/install/config/fast-shutdown.sh"
-"$DOTFILES_DIR/install/config/nautilus-python.sh"
 
-if lspci | grep -i nvidia &> /dev/null; then
+if [ "$PLATFORM_GPU" = "nvidia" ]; then
     "$DOTFILES_DIR/install/system/nvidia.sh"
 fi
-
-"$DOTFILES_DIR/install/setup/defaults.sh"
-"$DOTFILES_DIR/install/setup/desktop-prefs.sh"
-"$DOTFILES_DIR/install/setup/setup-applications.sh"
 
 cargo install matugen

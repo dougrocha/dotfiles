@@ -31,7 +31,6 @@ xdg-mime default mpv.desktop video/3gpp
 xdg-mime default mpv.desktop video/3gpp2
 xdg-mime default mpv.desktop video/x-ms-asf
 xdg-mime default mpv.desktop video/x-ogm+ogg
-xdg-mime default mpv.desktop video/x-theora+ogg
 xdg-mime default mpv.desktop application/ogg
 
 # Text editor defaults (nvim)
@@ -60,3 +59,5 @@ xdg-mime default imv.desktop image/gif
 xdg-mime default imv.desktop image/webp
 xdg-mime default imv.desktop image/bmp
 xdg-mime default imv.desktop image/tiff
+
+# vim: ft=sh

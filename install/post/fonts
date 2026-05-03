@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -euo pipefail
+
+set-font 'JetBrainsMono Nerd Font' 'monospace'
+
+# vim: ft=sh

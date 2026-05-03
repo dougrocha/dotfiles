@@ -4,10 +4,10 @@ set -euo pipefail
 
 CONFIG_DIR="$HOME/.config/ghostty"
 
-OS="$(uname -s)"
+mkdir -p "$CONFIG_DIR"
 
-case "$OS" in
-    Darwin)
+case "$PLATFORM_OS" in
+    darwin)
         cat > "$CONFIG_DIR/config-macos" << 'EOF'
 font-family = "Monaspace Neon"
 font-size = 14
@@ -22,7 +22,7 @@ mouse-hide-while-typing = true
 # vim: set ft=conf:
 EOF
         ;;
-    Linux)
+    linux)
         cat > "$CONFIG_DIR/config-linux" << 'EOF'
 font-family = "JetBrainsMono Nerd Font"
 
@@ -33,9 +33,11 @@ keybind = control+insert=copy_to_clipboard
 EOF
         ;;
     *)
-        echo "NUH UH! You can't do that on '$OS' - Ghostty config generation says NO!"
+        echo "NUH UH! You can't do that on '$PLATFORM_OS' - Ghostty config generation says NO!"
         exit 1
         ;;
 esac
 
 echo "Done configuring Ghostty!"
+
+# vim: ft=sh

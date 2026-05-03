@@ -27,13 +27,14 @@ echo -e "\n$ansi_art\n"
 
 mkdir -p "$BUILD_DIR"
 
-"$DOTFILES_DIR/stow"
+source "$DOTFILES_DIR/install/platform"
+
+"$DOTFILES_DIR/install/deploy"
 
 "$DOTFILES_DIR/install/base.sh"
 
-systemctl --user enable --now hyprpaper.service
-systemctl --user enable --now hyprpolkitagent.service
-systemctl --user enable --now hypridle.service
-systemctl --user enable --now hyprsunset.service
+"$DOTFILES_DIR/install/post-deploy"
 
 echo -e "Setup complete! Please reboot to start Hyprland."
+
+# vim: ft=sh
