@@ -2,10 +2,10 @@
 
 if systemctl --user is-active --quiet hypridle.service; then
   systemctl --user stop hypridle.service
-  notify-send "󱫖    Stop locking computer when idle"
+  notify-send "Idle inhibitor enabled" "Computer will not lock when idle" -a "Idle"
 else
   systemctl --user start hypridle.service
-  notify-send "󱫖    Now locking computer when idle"
+  notify-send "Idle inhibitor disabled" "Computer will lock when idle" -a "Idle"
 fi
 
 # vim: ft=sh

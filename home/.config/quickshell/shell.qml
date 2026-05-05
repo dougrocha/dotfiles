@@ -1,5 +1,9 @@
 //@ pragma UseQApplication
+//@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
+//@ pragma Env QT_QPA_PLATFORMTHEME=
+
 import qs.Modules.Bar
+import qs.Modules.Notifications
 import qs.Components
 import qs.Services
 import qs.Widgets
@@ -12,7 +16,11 @@ ShellRoot {
 
     Variants {
         model: Quickshell.screens
-
         Bar {}
+    }
+
+    Loader {
+        active: true
+        sourceComponent: NotificationManager {}
     }
 }

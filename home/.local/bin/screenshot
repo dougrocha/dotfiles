@@ -4,7 +4,7 @@
 OUTPUT_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures/}"
 
 if [[ ! -d $OUTPUT_DIR ]]; then
-  notify-send "Pictures directory does not exist: $OUTPUT_DIR" -u critical -t 3000
+  notify-send "Invalid directory" "Pictures directory does not exist: $OUTPUT_DIR" -a "Screenshot" -u critical -t 3000
   exit 1
 fi
 
@@ -105,6 +105,6 @@ mkdir -p $OUTPUT_DIR/Screenshots
 grim -g "$SELECTION" "$FILEPATH" || exit 1
 wl-copy <"$FILEPATH"
 
-notify-send "Screenshot saved to clipboard and file" -t 10000 -i "$FILEPATH" &
+notify-send "Screenshot captured" "Saved to clipboard and file" -a "Screenshot" -t 10000 -i "$FILEPATH" &
 
 # vim: ft=sh
