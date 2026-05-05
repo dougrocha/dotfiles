@@ -10,6 +10,7 @@ Singleton {
     id: root
 
     property list<var> notifications: []
+    property bool stackPaused: false
 
     NotificationServer {
         keepOnReload: false
@@ -70,7 +71,7 @@ Singleton {
             const now = Date.now();
 
             const expired = notifications.filter(notif => {
-                return notif.duration !== -1 && (now - notif.timestamp) > notif.duration;
+                return notif.duration !== -1 && !root.stackPaused && (now - notif.timestamp) > notif.duration;
             });
 
             expired.forEach(notif => removeNotification(notif.id));

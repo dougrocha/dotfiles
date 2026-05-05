@@ -70,6 +70,25 @@ Scope {
                 clip: false
                 interactive: false
 
+                HoverHandler {
+                    id: listHover
+                    onHoveredChanged: {
+                        if (hovered) {
+                            unhoverTimer.stop();
+                            NotificationService.stackPaused = true;
+                        } else {
+                            unhoverTimer.restart();
+                        }
+                    }
+                }
+
+                Timer {
+                    id: unhoverTimer
+                    interval: 100
+                    repeat: false
+                    onTriggered: NotificationService.stackPaused = false
+                }
+
                 add: Transition {
                     ParallelAnimation {
                         NumberAnimation {
