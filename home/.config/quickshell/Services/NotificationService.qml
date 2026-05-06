@@ -9,6 +9,7 @@ import Quickshell.Services.Notifications
 Singleton {
     id: root
 
+    property list<var> history: []
     property list<var> notifications: []
     property bool stackPaused: false
 
@@ -45,7 +46,8 @@ Singleton {
 
         const metadata = {
             timestamp: Date.now(),
-            duration: calculateDuration(notification)
+            duration: calculateDuration(notification),
+            isPopup: true
         };
 
         const data = Object.assign(notification, metadata);
@@ -58,9 +60,28 @@ Singleton {
     }
 
     function removeNotification(notificationId) {
-        const index = root.notifications.findIndex(notif => notif.id === notificationId);
-        if (index !== -1)
-            root.notifications.splice(index, 1);
+        const popupIndex = root.notifications.findIndex(notif => notif.id === notificationId);
+        if (popupIndex !== -1) {
+            const notif = root.notifications[popupIndex];
+            notif.isPopup = false;
+            root.notifications.splice(popupIndex, 1);
+            addToHistory(notif);
+            return;
+        }
+
+        const historyIndex = root.history.findIndex(notif => notif.id === notificationId);
+        if (historyIndex !== -1)
+            root.history.splice(historyIndex, 1);
+    }
+
+    function addToHistory(notification) {
+        root.history.unshift(notification);
+        if (root.history.length > 20)
+            root.history.pop();
+    }
+
+    function clearHistory() {
+        root.history = [];
     }
 
     Timer {

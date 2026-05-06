@@ -16,7 +16,14 @@ Singleton {
         readonly property int panelWidth: 380
         readonly property int cardWidth: 360
         readonly property int cardHeight: 48
+        readonly property int cardRadius: 16
         readonly property int spacing: 8
         readonly property int margin: 12
+    }
+
+    readonly property QtObject animations: QtObject {
+        readonly property int fast: 150
+        readonly property int normal: 200
+        readonly property int slow: 300
     }
 }

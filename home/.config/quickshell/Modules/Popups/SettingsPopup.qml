@@ -5,11 +5,14 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Constants
-import qs.Components
 import qs.Services
+import qs.Modules.Notifications
+import Quickshell.Widgets
 
 PopupWindow {
     id: settingsPanel
+
+    implicitHeight: Math.max(520, contentLayout.implicitHeight + 40)
 
     onVisibleChanged: {
         if (visible) {
@@ -19,7 +22,6 @@ PopupWindow {
     }
 
     implicitWidth: 420
-    implicitHeight: 500
     color: "transparent"
 
     HyprlandFocusGrab {
@@ -42,7 +44,11 @@ PopupWindow {
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        id: contentLayout
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.margins: 20
         spacing: 20
 
@@ -373,8 +379,126 @@ PopupWindow {
             }
         }
 
-        Item {
-            Layout.fillHeight: true
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                Text {
+                    text: "Notifications"
+                    color: Colors.on_surface
+                    font.family: Fonts.font
+                    font.pixelSize: Fonts.h4
+                    font.weight: Font.DemiBold
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "Clear"
+                    color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                    font.family: Fonts.font
+                    font.pixelSize: Fonts.p
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
+
+                    HoverHandler {
+                        id: clearHover
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
+                    TapHandler {
+                        onTapped: NotificationService.clearHistory()
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 1
+                color: Colors.outline_variant
+            }
+
+            ListView {
+                id: historyList
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 320
+                topMargin: 6
+                bottomMargin: 6
+                spacing: Theme.notifications.spacing
+                clip: true
+
+                model: ScriptModel {
+                    values: NotificationService.history
+                    objectProp: "id"
+                }
+
+                add: Transition {
+                    ParallelAnimation {
+                        NumberAnimation {
+                            property: "opacity"
+                            from: 0
+                            to: 1
+                            duration: Theme.animations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            property: "x"
+                            from: 40
+                            to: 0
+                            duration: Theme.animations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                }
+
+                remove: Transition {
+                    ParallelAnimation {
+                        NumberAnimation {
+                            property: "opacity"
+                            to: 0
+                            duration: Theme.animations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            property: "x"
+                            to: 40
+                            duration: Theme.animations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                }
+
+                displaced: Transition {
+                    NumberAnimation {
+                        property: "y"
+                        duration: Theme.animations.slow
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                delegate: NotificationCard {
+                    width: ListView.view.width
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "No notifications"
+                    color: Colors.on_surface_variant
+                    font.family: Fonts.font
+                    font.pixelSize: Fonts.p
+                    visible: historyList.count === 0
+                }
+            }
         }
 
         Rectangle {
