@@ -10,7 +10,7 @@ Item {
     id: root
 
     implicitWidth: pill.implicitWidth
-    implicitHeight: Theme.panelHeight
+    implicitHeight: Theme.topBarHeight
 
     readonly property bool btEnabled: BluetoothService.bluetoothEnabled
     readonly property bool btConnected: BluetoothService.hasConnectedDevices
@@ -104,6 +104,7 @@ Item {
             anchor.window: root.QsWindow.window
             anchor.rect.x: root.QsWindow.window ? root.QsWindow.window.width - implicitWidth - 8 : 0
             anchor.rect.y: root.QsWindow.window ? root.QsWindow.window.height + 8 : 0
+            anchor.gravity: Edges.Bottom | Edges.Right
         }
     }
 }

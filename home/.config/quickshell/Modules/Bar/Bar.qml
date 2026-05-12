@@ -2,84 +2,95 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Wayland
 import qs.Constants
 import qs.Components
 import qs.Modules.Bar.Components
 import qs.Services
 import qs.Widgets
 
-PanelWindow {
-    property var modelData
+Variants {
+    id: root
+    model: Quickshell.screens
 
-    screen: modelData
-    implicitHeight: Theme.panelHeight
-    color: Colors.surface
-
-    anchors {
-        top: true
-        left: true
-        right: true
+    component Separator: Rectangle {
+        Layout.preferredWidth: 1
+        Layout.preferredHeight: 16
+        Layout.alignment: Qt.AlignVCenter
+        color: Colors.on_surface_variant
     }
 
-    Rectangle {
-        anchors.fill: parent
+    delegate: PanelWindow {
+        id: topBar
+
+        required property var modelData
+        screen: modelData
+
+        WlrLayershell.layer: WlrLayer.Top
+        WlrLayershell.namespace: "qs.topbar"
+
+        implicitHeight: Theme.topBarHeight
         color: Colors.surface
 
+        anchors {
+            top: true
+            left: true
+            right: true
+        }
+
+        Workspaces {
+            id: workspaceModule
+            targetMonitor: modelData.name
+
+            anchors {
+                left: parent.left
+                leftMargin: 15
+                verticalCenter: parent.verticalCenter
+            }
+        }
+
+        MusicPanel {
+            id: musicPopout
+            anchor.window: topBar
+            anchor.rect.x: (topBar.width - 480) / 2
+            anchor.rect.y: topBar.height + 8
+        }
+
+        MediaSection {
+            id: mediaSection
+            anchors.centerIn: parent
+            colYellow: Colors.secondary
+            colMuted: Colors.outline
+            fontSize: Fonts.p
+            fontFamily: Fonts.font
+            panelOpen: musicPopout.visible
+            onTogglePanel: musicPopout.visible = !musicPopout.visible
+        }
+
         RowLayout {
-            anchors.fill: parent
-            spacing: 0
+            anchors.right: parent.right
+            spacing: 8
 
-            WorkspaceIndicator {}
-
-            // Spacer
-            Item {
-                Layout.fillWidth: true
-            }
-
-            // System Tray
-            TraySection {}
-
-            // Media Section
-            MediaSection {
-                colYellow: Colors.secondary
-                colMuted: Colors.outline
-                fontSize: Fonts.p
-                fontFamily: Fonts.font
-            }
-
-            // Screen Share Status
             ScreenShare {}
 
-            Rectangle {
-                Layout.preferredWidth: ScreenShare.visible ?? false ? 1 : 0
-                Layout.preferredHeight: 16
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: ScreenShare.visible ?? false ? 8 : 0
-                color: Colors.on_surface_variant
+            TraySection {}
+
+            Separator {
                 visible: ScreenShare.visible ?? false
             }
 
-            // CPU Usage
             CpuSection {}
 
-            // Separator
-            Rectangle {
-                Layout.preferredWidth: 1
-                Layout.preferredHeight: 16
-                Layout.alignment: Qt.AlignVCenter
-                Layout.rightMargin: 8
-                color: Colors.on_surface_variant
-            }
+            Separator {}
 
-            // Volume Section
             VolumeSection {
                 textColor: Colors.primary
-                separatorColor: Colors.outline
                 fontSize: Fonts.p
                 fontFamily: Fonts.font
             }
 
-            // Clock Widget
+            Separator {}
+
             ClockWidget {
                 color: Colors.primary
                 font.pixelSize: Fonts.p
@@ -90,10 +101,6 @@ PanelWindow {
 
             SettingsButton {
                 Layout.rightMargin: 8
-            }
-
-            Item {
-                width: 8
             }
         }
     }

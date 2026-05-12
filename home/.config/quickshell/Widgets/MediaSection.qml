@@ -1,10 +1,6 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
-import Quickshell
 import Quickshell.Widgets
-import qs.Components
-import qs.Modules.Popups
 import qs.Services
 
 Item {
@@ -14,6 +10,10 @@ Item {
     property color colMuted
     property int fontSize
     property string fontFamily
+    property bool panelOpen: false
+
+    signal togglePanel
+
     readonly property bool showCider: CiderRpcService.isOnline
 
     implicitWidth: clickWrapper.implicitWidth
@@ -24,9 +24,7 @@ Item {
 
         cursorShape: showCider ? Qt.PointingHandCursor : Qt.ArrowCursor
         enabled: showCider
-        onClicked: {
-            musicPopup.visible = true;
-        }
+        onClicked: root.togglePanel()
 
         RowLayout {
             id: mediaLayout
@@ -41,29 +39,19 @@ Item {
 
                     return title;
                 }
-                color: root.colYellow
+                color: root.panelOpen ? Qt.lighter(root.colYellow, 1.3) : root.colYellow
                 font.pixelSize: root.fontSize
                 font.family: root.fontFamily
                 font.bold: true
-                Layout.rightMargin: 8
                 elide: Text.ElideRight
-                Layout.maximumWidth: 200
-            }
+                Layout.maximumWidth: 240
 
-            Rectangle {
-                visible: showCider
-                Layout.preferredWidth: 1
-                Layout.preferredHeight: 16
-                Layout.alignment: Qt.AlignVCenter
-                Layout.leftMargin: 0
-                Layout.rightMargin: 8
-                color: root.colMuted
+                Behavior on color {
+                    ColorAnimation {
+                        duration: 150
+                    }
+                }
             }
         }
-    }
-
-    MusicPopup {
-        id: musicPopup
-        anchorItem: root
     }
 }

@@ -32,7 +32,7 @@ Singleton {
 
         // app decides
         if (n.expireTimeout > 0) {
-            return n.expireTimeout;
+            return n.expireTimeout * 1000;
         }
 
         // 3 second default

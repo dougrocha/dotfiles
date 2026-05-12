@@ -1,12 +1,23 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.SystemTray
+import qs.Constants
 
-RowLayout {
-    spacing: 4
+Item {
+    id: root
 
-    Repeater {
-        model: SystemTray.items.values
-        delegate: TrayItem {}
+    implicitWidth: mainLayout.width
+    implicitHeight: Theme.topBarHeight
+
+    RowLayout {
+        id: mainLayout
+        anchors.centerIn: parent
+        Layout.alignment: Qt.AlignVCenter
+        spacing: 4
+
+        Repeater {
+            model: SystemTray.items.values
+            delegate: TrayItem {}
+        }
     }
 }

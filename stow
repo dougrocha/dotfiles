@@ -4,6 +4,12 @@ set -euo pipefail
 
 export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+case "$(uname -s)" in
+    Darwin) export PLATFORM_OS=darwin ;;
+    Linux)  export PLATFORM_OS=linux ;;
+    *)      export PLATFORM_OS=unknown ;;
+esac
+
 "$DOTFILES_DIR/install/deploy"
 
 "$DOTFILES_DIR/install/post/setup-ghostty-config"

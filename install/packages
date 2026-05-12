@@ -31,7 +31,6 @@ hyprland-preview-share-picker-git
 quickshell
 qt6-websockets
 walker
-mako
 cliphist
 elephant
 elephant-desktopapplications
@@ -82,7 +81,7 @@ ttf-liberation
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
-yaru-icon-theme
+papirus-icon-theme
 
 gpu-screen-recorder
 

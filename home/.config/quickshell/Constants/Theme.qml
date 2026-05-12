@@ -6,7 +6,6 @@ Singleton {
     // Sizing
     property int blockHeight: 28
     property int blockRadius: 8
-    property int panelHeight: 36
     property int panelMargin: 12
 
     // Card
@@ -26,4 +25,6 @@ Singleton {
         readonly property int normal: 200
         readonly property int slow: 300
     }
+
+    readonly property int topBarHeight: 36
 }

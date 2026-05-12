@@ -10,7 +10,6 @@ RowLayout {
 
     // Accept theme properties from parent
     property color textColor
-    property color separatorColor
     property int fontSize
     property string fontFamily
 
@@ -37,15 +36,6 @@ RowLayout {
             font.family: root.fontFamily
             font.bold: true
         }
-    }
-
-    Rectangle {
-        Layout.preferredWidth: 1
-        Layout.preferredHeight: 16
-        Layout.alignment: Qt.AlignVCenter
-        Layout.leftMargin: 8
-        Layout.rightMargin: 8
-        color: root.separatorColor
     }
 
     Process {

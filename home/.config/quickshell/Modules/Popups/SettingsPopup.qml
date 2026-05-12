@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Constants
 import qs.Services
@@ -12,28 +11,29 @@ import Quickshell.Widgets
 PopupWindow {
     id: settingsPanel
 
-    implicitHeight: Math.max(520, contentLayout.implicitHeight + 40)
+    property bool audioSwitcherOpen: false
+    grabFocus: true
+
+    implicitHeight: contentLayout.implicitHeight + 40
+
+    Behavior on implicitHeight {
+        NumberAnimation {
+            duration: 80
+            easing.type: Easing.OutExpo
+        }
+    }
 
     onVisibleChanged: {
         if (visible) {
             IdleService.refresh();
             SunsetService.refresh();
+        } else {
+            audioSwitcherOpen = false;
         }
     }
 
     implicitWidth: 420
     color: "transparent"
-
-    HyprlandFocusGrab {
-        id: focusGrab
-
-        active: settingsPanel.visible
-        windows: [settingsPanel]
-        onActiveChanged: {
-            if (!active && settingsPanel.visible)
-                settingsPanel.visible = false;
-        }
-    }
 
     Rectangle {
         id: contentRect
@@ -301,27 +301,36 @@ PopupWindow {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 40
-                color: switchAudioButton.containsMouse ? Colors.surface_container_high : "transparent"
+                color: settingsPanel.audioSwitcherOpen ? Colors.primary_container : (switchAudioHover.hovered ? Colors.surface_container_high : "transparent")
                 radius: 8
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
 
                 Text {
                     anchors.centerIn: parent
                     text: Icons.speaker
-                    color: Colors.primary
+                    color: settingsPanel.audioSwitcherOpen ? Colors.on_primary_container : Colors.primary
                     font.pixelSize: 18
                     font.family: Fonts.iconFont
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
                 }
 
-                MouseArea {
-                    id: switchAudioButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
+                HoverHandler {
+                    id: switchAudioHover
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        switchAudioProcess.running = true;
-                        settingsPanel.visible = false;
-                    }
+                }
+
+                TapHandler {
+                    onTapped: settingsPanel.audioSwitcherOpen = !settingsPanel.audioSwitcherOpen
                 }
             }
 
@@ -375,6 +384,97 @@ PopupWindow {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: SunsetService.toggle()
+                }
+            }
+        }
+
+        // Audio Sink Switcher (collapsible)
+        Item {
+            id: audioSwitcherWrapper
+
+            property real sectionHeight: 0
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: sectionHeight
+            clip: true
+
+            Behavior on sectionHeight {
+                NumberAnimation {
+                    duration: 220
+                    easing.type: Easing.OutExpo
+                }
+            }
+
+            Connections {
+                target: settingsPanel
+                function onAudioSwitcherOpenChanged() {
+                    audioSwitcherWrapper.sectionHeight = settingsPanel.audioSwitcherOpen ? audioSwitcherColumn.implicitHeight : 0;
+                }
+            }
+
+            Column {
+                id: audioSwitcherColumn
+                width: parent.width
+                spacing: 4
+
+                Repeater {
+                    model: ScriptModel {
+                        values: AudioService.sinks
+                        objectProp: "id"
+                    }
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        readonly property bool isActive: AudioService.sink && modelData.id === AudioService.sink.id
+                        readonly property string displayName: modelData.nickname || modelData.description || modelData.name
+
+                        width: audioSwitcherColumn.width
+                        height: 36
+                        radius: 8
+                        color: sinkHover.hovered ? Colors.surface_container_high : "transparent"
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 8
+                            anchors.rightMargin: 8
+                            spacing: 10
+
+                            Rectangle {
+                                width: 8
+                                height: 8
+                                radius: 4
+                                color: isActive ? Colors.primary : Colors.outline
+                            }
+
+                            Text {
+                                Layout.fillWidth: true
+                                text: displayName
+                                color: isActive ? Colors.primary : Colors.on_surface_variant
+                                font.pixelSize: Fonts.p
+                                font.family: Fonts.font
+                                font.bold: isActive
+                                elide: Text.ElideRight
+                            }
+                        }
+
+                        HoverHandler {
+                            id: sinkHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+
+                        TapHandler {
+                            onTapped: {
+                                AudioService.setAudioSink(modelData);
+                                settingsPanel.audioSwitcherOpen = false;
+                            }
+                        }
+                    }
+                }
+
+                // bottom padding
+                Item {
+                    width: 1
+                    height: 4
                 }
             }
         }
@@ -587,11 +687,6 @@ PopupWindow {
                 }
             }
         }
-    }
-
-    Process {
-        id: switchAudioProcess
-        command: ["launch-or-focus-tui", "switch-audio"]
     }
 
     Process {

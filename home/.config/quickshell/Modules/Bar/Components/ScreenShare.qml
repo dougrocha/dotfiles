@@ -25,7 +25,7 @@ RowLayout {
             item: screenShareText
             edges: Edges.Bottom | Edges.HCenter
             gravity: Edges.Bottom | Edges.HCenter
-            margins.top: Theme.panelHeight
+            margins.top: Theme.topBarHeight
         }
 
         HyprlandFocusGrab {
@@ -183,7 +183,7 @@ RowLayout {
             item: recordingText
             edges: Edges.Bottom | Edges.HCenter
             gravity: Edges.Bottom | Edges.HCenter
-            margins.top: Theme.panelHeight
+            margins.top: Theme.topBarHeight
         }
 
         HyprlandFocusGrab {

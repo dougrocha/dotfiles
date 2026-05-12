@@ -14,7 +14,6 @@ RowLayout {
         id: clickWrapper
         cursorShape: Qt.PointingHandCursor
         hoverEnabled: true
-        Layout.rightMargin: 8
         onClicked: {
             btopProcess.running = true;
         }

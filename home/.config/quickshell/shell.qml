@@ -14,13 +14,7 @@ import Quickshell
 ShellRoot {
     id: root
 
-    Variants {
-        model: Quickshell.screens
-        Bar {}
-    }
+    Bar {}
 
-    Loader {
-        active: true
-        sourceComponent: NotificationManager {}
-    }
+    NotificationManager {}
 }
