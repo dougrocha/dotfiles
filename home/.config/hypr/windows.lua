@@ -28,10 +28,7 @@ hl.window_rule({
 })
 
 -- Tag rule: add default-opacity tag to all windows
-hl.window_rule({
-    match = { class = ".*" },
-    tag = "+default-opacity",
-})
+hl.window_rule({ match = { class = ".*" }, tag = "+default-opacity" })
 
 -- Default opacity styling
 hl.window_rule({

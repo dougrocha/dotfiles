@@ -14,17 +14,17 @@ uwsm
 sddm
 
 # Hyprland
-hyprland-git
-hypridle-git
-hyprlock-git
-hyprshot-git
-hyprpaper-git
-hyprpicker-git
-hyprpolkitagent-git
-hyprshutdown-git
-hyprsunset-git
-hyprland-guiutils-git
-xdg-desktop-portal-hyprland-git
+hyprland
+hypridle
+hyprlock
+hyprshot
+hyprpaper
+hyprpicker
+hyprpolkitagent
+hyprshutdown
+hyprsunset
+hyprland-guiutils
+xdg-desktop-portal-hyprland
 hyprland-preview-share-picker-git
 
 # Shell

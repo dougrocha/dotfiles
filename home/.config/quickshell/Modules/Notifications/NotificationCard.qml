@@ -166,10 +166,10 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
-            visible: card.modelData.actions.length > 0
+            visible: card.modelData.actions.filter(a => a.identifier !== "default" && a.text !== "").length > 0
 
             Repeater {
-                model: card.modelData.actions
+                model: card.modelData.actions.filter(a => a.identifier !== "default" && a.text !== "")
                 delegate: ActionButton {}
             }
         }
