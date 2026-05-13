@@ -1,0 +1,12 @@
+#!/bin/bash
+# Launch walker, ensuring elephant and walker daemon are running via uwsm-app
+
+if ! pgrep -x elephant > /dev/null; then
+  uwsm-app -- elephant &
+fi
+
+if ! pgrep -f "walker --gapplication-service" > /dev/null; then
+  uwsm-app -- walker --gapplication-service &
+fi
+
+exec uwsm-app -- walker

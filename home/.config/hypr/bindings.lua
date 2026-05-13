@@ -9,7 +9,7 @@ end
 bind({ "RETURN" }, hl.dsp.exec_cmd("uwsm-app -- xdg-terminal-exec"))
 bind({ "W" }, hl.dsp.window.close())
 bind({ "E" }, hl.dsp.exec_cmd("uwsm-app -- nautilus --new-window"))
-bind({ "SPACE" }, hl.dsp.exec_cmd("uwsm-app -- walker"))
+bind({ "SPACE" }, hl.dsp.exec_cmd("launch-walker"))
 bind({ "B" }, hl.dsp.exec_cmd("uwsm-app -- $(xdg-settings get default-web-browser)"))
 
 bind({ "S" }, hl.dsp.workspace.toggle_special("scratchpad"))
@@ -50,6 +50,7 @@ bind({ "mouse:273" }, hl.dsp.window.resize(), { mouse = true })
 -- Captures
 bind({ "SHIFT", "P" }, hl.dsp.exec_cmd("screenshot fullscreen"))
 bind({ "CTRL", "S" }, hl.dsp.exec_cmd("screenshot"))
+bind({ "SHIFT", "C" }, hl.dsp.exec_cmd("hyprpicker -a"), { description = "Color picker" })
 
 -- Screen recording
 bind({ "SHIFT", "R" }, hl.dsp.exec_cmd("save-replay"))
