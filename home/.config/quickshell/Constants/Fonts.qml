@@ -13,9 +13,19 @@ Singleton {
         source: Quickshell.shellDir + "/assets/MaterialSymbolsOutlined-Regular.ttf"
     }
 
+    FontLoader {
+        source: Quickshell.shellDir + "/assets/Phosphor.ttf"
+    }
+
+    FontLoader {
+        source: Quickshell.shellDir + "/assets/Phosphor-Fill.ttf"
+    }
+
     readonly property string font: "JetBrainsMono Nerd Font Propo"
     readonly property string iconFont: "Material Symbols Outlined Filled"
     readonly property string iconFontOutline: "Material Symbols Outlined"
+    readonly property string phosphorFont: "Phosphor"
+    readonly property string phosphorFill: "Phosphor-Fill"
 
     readonly property int p: 14
     readonly property int h1: 24

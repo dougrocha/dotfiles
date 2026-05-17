@@ -49,8 +49,10 @@ bind({ "mouse:273" }, hl.dsp.window.resize(), { mouse = true })
 
 -- Captures
 bind({ "SHIFT", "P" }, hl.dsp.exec_cmd("screenshot fullscreen"))
-bind({ "CTRL", "S" }, hl.dsp.exec_cmd("screenshot"))
+bind({ "CTRL", "S" }, hl.dsp.exec_cmd("screenshot smart"))
+bind({ "CTRL", "SHIFT", "S" }, hl.dsp.exec_cmd("screenshot-ui"))
 bind({ "SHIFT", "C" }, hl.dsp.exec_cmd("hyprpicker -a"), { description = "Color picker" })
+bind({ "CTRL", "O" }, hl.dsp.exec_cmd("ocr"), { description = "OCR selection to clipboard" })
 
 -- Screen recording
 bind({ "SHIFT", "R" }, hl.dsp.exec_cmd("save-replay"))

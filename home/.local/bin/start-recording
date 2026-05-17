@@ -7,8 +7,11 @@ mkdir -p "$RECORDING_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 OUTPUT_FILE="$RECORDING_DIR/recording_${TIMESTAMP}.mp4"
 
-gpu-screen-recorder -w "$TARGET" -f 60 -q high -c mp4 -a "default_output|default_input" -o "$OUTPUT_FILE" &
+AUDIO_ARGS=(-a "default_output|default_input")
+[[ "$*" == *"--no-audio"* ]] && AUDIO_ARGS=()
 
-notify-send "Recording Started" -t 3000 -a "GPU Screen Recorder"
+setsid gpu-screen-recorder -w "$TARGET" -f 60 -q high -c mp4 "${AUDIO_ARGS[@]}" -o "$OUTPUT_FILE" &>/dev/null &
+
+notify-send "Recording Started" -t 3 -a "GPU Screen Recorder"
 
 # vim: ft=sh

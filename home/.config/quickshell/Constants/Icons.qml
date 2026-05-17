@@ -46,4 +46,12 @@ Singleton {
     readonly property string closeSmall: "\uf508"
 
     readonly property string chevronRight: "\ue5cc"
+
+    readonly property string cropFree: "\ue3c9"
+    readonly property string webAsset: "\ue051"
+    readonly property string monitor: "\uf380"
+    readonly property string videocam: "\ue04b"
+    readonly property string timer: "\ue425"
+    readonly property string mouse: "\ue323"
+    readonly property string expandMore: "\ue5cf"
 }

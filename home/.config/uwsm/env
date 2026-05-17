@@ -5,6 +5,7 @@ export __GLX_VENDOR_LIBRARY_NAME=nvidia
 
 # Set defaults
 source ~/.config/uwsm/default
+source ~/.config/user-dirs.dirs
 
 export PATH="$PATH:$HOME/.local/bin"
 

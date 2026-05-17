@@ -4,6 +4,7 @@
 
 import qs.Modules.Bar
 import qs.Modules.Notifications
+import qs.Modules.Screenshot
 import qs.Components
 import qs.Services
 import qs.Widgets
@@ -17,4 +18,6 @@ ShellRoot {
     Bar {}
 
     NotificationManager {}
+
+    ScreenshotManager {}
 }
