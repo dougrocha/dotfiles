@@ -3,6 +3,8 @@ import QtQuick
 import Quickshell
 
 Singleton {
+    readonly property string primaryMonitor: "DP-1"
+
     // Sizing
     property int blockHeight: 28
     property int blockRadius: 8

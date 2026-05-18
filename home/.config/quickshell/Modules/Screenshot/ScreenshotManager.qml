@@ -33,8 +33,12 @@ Item {
         }
     }
 
-    Process { id: screenshotProcess }
-    Process { id: toggleRecordingProcess }
+    Process {
+        id: screenshotProcess
+    }
+    Process {
+        id: toggleRecordingProcess
+    }
 
     onOverlayVisibleChanged: {
         if (!overlayVisible && pendingMode !== "" && pendingMode !== "video") {
@@ -55,14 +59,14 @@ Item {
 
     function executeAction() {
         if (pendingMode === "video") {
-            toggleRecordingProcess.command = manager.micEnabled
-                ? ["toggle-recording"]
-                : ["toggle-recording", "--no-audio"];
+            toggleRecordingProcess.command = manager.micEnabled ? ["toggle-recording"] : ["toggle-recording", "--no-audio"];
             toggleRecordingProcess.running = true;
         } else {
             let args = ["screenshot"];
-            if (timerDelay > 0) args = args.concat(["--delay", timerDelay.toString()]);
-            if (showCursor) args.push("--cursor");
+            if (timerDelay > 0)
+                args = args.concat(["--delay", timerDelay.toString()]);
+            if (showCursor)
+                args.push("--cursor");
             args.push(pendingMode);
             screenshotProcess.command = args;
             screenshotProcess.running = true;
@@ -84,18 +88,14 @@ Item {
             required property var modelData
             screen: modelData
 
-            readonly property bool isFocusedScreen:
-                Hyprland.focusedMonitor != null &&
-                modelData.name === Hyprland.focusedMonitor.name
+            readonly property bool isFocusedScreen: Hyprland.focusedMonitor != null && modelData.name === Hyprland.focusedMonitor.name
 
             visible: manager.overlayVisible
             color: "transparent"
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs.screenshot_overlay"
-            WlrLayershell.keyboardFocus: (overlayWindow.isFocusedScreen && overlayWindow.visible)
-                ? WlrKeyboardFocus.Exclusive
-                : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: (overlayWindow.isFocusedScreen && overlayWindow.visible) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
             anchors.top: true
@@ -149,8 +149,16 @@ Item {
                 scale: manager.optionsOpen ? 1.0 : 0.95
                 transformOrigin: Item.Bottom
 
-                Behavior on opacity { NumberAnimation { duration: Theme.animations.fast } }
-                Behavior on scale { NumberAnimation { duration: Theme.animations.fast } }
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
 
                 MouseArea {
                     anchors.fill: parent
@@ -183,10 +191,22 @@ Item {
 
                         Repeater {
                             model: [
-                                { delay: 0,  label: "None" },
-                                { delay: 3,  label: "3s"   },
-                                { delay: 5,  label: "5s"   },
-                                { delay: 10, label: "10s"  }
+                                {
+                                    delay: 0,
+                                    label: "None"
+                                },
+                                {
+                                    delay: 3,
+                                    label: "3s"
+                                },
+                                {
+                                    delay: 5,
+                                    label: "5s"
+                                },
+                                {
+                                    delay: 10,
+                                    label: "10s"
+                                }
                             ]
 
                             delegate: Rectangle {
@@ -194,20 +214,18 @@ Item {
                                 Layout.fillWidth: true
                                 implicitHeight: 32
                                 radius: 8
-                                color: manager.timerDelay === modelData.delay
-                                    ? Colors.primary_container
-                                    : (timerOptArea.containsMouse
-                                        ? Colors.surface_container_high
-                                        : Colors.surface_container_low)
+                                color: manager.timerDelay === modelData.delay ? Colors.primary_container : (timerOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container_low)
 
-                                Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.animations.fast
+                                    }
+                                }
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: modelData.label
-                                    color: manager.timerDelay === modelData.delay
-                                        ? Colors.on_primary_container
-                                        : Colors.on_surface_variant
+                                    color: manager.timerDelay === modelData.delay ? Colors.on_primary_container : Colors.on_surface_variant
                                     font.pixelSize: 12
                                     font.family: Fonts.font
                                 }
@@ -236,7 +254,11 @@ Item {
                         implicitHeight: 40
                         radius: 8
                         color: cursorOptArea.containsMouse ? Colors.surface_container_high : "transparent"
-                        Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
 
                         RowLayout {
                             anchors.fill: parent
@@ -280,7 +302,11 @@ Item {
                         implicitHeight: 40
                         radius: 8
                         color: micOptArea.containsMouse ? Colors.surface_container_high : "transparent"
-                        Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
 
                         RowLayout {
                             anchors.fill: parent
@@ -319,7 +345,9 @@ Item {
                         }
                     }
 
-                    Item { implicitHeight: 4 }
+                    Item {
+                        implicitHeight: 4
+                    }
                 }
             }
 
@@ -378,9 +406,18 @@ Item {
                     // Screenshot buttons
                     Repeater {
                         model: [
-                            { mode: "region",     icon: PhosphorIcons.selection },
-                            { mode: "windows",    icon: PhosphorIcons.appWindow },
-                            { mode: "fullscreen", icon: PhosphorIcons.monitor   }
+                            {
+                                mode: "region",
+                                icon: PhosphorIcons.selection
+                            },
+                            {
+                                mode: "windows",
+                                icon: PhosphorIcons.appWindow
+                            },
+                            {
+                                mode: "fullscreen",
+                                icon: PhosphorIcons.monitor
+                            }
                         ]
 
                         delegate: Rectangle {
@@ -388,26 +425,34 @@ Item {
                             implicitWidth: 44
                             implicitHeight: 44
                             radius: 10
-                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse
-                                ? Colors.surface_container_high : "transparent"
+                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Colors.surface_container_high : "transparent"
 
-                            Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.animations.fast
+                                }
+                            }
 
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                color: manager.selectedMode === modelData.mode
-                                    ? Colors.on_surface : Colors.on_surface_variant
+                                color: manager.selectedMode === modelData.mode ? Colors.on_surface : Colors.on_surface_variant
                                 font.pixelSize: 22
                                 font.family: Fonts.phosphorFont
-                                Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.animations.fast
+                                    }
+                                }
                             }
 
                             Rectangle {
                                 anchors.bottom: parent.bottom
                                 anchors.bottomMargin: 4
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: 4; height: 4; radius: 2
+                                width: 4
+                                height: 4
+                                radius: 2
                                 color: Colors.primary
                                 visible: manager.selectedMode === modelData.mode
                             }
@@ -436,26 +481,34 @@ Item {
                         implicitWidth: 44
                         implicitHeight: 44
                         radius: 10
-                        color: manager.selectedMode === "video" || videoArea.containsMouse
-                            ? Colors.surface_container_high : "transparent"
+                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Colors.surface_container_high : "transparent"
 
-                        Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
 
                         Text {
                             anchors.centerIn: parent
                             text: PhosphorIcons.videoCamera
-                            color: manager.selectedMode === "video"
-                                ? Colors.on_surface : Colors.on_surface_variant
+                            color: manager.selectedMode === "video" ? Colors.on_surface : Colors.on_surface_variant
                             font.pixelSize: 22
                             font.family: Fonts.phosphorFont
-                            Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.animations.fast
+                                }
+                            }
                         }
 
                         Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: 4
                             anchors.horizontalCenter: parent.horizontalCenter
-                            width: 4; height: 4; radius: 2
+                            width: 4
+                            height: 4
+                            radius: 2
                             color: Colors.primary
                             visible: manager.selectedMode === "video"
                         }
@@ -483,13 +536,13 @@ Item {
                         implicitWidth: optionsLabel.implicitWidth + 20
                         implicitHeight: 44
                         radius: 10
-                        color: manager.optionsOpen
-                            ? Colors.surface_container_high
-                            : (optionsBtn.containsMouse
-                                ? Colors.surface_container_high
-                                : "transparent")
+                        color: manager.optionsOpen ? Colors.surface_container_high : (optionsBtn.containsMouse ? Colors.surface_container_high : "transparent")
 
-                        Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
 
                         Row {
                             id: optionsLabel
@@ -511,7 +564,11 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 rotation: manager.optionsOpen ? 180 : 0
-                                Behavior on rotation { NumberAnimation { duration: Theme.animations.fast } }
+                                Behavior on rotation {
+                                    NumberAnimation {
+                                        duration: Theme.animations.fast
+                                    }
+                                }
                             }
                         }
 
@@ -529,12 +586,14 @@ Item {
                         implicitWidth: captureLabel.implicitWidth + 28
                         implicitHeight: 44
                         radius: 22
-                        color: captureBtn.containsMouse
-                            ? Qt.lighter(Colors.primary, 1.1)
-                            : Colors.primary
+                        color: captureBtn.containsMouse ? Qt.lighter(Colors.primary, 1.1) : Colors.primary
                         Layout.leftMargin: 4
 
-                        Behavior on color { ColorAnimation { duration: Theme.animations.fast } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
 
                         Text {
                             id: captureLabel

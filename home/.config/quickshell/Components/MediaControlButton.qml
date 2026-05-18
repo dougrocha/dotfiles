@@ -22,7 +22,12 @@ Item {
         width: isPrimary ? 56 : size
         height: isPrimary ? 56 : size
         radius: isPrimary ? 28 : size / 2
-        color: "transparent"
+        color: hoverHandler.hovered && root.enabled ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.12) : "transparent"
+        Behavior on color {
+            ColorAnimation {
+                duration: 100
+            }
+        }
 
         Text {
             anchors.centerIn: parent
@@ -32,21 +37,16 @@ Item {
             font.family: "JetBrainsMono Nerd Font"
             font.bold: true
         }
+    }
 
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            enabled: root.enabled
-            onClicked: {
-                if (root.onClicked)
-                    root.onClicked();
-            }
-            onContainsMouseChanged: {
-                if (containsMouse && root.enabled)
-                    buttonBackground.color = Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.12);
-                else
-                    buttonBackground.color = "transparent";
-            }
-        }
+    HoverHandler {
+        id: hoverHandler
+        cursorShape: Qt.PointingHandCursor
+        enabled: root.enabled
+    }
+
+    TapHandler {
+        enabled: root.enabled
+        onTapped: root.onClicked()
     }
 }

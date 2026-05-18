@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Widgets
 import Quickshell.Services.SystemTray
+import Quickshell.Widgets
 import qs.Modules.Popups
 
 Rectangle {
@@ -35,16 +35,20 @@ Rectangle {
         menuOpener: menuOpener
     }
 
-    MouseArea {
-        anchors.fill: parent
+    HoverHandler {
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onClicked: event => {
-            if (event.button === Qt.LeftButton) {
-                root.trayItem.activate();
-            } else if (event.button === Qt.RightButton && root.trayItem.hasMenu) {
+    }
+
+    TapHandler {
+        acceptedButtons: Qt.LeftButton
+        onTapped: root.trayItem.activate()
+    }
+
+    TapHandler {
+        acceptedButtons: Qt.RightButton
+        onTapped: {
+            if (root.trayItem.hasMenu)
                 trayMenu.visible = true;
-            }
         }
     }
 }

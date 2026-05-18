@@ -114,10 +114,12 @@ RowLayout {
                         font.bold: true
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
+                    HoverHandler {
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                    }
+
+                    TapHandler {
+                        onTapped: {
                             StreamingService.stopRecording();
                             screenSharePopup.visible = false;
                         }
@@ -138,11 +140,12 @@ RowLayout {
         Layout.rightMargin: 8
         visible: StreamingService.isScreenshare
 
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
+        HoverHandler {
             cursorShape: Qt.PointingHandCursor
-            onClicked: screenSharePopup.visible = !screenSharePopup.visible
+        }
+
+        TapHandler {
+            onTapped: screenSharePopup.visible = !screenSharePopup.visible
         }
     }
 
@@ -157,11 +160,12 @@ RowLayout {
         Layout.rightMargin: 8
         visible: !StreamingService.isScreenshare
 
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
+        HoverHandler {
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
+        }
+
+        TapHandler {
+            onTapped: {
                 if (StreamingService.isRecordingScreen) {
                     StreamingService.stopRecording();
                 } else {
@@ -251,10 +255,12 @@ RowLayout {
                         font.bold: true
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
+                    HoverHandler {
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                    }
+
+                    TapHandler {
+                        onTapped: {
                             let startProc = Qt.createQmlObject('import Quickshell; Process { command: ["start-recording", "screen"] }', recordingOptionsPopup);
                             startProc.running = true;
                             recordingOptionsPopup.visible = false;
@@ -277,10 +283,12 @@ RowLayout {
                         font.bold: true
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
+                    HoverHandler {
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                    }
+
+                    TapHandler {
+                        onTapped: {
                             let startProc = Qt.createQmlObject('import Quickshell; Process { command: ["start-recording", "DP-1"] }', recordingOptionsPopup);
                             startProc.running = true;
                             recordingOptionsPopup.visible = false;
@@ -303,10 +311,12 @@ RowLayout {
                         font.bold: true
                     }
 
-                    MouseArea {
-                        anchors.fill: parent
+                    HoverHandler {
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: {
+                    }
+
+                    TapHandler {
+                        onTapped: {
                             let startProc = Qt.createQmlObject('import Quickshell; Process { command: ["start-recording", "DP-2"] }', recordingOptionsPopup);
                             startProc.running = true;
                             recordingOptionsPopup.visible = false;

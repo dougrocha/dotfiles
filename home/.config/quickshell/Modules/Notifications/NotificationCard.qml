@@ -118,7 +118,7 @@ Rectangle {
             Text {
                 text: Icons.close
                 font.family: Fonts.iconFont
-                font.pixelSize: 16
+                font.pixelSize: Fonts.h5
                 color: Colors.on_surface_variant
                 opacity: cardHover.hovered ? 1 : 0
 

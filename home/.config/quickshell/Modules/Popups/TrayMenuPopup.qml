@@ -25,12 +25,9 @@ PopupWindow {
         }
     }
 
-    anchor {
-        item: root.anchorItem
-        edges: Edges.Bottom | Edges.HCenter
-        gravity: Edges.Bottom | Edges.HCenter
-        margins.top: 12
-    }
+    anchor.item: root.anchorItem
+    anchor.rect.x: anchorItem ? Math.round(anchorItem.width / 2 - implicitWidth / 2) : 0
+    anchor.rect.y: anchorItem ? anchorItem.height + 12 : 0
 
     HyprlandFocusGrab {
         id: focusGrab
@@ -126,6 +123,14 @@ PopupWindow {
                                 spacing: 6
 
                                 Text {
+                                    visible: modelData.checkState === Qt.Checked
+                                    text: Icons.check
+                                    color: Colors.primary
+                                    font.pixelSize: Fonts.p
+                                    font.family: Fonts.iconFont
+                                }
+
+                                Text {
                                     Layout.fillWidth: true
                                     text: modelData.text
                                     color: modelData.enabled ? Colors.on_surface : Colors.on_surface_variant
@@ -200,12 +205,35 @@ PopupWindow {
         }
     }
 
+    mask: Region {
+        item: menuRect
+    }
+
     Rectangle {
+        id: menuRect
         anchors.fill: parent
         radius: 8
         color: Colors.surface
-        border.color: Colors.on_surface_variant
+        border.color: Colors.outline_variant
         border.width: 1
+
+        transformOrigin: Item.Top
+        scale: root.visible ? 1.0 : 0.92
+        opacity: root.visible ? 1.0 : 0.0
+
+        Behavior on scale {
+            SpringAnimation {
+                spring: 8.0
+                damping: 0.7
+                mass: 0.5
+            }
+        }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 80
+                easing.type: Easing.OutCubic
+            }
+        }
 
         Column {
             id: menuColumn

@@ -12,9 +12,8 @@ PopupWindow {
     id: settingsPanel
 
     property bool audioSwitcherOpen: false
-    grabFocus: true
 
-    implicitHeight: contentLayout.implicitHeight + 40
+    implicitHeight: contentLayout.implicitHeight + Theme.panelMargin * 2
 
     Behavior on implicitHeight {
         NumberAnimation {
@@ -41,94 +40,116 @@ PopupWindow {
         anchors.fill: parent
         color: Colors.surface_container
         radius: 12
+
+        transformOrigin: Item.Top
+        scale: settingsPanel.visible ? 1.0 : 0.92
+        opacity: settingsPanel.visible ? 1.0 : 0.0
+
+        Behavior on scale {
+            SpringAnimation {
+                spring: 12.0
+                damping: 0.7
+                mass: 0.4
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 80
+                easing.type: Easing.OutCubic
+            }
+        }
     }
 
-    ColumnLayout {
-        id: contentLayout
+    component SettingsSlider: RowLayout {
+        id: sliderRow
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 20
-        spacing: 20
+        property string iconText: ""
+        property string labelText: ""
+        property real sliderValue: 0
+        property real sliderMax: 1.5
+        property bool muted: false
+        property string muteIcon: ""
+        property string mutedIcon: ""
 
-        // Header
-        RowLayout {
+        signal moved(real value)
+        signal muteToggled
+
+        Layout.fillWidth: true
+        spacing: 12
+
+        Text {
+            text: sliderRow.iconText
+            color: Colors.primary
+            font.pixelSize: Fonts.h3
+            font.family: Fonts.iconFont
+            Layout.alignment: Qt.AlignVCenter
+        }
+
+        ColumnLayout {
             Layout.fillWidth: true
+            spacing: 2
 
-            Text {
-                text: "Settings"
-                color: Colors.primary
-                font.pixelSize: 24
-                font.family: Fonts.font
-                font.bold: true
-            }
-
-            Item {
+            RowLayout {
                 Layout.fillWidth: true
-            }
+                spacing: 8
 
-            Text {
-                text: Icons.closeSmall
-                color: Colors.primary
-                font.family: Fonts.iconFont
-                font.pixelSize: 28
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: settingsPanel.visible = false
+                Text {
+                    text: sliderRow.labelText
+                    color: Colors.on_surface_variant
+                    font.pixelSize: Fonts.p
+                    font.family: Fonts.font
                 }
-            }
-        }
 
-        Rectangle {
-            Layout.fillWidth: true
-            height: 1
-            color: Colors.outline_variant
-        }
+                Item {
+                    Layout.fillWidth: true
+                }
 
-        // Speakers Section
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 15
+                Text {
+                    text: Math.round(sliderRow.sliderValue * 100) + "%"
+                    color: Colors.on_surface_variant
+                    font.pixelSize: Fonts.p
+                    font.family: Fonts.font
+                }
 
-            Text {
-                text: Icons.speaker
-                color: Colors.primary
-                font.pixelSize: 20
-                font.family: Fonts.iconFont
-            }
+                Text {
+                    text: sliderRow.muted ? sliderRow.mutedIcon : sliderRow.muteIcon
+                    color: Colors.primary
+                    font.pixelSize: Fonts.h3
+                    font.family: Fonts.iconFont
 
-            Text {
-                text: "Speakers"
-                color: Colors.on_surface_variant
-                font.pixelSize: 14
-                font.family: Fonts.font
-                Layout.preferredWidth: 100
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
+                    TapHandler {
+                        onTapped: sliderRow.muteToggled()
+                    }
+                }
             }
 
             Slider {
-                id: volumeSliders
-
-                Layout.preferredWidth: 120
+                id: slider
+                Layout.fillWidth: true
                 from: 0
-                to: 1.5
-                value: AudioService.volume
-                onMoved: {
-                    AudioService.setVolume(value);
+                to: sliderRow.sliderMax
+                value: sliderRow.sliderValue
+                onMoved: sliderRow.moved(value)
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
                 }
 
                 background: Rectangle {
-                    x: volumeSliders.leftPadding
-                    y: volumeSliders.topPadding + volumeSliders.availableHeight / 2 - height / 2
-                    width: volumeSliders.availableWidth
+                    x: slider.leftPadding
+                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
+                    width: slider.availableWidth
                     height: 4
                     radius: 2
                     color: Colors.outline_variant
 
                     Rectangle {
-                        width: volumeSliders.visualPosition * parent.width
+                        width: slider.visualPosition * parent.width
                         height: parent.height
                         color: Colors.primary
                         radius: 2
@@ -143,12 +164,12 @@ PopupWindow {
                 }
 
                 handle: Rectangle {
-                    x: volumeSliders.leftPadding + volumeSliders.visualPosition * (volumeSliders.availableWidth - width)
-                    y: volumeSliders.topPadding + volumeSliders.availableHeight / 2 - height / 2
+                    x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
+                    y: slider.topPadding + slider.availableHeight / 2 - height / 2
                     implicitWidth: 14
                     implicitHeight: 14
                     radius: 7
-                    color: volumeSliders.pressed ? Colors.primary_fixed : Colors.primary
+                    color: slider.pressed ? Colors.primary_fixed : Colors.primary
 
                     Behavior on x {
                         NumberAnimation {
@@ -158,151 +179,119 @@ PopupWindow {
                     }
                 }
             }
+        }
+    }
 
-            Text {
-                text: Math.round(AudioService.volume * 100) + "%"
-                color: Colors.on_surface_variant
-                font.pixelSize: 14
-                font.family: Fonts.font
-                Layout.preferredWidth: 45
-            }
+    component SettingsIconButton: Rectangle {
+        id: btn
 
-            Text {
-                text: AudioService.muted ? Icons.volumeMute : Icons.volumeUp
-                color: Colors.primary
-                font.pixelSize: 20
-                font.family: Fonts.iconFont
+        property string iconText: ""
+        property string labelText: ""
+        property color iconColor: Colors.primary
+        property int iconSize: Fonts.h4
+        property bool active: false
+        property color activeBackground: "transparent"
+        property color activeIconColor: iconColor
 
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: AudioService.toggleMute()
-                }
+        signal tapped
+
+        Layout.fillWidth: true
+        Layout.preferredHeight: labelText !== "" ? 52 : 44
+        radius: Theme.blockRadius
+        color: active ? activeBackground : (hover.hovered ? Colors.surface_container_high : Colors.surface_container)
+        border.width: 1
+        border.color: active ? Qt.rgba(btn.activeIconColor.r, btn.activeIconColor.g, btn.activeIconColor.b, 0.35) : "transparent"
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
             }
         }
 
-        // Microphone Section
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 15
+        Behavior on border.color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+
+        ColumnLayout {
+            anchors.centerIn: parent
+            spacing: 2
 
             Text {
-                text: Icons.mic
-                color: Colors.primary
-                font.pixelSize: 20
+                Layout.alignment: Qt.AlignHCenter
+                text: btn.iconText
+                color: btn.active ? btn.activeIconColor : btn.iconColor
+                font.pixelSize: btn.iconSize
                 font.family: Fonts.iconFont
-            }
 
-            Text {
-                text: "Microphone"
-                color: Colors.on_surface_variant
-                font.pixelSize: 14
-                font.family: Fonts.font
-                Layout.preferredWidth: 100
-            }
-
-            Slider {
-                id: micSlider
-
-                Layout.preferredWidth: 120
-                from: 0
-                to: 1.5
-                value: AudioService.sourceVolume
-                onMoved: {
-                    AudioService.setSourceVolumeValue(value);
-                }
-
-                background: Rectangle {
-                    x: micSlider.leftPadding
-                    y: micSlider.topPadding + micSlider.availableHeight / 2 - height / 2
-                    width: micSlider.availableWidth
-                    height: 4
-                    radius: 2
-                    color: Colors.outline_variant
-
-                    Rectangle {
-                        width: micSlider.visualPosition * parent.width
-                        height: parent.height
-                        color: Colors.primary
-                        radius: 2
-                    }
-                }
-
-                handle: Rectangle {
-                    x: micSlider.leftPadding + micSlider.visualPosition * (micSlider.availableWidth - width)
-                    y: micSlider.topPadding + micSlider.availableHeight / 2 - height / 2
-                    implicitWidth: 14
-                    implicitHeight: 14
-                    radius: 7
-                    color: micSlider.pressed ? Colors.primary_fixed : Colors.primary
-
-                    Behavior on x {
-                        NumberAnimation {
-                            duration: 100
-                            easing.type: Easing.OutCubic
-                        }
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
                     }
                 }
             }
 
             Text {
-                text: Math.round(AudioService.sourceVolume * 100) + "%"
-                color: Colors.on_surface_variant
-                font.pixelSize: 14
+                Layout.alignment: Qt.AlignHCenter
+                text: btn.labelText
+                color: btn.active ? btn.activeIconColor : Colors.on_surface_variant
+                font.pixelSize: Fonts.p - 2
                 font.family: Fonts.font
-                Layout.preferredWidth: 45
-            }
+                visible: btn.labelText !== ""
 
-            Text {
-                text: AudioService.sourceMuted ? Icons.micOff : Icons.mic
-                color: Colors.primary
-                font.pixelSize: 20
-                font.family: Fonts.iconFont
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: AudioService.toggleSourceMute()
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
                 }
             }
         }
 
-        // Utility Buttons Row
+        HoverHandler {
+            id: hover
+            cursorShape: Qt.PointingHandCursor
+        }
+
+        TapHandler {
+            onTapped: btn.tapped()
+        }
+    }
+
+    component SettingsConnectionRow: Rectangle {
+        id: connRow
+
+        property string iconText: ""
+        property string title: ""
+        property string subtitle: ""
+        property bool on: false
+        property color accent: Colors.primary
+
+        signal toggled
+        signal tapped
+
+        Layout.fillWidth: true
+        implicitHeight: 52
+        radius: Theme.blockRadius
+        color: connHover.hovered ? Colors.surface_container_high : Colors.surface_container
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+
         RowLayout {
-            Layout.fillWidth: true
+            anchors.fill: parent
+            anchors.leftMargin: 12
+            anchors.rightMargin: 12
             spacing: 12
 
-            // Toggle Idle Button
             Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40
-                color: toggleIdleButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.lockClock
-                    color: IdleService.active ? Colors.tertiary : Colors.outline
-                    font.pixelSize: 18
-                    font.family: Fonts.iconFont
-                }
-
-                MouseArea {
-                    id: toggleIdleButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: IdleService.toggle()
-                }
-            }
-
-            // Switch Audio Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40
-                color: settingsPanel.audioSwitcherOpen ? Colors.primary_container : (switchAudioHover.hovered ? Colors.surface_container_high : "transparent")
-                radius: 8
+                Layout.preferredWidth: 32
+                Layout.preferredHeight: 32
+                radius: 16
+                color: connRow.on ? Qt.rgba(connRow.accent.r, connRow.accent.g, connRow.accent.b, 0.2) : Colors.surface_container_high
 
                 Behavior on color {
                     ColorAnimation {
@@ -311,10 +300,13 @@ PopupWindow {
                 }
 
                 Text {
-                    anchors.centerIn: parent
-                    text: Icons.speaker
-                    color: settingsPanel.audioSwitcherOpen ? Colors.on_primary_container : Colors.primary
-                    font.pixelSize: 18
+                    width: parent.width
+                    height: parent.height
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    text: connRow.iconText
+                    color: connRow.on ? connRow.accent : Colors.outline
+                    font.pixelSize: Fonts.h4
                     font.family: Fonts.iconFont
 
                     Behavior on color {
@@ -325,160 +317,285 @@ PopupWindow {
                 }
 
                 HoverHandler {
-                    id: switchAudioHover
                     cursorShape: Qt.PointingHandCursor
                 }
 
                 TapHandler {
+                    onTapped: connRow.toggled()
+                }
+            }
+
+            ColumnLayout {
+                spacing: 2
+
+                Text {
+                    Layout.fillWidth: true
+                    text: connRow.title
+                    color: Colors.on_surface
+                    font.pixelSize: Fonts.p
+                    font.family: Fonts.font
+                    font.weight: Font.DemiBold
+                }
+
+                Text {
+                    text: connRow.subtitle
+                    color: Colors.on_surface_variant
+                    font.pixelSize: Fonts.p - 2
+                    font.family: Fonts.font
+                    visible: connRow.subtitle !== ""
+                    Layout.preferredHeight: connRow.subtitle !== "" ? implicitHeight : 0
+                }
+            }
+
+            Text {
+                text: Icons.chevronRight
+                color: Colors.on_surface_variant
+                font.pixelSize: Fonts.h4
+                font.family: Fonts.iconFont
+            }
+        }
+
+        HoverHandler {
+            id: connHover
+            cursorShape: Qt.PointingHandCursor
+        }
+
+        TapHandler {
+            onTapped: connRow.tapped()
+        }
+    }
+
+    ColumnLayout {
+        id: contentLayout
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: Theme.panelMargin
+        spacing: 16
+
+        // Header
+        RowLayout {
+            Layout.fillWidth: true
+
+            Text {
+                text: "Settings"
+                color: Colors.primary
+                font.pixelSize: Fonts.h1
+                font.family: Fonts.font
+                font.bold: true
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            Rectangle {
+                implicitWidth: 32
+                implicitHeight: 32
+                radius: 16
+                color: closeHover.hovered ? Colors.surface_container_high : Colors.surface_container
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: Icons.closeSmall
+                    color: Colors.primary
+                    font.family: Fonts.iconFont
+                    font.pixelSize: 22
+                }
+
+                HoverHandler {
+                    id: closeHover
+                    cursorShape: Qt.PointingHandCursor
+                }
+                TapHandler {
+                    onTapped: settingsPanel.visible = false
+                }
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            height: 1
+            color: Colors.outline_variant
+        }
+
+        // Speakers
+        SettingsSlider {
+            iconText: Icons.speaker
+            labelText: "Speakers"
+            sliderValue: AudioService.volume
+            muted: AudioService.muted
+            muteIcon: Icons.volumeUp
+            mutedIcon: Icons.volumeMute
+            onMoved: value => AudioService.setVolume(value)
+            onMuteToggled: AudioService.toggleMute()
+        }
+
+        // Microphone
+        SettingsSlider {
+            iconText: Icons.mic
+            labelText: "Microphone"
+            sliderValue: AudioService.sourceVolume
+            muted: AudioService.sourceMuted
+            muteIcon: Icons.mic
+            mutedIcon: Icons.micOff
+            onMoved: value => AudioService.setSourceVolumeValue(value)
+            onMuteToggled: AudioService.toggleSourceMute()
+        }
+
+        // Connection Rows
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 8
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 0
+
+                SettingsConnectionRow {
+                    Layout.fillWidth: true
+                    iconText: Icons.speaker
+                    title: "Speakers"
+                    subtitle: AudioService.sink ? (AudioService.sink.nickname || AudioService.sink.description || AudioService.sink.name || "") : ""
+                    on: !AudioService.muted
+                    accent: Colors.primary
+                    onToggled: AudioService.toggleMute()
                     onTapped: settingsPanel.audioSwitcherOpen = !settingsPanel.audioSwitcherOpen
                 }
-            }
 
-            // Bluetooth Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40
-                color: bluetoothButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.settingsBluetooth
-                    color: BluetoothService.bluetoothEnabled ? (BluetoothService.hasConnectedDevices ? Colors.tertiary : Colors.secondary) : Colors.outline
-                    font.pixelSize: 18
-                    font.family: Fonts.iconFont
-                }
-
-                MouseArea {
-                    id: bluetoothButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        bluetoothProcess.running = true;
-                        settingsPanel.visible = false;
-                    }
-                }
-            }
-
-            // Hyprsunset Toggle Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 40
-                color: sunsetButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    anchors.centerIn: parent
-                    text: SunsetService.active ? Icons.wbSunny : Icons.nightlight
-                    color: SunsetService.active ? Colors.tertiary_container : Colors.outline
-                    font.pixelSize: 18
-                    font.family: Fonts.iconFont
-                }
-
-                MouseArea {
-                    id: sunsetButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: SunsetService.toggle()
-                }
-            }
-        }
-
-        // Audio Sink Switcher (collapsible)
-        Item {
-            id: audioSwitcherWrapper
-
-            property real sectionHeight: 0
-
-            Layout.fillWidth: true
-            Layout.preferredHeight: sectionHeight
-            clip: true
-
-            Behavior on sectionHeight {
-                NumberAnimation {
-                    duration: 220
-                    easing.type: Easing.OutExpo
-                }
-            }
-
-            Connections {
-                target: settingsPanel
-                function onAudioSwitcherOpenChanged() {
-                    audioSwitcherWrapper.sectionHeight = settingsPanel.audioSwitcherOpen ? audioSwitcherColumn.implicitHeight : 0;
-                }
-            }
-
-            Column {
-                id: audioSwitcherColumn
-                width: parent.width
-                spacing: 4
-
-                Repeater {
-                    model: ScriptModel {
-                        values: AudioService.sinks
-                        objectProp: "id"
-                    }
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        readonly property bool isActive: AudioService.sink && modelData.id === AudioService.sink.id
-                        readonly property string displayName: modelData.nickname || modelData.description || modelData.name
-
-                        width: audioSwitcherColumn.width
-                        height: 36
-                        radius: 8
-                        color: sinkHover.hovered ? Colors.surface_container_high : "transparent"
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 8
-                            spacing: 10
-
-                            Rectangle {
-                                width: 8
-                                height: 8
-                                radius: 4
-                                color: isActive ? Colors.primary : Colors.outline
-                            }
-
-                            Text {
-                                Layout.fillWidth: true
-                                text: displayName
-                                color: isActive ? Colors.primary : Colors.on_surface_variant
-                                font.pixelSize: Fonts.p
-                                font.family: Fonts.font
-                                font.bold: isActive
-                                elide: Text.ElideRight
-                            }
-                        }
-
-                        HoverHandler {
-                            id: sinkHover
-                            cursorShape: Qt.PointingHandCursor
-                        }
-
-                        TapHandler {
-                            onTapped: {
-                                AudioService.setAudioSink(modelData);
-                                settingsPanel.audioSwitcherOpen = false;
-                            }
-                        }
-                    }
-                }
-
-                // bottom padding
                 Item {
-                    width: 1
-                    height: 4
+                    id: audioSwitcherWrapper
+
+                    property real sectionHeight: 0
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: sectionHeight
+                    clip: true
+
+                    Behavior on sectionHeight {
+                        NumberAnimation {
+                            duration: 220
+                            easing.type: Easing.OutExpo
+                        }
+                    }
+
+                    Connections {
+                        target: settingsPanel
+                        function onAudioSwitcherOpenChanged() {
+                            audioSwitcherWrapper.sectionHeight = settingsPanel.audioSwitcherOpen ? audioSwitcherColumn.implicitHeight : 0;
+                        }
+                    }
+
+                    Column {
+                        id: audioSwitcherColumn
+                        width: parent.width
+                        spacing: 2
+                        topPadding: 4
+
+                        Repeater {
+                            model: ScriptModel {
+                                values: AudioService.sinks
+                                objectProp: "id"
+                            }
+
+                            delegate: Rectangle {
+                                required property var modelData
+                                readonly property bool isActive: AudioService.sink && modelData.id === AudioService.sink.id
+                                readonly property string displayName: modelData.nickname || modelData.description || modelData.name
+
+                                width: audioSwitcherColumn.width
+                                height: Theme.blockHeight + 8
+                                radius: Theme.blockRadius
+                                color: sinkHover.hovered ? Colors.surface_container_high : "transparent"
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: 56
+                                    anchors.rightMargin: 12
+                                    spacing: 8
+
+                                    Rectangle {
+                                        width: 8
+                                        height: 8
+                                        radius: 4
+                                        color: isActive ? Colors.primary : Colors.outline
+                                    }
+
+                                    Text {
+                                        Layout.fillWidth: true
+                                        text: displayName
+                                        color: isActive ? Colors.primary : Colors.on_surface_variant
+                                        font.pixelSize: Fonts.p
+                                        font.family: Fonts.font
+                                        font.bold: isActive
+                                        elide: Text.ElideRight
+                                    }
+                                }
+
+                                HoverHandler {
+                                    id: sinkHover
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                                TapHandler {
+                                    onTapped: {
+                                        AudioService.setAudioSink(modelData);
+                                        settingsPanel.audioSwitcherOpen = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            width: 1
+                            height: 4
+                        }
+                    }
+                }
+            }
+
+            SettingsConnectionRow {
+                Layout.fillWidth: true
+                iconText: Icons.settingsBluetooth
+                title: "Bluetooth"
+                subtitle: BluetoothService.statusText
+                on: BluetoothService.bluetoothEnabled
+                accent: Colors.primary
+                onToggled: BluetoothService.togglePower()
+                onTapped: {
+                    bluetoothProcess.running = true;
+                    settingsPanel.visible = false;
                 }
             }
         }
 
+        // Utility Buttons Row
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 12
+
+            SettingsIconButton {
+                iconText: Icons.lockClock
+                labelText: "Idle"
+                iconColor: IdleService.active ? Colors.tertiary : Colors.outline
+                onTapped: IdleService.toggle()
+            }
+
+            SettingsIconButton {
+                iconText: SunsetService.active ? Icons.wbSunny : Icons.nightlight
+                labelText: "Night"
+                iconColor: SunsetService.active ? Colors.tertiary_container : Colors.outline
+                onTapped: SunsetService.toggle()
+            }
+        }
+
+        // Notifications
         ColumnLayout {
             Layout.fillWidth: true
             spacing: 8
@@ -498,11 +615,11 @@ PopupWindow {
                     Layout.fillWidth: true
                 }
 
-                Text {
-                    text: "Clear"
-                    color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.p
+                Rectangle {
+                    implicitWidth: clearLabel.implicitWidth + 16
+                    implicitHeight: clearLabel.implicitHeight + 8
+                    radius: Theme.blockRadius
+                    color: clearHover.hovered ? Colors.surface_container_high : Colors.surface_container
 
                     Behavior on color {
                         ColorAnimation {
@@ -510,11 +627,25 @@ PopupWindow {
                         }
                     }
 
+                    Text {
+                        id: clearLabel
+                        anchors.centerIn: parent
+                        text: "Clear"
+                        color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                        font.family: Fonts.font
+                        font.pixelSize: Fonts.p
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
+                    }
+
                     HoverHandler {
                         id: clearHover
                         cursorShape: Qt.PointingHandCursor
                     }
-
                     TapHandler {
                         onTapped: NotificationService.clearHistory()
                     }
@@ -612,79 +743,25 @@ PopupWindow {
             Layout.fillWidth: true
             spacing: 12
 
-            // Shutdown Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                color: shutdownButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    text: Icons.powerSettingsNew
-                    color: Colors.error
-                    font.pixelSize: 24
-                    font.family: Fonts.iconFont
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: shutdownButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: shutdownProcess.running = true
-                }
+            SettingsIconButton {
+                iconText: Icons.powerSettingsNew
+                iconColor: Colors.error
+                iconSize: Fonts.h1
+                onTapped: shutdownProcess.running = true
             }
 
-            // Reboot Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                color: rebootButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    text: Icons.restartAlt
-                    color: Colors.tertiary
-                    font.pixelSize: 24
-                    font.family: Fonts.iconFont
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: rebootButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: rebootProcess.running = true
-                }
+            SettingsIconButton {
+                iconText: Icons.restartAlt
+                iconColor: Colors.tertiary
+                iconSize: Fonts.h1
+                onTapped: rebootProcess.running = true
             }
 
-            // Logout Button
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                color: logoutButton.containsMouse ? Colors.surface_container_high : "transparent"
-                radius: 8
-
-                Text {
-                    text: Icons.logout
-                    color: Colors.primary
-                    font.pixelSize: 24
-                    font.family: Fonts.iconFont
-                    anchors.centerIn: parent
-                }
-
-                MouseArea {
-                    id: logoutButton
-
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: logoutProcess.running = true
-                }
+            SettingsIconButton {
+                iconText: Icons.logout
+                iconColor: Colors.primary
+                iconSize: Fonts.h1
+                onTapped: logoutProcess.running = true
             }
         }
     }
@@ -709,7 +786,4 @@ PopupWindow {
         command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""]
     }
 
-    mask: Region {
-        item: contentRect
-    }
 }

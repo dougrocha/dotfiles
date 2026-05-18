@@ -11,6 +11,12 @@ Singleton {
     property bool isOnline: ciderSocket.status === WebSocket.Open
     property bool isPlaying: false
 
+    signal trackChanged
+
+    function resolveArtUrl(url) {
+        return url ? url.replace("{w}", "512").replace("{h}", "512") : "";
+    }
+
     property string trackTitle: ""
     property string trackArtist: ""
     property string albumName: ""
@@ -88,7 +94,7 @@ Singleton {
                         trackTitle = info.name || "";
                         trackArtist = info.artistName || "";
                         albumName = info.albumName || "";
-                        trackArtUrl = (info.artwork && info.artwork.url) || "";
+                        trackArtUrl = resolveArtUrl((info.artwork && info.artwork.url) || "");
                         position = info.currentPlaybackTime || 0;
                         duration = (info.durationInMillis || 0) / 1000;
                     }
@@ -131,12 +137,13 @@ Singleton {
                     trackTitle = attrs.name || "";
                     trackArtist = attrs.artistName || "";
                     albumName = attrs.albumName || "";
-                    trackArtUrl = attrs.artwork ? (attrs.artwork.url || "") : "";
+                    trackArtUrl = resolveArtUrl(attrs.artwork ? (attrs.artwork.url || "") : "");
                     duration = (attrs.durationInMillis || 0) / 1000;
                     if (attrs.currentPlaybackTime !== undefined)
                         position = attrs.currentPlaybackTime;
 
                     isOnline = true;
+                    trackChanged();
                 }
                 if (eventType === "playbackStatus.playbackStateDidChange") {
                     var state = data.state;

@@ -15,9 +15,9 @@ Variants {
 
     component Separator: Rectangle {
         Layout.preferredWidth: 1
-        Layout.preferredHeight: 16
+        Layout.preferredHeight: 12
         Layout.alignment: Qt.AlignVCenter
-        color: Colors.on_surface_variant
+        color: Qt.rgba(Colors.on_surface_variant.r, Colors.on_surface_variant.g, Colors.on_surface_variant.b, 0.25)
     }
 
     delegate: PanelWindow {
@@ -49,11 +49,16 @@ Variants {
             }
         }
 
-        MusicPanel {
-            id: musicPopout
-            anchor.window: topBar
-            anchor.rect.x: (topBar.width - 480) / 2
-            anchor.rect.y: topBar.height + 8
+        LazyLoader {
+            active: modelData.name === Theme.primaryMonitor
+
+            MusicPanel {
+                anchor.window: topBar
+                anchor.rect.x: (topBar.width - 480) / 2
+                anchor.rect.y: topBar.height + 8
+                visible: Visibilities.musicPanel
+                onVisibleChanged: Visibilities.musicPanel = visible
+            }
         }
 
         MediaSection {
@@ -63,45 +68,37 @@ Variants {
             colMuted: Colors.outline
             fontSize: Fonts.p
             fontFamily: Fonts.font
-            panelOpen: musicPopout.visible
-            onTogglePanel: musicPopout.visible = !musicPopout.visible
+            panelOpen: Visibilities.musicPanel
+            onTogglePanel: Visibilities.musicPanel = !Visibilities.musicPanel
         }
 
         RowLayout {
             anchors.right: parent.right
-            spacing: 8
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 16
+            spacing: 14
 
             ScreenShare {}
 
             TraySection {}
 
-            Separator {
-                visible: ScreenShare.visible ?? false
-            }
-
-            CpuSection {}
-
             Separator {}
 
-            VolumeSection {
-                textColor: Colors.primary
-                fontSize: Fonts.p
-                fontFamily: Fonts.font
-            }
+            CpuIndicator {}
 
-            Separator {}
+            BluetoothIndicator {}
+
+            VolumeIndicator {}
 
             ClockWidget {
-                color: Colors.primary
+                color: Colors.on_surface_variant
                 font.pixelSize: Fonts.p
                 font.family: Fonts.font
-                font.bold: true
-                Layout.rightMargin: 8
+                font.weight: Font.Light
+                font.letterSpacing: 1
             }
 
-            SettingsButton {
-                Layout.rightMargin: 8
-            }
+            SettingsButton {}
         }
     }
 }

@@ -5,6 +5,7 @@
 import qs.Modules.Bar
 import qs.Modules.Notifications
 import qs.Modules.Screenshot
+import qs.Modules.SongDropOverlay
 import qs.Components
 import qs.Services
 import qs.Widgets
@@ -20,4 +21,6 @@ ShellRoot {
     NotificationManager {}
 
     ScreenshotManager {}
+
+    SongDropOverlay {}
 }
