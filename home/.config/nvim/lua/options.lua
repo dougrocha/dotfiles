@@ -6,6 +6,9 @@ vim.o.pumheight = 15
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'fuzzy' }
 vim.o.winborder = 'rounded'
 
+-- Allow local lua code configuration
+vim.o.exrc = true
+
 vim.o.mouse = 'a'
 
 vim.o.backup = false

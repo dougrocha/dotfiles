@@ -4,6 +4,9 @@ local map = vim.keymap.set
 map({ 'n', 'x' }, 'j', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'j']], { expr = true })
 map({ 'n', 'x' }, 'k', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'k']], { expr = true })
 
+-- paste text without copying what under it
+map('x', 'p', [["_dp]], { desc = 'Paste over selection without yanking' })
+
 -- Replicate <Esc>
 map('i', '<C-c>', '<Esc>')
 

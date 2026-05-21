@@ -170,7 +170,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
             -- Extend neovim's client capabilities with the completion ones.
             vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities(nil, true) })
 
-            local server_configs = vim.iter(vim.api.nvim_get_runtime_file('lsp/*.lua', true))
+            local config_dir = vim.fn.stdpath 'config' .. '/lsp'
+            local server_configs = vim.iter(vim.fn.glob(config_dir .. '/*.lua', false, true))
                 :map(function(file)
                     return vim.fn.fnamemodify(file, ':t:r')
                 end)
