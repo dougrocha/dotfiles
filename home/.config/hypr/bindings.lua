@@ -90,7 +90,7 @@ for i = 1, 10 do
 end
 
 bind({ "G" }, hl.dsp.focus({ workspace = "name:gaming" }))
-bind({ "ALT", "G" }, hl.dsp.window.move({ workspace = "name:gaming" }))
+bind({ "SHIFT", "G" }, hl.dsp.window.move({ workspace = "name:gaming" }))
 
 bind({ "D" }, hl.dsp.workspace.toggle_special("discord"))
 bind({ "SHIFT", "D" }, hl.dsp.window.move({ workspace = "special:discord" }))
