@@ -54,9 +54,11 @@ Singleton {
 
         root.notifications.unshift(data);
 
-        notification.closed.connect(() => {
+        const onClosed = () => {
+            notification.closed.disconnect(onClosed);
             removeNotification(id);
-        });
+        };
+        notification.closed.connect(onClosed);
     }
 
     function removeNotification(notificationId) {

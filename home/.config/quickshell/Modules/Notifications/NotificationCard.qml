@@ -31,6 +31,8 @@ Rectangle {
         return false;
     }
 
+    property bool actionHovered: false
+
     HoverHandler {
         id: cardHover
     }
@@ -38,6 +40,7 @@ Rectangle {
     TapHandler {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onTapped: function (eventPoint, button) {
+            if (closeHover.hovered || card.actionHovered) return;
             if (button === Qt.RightButton) {
                 NotificationService.removeNotification(card.modelData.id);
                 return;
@@ -72,6 +75,7 @@ Rectangle {
 
         HoverHandler {
             cursorShape: Qt.PointingHandCursor
+            onHoveredChanged: card.actionHovered = hovered
         }
 
         TapHandler {
@@ -121,6 +125,7 @@ Rectangle {
                 font.pixelSize: Fonts.h5
                 color: Colors.on_surface_variant
                 opacity: cardHover.hovered ? 1 : 0
+                enabled: cardHover.hovered
 
                 Behavior on opacity {
                     NumberAnimation {
@@ -129,6 +134,7 @@ Rectangle {
                 }
 
                 HoverHandler {
+                    id: closeHover
                     cursorShape: Qt.PointingHandCursor
                 }
 

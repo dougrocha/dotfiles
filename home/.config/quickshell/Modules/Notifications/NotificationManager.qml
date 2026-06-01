@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.Constants
 import qs.Services
@@ -31,10 +30,7 @@ Variants {
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: {
-            const isFocused = Hyprland.focusedMonitor && modelData.name === Hyprland.focusedMonitor.name;
-            return isFocused && NotificationService.notifications.length > 0;
-        }
+        visible: modelData.name === Theme.primaryMonitor && NotificationService.notifications.length > 0
 
         anchors {
             top: true
@@ -42,7 +38,7 @@ Variants {
         }
 
         implicitWidth: Theme.notifications.panelWidth
-        implicitHeight: notificationList.displayHeight + Theme.topBarHeight + Theme.notifications.margin
+        implicitHeight: notificationList.displayHeight + Theme.notifications.margin
 
         ListView {
             id: notificationList
@@ -89,7 +85,6 @@ Variants {
             interactive: false
 
             HoverHandler {
-                id: listHover
                 onHoveredChanged: {
                     if (hovered) {
                         unhoverTimer.stop();
