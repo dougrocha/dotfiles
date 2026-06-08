@@ -134,14 +134,15 @@ Rectangle {
                     }
                 }
 
-                HoverHandler {
-                    id: closeHover
+                MouseArea {
+                    anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
+                    onClicked: NotificationService.removeNotification(card.modelData.id)
+                    onContainsMouseChanged: closeHover.hovered = containsMouse
                 }
 
-                TapHandler {
-                    cursorShape: Qt.PointingHandCursor
-                    onTapped: NotificationService.removeNotification(card.modelData.id)
+                HoverHandler {
+                    id: closeHover
                 }
             }
         }
