@@ -90,13 +90,7 @@ Variants {
 
             SettingsButton {}
 
-            ClockWidget {
-                color: Colors.on_surface_variant
-                font.pixelSize: Fonts.p
-                font.family: Fonts.font
-                font.weight: Font.Light
-                font.letterSpacing: 1
-            }
+            ClockButton {}
         }
     }
 }
