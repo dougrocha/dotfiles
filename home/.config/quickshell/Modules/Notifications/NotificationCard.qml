@@ -40,7 +40,8 @@ Rectangle {
     TapHandler {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onTapped: function (eventPoint, button) {
-            if (closeHover.hovered || card.actionHovered) return;
+            if (closeHover.hovered || card.actionHovered)
+                return;
             if (button === Qt.RightButton) {
                 NotificationService.removeNotification(card.modelData.id);
                 return;

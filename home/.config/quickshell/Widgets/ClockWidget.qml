@@ -3,7 +3,7 @@ import QtQuick
 Text {
     id: clockWidget
 
-    property string format: "HH:mm"
+    property string format: "h:mmAP"
     property int updateInterval: 1000
 
     text: Qt.formatDateTime(new Date(), format)

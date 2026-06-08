@@ -15,13 +15,6 @@ PopupWindow {
 
     implicitHeight: contentLayout.implicitHeight + Theme.panelMargin * 2
 
-    Behavior on implicitHeight {
-        NumberAnimation {
-            duration: 80
-            easing.type: Easing.OutExpo
-        }
-    }
-
     onVisibleChanged: {
         if (visible) {
             IdleService.refresh();
@@ -33,6 +26,7 @@ PopupWindow {
 
     implicitWidth: 420
     color: "transparent"
+    grabFocus: true
 
     Rectangle {
         id: contentRect
@@ -41,22 +35,418 @@ PopupWindow {
         color: Colors.surface_container
         radius: 12
 
-        transformOrigin: Item.Top
-        scale: settingsPanel.visible ? 1.0 : 0.92
-        opacity: settingsPanel.visible ? 1.0 : 0.0
 
-        Behavior on scale {
-            SpringAnimation {
-                spring: 12.0
-                damping: 0.7
-                mass: 0.4
+        ColumnLayout {
+            id: contentLayout
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: Theme.panelMargin
+            spacing: 16
+
+            // Header
+            RowLayout {
+                Layout.fillWidth: true
+
+                Text {
+                    text: "Settings"
+                    color: Colors.primary
+                    font.pixelSize: Fonts.h1
+                    font.family: Fonts.font
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Rectangle {
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    radius: 16
+                    color: closeHover.hovered ? Colors.surface_container_high : Colors.surface_container
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: Icons.closeSmall
+                        color: Colors.primary
+                        font.family: Fonts.iconFont
+                        font.pixelSize: 22
+                    }
+
+                    HoverHandler {
+                        id: closeHover
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: settingsPanel.visible = false
+                    }
+                }
             }
-        }
 
-        Behavior on opacity {
-            NumberAnimation {
-                duration: 80
-                easing.type: Easing.OutCubic
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Colors.outline_variant
+            }
+
+            // Speakers
+            SettingsSlider {
+                iconText: Icons.speaker
+                labelText: "Speakers"
+                sliderValue: AudioService.volume
+                muted: AudioService.muted
+                muteIcon: Icons.volumeUp
+                mutedIcon: Icons.volumeMute
+                onMoved: value => AudioService.setVolume(value)
+                onMuteToggled: AudioService.toggleMute()
+            }
+
+            // Microphone
+            SettingsSlider {
+                iconText: Icons.mic
+                labelText: "Microphone"
+                sliderValue: AudioService.sourceVolume
+                muted: AudioService.sourceMuted
+                muteIcon: Icons.mic
+                mutedIcon: Icons.micOff
+                onMoved: value => AudioService.setSourceVolumeValue(value)
+                onMuteToggled: AudioService.toggleSourceMute()
+            }
+
+            // Connection Rows
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 8
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+
+                    SettingsConnectionRow {
+                        Layout.fillWidth: true
+                        iconText: Icons.speaker
+                        title: "Speakers"
+                        subtitle: AudioService.sink ? (AudioService.sink.nickname || AudioService.sink.description || AudioService.sink.name || "") : ""
+                        on: !AudioService.muted
+                        accent: Colors.primary
+                        onToggled: AudioService.toggleMute()
+                        onTapped: settingsPanel.audioSwitcherOpen = !settingsPanel.audioSwitcherOpen
+                    }
+
+                    Item {
+                        id: audioSwitcherWrapper
+
+                        property real sectionHeight: 0
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: sectionHeight
+                        clip: true
+
+                        Behavior on sectionHeight {
+                            NumberAnimation {
+                                duration: 220
+                                easing.type: Easing.OutExpo
+                            }
+                        }
+
+                        Connections {
+                            target: settingsPanel
+                            function onAudioSwitcherOpenChanged() {
+                                audioSwitcherWrapper.sectionHeight = settingsPanel.audioSwitcherOpen ? audioSwitcherColumn.implicitHeight : 0;
+                            }
+                        }
+
+                        Column {
+                            id: audioSwitcherColumn
+                            width: parent.width
+                            spacing: 2
+                            topPadding: 4
+
+                            Repeater {
+                                model: ScriptModel {
+                                    values: AudioService.sinks
+                                    objectProp: "id"
+                                }
+
+                                delegate: Rectangle {
+                                    required property var modelData
+                                    readonly property bool isActive: AudioService.sink && modelData.id === AudioService.sink.id
+                                    readonly property string displayName: modelData.nickname || modelData.description || modelData.name
+
+                                    width: audioSwitcherColumn.width
+                                    height: Theme.blockHeight + 8
+                                    radius: Theme.blockRadius
+                                    color: sinkHover.hovered ? Colors.surface_container_high : "transparent"
+
+                                    RowLayout {
+                                        anchors.fill: parent
+                                        anchors.leftMargin: 56
+                                        anchors.rightMargin: 12
+                                        spacing: 8
+
+                                        Rectangle {
+                                            width: 8
+                                            height: 8
+                                            radius: 4
+                                            color: isActive ? Colors.primary : Colors.outline
+                                        }
+
+                                        Text {
+                                            Layout.fillWidth: true
+                                            text: displayName
+                                            color: isActive ? Colors.primary : Colors.on_surface_variant
+                                            font.pixelSize: Fonts.p
+                                            font.family: Fonts.font
+                                            font.bold: isActive
+                                            elide: Text.ElideRight
+                                        }
+                                    }
+
+                                    HoverHandler {
+                                        id: sinkHover
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                    TapHandler {
+                                        onTapped: {
+                                            AudioService.setAudioSink(modelData);
+                                            settingsPanel.audioSwitcherOpen = false;
+                                        }
+                                    }
+                                }
+                            }
+
+                            Item {
+                                width: 1
+                                height: 4
+                            }
+                        }
+                    }
+                }
+
+                SettingsConnectionRow {
+                    Layout.fillWidth: true
+                    iconText: Icons.settingsBluetooth
+                    title: "Bluetooth"
+                    subtitle: BluetoothService.statusText
+                    on: BluetoothService.bluetoothEnabled
+                    accent: Colors.primary
+                    onToggled: BluetoothService.togglePower()
+                    onTapped: {
+                        bluetoothProcess.running = true;
+                        settingsPanel.visible = false;
+                    }
+                }
+            }
+
+            // Utility Buttons Row
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+
+                SettingsIconButton {
+                    iconText: Icons.lockClock
+                    labelText: "Idle"
+                    iconColor: IdleService.active ? Colors.tertiary : Colors.outline
+                    onTapped: IdleService.toggle()
+                }
+
+                SettingsIconButton {
+                    iconText: SunsetService.active ? Icons.wbSunny : Icons.nightlight
+                    labelText: "Night"
+                    iconColor: SunsetService.active ? Colors.tertiary_container : Colors.outline
+                    onTapped: SunsetService.toggle()
+                }
+            }
+
+            // Notifications
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 8
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Text {
+                        text: "Notifications"
+                        color: Colors.on_surface
+                        font.family: Fonts.font
+                        font.pixelSize: Fonts.h4
+                        font.weight: Font.DemiBold
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                    }
+
+                    Rectangle {
+                        implicitWidth: clearLabel.implicitWidth + 16
+                        implicitHeight: clearLabel.implicitHeight + 8
+                        radius: Theme.blockRadius
+                        color: clearHover.hovered ? Colors.surface_container_high : Colors.surface_container
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
+
+                        Text {
+                            id: clearLabel
+                            anchors.centerIn: parent
+                            text: "Clear"
+                            color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                            font.family: Fonts.font
+                            font.pixelSize: Fonts.p
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.animations.fast
+                                }
+                            }
+                        }
+
+                        HoverHandler {
+                            id: clearHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                        TapHandler {
+                            onTapped: NotificationService.clearHistory()
+                        }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 1
+                    color: Colors.outline_variant
+                }
+
+                ListView {
+                    id: historyList
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 320
+                    topMargin: 6
+                    bottomMargin: 6
+                    spacing: Theme.notifications.spacing
+                    clip: true
+
+                    model: ScriptModel {
+                        values: NotificationService.history
+                        objectProp: "id"
+                    }
+
+                    add: Transition {
+                        ParallelAnimation {
+                            NumberAnimation {
+                                property: "opacity"
+                                from: 0
+                                to: 1
+                                duration: Theme.animations.normal
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                property: "x"
+                                from: 40
+                                to: 0
+                                duration: Theme.animations.normal
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                    }
+
+                    remove: Transition {
+                        ParallelAnimation {
+                            NumberAnimation {
+                                property: "opacity"
+                                to: 0
+                                duration: Theme.animations.normal
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                property: "x"
+                                to: 40
+                                duration: Theme.animations.normal
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                    }
+
+                    displaced: Transition {
+                        NumberAnimation {
+                            property: "y"
+                            duration: Theme.animations.slow
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    delegate: NotificationCard {
+                        width: ListView.view.width
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "No notifications"
+                        color: Colors.on_surface_variant
+                        font.family: Fonts.font
+                        font.pixelSize: Fonts.p
+                        visible: historyList.count === 0
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Colors.outline_variant
+            }
+
+            // Power Buttons Row
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+
+                SettingsIconButton {
+                    iconText: PhosphorIcons.power
+                    iconColor: Colors.error
+                    iconSize: 28
+                    iconFont: Fonts.phosphorFont
+                    onTapped: shutdownProcess.running = true
+                }
+
+                SettingsIconButton {
+                    iconText: PhosphorIcons.arrowCounterClockwise
+                    iconColor: Colors.tertiary
+                    iconSize: 28
+                    iconFont: Fonts.phosphorFont
+                    onTapped: rebootProcess.running = true
+                }
+
+                SettingsIconButton {
+                    iconText: PhosphorIcons.signOut
+                    iconColor: Colors.primary
+                    iconSize: 28
+                    iconFont: Fonts.phosphorFont
+                    onTapped: logoutProcess.running = true
+                }
+
+                SettingsIconButton {
+                    iconText: PhosphorIcons.lockSimple
+                    iconColor: Colors.secondary
+                    iconSize: 28
+                    iconFont: Fonts.phosphorFont
+                    onTapped: {
+                        lockProcess.running = true;
+                        settingsPanel.visible = false;
+                    }
+                }
             }
         }
     }
@@ -189,6 +579,7 @@ PopupWindow {
         property string labelText: ""
         property color iconColor: Colors.primary
         property int iconSize: Fonts.h4
+        property string iconFont: Fonts.iconFont
         property bool active: false
         property color activeBackground: "transparent"
         property color activeIconColor: iconColor
@@ -223,7 +614,7 @@ PopupWindow {
                 text: btn.iconText
                 color: btn.active ? btn.activeIconColor : btn.iconColor
                 font.pixelSize: btn.iconSize
-                font.family: Fonts.iconFont
+                font.family: btn.iconFont
 
                 Behavior on color {
                     ColorAnimation {
@@ -365,410 +756,14 @@ PopupWindow {
         }
     }
 
-    ColumnLayout {
-        id: contentLayout
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: Theme.panelMargin
-        spacing: 16
-
-        // Header
-        RowLayout {
-            Layout.fillWidth: true
-
-            Text {
-                text: "Settings"
-                color: Colors.primary
-                font.pixelSize: Fonts.h1
-                font.family: Fonts.font
-                font.bold: true
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            Rectangle {
-                implicitWidth: 32
-                implicitHeight: 32
-                radius: 16
-                color: closeHover.hovered ? Colors.surface_container_high : Colors.surface_container
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.closeSmall
-                    color: Colors.primary
-                    font.family: Fonts.iconFont
-                    font.pixelSize: 22
-                }
-
-                HoverHandler {
-                    id: closeHover
-                    cursorShape: Qt.PointingHandCursor
-                }
-                TapHandler {
-                    onTapped: settingsPanel.visible = false
-                }
-            }
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            height: 1
-            color: Colors.outline_variant
-        }
-
-        // Speakers
-        SettingsSlider {
-            iconText: Icons.speaker
-            labelText: "Speakers"
-            sliderValue: AudioService.volume
-            muted: AudioService.muted
-            muteIcon: Icons.volumeUp
-            mutedIcon: Icons.volumeMute
-            onMoved: value => AudioService.setVolume(value)
-            onMuteToggled: AudioService.toggleMute()
-        }
-
-        // Microphone
-        SettingsSlider {
-            iconText: Icons.mic
-            labelText: "Microphone"
-            sliderValue: AudioService.sourceVolume
-            muted: AudioService.sourceMuted
-            muteIcon: Icons.mic
-            mutedIcon: Icons.micOff
-            onMoved: value => AudioService.setSourceVolumeValue(value)
-            onMuteToggled: AudioService.toggleSourceMute()
-        }
-
-        // Connection Rows
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                spacing: 0
-
-                SettingsConnectionRow {
-                    Layout.fillWidth: true
-                    iconText: Icons.speaker
-                    title: "Speakers"
-                    subtitle: AudioService.sink ? (AudioService.sink.nickname || AudioService.sink.description || AudioService.sink.name || "") : ""
-                    on: !AudioService.muted
-                    accent: Colors.primary
-                    onToggled: AudioService.toggleMute()
-                    onTapped: settingsPanel.audioSwitcherOpen = !settingsPanel.audioSwitcherOpen
-                }
-
-                Item {
-                    id: audioSwitcherWrapper
-
-                    property real sectionHeight: 0
-
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: sectionHeight
-                    clip: true
-
-                    Behavior on sectionHeight {
-                        NumberAnimation {
-                            duration: 220
-                            easing.type: Easing.OutExpo
-                        }
-                    }
-
-                    Connections {
-                        target: settingsPanel
-                        function onAudioSwitcherOpenChanged() {
-                            audioSwitcherWrapper.sectionHeight = settingsPanel.audioSwitcherOpen ? audioSwitcherColumn.implicitHeight : 0;
-                        }
-                    }
-
-                    Column {
-                        id: audioSwitcherColumn
-                        width: parent.width
-                        spacing: 2
-                        topPadding: 4
-
-                        Repeater {
-                            model: ScriptModel {
-                                values: AudioService.sinks
-                                objectProp: "id"
-                            }
-
-                            delegate: Rectangle {
-                                required property var modelData
-                                readonly property bool isActive: AudioService.sink && modelData.id === AudioService.sink.id
-                                readonly property string displayName: modelData.nickname || modelData.description || modelData.name
-
-                                width: audioSwitcherColumn.width
-                                height: Theme.blockHeight + 8
-                                radius: Theme.blockRadius
-                                color: sinkHover.hovered ? Colors.surface_container_high : "transparent"
-
-                                RowLayout {
-                                    anchors.fill: parent
-                                    anchors.leftMargin: 56
-                                    anchors.rightMargin: 12
-                                    spacing: 8
-
-                                    Rectangle {
-                                        width: 8
-                                        height: 8
-                                        radius: 4
-                                        color: isActive ? Colors.primary : Colors.outline
-                                    }
-
-                                    Text {
-                                        Layout.fillWidth: true
-                                        text: displayName
-                                        color: isActive ? Colors.primary : Colors.on_surface_variant
-                                        font.pixelSize: Fonts.p
-                                        font.family: Fonts.font
-                                        font.bold: isActive
-                                        elide: Text.ElideRight
-                                    }
-                                }
-
-                                HoverHandler {
-                                    id: sinkHover
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: {
-                                        AudioService.setAudioSink(modelData);
-                                        settingsPanel.audioSwitcherOpen = false;
-                                    }
-                                }
-                            }
-                        }
-
-                        Item {
-                            width: 1
-                            height: 4
-                        }
-                    }
-                }
-            }
-
-            SettingsConnectionRow {
-                Layout.fillWidth: true
-                iconText: Icons.settingsBluetooth
-                title: "Bluetooth"
-                subtitle: BluetoothService.statusText
-                on: BluetoothService.bluetoothEnabled
-                accent: Colors.primary
-                onToggled: BluetoothService.togglePower()
-                onTapped: {
-                    bluetoothProcess.running = true;
-                    settingsPanel.visible = false;
-                }
-            }
-        }
-
-        // Utility Buttons Row
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 12
-
-            SettingsIconButton {
-                iconText: Icons.lockClock
-                labelText: "Idle"
-                iconColor: IdleService.active ? Colors.tertiary : Colors.outline
-                onTapped: IdleService.toggle()
-            }
-
-            SettingsIconButton {
-                iconText: SunsetService.active ? Icons.wbSunny : Icons.nightlight
-                labelText: "Night"
-                iconColor: SunsetService.active ? Colors.tertiary_container : Colors.outline
-                onTapped: SunsetService.toggle()
-            }
-        }
-
-        // Notifications
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            RowLayout {
-                Layout.fillWidth: true
-
-                Text {
-                    text: "Notifications"
-                    color: Colors.on_surface
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.h4
-                    font.weight: Font.DemiBold
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                Rectangle {
-                    implicitWidth: clearLabel.implicitWidth + 16
-                    implicitHeight: clearLabel.implicitHeight + 8
-                    radius: Theme.blockRadius
-                    color: clearHover.hovered ? Colors.surface_container_high : Colors.surface_container
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.animations.fast
-                        }
-                    }
-
-                    Text {
-                        id: clearLabel
-                        anchors.centerIn: parent
-                        text: "Clear"
-                        color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.p
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.animations.fast
-                            }
-                        }
-                    }
-
-                    HoverHandler {
-                        id: clearHover
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                    TapHandler {
-                        onTapped: NotificationService.clearHistory()
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 1
-                color: Colors.outline_variant
-            }
-
-            ListView {
-                id: historyList
-
-                Layout.fillWidth: true
-                Layout.preferredHeight: 320
-                topMargin: 6
-                bottomMargin: 6
-                spacing: Theme.notifications.spacing
-                clip: true
-
-                model: ScriptModel {
-                    values: NotificationService.history
-                    objectProp: "id"
-                }
-
-                add: Transition {
-                    ParallelAnimation {
-                        NumberAnimation {
-                            property: "opacity"
-                            from: 0
-                            to: 1
-                            duration: Theme.animations.normal
-                            easing.type: Easing.OutCubic
-                        }
-                        NumberAnimation {
-                            property: "x"
-                            from: 40
-                            to: 0
-                            duration: Theme.animations.normal
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-                }
-
-                remove: Transition {
-                    ParallelAnimation {
-                        NumberAnimation {
-                            property: "opacity"
-                            to: 0
-                            duration: Theme.animations.normal
-                            easing.type: Easing.OutCubic
-                        }
-                        NumberAnimation {
-                            property: "x"
-                            to: 40
-                            duration: Theme.animations.normal
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-                }
-
-                displaced: Transition {
-                    NumberAnimation {
-                        property: "y"
-                        duration: Theme.animations.slow
-                        easing.type: Easing.OutCubic
-                    }
-                }
-
-                delegate: NotificationCard {
-                    width: ListView.view.width
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "No notifications"
-                    color: Colors.on_surface_variant
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.p
-                    visible: historyList.count === 0
-                }
-            }
-        }
-
-        Rectangle {
-            Layout.fillWidth: true
-            height: 1
-            color: Colors.outline_variant
-        }
-
-        // Power Buttons Row
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 12
-
-            SettingsIconButton {
-                iconText: Icons.powerSettingsNew
-                iconColor: Colors.error
-                iconSize: Fonts.h1
-                onTapped: shutdownProcess.running = true
-            }
-
-            SettingsIconButton {
-                iconText: Icons.restartAlt
-                iconColor: Colors.tertiary
-                iconSize: Fonts.h1
-                onTapped: rebootProcess.running = true
-            }
-
-            SettingsIconButton {
-                iconText: Icons.logout
-                iconColor: Colors.primary
-                iconSize: Fonts.h1
-                onTapped: logoutProcess.running = true
-            }
-        }
-    }
-
     Process {
         id: bluetoothProcess
         command: ["launch-or-focus-tui", "bluetui"]
+    }
+
+    Process {
+        id: lockProcess
+        command: ["loginctl", "lock-session"]
     }
 
     Process {
@@ -785,5 +780,4 @@ PopupWindow {
         id: logoutProcess
         command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""]
     }
-
 }

@@ -71,6 +71,7 @@ Singleton {
     readonly property string power: String.fromCodePoint(0xE3DA)
     readonly property string lock: String.fromCodePoint(0xE2FA)
     readonly property string lockSimple: String.fromCodePoint(0xE308)
+    readonly property string signOut: String.fromCodePoint(0xE42A)
     readonly property string terminal: String.fromCodePoint(0xEAE8)
     readonly property string cpu: String.fromCodePoint(0xE610)
     readonly property string hardDrive: String.fromCodePoint(0xE29E)

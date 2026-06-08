@@ -82,13 +82,13 @@ Variants {
 
             TraySection {}
 
-            Separator {}
-
             CpuIndicator {}
 
             BluetoothIndicator {}
 
             VolumeIndicator {}
+
+            SettingsButton {}
 
             ClockWidget {
                 color: Colors.on_surface_variant
@@ -97,8 +97,6 @@ Variants {
                 font.weight: Font.Light
                 font.letterSpacing: 1
             }
-
-            SettingsButton {}
         }
     }
 }

@@ -9,6 +9,13 @@ add {
         opts = {
             notify_on_error = false,
             notify_no_formatters = false,
+            formatters = {
+                odinfmt = {
+                    command = 'odinfmt',
+                    args = { '-stdin' },
+                    stdin = true,
+                },
+            },
             formatters_by_ft = {
                 c = { lsp_format = 'prefer' },
                 cpp = { lsp_format = 'prefer' },
@@ -20,6 +27,7 @@ add {
                 json = { 'prettier', lsp_format = 'fallback' },
                 jsonc = { 'prettier', lsp_format = 'fallback' },
                 lua = { 'stylua' },
+                odin = { 'odinfmt' },
                 markdown = { 'prettier' },
                 objc = { lsp_format = 'prefer' },
                 objcpp = { lsp_format = 'prefer' },

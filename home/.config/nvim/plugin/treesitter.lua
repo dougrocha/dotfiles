@@ -8,6 +8,7 @@ local langs = {
     'json',
     'json5',
     'lua',
+    'odin',
     'markdown',
     'markdown_inline',
     'regex',
