@@ -22,7 +22,7 @@ fi
 
 # Run matugen — writes $image + all color vars into colors.conf
 # post-hooks handle: hyprctl reload, makoctl reload
-matugen image -m dark --source-color-index 0 "$image"
+matugen image -m dark "$image"
 
 # Restart hyprpaper so it picks up the new $image from colors.conf
 pkill -x hyprpaper || true
