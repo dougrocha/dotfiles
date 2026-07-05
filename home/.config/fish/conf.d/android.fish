@@ -1,9 +1,5 @@
 # Android SDK Setup
-if test (uname) = "Darwin"
-    # macOS
-    set -gx JAVA_HOME /Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
-    set -gx ANDROID_HOME $HOME/Library/Android/sdk
-else if test (uname) = "Linux"
+if test (uname) = "Linux"
     set -gx ANDROID_HOME /opt/android-sdk
     set -gx ANDROID_AVD_HOME $HOME/.config/.android/avd
 end
