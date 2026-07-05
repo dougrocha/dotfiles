@@ -62,14 +62,19 @@ fd
 fish
 fzf
 ghostty
+git-delta
+github-cli
 glow
 gum
 imagemagick
 lazygit
+matugen-bin
 mise
+opencode-bin
 ripgrep
 starship
 tmux
+typst
 xdg-terminal-exec
 zoxide
 
@@ -84,6 +89,8 @@ noto-fonts-emoji
 papirus-icon-theme
 
 gpu-screen-recorder
+localsend
+ocrs
 
 playerctl
 xmlstarlet

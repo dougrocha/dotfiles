@@ -34,8 +34,8 @@ Item {
                     readonly property bool hasWindows: (modelData.lastIpcObject?.windows ?? 0) > 0
 
                     visible: modelData.id >= 0 && /^\d+$/.test(modelData.name) && modelData.monitor?.name === root.targetMonitor
-                    width: visible ? 20 : 0
-                    height: 20
+                    width: visible ? 10 : 0
+                    height: 10
 
                     Behavior on width {
                         NumberAnimation {
@@ -68,20 +68,6 @@ Item {
                                 duration: 100
                             }
                         }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: modelData.name
-                            color: isActive ? Colors.on_primary : Colors.primary
-                            font.family: Fonts.font
-                            font.pixelSize: 10
-                            font.weight: Font.Medium
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: 100
-                                }
-                            }
-                        }
                     }
 
                     HoverHandler {
@@ -96,7 +82,7 @@ Item {
 
         Item {
             clip: true
-            implicitHeight: 20
+            implicitHeight: 16
             Layout.alignment: Qt.AlignVCenter
             Layout.preferredWidth: root.onNamedWs ? namedBadge.implicitWidth + 5 : 0
             Layout.leftMargin: root.onNamedWs ? 5 : 0
@@ -119,13 +105,14 @@ Item {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 implicitWidth: namedLabel.implicitWidth + 16
-                height: 20
-                radius: 5
+                height: 16
+                radius: 8
                 color: Colors.tertiary_container
 
                 Text {
                     id: namedLabel
                     anchors.centerIn: parent
+                    renderType: Text.NativeRendering
                     text: root.focusedWs?.name ?? ""
                     color: Colors.on_tertiary_container
                     font.family: Fonts.font

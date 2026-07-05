@@ -23,7 +23,7 @@ Item {
             return PhosphorIcons.speakerHigh;
         }
         color: AudioService.muted ? Colors.error : Colors.on_surface_variant
-        font.pixelSize: 16
+        font.pixelSize: 14
         font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {

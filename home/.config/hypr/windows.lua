@@ -1,3 +1,5 @@
+hl.layer_rule({ match = { namespace = "qs.notification_overlay" }, no_anim = true })
+
 -- Suppress maximize requests from all apps
 hl.window_rule({
     name = "suppress-maximize-events",

@@ -20,17 +20,17 @@ Variants {
         color: "transparent"
 
         mask: Region {
-            item: NotificationService.notifications.length > 0 ? notificationList : null
+            item: localNotifications.length > 0 ? cardColumn : null
         }
 
         WlrLayershell.namespace: "qs.notification_overlay"
-        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.layer: WlrLayer.Top
         WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.margins.top: Theme.topBarHeight
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: modelData.name === Theme.primaryMonitor && NotificationService.notifications.length > 0
+        visible: modelData.name === Theme.primaryMonitor && localNotifications.length > 0 && !Visibilities.notificationCenter
 
         anchors {
             top: true
@@ -38,51 +38,34 @@ Variants {
         }
 
         implicitWidth: Theme.notifications.panelWidth
-        implicitHeight: notificationList.displayHeight + Theme.notifications.margin
+        implicitHeight: cardColumn.implicitHeight + Theme.notifications.margin * 2
 
-        ListView {
-            id: notificationList
+        property var localNotifications: []
 
-            readonly property int maxVisible: 5
-            readonly property int removeDuration: Theme.animations.normal
-            property real displayHeight: 0
+        function removeLocal(id) {
+            localNotifications = localNotifications.filter(n => n.id !== id);
+        }
 
-            onContentHeightChanged: {
-                if (contentHeight > notificationList.displayHeight) {
-                    heightBehavior.enabled = false;
-                    notificationList.displayHeight = contentHeight;
-                    heightBehavior.enabled = true;
-                } else {
-                    shrinkTimer.restart();
-                }
+        Connections {
+            target: NotificationService
+            function onNotificationsChanged() {
+                const svc = NotificationService.notifications.slice(0, 5);
+                const localIds = new Set(notificationPanel.localNotifications.map(n => n.id));
+                svc.forEach(n => {
+                    if (n && !localIds.has(n.id))
+                        notificationPanel.localNotifications = [...notificationPanel.localNotifications, n];
+                });
             }
+        }
 
-            Timer {
-                id: shrinkTimer
-                interval: notificationList.removeDuration
-                repeat: false
-                onTriggered: notificationList.displayHeight = notificationList.contentHeight
-            }
-
+        Column {
+            id: cardColumn
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: Theme.notifications.margin
             anchors.rightMargin: Theme.notifications.margin
-
             width: Theme.notifications.cardWidth
-            height: displayHeight
             spacing: Theme.notifications.spacing
-
-            Behavior on displayHeight {
-                id: heightBehavior
-                NumberAnimation {
-                    duration: Theme.animations.slow
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            clip: false
-            interactive: false
 
             HoverHandler {
                 onHoveredChanged: {
@@ -102,57 +85,76 @@ Variants {
                 onTriggered: NotificationService.stackPaused = false
             }
 
-            add: Transition {
-                ParallelAnimation {
+            Repeater {
+                model: ScriptModel {
+                    values: notificationPanel.localNotifications
+                    objectProp: "id"
+                }
+
+                delegate: Item {
+                    id: delegateWrapper
+                    required property var modelData
+
+                    property bool leaving: false
+
+                    width: cardColumn.width
+                    height: leaving ? 0 : card.height
+                    clip: true
+                    opacity: leaving ? 0 : 1
+
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: Theme.animations.fast
+                            easing.type: Easing.InCubic
+                        }
+                    }
+
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.animations.fast
+                            easing.type: Easing.InCubic
+                        }
+                    }
+
+                    Component.onCompleted: appearAnim.start()
+
                     NumberAnimation {
+                        id: appearAnim
+                        target: delegateWrapper
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: notificationList.removeDuration
+                        duration: Theme.animations.slow
                         easing.type: Easing.OutCubic
                     }
-                    NumberAnimation {
-                        property: "x"
-                        from: 40
-                        to: 0
-                        duration: notificationList.removeDuration
-                        easing.type: Easing.OutCubic
+
+                    Connections {
+                        target: NotificationService
+                        function onNotificationsChanged() {
+                            const notif = delegateWrapper?.modelData;
+                            if (!notif)
+                                return;
+                            const gone = !NotificationService.notifications.some(n => n?.id === notif.id);
+                            if (gone && !delegateWrapper.leaving) {
+                                delegateWrapper.leaving = true;
+                                removeTimer.start();
+                            }
+                        }
+                    }
+
+                    Timer {
+                        id: removeTimer
+                        interval: Theme.animations.fast + 20
+                        repeat: false
+                        onTriggered: notificationPanel.removeLocal(delegateWrapper.modelData.id)
+                    }
+
+                    NotificationCard {
+                        id: card
+                        width: delegateWrapper.width
+                        modelData: delegateWrapper.modelData
                     }
                 }
-            }
-
-            remove: Transition {
-                ParallelAnimation {
-                    NumberAnimation {
-                        property: "opacity"
-                        to: 0
-                        duration: notificationList.removeDuration
-                        easing.type: Easing.OutCubic
-                    }
-                    NumberAnimation {
-                        property: "x"
-                        to: 40
-                        duration: notificationList.removeDuration
-                        easing.type: Easing.OutCubic
-                    }
-                }
-            }
-
-            displaced: Transition {
-                NumberAnimation {
-                    property: "y"
-                    duration: Theme.animations.slow
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            model: ScriptModel {
-                values: NotificationService.notifications.slice(0, notificationList.maxVisible)
-                objectProp: "id"
-            }
-
-            delegate: NotificationCard {
-                width: ListView.view.width
             }
         }
     }

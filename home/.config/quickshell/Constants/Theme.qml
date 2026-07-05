@@ -20,6 +20,7 @@ Singleton {
         readonly property int cardRadius: 16
         readonly property int spacing: 8
         readonly property int margin: 12
+        readonly property string historyPath: Quickshell.cacheDir + "/notifications.json"
     }
 
     readonly property QtObject animations: QtObject {

@@ -13,15 +13,15 @@ Rectangle {
 
     required property var modelData
 
-    height: cardContent.implicitHeight + Theme.notifications.margin * 2
+    height: cardContent.implicitHeight + 12 * 2
 
-    radius: Theme.notifications.cardRadius
+    radius: 12
     border.width: 1
     color: Colors.surface_container
     border.color: Colors.outline_variant
 
     function defaultAction() {
-        for (let i = 0; i < card.modelData.actions.length; i++) {
+        for (let i = 0; i < (card.modelData?.actions?.length ?? 0); i++) {
             const a = card.modelData.actions[i];
             if (a.identifier === "default") {
                 a.invoke();
@@ -57,24 +57,39 @@ Rectangle {
 
         Layout.preferredHeight: 28
         Layout.fillWidth: true
-        color: Colors.surface_container_high
-        radius: 6
-        border.color: Colors.outline_variant
+        radius: Theme.blockRadius
+        color: actionHover.hovered ? Colors.surface_container_high : Colors.surface_container
+        border.color: actionHover.hovered ? Colors.primary : Colors.outline_variant
         border.width: 1
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+        Behavior on border.color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
 
         Text {
             anchors.centerIn: parent
             anchors.margins: 4
             text: modelData.text
-            color: Colors.on_surface
+            color: actionHover.hovered ? Colors.primary : Colors.on_surface_variant
             elide: Text.ElideRight
-            font {
-                family: Fonts.font
-                pixelSize: Fonts.p
+            font.family: Fonts.font
+            font.pixelSize: Fonts.p - 2
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.animations.fast
+                }
             }
         }
 
         HoverHandler {
+            id: actionHover
             cursorShape: Qt.PointingHandCursor
             onHoveredChanged: card.actionHovered = hovered
         }
@@ -87,10 +102,7 @@ Rectangle {
     ColumnLayout {
         id: cardContent
         anchors.fill: parent
-        anchors.leftMargin: Theme.notifications.margin
-        anchors.rightMargin: Theme.notifications.margin
-        anchors.topMargin: Theme.notifications.margin
-        anchors.bottomMargin: Theme.notifications.margin
+        anchors.margins: 12
         spacing: 6
 
         RowLayout {
@@ -106,17 +118,17 @@ Rectangle {
                 IconImage {
                     id: appIconImage
                     anchors.centerIn: parent
-                    source: Quickshell.iconPath(card.modelData.appIcon, true)
+                    source: Quickshell.iconPath(card.modelData?.appIcon ?? "", true)
                     implicitSize: 16
                 }
             }
 
             Text {
                 Layout.fillWidth: true
-                text: card.modelData.appName
+                text: card.modelData?.appName ?? ""
                 color: Colors.on_surface_variant
                 font.family: Fonts.font
-                font.pixelSize: Fonts.p
+                font.pixelSize: Fonts.p - 2
                 elide: Text.ElideRight
             }
 
@@ -149,22 +161,22 @@ Rectangle {
 
         Text {
             Layout.fillWidth: true
-            text: card.modelData.summary
+            text: card.modelData?.summary ?? ""
             visible: text !== ""
             color: Colors.on_surface
             font.family: Fonts.font
-            font.pixelSize: Fonts.h5
+            font.pixelSize: Fonts.p
             font.weight: Font.DemiBold
             elide: Text.ElideRight
         }
 
         Text {
             Layout.fillWidth: true
-            text: card.modelData.body
+            text: card.modelData?.body ?? ""
             visible: text !== ""
             color: Colors.on_surface_variant
             font.family: Fonts.font
-            font.pixelSize: Fonts.p
+            font.pixelSize: Fonts.p - 2
             font.weight: Font.Normal
             wrapMode: Text.WordWrap
             maximumLineCount: 2
@@ -174,10 +186,10 @@ Rectangle {
         RowLayout {
             Layout.fillWidth: true
             spacing: 8
-            visible: card.modelData.actions.filter(a => a.identifier !== "default" && a.text !== "").length > 0
+            visible: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "").length > 0
 
             Repeater {
-                model: card.modelData.actions.filter(a => a.identifier !== "default" && a.text !== "")
+                model: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "")
                 delegate: ActionButton {}
             }
         }

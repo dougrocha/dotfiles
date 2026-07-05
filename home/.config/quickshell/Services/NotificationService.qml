@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
+import qs.Constants
 
 Singleton {
     id: root
@@ -32,7 +33,7 @@ Singleton {
 
         // app decides
         if (n.expireTimeout > 0) {
-            return n.expireTimeout * 1000;
+            return n.expireTimeout;
         }
 
         // 3 second default
@@ -40,9 +41,16 @@ Singleton {
     }
 
     function handleNotification(notification) {
+        if (!notification.summary && !notification.body)
+            return;
+
         notification.tracked = true;
 
         const id = notification.id;
+
+        const existing = root.notifications.find(notif => notif.id === id);
+        if (existing && existing.onClosed)
+            notification.closed.disconnect(existing.onClosed);
 
         const metadata = {
             timestamp: Date.now(),
@@ -52,38 +60,93 @@ Singleton {
 
         const data = Object.assign(notification, metadata);
 
-        root.notifications.unshift(data);
-
         const onClosed = () => {
             notification.closed.disconnect(onClosed);
             removeNotification(id);
         };
         notification.closed.connect(onClosed);
+        data.onClosed = onClosed;
+
+        if (Visibilities.notificationCenter) {
+            addToHistory(data);
+            return;
+        }
+
+        root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id)];
     }
 
     function removeNotification(notificationId) {
-        const popupIndex = root.notifications.findIndex(notif => notif.id === notificationId);
-        if (popupIndex !== -1) {
-            const notif = root.notifications[popupIndex];
+        const notif = root.notifications.find(n => n.id === notificationId);
+        if (notif) {
             notif.isPopup = false;
-            root.notifications.splice(popupIndex, 1);
+            root.notifications = root.notifications.filter(n => n.id !== notificationId);
             addToHistory(notif);
             return;
         }
 
-        const historyIndex = root.history.findIndex(notif => notif.id === notificationId);
-        if (historyIndex !== -1)
-            root.history.splice(historyIndex, 1);
+        if (root.history.some(n => n.id === notificationId)) {
+            root.history = root.history.filter(n => n.id !== notificationId);
+            saveHistory();
+        }
     }
 
     function addToHistory(notification) {
-        root.history.unshift(notification);
-        if (root.history.length > 20)
-            root.history.pop();
+        if (!notification.summary && !notification.body)
+            return;
+        const entry = {
+            id: notification.id,
+            appName: notification.appName ?? "",
+            appIcon: notification.appIcon ?? "",
+            summary: notification.summary ?? "",
+            body: notification.body ?? "",
+            timestamp: notification.timestamp ?? Date.now(),
+            actions: (notification.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "").map(a => ({
+                        identifier: a.identifier,
+                        text: a.text
+                    }))
+        };
+        root.history = [entry, ...root.history.filter(n => n.id !== entry.id)].slice(0, 10);
+        saveHistory();
     }
 
     function clearHistory() {
         root.history = [];
+        saveHistory();
+    }
+
+    function saveHistory() {
+        saveDebounce.restart();
+    }
+
+    Timer {
+        id: saveDebounce
+        interval: 300
+        repeat: false
+        onTriggered: {
+            saveProcess.json = JSON.stringify(root.history);
+            saveProcess.running = true;
+        }
+    }
+
+    FileView {
+        path: Theme.notifications.historyPath
+        onLoaded: {
+            try {
+                const parsed = JSON.parse(text());
+                if (Array.isArray(parsed))
+                    root.history = parsed;
+            } catch (e) {}
+        }
+    }
+
+    Process {
+        id: saveProcess
+        property string json: ""
+        command: ["sh", "-c", `mkdir -p "${Quickshell.cacheDir}" && printf '%s' "$QS_NOTIF" > "${Theme.notifications.historyPath}"`]
+        environment: ({
+                "QS_NOTIF": json
+            })
+        running: false
     }
 
     Timer {
