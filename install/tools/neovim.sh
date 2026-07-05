@@ -2,25 +2,13 @@
 
 set -euo pipefail
 
-TPM_DIR="$HOME/.tmux/plugins/tpm"
-
-if [[ -d "$TPM_DIR" ]]; then
-    cd "$TPM_DIR"
-    git pull
-else
-    mkdir -p "$HOME/.tmux/plugins"
-    git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
-fi
-
 NEOVIM_DIR="$BUILD_DIR/neovim"
 
 mkdir -p "$BUILD_DIR"
 
-sudo pacman -S --noconfirm --needed base-devel cmake ninja curl git
-
 if [[ -d "$NEOVIM_DIR" ]]; then
     cd "$NEOVIM_DIR"
-    git fetch origin
+    git fetch origin master
     git switch master
     git reset --hard origin/master
 else

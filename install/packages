@@ -51,6 +51,11 @@ mpv
 nautilus
 nautilus-python
 
+# Build Tools
+base-devel
+cmake
+ninja
+
 # Terminal Stuff
 bat
 btop
