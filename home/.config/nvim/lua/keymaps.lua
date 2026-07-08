@@ -35,3 +35,7 @@ map('v', '>', '>gv')
 
 -- Mark management
 map('c', 'dm', 'delmarks', { desc = 'Delete marks' })
+
+-- Package manager.
+map('n', '<leader>pu', '<cmd>packupdate<cr>', { desc = 'Update packages' })
+map('n', '<leader>ps', '<cmd>packupdate ++lockfile<cr>', { desc = 'Sync packages to lockfile' })
