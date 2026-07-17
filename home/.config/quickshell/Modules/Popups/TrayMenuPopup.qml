@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import qs.Constants
 import qs.Components
 
@@ -11,48 +10,24 @@ PopupWindow {
     property Item anchorItem
     property var menuOpener: null
 
-    // Window size tracks the content container's full natural size instantly —
-    // no animation here so Hyprland never sees a mid-animation resize.
     implicitWidth: 200
-    implicitHeight: menuColumn.implicitHeight + 16
+    implicitHeight: {
+        const win = barWindow;
+        return (win && win.screen) ? Math.max(300, win.screen.height - win.height - 24) : 600;
+    }
     color: "transparent"
     visible: false
-
-    Behavior on implicitHeight {
-        NumberAnimation {
-            duration: 150
-            easing.type: Easing.OutCubic
-        }
-    }
 
     anchor.item: root.anchorItem
     anchor.rect.x: anchorItem ? Math.round(anchorItem.width / 2 - implicitWidth / 2) : 0
     anchor.rect.y: anchorItem ? anchorItem.height + 12 : 0
 
-    HyprlandFocusGrab {
-        id: focusGrab
-        active: false
-        windows: [root]
-        onActiveChanged: {
-            if (!active && root.visible)
-                root.visible = false;
-        }
-    }
+    readonly property var barWindow: anchorItem ? anchorItem.QsWindow.window : null
 
-    Timer {
-        id: grabDelay
-        interval: 50
-        repeat: false
-        onTriggered: focusGrab.active = true
-    }
-
-    onVisibleChanged: {
-        if (visible) {
-            grabDelay.restart();
-        } else {
-            grabDelay.stop();
-            focusGrab.active = false;
-        }
+    PopupGrab {
+        popup: root
+        anchorWindow: root.barWindow
+        onDismissed: root.visible = false
     }
 
     // Recursive submenu list component — used at every nesting level.
@@ -211,7 +186,10 @@ PopupWindow {
 
     Rectangle {
         id: menuRect
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: menuColumn.implicitHeight + 16
         radius: 8
         color: Colors.surface
         border.color: Colors.outline_variant

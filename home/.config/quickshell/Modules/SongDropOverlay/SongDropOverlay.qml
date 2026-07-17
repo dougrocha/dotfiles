@@ -32,6 +32,8 @@ Variants {
         WlrLayershell.namespace: "qs.song-drop"
         mask: Region {}
 
+        visible: modelData.name === Theme.primaryMonitor
+
         // ---------- Track state ----------
         property string trackTitle: ""
         property string trackArtist: ""
@@ -43,6 +45,8 @@ Variants {
         Connections {
             target: CiderRpcService
             function onTrackChanged() {
+                if (overlay.modelData.name !== Theme.primaryMonitor)
+                    return;
                 if (!CiderRpcService.trackTitle)
                     return;
                 if (Visibilities.musicPanel)

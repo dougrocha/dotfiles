@@ -37,7 +37,8 @@ Variants {
             right: true
         }
 
-        implicitWidth: Theme.notifications.panelWidth
+        // +10 for the gutter the cards' close badges hang into.
+        implicitWidth: Theme.notifications.panelWidth + 10
         implicitHeight: cardColumn.implicitHeight + Theme.notifications.margin * 2
 
         property var localNotifications: []
@@ -50,11 +51,23 @@ Variants {
             target: NotificationService
             function onNotificationsChanged() {
                 const svc = NotificationService.notifications.slice(0, 5);
-                const localIds = new Set(notificationPanel.localNotifications.map(n => n.id));
+                const byId = new Map(notificationPanel.localNotifications.map(n => [n.id, n]));
+                let next = notificationPanel.localNotifications;
+                let changed = false;
                 svc.forEach(n => {
-                    if (n && !localIds.has(n.id))
-                        notificationPanel.localNotifications = [...notificationPanel.localNotifications, n];
+                    if (!n)
+                        return;
+                    const existing = byId.get(n.id);
+                    if (!existing) {
+                        next = [...next, n];
+                        changed = true;
+                    } else if (existing !== n) {
+                        next = next.map(x => x.id === n.id ? n : x);
+                        changed = true;
+                    }
                 });
+                if (changed)
+                    notificationPanel.localNotifications = next;
             }
         }
 
@@ -64,7 +77,7 @@ Variants {
             anchors.right: parent.right
             anchors.topMargin: Theme.notifications.margin
             anchors.rightMargin: Theme.notifications.margin
-            width: Theme.notifications.cardWidth
+            width: Theme.notifications.cardWidth + 10
             spacing: Theme.notifications.spacing
 
             HoverHandler {

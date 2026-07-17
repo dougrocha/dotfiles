@@ -27,7 +27,7 @@ Item {
                 var title = CiderRpcService.trackTitle || "";
                 var artist = CiderRpcService.trackArtist || "";
                 if (artist && artist.length > 0 && title && title.length > 0)
-                    return artist + " - " + title;
+                    return title + " - " + artist;
                 return title;
             }
             color: root.panelOpen ? Qt.lighter(root.colYellow, 1.3) : root.colYellow

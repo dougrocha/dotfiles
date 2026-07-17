@@ -3,13 +3,13 @@
 set -euo pipefail
 
 # Browser defaults
-xdg-settings set default-web-browser zen.desktop
-xdg-mime default zen.desktop x-scheme-handler/http
-xdg-mime default zen.desktop x-scheme-handler/https
-xdg-mime default zen.desktop text/html
+xdg-settings set default-web-browser chromium.desktop
+xdg-mime default chromium.desktop x-scheme-handler/http
+xdg-mime default chromium.desktop x-scheme-handler/https
+xdg-mime default chromium.desktop text/html
 
 # PDF defaults
-xdg-mime default zen.desktop application/pdf
+xdg-mime default chromium.desktop application/pdf
 
 # File manager defaults
 xdg-mime default org.gnome.Nautilus.desktop inode/directory

@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import qs.Constants
+import qs.Services
 
 Item {
     id: root
@@ -74,7 +75,10 @@ Item {
                         cursorShape: Qt.PointingHandCursor
                     }
                     TapHandler {
-                        onTapped: modelData.activate()
+                        onTapped: {
+                            Visibilities.closePopups();
+                            modelData.activate();
+                        }
                     }
                 }
             }

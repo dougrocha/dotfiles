@@ -1,35 +1,36 @@
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
+import qs.Components
 import qs.Constants
 import qs.Modules.Notifications
 import qs.Services
 
-PanelWindow {
+PopupWindow {
     id: panel
 
     color: "transparent"
-    anchors {
-        top: true
-        left: true
-        right: true
-        bottom: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "qs.notification_center"
-    WlrLayershell.keyboardFocus: Visibilities.notificationCenter ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    visible: container.reveal > 0.001
+    implicitWidth: container.width
+    implicitHeight: {
+        const win = anchor.window;
+        return (win && win.screen) ? Math.max(400, win.screen.height - win.height - 12) : 800;
+    }
+
+    mask: Region {
+        item: container
+    }
+
+    visible: Visibilities.notificationCenter
+
+    PopupGrab {
+        popup: panel
+        onDismissed: Visibilities.notificationCenter = false
+    }
 
     onVisibleChanged: {
+        Visibilities.notificationCenter = visible;
         if (visible)
             calendarView.reset();
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: Visibilities.notificationCenter = false
     }
 
     Item {
@@ -43,10 +44,10 @@ PanelWindow {
             }
         }
 
-        width: 322
+        // 10px wider than the content column: a left gutter the cards' close
+        // badges hang into, so card surfaces still align with the calendar.
+        width: 332
         height: stack.implicitHeight
-        x: parent.width - width - 8
-        y: Theme.topBarHeight + 6
         opacity: reveal
         transform: Translate {
             y: (1 - container.reveal) * -6
@@ -60,27 +61,114 @@ PanelWindow {
             }
         }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {}
-        }
-
         Column {
             id: stack
             width: parent.width
             spacing: 6
 
-            NotificationHistory {
+            Item {
+                id: header
+                x: 10
+                width: parent.width - 10
+                height: 28
+
+                Text {
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Notification Center"
+                    color: Colors.on_surface
+                    font.family: Fonts.font
+                    font.pixelSize: Fonts.p
+                    font.weight: Font.DemiBold
+                }
+
+                // Clears the entire notification history.
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 24
+                    height: 24
+                    radius: Theme.blockRadius
+                    color: headerClearHover.hovered ? Colors.surface_container_high : Colors.surface_container
+                    border.width: 1
+                    border.color: headerClearHover.hovered ? Colors.primary : Colors.outline_variant
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
+                    Behavior on border.color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: Icons.close
+                        color: headerClearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                        font.family: Fonts.iconFont
+                        font.pixelSize: 14
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
+                    }
+
+                    HoverHandler {
+                        id: headerClearHover
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
+                    TapHandler {
+                        onTapped: NotificationService.clearHistory()
+                    }
+                }
+            }
+
+            Item {
+                x: 10
+                width: parent.width - 10
+                height: 90
+                visible: NotificationService.history.length === 0
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "No Notifications"
+                    color: Colors.on_surface_variant
+                    font.family: Fonts.font
+                    font.pixelSize: Fonts.p
+                }
+            }
+
+            Flickable {
+                id: historyScroll
                 width: parent.width
+                visible: history.implicitHeight > 0
+                height: Math.min(history.implicitHeight, panel.implicitHeight - header.height - calendarBlock.height - stack.spacing * 2)
+                contentHeight: history.implicitHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+
+                NotificationHistory {
+                    id: history
+                    width: historyScroll.width
+                }
             }
 
             Rectangle {
-                width: parent.width
+                id: calendarBlock
+                x: 10
+                width: parent.width - 10
                 height: calendarView.implicitHeight + 32
                 radius: 12
                 color: Colors.surface_container
                 border.width: 1
                 border.color: Colors.outline_variant
+                clip: true
 
                 Behavior on height {
                     NumberAnimation {

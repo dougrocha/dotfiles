@@ -58,6 +58,12 @@ bind({ "CTRL", "O" }, hl.dsp.exec_cmd("ocr"), { description = "OCR selection to 
 bind({ "SHIFT", "R" }, hl.dsp.exec_cmd("save-replay"))
 bind({ "CTRL", "R" }, hl.dsp.exec_cmd("toggle-recording"))
 
+-- Quickshell panels
+bind({ "N" }, hl.dsp.exec_cmd("quickshell ipc call notification-center toggle"))
+bind({ "COMMA" }, hl.dsp.exec_cmd("quickshell ipc call settings-panel toggle"))
+bind({ "PERIOD" }, hl.dsp.exec_cmd("quickshell ipc call music-panel toggle"))
+bind({ "U" }, hl.dsp.exec_cmd("quickshell ipc call top-bar toggle"))
+
 -- Copy/paste
 bind({ "C" }, hl.dsp.send_shortcut({ mods = "CTRL", key = "Insert" }))
 bind({ "V" }, hl.dsp.send_shortcut({ mods = "SHIFT", key = "Insert" }))

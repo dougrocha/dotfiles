@@ -3,7 +3,7 @@
 # relative paths are resolved relative to the location of the config file
 stylesheets: [./theme.css]
 # default page selected when the picker is opened
-default_page: windows
+default_page: outputs
 
 window:
   # height of the application window
@@ -45,7 +45,7 @@ windows:
   # maximum amount of image cards per row on the windows page
   max_per_row: 999
   # number of clicks needed to select a window
-  clicks: 2
+  clicks: 1
   # spacing in pixels between the window cards
   spacing: 12
 

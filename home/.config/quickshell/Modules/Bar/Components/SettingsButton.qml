@@ -29,6 +29,6 @@ Item {
     }
 
     TapHandler {
-        onTapped: Visibilities.settingsPanel = !Visibilities.settingsPanel
+        onTapped: Visibilities.toggleSettings()
     }
 }

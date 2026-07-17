@@ -38,7 +38,10 @@ Item {
 
     TapHandler {
         cursorShape: Qt.PointingHandCursor
-        onTapped: proc.running = true
+        onTapped: {
+            Visibilities.closePopups();
+            proc.running = true;
+        }
     }
 
     Tooltip {

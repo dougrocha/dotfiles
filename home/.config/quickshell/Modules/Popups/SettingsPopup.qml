@@ -1,37 +1,43 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Io
 import Quickshell.Widgets
+import qs.Components
 import qs.Constants
 import qs.Services
 
-PanelWindow {
+PopupWindow {
     id: panel
 
     color: "transparent"
-    anchors {
-        top: true
-        left: true
-        right: true
-        bottom: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.namespace: "qs.settings"
-    WlrLayershell.keyboardFocus: Visibilities.settingsPanel ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-    visible: card.reveal > 0.001
+    implicitWidth: card.cardWidth
+    implicitHeight: {
+        const win = anchor.window;
+        return (win && win.screen) ? Math.max(400, win.screen.height - win.height - 12) : 800;
+    }
+
+    mask: Region {
+        item: card
+    }
+
+    visible: Visibilities.settingsPanel
 
     property bool audioSwitcherOpen: false
 
+    PopupGrab {
+        popup: panel
+        onDismissed: Visibilities.settingsPanel = false
+    }
+
     onVisibleChanged: {
-        if (!visible)
-            audioSwitcherOpen = false;
+        Visibilities.settingsPanel = visible;
         if (visible) {
             IdleService.refresh();
             SunsetService.refresh();
+        } else {
+            audioSwitcherOpen = false;
         }
     }
 
@@ -233,11 +239,6 @@ PanelWindow {
         }
     }
 
-    MouseArea {
-        anchors.fill: parent
-        onClicked: Visibilities.settingsPanel = false
-    }
-
     Rectangle {
         id: card
 
@@ -252,10 +253,10 @@ PanelWindow {
         readonly property int cardWidth: 280
         readonly property int cardMargin: 12
 
-        width: cardWidth
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         height: col.implicitHeight + cardMargin * 2
-        x: parent.width - width - 8
-        y: Theme.topBarHeight + 6
         radius: 12
         color: Colors.surface_container
         opacity: reveal
@@ -269,11 +270,6 @@ PanelWindow {
                 Visibilities.settingsPanel = false;
                 event.accepted = true;
             }
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {}
         }
 
         Column {

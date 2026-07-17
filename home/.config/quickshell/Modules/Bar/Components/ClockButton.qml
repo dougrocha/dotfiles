@@ -40,6 +40,6 @@ Item {
     }
 
     TapHandler {
-        onTapped: Visibilities.notificationCenter = !Visibilities.notificationCenter
+        onTapped: Visibilities.toggleNotificationCenter()
     }
 }

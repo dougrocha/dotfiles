@@ -324,8 +324,16 @@ Item {
         // Selected day detail
         ColumnLayout {
             Layout.fillWidth: true
-            visible: root.selectedDay > 0
+            opacity: root.selectedDay > 0 ? 1 : 0
+            visible: opacity > 0
             spacing: 8
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.animations.normal
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             Rectangle {
                 Layout.fillWidth: true

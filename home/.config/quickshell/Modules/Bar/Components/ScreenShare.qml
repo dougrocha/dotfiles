@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import qs.Constants
 import qs.Components
 import qs.Services
@@ -28,30 +27,10 @@ RowLayout {
             margins.top: Theme.topBarHeight
         }
 
-        HyprlandFocusGrab {
-            id: focusGrab
-            active: false
-            windows: [screenSharePopup]
-            onActiveChanged: {
-                if (!active && screenSharePopup.visible)
-                    screenSharePopup.visible = false;
-            }
-        }
-
-        Timer {
-            id: grabDelay
-            interval: 50
-            repeat: false
-            onTriggered: focusGrab.active = true
-        }
-
-        onVisibleChanged: {
-            if (visible) {
-                grabDelay.restart();
-            } else {
-                grabDelay.stop();
-                focusGrab.active = false;
-            }
+        PopupGrab {
+            popup: screenSharePopup
+            anchorWindow: screenShareText.QsWindow.window
+            onDismissed: screenSharePopup.visible = false
         }
 
         Rectangle {
@@ -145,7 +124,10 @@ RowLayout {
         }
 
         TapHandler {
-            onTapped: screenSharePopup.visible = !screenSharePopup.visible
+            onTapped: {
+                Visibilities.closePopups();
+                screenSharePopup.visible = !screenSharePopup.visible;
+            }
         }
     }
 
@@ -166,6 +148,7 @@ RowLayout {
 
         TapHandler {
             onTapped: {
+                Visibilities.closePopups();
                 if (StreamingService.isRecordingScreen) {
                     StreamingService.stopRecording();
                 } else {
@@ -190,30 +173,10 @@ RowLayout {
             margins.top: Theme.topBarHeight
         }
 
-        HyprlandFocusGrab {
-            id: recordingFocusGrab
-            active: false
-            windows: [recordingOptionsPopup]
-            onActiveChanged: {
-                if (!active && recordingOptionsPopup.visible)
-                    recordingOptionsPopup.visible = false;
-            }
-        }
-
-        Timer {
-            id: recordingGrabDelay
-            interval: 50
-            repeat: false
-            onTriggered: recordingFocusGrab.active = true
-        }
-
-        onVisibleChanged: {
-            if (visible) {
-                recordingGrabDelay.restart();
-            } else {
-                recordingGrabDelay.stop();
-                recordingFocusGrab.active = false;
-            }
+        PopupGrab {
+            popup: recordingOptionsPopup
+            anchorWindow: recordingText.QsWindow.window
+            onDismissed: recordingOptionsPopup.visible = false
         }
 
         Rectangle {

@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -22,8 +23,12 @@ PopupWindow {
     implicitWidth: 480
     implicitHeight: mainLayout.implicitHeight + 28
     color: "transparent"
-    grabFocus: true
     visible: false
+
+    PopupGrab {
+        popup: root
+        onDismissed: Visibilities.musicPanel = false
+    }
 
     Rectangle {
         id: musicContent

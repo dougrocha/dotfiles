@@ -4,7 +4,7 @@
 
 import qs.Modules.Bar
 import qs.Modules.Notifications
-import qs.Modules.Popups
+import qs.Modules.Osd
 import qs.Modules.Screenshot
 import qs.Modules.SongDropOverlay
 import qs.Modules.TooltipOverlay
@@ -26,7 +26,7 @@ ShellRoot {
 
     SongDropOverlay {}
 
+    VolumeOsd {}
+
     TooltipOverlay {}
-    SettingsPopup {}
-    CalendarPopup {}
 }

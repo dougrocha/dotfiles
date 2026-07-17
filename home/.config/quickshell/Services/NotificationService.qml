@@ -13,6 +13,19 @@ Singleton {
     property list<var> history: []
     property list<var> notifications: []
     property bool stackPaused: false
+    property double pausedAt: 0
+
+    // Pausing only stops dismissal; timestamps keep aging. Shift them by the
+    // paused duration on resume so cards get their remaining time back
+    // instead of all expiring at once.
+    onStackPausedChanged: {
+        if (stackPaused) {
+            pausedAt = Date.now();
+        } else {
+            const delta = Date.now() - pausedAt;
+            root.notifications.forEach(n => n.timestamp += delta);
+        }
+    }
 
     NotificationServer {
         keepOnReload: false
@@ -40,6 +53,26 @@ Singleton {
         return 3000;
     }
 
+    function snapshot(n, metadata) {
+        return {
+            id: n.id,
+            appName: n.appName ?? "",
+            appIcon: n.appIcon ?? "",
+            summary: n.summary ?? "",
+            body: n.body ?? "",
+            image: n.image ?? "",
+            actions: (n.actions ?? []).map(a => ({
+                        identifier: a.identifier,
+                        text: a.text,
+                        invoke: () => a.invoke()
+                    })),
+            timestamp: metadata.timestamp,
+            duration: metadata.duration,
+            isPopup: metadata.isPopup,
+            ref: n
+        };
+    }
+
     function handleNotification(notification) {
         if (!notification.summary && !notification.body)
             return;
@@ -49,8 +82,8 @@ Singleton {
         const id = notification.id;
 
         const existing = root.notifications.find(notif => notif.id === id);
-        if (existing && existing.onClosed)
-            notification.closed.disconnect(existing.onClosed);
+        if (existing && existing.closeHandler)
+            existing.ref.closed.disconnect(existing.closeHandler);
 
         const metadata = {
             timestamp: Date.now(),
@@ -58,29 +91,33 @@ Singleton {
             isPopup: true
         };
 
-        const data = Object.assign(notification, metadata);
+        const data = snapshot(notification, metadata);
 
-        const onClosed = () => {
-            notification.closed.disconnect(onClosed);
-            removeNotification(id);
+        // "onClosed" would collide with the closed signal's handler slot, so
+        // the stashed callback needs a different name.
+        const closeHandler = () => {
+            notification.closed.disconnect(closeHandler);
+            discardNotification(id);
         };
-        notification.closed.connect(onClosed);
-        data.onClosed = onClosed;
+        notification.closed.connect(closeHandler);
+        data.closeHandler = closeHandler;
 
         if (Visibilities.notificationCenter) {
             addToHistory(data);
+            notification.expire();
             return;
         }
 
         root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id)];
     }
 
+    // User- or UI-initiated removal. Live notifications are dismissed
+    // server-side so the sending app is informed; the closed signal then
+    // drives the actual bookkeeping.
     function removeNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (notif) {
-            notif.isPopup = false;
-            root.notifications = root.notifications.filter(n => n.id !== notificationId);
-            addToHistory(notif);
+            notif.ref.dismiss();
             return;
         }
 
@@ -88,6 +125,16 @@ Singleton {
             root.history = root.history.filter(n => n.id !== notificationId);
             saveHistory();
         }
+    }
+
+    // Runs when the server reports a notification closed, whatever the cause.
+    function discardNotification(notificationId) {
+        const notif = root.notifications.find(n => n.id === notificationId);
+        if (!notif)
+            return;
+        notif.isPopup = false;
+        root.notifications = root.notifications.filter(n => n.id !== notificationId);
+        addToHistory(notif);
     }
 
     function addToHistory(notification) {
@@ -99,13 +146,14 @@ Singleton {
             appIcon: notification.appIcon ?? "",
             summary: notification.summary ?? "",
             body: notification.body ?? "",
-            timestamp: notification.timestamp ?? Date.now(),
-            actions: (notification.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "").map(a => ({
-                        identifier: a.identifier,
-                        text: a.text
-                    }))
+            timestamp: notification.timestamp ?? Date.now()
         };
-        root.history = [entry, ...root.history.filter(n => n.id !== entry.id)].slice(0, 10);
+        root.history = [entry, ...root.history.filter(n => n.id !== entry.id)].slice(0, 50);
+        saveHistory();
+    }
+
+    function clearAppHistory(appName) {
+        root.history = root.history.filter(n => (n.appName || "Unknown") !== appName);
         saveHistory();
     }
 
@@ -160,7 +208,7 @@ Singleton {
                 return notif.duration !== -1 && !root.stackPaused && (now - notif.timestamp) > notif.duration;
             });
 
-            expired.forEach(notif => removeNotification(notif.id));
+            expired.forEach(notif => notif.ref.expire());
         }
     }
 }

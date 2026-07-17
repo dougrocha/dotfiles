@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.Modules.Popups
+import qs.Services
 
 Rectangle {
     id: root
@@ -41,14 +42,20 @@ Rectangle {
 
     TapHandler {
         acceptedButtons: Qt.LeftButton
-        onTapped: root.trayItem.activate()
+        onTapped: {
+            Visibilities.closePopups();
+            trayMenu.visible = false;
+            root.trayItem.activate();
+        }
     }
 
     TapHandler {
         acceptedButtons: Qt.RightButton
         onTapped: {
-            if (root.trayItem.hasMenu)
-                trayMenu.visible = true;
+            if (root.trayItem.hasMenu) {
+                Visibilities.closePopups();
+                trayMenu.visible = !trayMenu.visible;
+            }
         }
     }
 }
