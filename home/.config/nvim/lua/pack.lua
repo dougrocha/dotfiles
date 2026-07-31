@@ -7,26 +7,34 @@ local M = {}
 ---@field opts? table|fun():table Options passed to require(module).setup(opts)
 ---@field on_setup? fun() Runs after opts setup with no args
 ---@field setup? false Set to false to skip require/setup (for deps or vimscript plugins)
----@field on_update? string|fun() Command string (runs in plugin dir) or function, fired on PackChanged install/update
+---@field on_update? string|fun() Command string (runs in plugin dir) or function, fired when the plugin's commit changes (install or update)
 ---@field version? string Git ref (branch, tag, or commit) passed to vim.pack.add
 ---@field event? string|string[] Defer loading until this autocmd event fires (once)
 ---@field pattern? string|string[] Autocmd pattern passed alongside event (e.g. filetypes)
 
----@param plugin_name string
+---@param name string
+---@return string
+local function plugin_path(name)
+    return vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt', name)
+end
+
+---@param path string
+---@return string? commit
+local function plugin_commit(path)
+    if vim.fn.isdirectory(path) == 0 then return nil end
+    local result = vim.system({ 'git', 'rev-parse', 'HEAD' }, { cwd = path }):wait()
+    if result.code ~= 0 or not result.stdout then return nil end
+    return vim.trim(result.stdout)
+end
+
+---@param path string
 ---@param on_update string|fun()
-local function register_on_update(plugin_name, on_update)
-    vim.api.nvim_create_autocmd('PackChanged', {
-        callback = function(args)
-            local d = args.data
-            if d.spec.name == plugin_name and (d.kind == 'install' or d.kind == 'update') then
-                if type(on_update) == 'string' then
-                    vim.system(vim.split(on_update, ' '), { cwd = d.path })
-                else
-                    vim.schedule(on_update)
-                end
-            end
-        end,
-    })
+local function run_on_update(path, on_update)
+    if type(on_update) == 'string' then
+        vim.system(vim.split(on_update, ' '), { cwd = path })
+    else
+        vim.schedule(on_update)
+    end
 end
 
 ---@param plugins PluginSpec[]
@@ -46,7 +54,22 @@ local function configure(plugins)
         if p.dir then vim.opt.runtimepath:prepend(vim.fn.expand(p.dir)) end
     end
 
+    local pending_updates = {}
+    for _, p in ipairs(plugins) do
+        if p.on_update then
+            local path = plugin_path(p[1]:match('[^/]+$'))
+            table.insert(pending_updates, { p = p, path = path, before = plugin_commit(path) })
+        end
+    end
+
     if #sources > 0 then vim.pack.add(sources) end
+
+    for _, entry in ipairs(pending_updates) do
+        local after = plugin_commit(entry.path)
+        if after and after ~= entry.before then
+            run_on_update(entry.path, entry.p.on_update)
+        end
+    end
 
     for _, p in ipairs(plugins) do
         if p.setup ~= false then
@@ -59,10 +82,6 @@ local function configure(plugins)
         end
 
         if p.on_setup then p.on_setup() end
-
-        if p.on_update then
-            register_on_update(p[1]:match('[^/]+$'), p.on_update)
-        end
     end
 end
 

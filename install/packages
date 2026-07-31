@@ -55,6 +55,7 @@ nautilus-python
 base-devel
 cmake
 ninja
+odin
 
 # Terminal Stuff
 bat

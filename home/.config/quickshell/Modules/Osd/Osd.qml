@@ -7,10 +7,15 @@ import Quickshell.Wayland
 import qs.Constants
 import qs.Services
 
-// On volume or mute changes, slides a click-through pill up from the bottom
-// of the primary screen, holds briefly, then fades. Lives on the overlay
-// layer so it stays visible above fullscreen windows, where the bar's hover
-// strip is unreachable.
+// Generic OSD pill: any producer calls `show(mode, level, muted, label)` and
+// the pill slides up from the bottom of the primary screen, holds briefly,
+// then fades. Lives on the overlay layer so it stays visible above
+// fullscreen windows, where the bar's hover strip is unreachable.
+//
+// Producers only need to know `show()` — icon/label resolution for a mode
+// lives entirely in `iconFor()` below, so adding a new mode (e.g.
+// brightness) means adding one case there and one Connections block, not
+// touching the pill itself.
 Variants {
     id: root
     model: Quickshell.screens
@@ -34,12 +39,14 @@ Variants {
 
         visible: modelData.name === Theme.primaryMonitor
 
-        // "volume" or "mic"
+        // "volume", "mic", or any future mode a producer registers below.
         property string mode: "volume"
         property bool shown: false
-        readonly property bool micMode: mode === "mic"
-        readonly property bool muted: micMode ? AudioService.sourceMuted : AudioService.muted
-        readonly property real level: micMode ? AudioService.sourceVolume : AudioService.volume
+        property real level: 0
+        property bool muted: false
+        // Overrides the value readout (e.g. "Live"); empty falls back to a
+        // rounded percentage.
+        property string label: ""
 
         // Swallow the property changes PipeWire emits while the shell (re)loads.
         property bool ready: false
@@ -55,10 +62,28 @@ Variants {
             onTriggered: osd.shown = false
         }
 
-        function show(newMode) {
+        function iconFor(forMode, forMuted, forLevel) {
+            switch (forMode) {
+            case "mic":
+                return forMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone;
+            case "volume":
+                if (forMuted)
+                    return PhosphorIcons.speakerSlash;
+                if (forLevel === 0)
+                    return PhosphorIcons.speakerNone;
+                return forLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
+            default:
+                return "";
+            }
+        }
+
+        function show(newMode, newLevel, newMuted, newLabel) {
             if (!ready || modelData.name !== Theme.primaryMonitor)
                 return;
             mode = newMode;
+            level = newLevel ?? 0;
+            muted = !!newMuted;
+            label = newLabel ?? "";
             shown = true;
             hideTimer.restart();
         }
@@ -66,17 +91,17 @@ Variants {
         Connections {
             target: AudioService.sink?.audio ?? null
             function onVolumeChanged() {
-                osd.show("volume");
+                osd.show("volume", AudioService.volume, AudioService.muted);
             }
             function onMutedChanged() {
-                osd.show("volume");
+                osd.show("volume", AudioService.volume, AudioService.muted);
             }
         }
 
         Connections {
             target: AudioService.source?.audio ?? null
             function onMutedChanged() {
-                osd.show("mic");
+                osd.show("mic", AudioService.sourceVolume, AudioService.sourceMuted, "Live");
             }
         }
 
@@ -117,15 +142,7 @@ Variants {
                     font.family: Fonts.phosphorFont
                     font.pixelSize: 18
                     color: osd.muted ? Colors.on_surface_variant : Colors.on_surface
-                    text: {
-                        if (osd.micMode)
-                            return osd.muted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone;
-                        if (osd.muted)
-                            return PhosphorIcons.speakerSlash;
-                        if (osd.level === 0)
-                            return PhosphorIcons.speakerNone;
-                        return osd.level < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
-                    }
+                    text: osd.iconFor(osd.mode, osd.muted, osd.level)
                 }
 
                 // Track: 0-100% fills in primary; the 100-150% boost range
@@ -172,7 +189,7 @@ Variants {
                     font.pixelSize: 12
                     font.weight: Font.Bold
                     color: Colors.on_surface
-                    text: osd.muted ? "Muted" : (osd.micMode ? "Live" : Math.round(osd.level * 100) + "%")
+                    text: osd.muted ? "Muted" : (osd.label !== "" ? osd.label : Math.round(osd.level * 100) + "%")
                 }
             }
         }

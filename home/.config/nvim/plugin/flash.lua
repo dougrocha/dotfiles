@@ -2,7 +2,11 @@ local add = require('pack').add
 
 add {
     {
-        'folke/flash.nvim',
+        'onion108/flash.nvim',
+        -- Pinned to the fix branch for https://github.com/folke/flash.nvim/pull/492
+        -- (undefined symbol: search_match_endcol on neovim 0.13-dev). Switch back
+        -- to 'folke/flash.nvim' once that PR merges upstream.
+        version = '25ce9b72a8be5a8458c8983c8af766c8fbbc2012',
         ---@type Flash.Config
         opts = {
             jump = { nohlsearch = true },

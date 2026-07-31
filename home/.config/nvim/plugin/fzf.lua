@@ -99,6 +99,7 @@ add {
                 { desc = 'Find document diagnostics' }
             )
             vim.keymap.set('n', '<leader>fr', '<cmd>FzfLua oldfiles<CR>', { desc = 'Recently opened files' })
+            vim.keymap.set('n', '<leader>ft', '<cmd>FzfLua tags<CR>', { desc = 'Find tags' })
             vim.keymap.set('n', '<leader>f<', '<cmd>FzfLua resume<cr>', { desc = 'Resume last fzf command' })
             vim.keymap.set('n', 'z=', '<cmd>FzfLua spell_suggest<CR>', { desc = 'Spell suggestions' })
         end,
