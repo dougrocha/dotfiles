@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Restart an application by killing it and relaunching it detached via uwsm.
+
+if (($# == 0)); then
+  echo "Usage: restart-app [application-name] [application-args...]"
+  exit 1
+fi
+
+pkill -x "$1"
+setsid uwsm-app -- "$@" >/dev/null 2>&1 &
+
+# vim: ft=sh
