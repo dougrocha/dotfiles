@@ -26,10 +26,12 @@ abbr --add vim nvim
 abbr --add lg lazygit
 abbr --add cat bat
 abbr --add tm 'tmux new-session -A -s default'
+abbr --add mup 'MISE_MINIMUM_RELEASE_AGE=0 mise up'
 alias cd z
 
 # My scripts
 fish_add_path "$HOME/.local/bin"
+fish_add_path "$HOME/.opencode/bin"
 
 source "$HOME/.cargo/env.fish"
 
