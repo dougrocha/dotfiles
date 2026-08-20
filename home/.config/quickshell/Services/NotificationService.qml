@@ -5,21 +5,19 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
-import qs.Constants
 
 Singleton {
     id: root
 
     property list<var> history: []
     property list<var> notifications: []
-    property bool stackPaused: false
+    // Pointer over the popup stack keeps cards from expiring while being read.
+    property bool hoverPaused: false
     property double pausedAt: 0
 
-    // Pausing only stops dismissal; timestamps keep aging. Shift them by the
-    // paused duration on resume so cards get their remaining time back
-    // instead of all expiring at once.
-    onStackPausedChanged: {
-        if (stackPaused) {
+    // Shift timestamps on resume so paused cards keep their remaining time.
+    onHoverPausedChanged: {
+        if (hoverPaused) {
             pausedAt = Date.now();
         } else {
             const delta = Date.now() - pausedAt;
@@ -49,7 +47,11 @@ Singleton {
             return n.expireTimeout;
         }
 
-        // 3 second default
+        // No timeout given: Critical stays, Low is brief, otherwise 3s.
+        if (n.urgency === NotificationUrgency.Critical)
+            return -1;
+        if (n.urgency === NotificationUrgency.Low)
+            return 2000;
         return 3000;
     }
 
@@ -61,6 +63,7 @@ Singleton {
             summary: n.summary ?? "",
             body: n.body ?? "",
             image: n.image ?? "",
+            urgency: n.urgency,
             actions: (n.actions ?? []).map(a => ({
                         identifier: a.identifier,
                         text: a.text,
@@ -73,6 +76,33 @@ Singleton {
         };
     }
 
+    // replaces_id writes new content onto the same object; watch it so the snapshot redraws. Returns an unwatch.
+    function watchForUpdates(notification, id) {
+        const refresh = () => refreshSnapshot(notification, id);
+        const signals = [notification.summaryChanged, notification.bodyChanged, notification.appNameChanged, notification.appIconChanged, notification.imageChanged, notification.actionsChanged];
+
+        signals.forEach(signal => signal.connect(refresh));
+        return () => signals.forEach(signal => signal.disconnect(refresh));
+    }
+
+    // Replace, not mutate, so the card redraws; keep the original timestamp.
+    function refreshSnapshot(notification, id) {
+        const index = root.notifications.findIndex(n => n.id === id);
+        if (index === -1)
+            return;
+
+        const previous = root.notifications[index];
+        const data = snapshot(notification, {
+            timestamp: previous.timestamp,
+            duration: previous.duration,
+            isPopup: previous.isPopup
+        });
+        data.closeHandler = previous.closeHandler;
+        data.unwatch = previous.unwatch;
+
+        root.notifications = root.notifications.map((n, i) => i === index ? data : n);
+    }
+
     function handleNotification(notification) {
         if (!notification.summary && !notification.body)
             return;
@@ -82,8 +112,10 @@ Singleton {
         const id = notification.id;
 
         const existing = root.notifications.find(notif => notif.id === id);
-        if (existing && existing.closeHandler)
+        if (existing && existing.ref && existing.closeHandler)
             existing.ref.closed.disconnect(existing.closeHandler);
+        if (existing && existing.unwatch)
+            existing.unwatch();
 
         const metadata = {
             timestamp: Date.now(),
@@ -93,8 +125,7 @@ Singleton {
 
         const data = snapshot(notification, metadata);
 
-        // "onClosed" would collide with the closed signal's handler slot, so
-        // the stashed callback needs a different name.
+        // "onClosed" would collide with the signal's slot, so it's named differently.
         const closeHandler = () => {
             notification.closed.disconnect(closeHandler);
             discardNotification(id);
@@ -102,22 +133,28 @@ Singleton {
         notification.closed.connect(closeHandler);
         data.closeHandler = closeHandler;
 
-        if (Visibilities.notificationCenter) {
+        // Center is showing it, or DND: record to history instead of popping up. Critical always pops.
+        if ((Visibilities.notificationCenter || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
             addToHistory(data);
             notification.expire();
             return;
         }
 
-        root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id)];
+        data.unwatch = watchForUpdates(notification, id);
+
+        // Restored twins carry different ids; drop a duplicate by content instead.
+        root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id && !(notif.restored && notif.appName === data.appName && notif.summary === data.summary && notif.body === data.body))];
     }
 
-    // User- or UI-initiated removal. Live notifications are dismissed
-    // server-side so the sending app is informed; the closed signal then
-    // drives the actual bookkeeping.
+    // Live cards are dismissed server-side so the app is informed; the closed signal does bookkeeping.
     function removeNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (notif) {
-            notif.ref.dismiss();
+            // A restored card has no server object; retire it here.
+            if (notif.ref)
+                notif.ref.dismiss();
+            else
+                discardNotification(notificationId);
             return;
         }
 
@@ -132,6 +169,9 @@ Singleton {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (!notif)
             return;
+        // Drop signal handlers before the C++ object dies.
+        if (notif.unwatch)
+            notif.unwatch();
         notif.isPopup = false;
         root.notifications = root.notifications.filter(n => n.id !== notificationId);
         addToHistory(notif);
@@ -146,6 +186,7 @@ Singleton {
             appIcon: notification.appIcon ?? "",
             summary: notification.summary ?? "",
             body: notification.body ?? "",
+            urgency: notification.urgency,
             timestamp: notification.timestamp ?? Date.now()
         };
         root.history = [entry, ...root.history.filter(n => n.id !== entry.id)].slice(0, 50);
@@ -170,31 +211,106 @@ Singleton {
         id: saveDebounce
         interval: 300
         repeat: false
-        onTriggered: {
-            saveProcess.json = JSON.stringify(root.history);
-            saveProcess.running = true;
+        onTriggered: historyFile.setText(JSON.stringify(root.history))
+    }
+
+    function parseArray(text) {
+        try {
+            const parsed = JSON.parse(text);
+            return Array.isArray(parsed) ? parsed : null;
+        } catch (e) {
+            return null;
         }
+    }
+
+    // Under XDG_STATE_HOME, not Quickshell.cacheDir — that path is keyed by a hash of the shell's path.
+    FileView {
+        id: historyFile
+
+        path: SettingsService.stateHome + "/quickshell/notifications.json"
+        atomicWrites: true
+        printErrors: false
+
+        onLoaded: {
+            const parsed = root.parseArray(text());
+            if (parsed)
+                root.history = parsed;
+        }
+        onLoadFailed: error => {
+            if (error === FileViewError.FileNotFound)
+                root.migrateLegacyHistory = true;
+        }
+    }
+
+    // One-shot: adopt the history from the old cacheDir location, then rewrite at the new path.
+    property bool migrateLegacyHistory: false
+
+    // A config reload re-announces notifications; only a full restart drops them.
+    // Restored cards are inert: their ref was a dead process's object, so actions are dropped.
+    function liveSnapshot(n) {
+        return {
+            id: n.id,
+            appName: n.appName,
+            appIcon: n.appIcon,
+            summary: n.summary,
+            body: n.body,
+            image: n.image,
+            urgency: n.urgency,
+            timestamp: n.timestamp,
+            duration: n.duration
+        };
+    }
+
+    function restoreLive(entries) {
+        const now = Date.now();
+        const usable = entries.filter(n => n.duration === -1 || (now - n.timestamp) < n.duration);
+
+        root.notifications = [...usable.map(n => Object.assign({}, n, {
+                    actions: [],
+                    isPopup: true,
+                    restored: true,
+                    ref: null
+                })), ...root.notifications];
+    }
+
+    Timer {
+        id: liveSaveDebounce
+        interval: 300
+        repeat: false
+        onTriggered: liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))))
+    }
+
+    onNotificationsChanged: if (root.liveLoaded) liveSaveDebounce.restart()
+
+    property bool liveLoaded: false
+
+    FileView {
+        id: liveFile
+
+        path: SettingsService.stateHome + "/quickshell/notifications-live.json"
+        atomicWrites: true
+        printErrors: false
+
+        onLoaded: {
+            const parsed = root.parseArray(text());
+            if (parsed)
+                root.restoreLive(parsed);
+            root.liveLoaded = true;
+        }
+        onLoadFailed: root.liveLoaded = true
     }
 
     FileView {
-        path: Theme.notifications.historyPath
-        onLoaded: {
-            try {
-                const parsed = JSON.parse(text());
-                if (Array.isArray(parsed))
-                    root.history = parsed;
-            } catch (e) {}
-        }
-    }
+        path: root.migrateLegacyHistory ? Quickshell.cacheDir + "/notifications.json" : ""
+        printErrors: false
 
-    Process {
-        id: saveProcess
-        property string json: ""
-        command: ["sh", "-c", `mkdir -p "${Quickshell.cacheDir}" && printf '%s' "$QS_NOTIF" > "${Theme.notifications.historyPath}"`]
-        environment: ({
-                "QS_NOTIF": json
-            })
-        running: false
+        onLoaded: {
+            const parsed = root.parseArray(text());
+            if (parsed) {
+                root.history = parsed;
+                root.saveHistory();
+            }
+        }
     }
 
     Timer {
@@ -205,10 +321,11 @@ Singleton {
             const now = Date.now();
 
             const expired = notifications.filter(notif => {
-                return notif.duration !== -1 && !root.stackPaused && (now - notif.timestamp) > notif.duration;
+                return notif.duration !== -1 && !root.hoverPaused && (now - notif.timestamp) > notif.duration;
             });
 
-            expired.forEach(notif => notif.ref.expire());
+            // Restored cards have no server object; retire them directly.
+            expired.forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
         }
     }
 }

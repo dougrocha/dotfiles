@@ -1,52 +1,38 @@
 import QtQuick
-import QtQuick.Layouts
-import qs.Components
+import qs.Constants
 
-Item {
-    id: root
-
+// Transport button; `filled` gives the primary action its disc.
+Rectangle {
     property string icon: ""
-    property int size: 24
-    property bool isPrimary: false
-    property color iconColor: Colors.on_surface
-    property bool enabled: true
-    property var onClicked: function () {}
+    property int iconSize: 28
+    property bool filled: false
 
-    implicitWidth: size
-    implicitHeight: size
+    signal tapped
 
-    Rectangle {
-        id: buttonBackground
+    width: filled ? 40 : 28
+    height: width
+    radius: filled ? width / 2 : 0
+    color: filled ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.15) : "transparent"
 
+    Text {
         anchors.centerIn: parent
-        width: isPrimary ? 56 : size
-        height: isPrimary ? 56 : size
-        radius: isPrimary ? 28 : size / 2
-        color: hoverHandler.hovered && root.enabled ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.12) : "transparent"
+        text: parent.icon
+        color: buttonHover.hovered ? Colors.primary : Colors.on_surface
+        font.pixelSize: parent.iconSize
+        font.family: Fonts.iconFont
+
         Behavior on color {
             ColorAnimation {
-                duration: 100
+                duration: Theme.animations.fast
             }
-        }
-
-        Text {
-            anchors.centerIn: parent
-            text: root.icon
-            color: root.enabled ? root.iconColor : Qt.rgba(root.iconColor.r, root.iconColor.g, root.iconColor.b, 0.4)
-            font.pixelSize: root.size
-            font.family: "JetBrainsMono Nerd Font"
-            font.bold: true
         }
     }
 
     HoverHandler {
-        id: hoverHandler
+        id: buttonHover
         cursorShape: Qt.PointingHandCursor
-        enabled: root.enabled
     }
-
     TapHandler {
-        enabled: root.enabled
-        onTapped: root.onClicked()
+        onTapped: parent.tapped()
     }
 }

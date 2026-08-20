@@ -6,12 +6,15 @@ Text {
     property string format: "h:mmAP"
     property int updateInterval: 1000
 
-    text: Qt.formatDateTime(new Date(), format)
+    // Drive via `now` so the format binding survives the tick.
+    property var now: new Date()
+
+    text: Qt.formatDateTime(clockWidget.now, clockWidget.format)
 
     Timer {
         interval: clockWidget.updateInterval
         running: true
         repeat: true
-        onTriggered: clockWidget.text = Qt.formatDateTime(new Date(), clockWidget.format)
+        onTriggered: clockWidget.now = new Date()
     }
 }

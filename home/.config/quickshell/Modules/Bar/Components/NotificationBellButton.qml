@@ -3,33 +3,23 @@ import Quickshell
 import qs.Constants
 import qs.Services
 
+// Opens the notification center (NotificationPopup); the island owns the clock now.
 Item {
     id: root
 
-    implicitWidth: clock.implicitWidth
+    implicitWidth: bellIcon.implicitWidth
     implicitHeight: Theme.topBarHeight
 
     Text {
-        id: clock
+        id: bellIcon
         anchors.centerIn: parent
-        text: Qt.formatDateTime(new Date(), "h:mmAP")
+        text: SettingsService.doNotDisturb ? PhosphorIcons.bellSlash : PhosphorIcons.bell
         color: (Visibilities.notificationCenter || hoverHandler.hovered) ? Colors.on_surface : Colors.on_surface_variant
-        renderType: Text.NativeRendering
         font.pixelSize: Fonts.p
-        font.family: Fonts.font
-        font.weight: Font.Light
-        font.letterSpacing: 1
-
-        Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: clock.text = Qt.formatDateTime(new Date(), "h:mmAP")
-        }
-
+        font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {
-                duration: 150
+                duration: Theme.animations.fast
             }
         }
     }

@@ -6,7 +6,8 @@ import qs.Constants
 Item {
     id: root
 
-    implicitWidth: mainLayout.width
+    visible: SystemTray.items.values.length > 0
+    implicitWidth: visible ? mainLayout.width : 0
     implicitHeight: Theme.topBarHeight
 
     RowLayout {

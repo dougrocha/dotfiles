@@ -44,6 +44,7 @@ Singleton {
 
     readonly property string close: String.fromCodePoint(0xE5CD)
     readonly property string closeSmall: String.fromCodePoint(0xF508)
+    readonly property string deleteSweep: String.fromCodePoint(0xE16C)
 
     readonly property string chevronRight: String.fromCodePoint(0xE5CC)
 

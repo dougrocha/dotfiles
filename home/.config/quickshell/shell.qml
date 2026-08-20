@@ -1,13 +1,12 @@
-//@ pragma UseQApplication
+// pragma UseQApplication
 //@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
 //@ pragma Env QT_QPA_PLATFORMTHEME=
 
 import qs.Modules.Bar
+import qs.Modules.Island
 import qs.Modules.Notifications
-import qs.Modules.Osd
 import qs.Modules.Polkit
 import qs.Modules.Screenshot
-import qs.Modules.SongDropOverlay
 import qs.Modules.TooltipOverlay
 import qs.Components
 import qs.Services
@@ -25,9 +24,7 @@ ShellRoot {
 
     ScreenshotManager {}
 
-    SongDropOverlay {}
-
-    Osd {}
+    Island {}
 
     PolkitAgent {}
 

@@ -8,17 +8,25 @@ Singleton {
 
     property bool musicPanel: false
     property bool settingsPanel: false
+    property bool soundPanel: false
+    property bool bluetoothPanel: false
     property bool notificationCenter: false
-    // Keeps the bar revealed over a fullscreen window; games that constrain
-    // the pointer make the hover strip unreachable, so this is keybound.
+    // Keybound: reveal the bar over fullscreen when the hover strip is unreachable.
     property bool barPinned: false
+    // Mirrors the bar's reveal so the island overlay slides in sync.
+    property bool barRevealed: true
 
-    // Any bar action — opening another popup, launching an app, switching
-    // workspace — closes whatever popup is open.
+    // Tray menus are one popup per item, so they listen for this.
+    signal closeTrayMenus
+
+    // Any bar action closes whatever popup is open.
     function closePopups() {
         musicPanel = false;
         settingsPanel = false;
+        soundPanel = false;
+        bluetoothPanel = false;
         notificationCenter = false;
+        closeTrayMenus();
     }
     function openSettings() {
         closePopups();
@@ -27,6 +35,20 @@ Singleton {
     function toggleSettings() {
         settingsPanel ? (settingsPanel = false) : openSettings();
     }
+    function openSoundPanel() {
+        closePopups();
+        soundPanel = true;
+    }
+    function toggleSoundPanel() {
+        soundPanel ? (soundPanel = false) : openSoundPanel();
+    }
+    function openBluetoothPanel() {
+        closePopups();
+        bluetoothPanel = true;
+    }
+    function toggleBluetoothPanel() {
+        bluetoothPanel ? (bluetoothPanel = false) : openBluetoothPanel();
+    }
     function openNotificationCenter() {
         closePopups();
         notificationCenter = true;
@@ -34,7 +56,10 @@ Singleton {
     function toggleNotificationCenter() {
         notificationCenter ? (notificationCenter = false) : openNotificationCenter();
     }
+    // Idempotent: re-opening resets the island's calendar.
     function openMusicPanel() {
+        if (musicPanel)
+            return;
         closePopups();
         musicPanel = true;
     }
@@ -65,6 +90,32 @@ Singleton {
         }
         function toggle(): void {
             root.toggleSettings();
+        }
+    }
+
+    IpcHandler {
+        target: "sound-panel"
+        function show(): void {
+            root.openSoundPanel();
+        }
+        function hide(): void {
+            root.soundPanel = false;
+        }
+        function toggle(): void {
+            root.toggleSoundPanel();
+        }
+    }
+
+    IpcHandler {
+        target: "bluetooth-panel"
+        function show(): void {
+            root.openBluetoothPanel();
+        }
+        function hide(): void {
+            root.bluetoothPanel = false;
+        }
+        function toggle(): void {
+            root.toggleBluetoothPanel();
         }
     }
 

@@ -1,7 +1,8 @@
 pragma Singleton
-import QtQml
+import QtQuick
 import Quickshell
 import Quickshell.Bluetooth
+import qs.Constants
 
 Singleton {
     id: root
@@ -23,6 +24,71 @@ Singleton {
         if (connectedDevices.length === 1)
             return "1 Device Connected";
         return connectedDevices.length + " Devices Connected";
+    }
+
+    // A device is "discovered" until it has a pairing record, then "paired", then "connected".
+    readonly property var namedDevices: devices.filter(d => hasHumanName(d))
+    readonly property var connectedRows: sortedRows(namedDevices.filter(d => d.connected))
+    readonly property var pairedRows: sortedRows(namedDevices.filter(d => !d.connected && isKnown(d)))
+    readonly property var discoveredRows: sortedRows(namedDevices.filter(d => !d.connected && !isKnown(d)))
+
+    function deviceLabel(device) {
+        if (!device)
+            return "";
+        return String(device.deviceName || device.name || "").trim();
+    }
+
+    function isKnown(device) {
+        return device.paired || device.bonded || device.trusted;
+    }
+
+    // Drop entries whose only name is a MAC or service UUID.
+    function hasHumanName(device) {
+        const label = deviceLabel(device);
+        if (label === "")
+            return false;
+        const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const address = /^([0-9a-f]{2}[:-]){5}[0-9a-f]{2}$/i;
+        return !uuid.test(label) && !address.test(label);
+    }
+
+    // Project to primitives — live BluetoothDevice objects can be destroyed by BlueZ churn mid-incubation.
+    function deviceRow(device) {
+        return {
+            address: device.address,
+            label: deviceLabel(device),
+            connected: device.connected,
+            known: isKnown(device),
+            state: device.state,
+            icon: deviceIcon(device.icon)
+        };
+    }
+
+    // Looked up per row, not projected into it: battery ticks would rebuild every list.
+    function batteryLabel(address) {
+        const device = deviceFor(address);
+        if (!device || !device.batteryAvailable)
+            return "";
+        return Math.round(device.battery * 100) + "%";
+    }
+
+    function sortedRows(list) {
+        return list.map(d => deviceRow(d)).sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    function deviceFor(address) {
+        return devices.find(d => d.address === address) ?? null;
+    }
+
+    function deviceIcon(icon) {
+        const name = icon || "";
+        if (name.includes("audio") || name.includes("headset"))
+            return PhosphorIcons.headphones;
+        if (name.includes("mouse"))
+            return PhosphorIcons.mouse;
+        if (name.includes("keyboard"))
+            return PhosphorIcons.keyboard;
+        return PhosphorIcons.bluetooth;
     }
 
     function togglePower() {
@@ -49,26 +115,114 @@ Singleton {
     }
 
     function connectDevice(address) {
-        const device = devices.find(d => d.address === address);
+        const device = deviceFor(address);
         if (device)
             device.connect();
     }
 
     function disconnectDevice(address) {
-        const device = devices.find(d => d.address === address);
+        const device = deviceFor(address);
         if (device)
             device.disconnect();
     }
 
     function pairDevice(address) {
-        const device = devices.find(d => d.address === address);
+        const device = deviceFor(address);
         if (device)
             device.pair();
     }
 
     function removeDevice(address) {
-        const device = devices.find(d => d.address === address);
+        const device = deviceFor(address);
         if (device)
             device.forget();
+    }
+
+    // address -> action in flight; BlueZ takes seconds, so rows show it.
+    property var pendingActions: ({})
+
+    function pendingAction(address) {
+        return pendingActions[address] ?? "";
+    }
+
+    function setPending(address, action) {
+        const next = Object.assign({}, pendingActions);
+        next[address] = action;
+        pendingActions = next;
+        pendingTimeout.restart();
+    }
+
+    function activate(row) {
+        if (row.connected) {
+            setPending(row.address, "disconnecting");
+            disconnectDevice(row.address);
+            return;
+        }
+        if (row.known) {
+            setPending(row.address, "connecting");
+            connectDevice(row.address);
+            return;
+        }
+        setPending(row.address, "pairing");
+        pairDevice(row.address);
+    }
+
+    function forget(row) {
+        setPending(row.address, "forgetting");
+        removeDevice(row.address);
+    }
+
+    // Lives here, not in the popup: a pairing outlives the panel that started it.
+    function syncPending() {
+        const next = ({});
+        let changed = false;
+
+        for (const address in pendingActions) {
+            const action = pendingActions[address];
+            const device = deviceFor(address);
+
+            // Device vanished mid-action; nothing left to wait on.
+            if (!device) {
+                changed = true;
+                continue;
+            }
+
+            // pair() only pairs, so carry a fresh pairing the rest of the way to connected.
+            if (action === "pairing") {
+                if (!device.paired) {
+                    next[address] = action;
+                } else if (device.connected) {
+                    // Some devices connect the moment they pair; nothing to carry on.
+                    changed = true;
+                } else {
+                    device.trusted = true;
+                    device.connect();
+                    next[address] = "connecting";
+                    changed = true;
+                }
+                continue;
+            }
+
+            const settled = (action === "connecting" && device.connected) || (action === "disconnecting" && !device.connected) || (action === "forgetting" && !isKnown(device));
+
+            if (settled)
+                changed = true;
+            else
+                next[address] = action;
+        }
+
+        if (changed)
+            pendingActions = next;
+    }
+
+    onConnectedRowsChanged: syncPending()
+    onPairedRowsChanged: syncPending()
+    onDiscoveredRowsChanged: syncPending()
+
+    // Fallback so a silent device doesn't sit at "Connecting…" forever.
+    Timer {
+        id: pendingTimeout
+        interval: 20000
+        onTriggered: root.pendingActions = ({})
     }
 }

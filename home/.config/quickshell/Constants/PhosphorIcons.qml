@@ -5,7 +5,6 @@ import QtQuick
 import Quickshell
 
 Singleton {
-    // Screenshot UI
     readonly property string selection: String.fromCodePoint(0xE69A)
     readonly property string appWindow: String.fromCodePoint(0xE5DA)
     readonly property string monitor: String.fromCodePoint(0xE32E)
@@ -16,6 +15,8 @@ Singleton {
     readonly property string check: String.fromCodePoint(0xE182)
     readonly property string timer: String.fromCodePoint(0xE492)
     readonly property string mouse: String.fromCodePoint(0xE33A)
+    readonly property string keyboard: String.fromCodePoint(0xE2D8)
+    readonly property string headphones: String.fromCodePoint(0xE2A6)
     readonly property string microphone: String.fromCodePoint(0xE326)
     readonly property string microphoneSlash: String.fromCodePoint(0xE328)
     readonly property string caretDown: String.fromCodePoint(0xE136)
@@ -23,10 +24,11 @@ Singleton {
     readonly property string caretRight: String.fromCodePoint(0xE13A)
     readonly property string caretLeft: String.fromCodePoint(0xE138)
 
-    // Music
+    readonly property string bell: String.fromCodePoint(0xE0CE)
+    readonly property string bellSlash: String.fromCodePoint(0xE0D4)
+
     readonly property string musicNoteSimple: String.fromCodePoint(0xE33E)
 
-    // Media / capture
     readonly property string camera: String.fromCodePoint(0xE10E)
     readonly property string image: String.fromCodePoint(0xE2CA)
     readonly property string copy: String.fromCodePoint(0xE1CA)
@@ -36,7 +38,6 @@ Singleton {
     readonly property string crop: String.fromCodePoint(0xE1D4)
     readonly property string cursor: String.fromCodePoint(0xE1DC)
 
-    // Actions
     readonly property string arrowClockwise: String.fromCodePoint(0xE036)
     readonly property string arrowCounterClockwise: String.fromCodePoint(0xE038)
     readonly property string xSquare: String.fromCodePoint(0xE4FA)
@@ -46,7 +47,6 @@ Singleton {
     readonly property string minus: String.fromCodePoint(0xE32C)
     readonly property string magnifyingGlass: String.fromCodePoint(0xE30C)
 
-    // System
     readonly property string speakerHigh: String.fromCodePoint(0xE44A)
     readonly property string speakerLow: String.fromCodePoint(0xE44C)
     readonly property string speakerNone: String.fromCodePoint(0xE44E)

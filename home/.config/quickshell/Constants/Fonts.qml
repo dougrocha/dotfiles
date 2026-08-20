@@ -28,6 +28,8 @@ Singleton {
     readonly property string phosphorFill: "Phosphor-Fill"
 
     readonly property int p: 14
+    readonly property int small: 12
+    readonly property int caption: 11
     readonly property int h1: 24
     readonly property int h2: 22
     readonly property int h3: 20

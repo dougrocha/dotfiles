@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Constants
@@ -14,13 +15,12 @@ Item {
     required property var modelData
     // History entries show their age; live popups are always "now".
     property bool showTimestamp: false
-    // Collapsed group stacks disable the card's own tap/close so a click
-    // can expand the group instead of acting on the notification.
+    // In a collapsed stack, a click expands the group instead of acting on the card.
     property bool interactive: true
 
-    // Top/left room for the close badge to straddle the surface's corner.
-    // Containers place cards 10px wider and offset so the visible surface
-    // still lines up with everything else.
+    readonly property bool isCritical: modelData?.urgency === NotificationUrgency.Critical
+
+    // Room for the close badge to straddle the corner; containers offset so the surface stays aligned.
     readonly property int overhang: 10
 
     height: surface.height + overhang
@@ -78,7 +78,7 @@ Item {
             color: actionHover.hovered ? Colors.primary : Colors.on_surface_variant
             elide: Text.ElideRight
             font.family: Fonts.font
-            font.pixelSize: Fonts.p - 2
+            font.pixelSize: Fonts.small
             Behavior on color {
                 ColorAnimation {
                     duration: Theme.animations.fast
@@ -108,7 +108,8 @@ Item {
         radius: 12
         border.width: 1
         color: Colors.surface_container
-        border.color: Colors.outline_variant
+        // Critical cards never expire, so make that look deliberate.
+        border.color: card.isCritical ? Colors.error : Colors.outline_variant
 
         HoverHandler {
             id: cardHover
@@ -159,7 +160,7 @@ Item {
                     text: card.modelData?.appName ?? ""
                     color: Colors.on_surface_variant
                     font.family: Fonts.font
-                    font.pixelSize: Fonts.p - 2
+                    font.pixelSize: Fonts.small
                     elide: Text.ElideRight
                 }
 
@@ -168,7 +169,7 @@ Item {
                     text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
                     color: Colors.on_surface_variant
                     font.family: Fonts.font
-                    font.pixelSize: Fonts.p - 2
+                    font.pixelSize: Fonts.small
                 }
             }
 
@@ -197,7 +198,7 @@ Item {
                         visible: text !== ""
                         color: Colors.on_surface_variant
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.p - 2
+                        font.pixelSize: Fonts.small
                         font.weight: Font.Normal
                         wrapMode: Text.WordWrap
                         maximumLineCount: 2

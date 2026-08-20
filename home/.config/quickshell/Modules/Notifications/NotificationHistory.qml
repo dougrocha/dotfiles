@@ -107,7 +107,7 @@ Column {
                                 text: "Show less"
                                 color: showLessHover.hovered ? Colors.primary : Colors.on_surface_variant
                                 font.family: Fonts.font
-                                font.pixelSize: Fonts.p - 2
+                                font.pixelSize: Fonts.small
 
                                 Behavior on color {
                                     ColorAnimation {

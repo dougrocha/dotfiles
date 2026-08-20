@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import qs.Constants
 import qs.Components
+import qs.Services
 
 PopupWindow {
     id: root
@@ -28,6 +29,13 @@ PopupWindow {
         popup: root
         anchorWindow: root.barWindow
         onDismissed: root.visible = false
+    }
+
+    Connections {
+        target: Visibilities
+        function onCloseTrayMenus() {
+            root.visible = false;
+        }
     }
 
     // Recursive submenu list component — used at every nesting level.
@@ -128,7 +136,7 @@ PopupWindow {
 
                                         Behavior on angle {
                                             NumberAnimation {
-                                                duration: 150
+                                                duration: Theme.animations.fast
                                                 easing.type: Easing.OutCubic
                                             }
                                         }
@@ -163,7 +171,7 @@ PopupWindow {
 
                             Behavior on height {
                                 NumberAnimation {
-                                    duration: 150
+                                    duration: Theme.animations.fast
                                     easing.type: Easing.OutCubic
                                 }
                             }
@@ -198,6 +206,14 @@ PopupWindow {
         transformOrigin: Item.Top
         scale: root.visible ? 1.0 : 0.92
         opacity: root.visible ? 1.0 : 0.0
+
+        focus: root.visible
+        Keys.onPressed: function (event) {
+            if (event.key === Qt.Key_Escape) {
+                root.visible = false;
+                event.accepted = true;
+            }
+        }
 
         Behavior on scale {
             SpringAnimation {

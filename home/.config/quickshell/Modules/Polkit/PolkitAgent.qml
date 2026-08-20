@@ -254,7 +254,7 @@ Item {
                         text: root.message
                         color: Colors.on_surface
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.p - 2
+                        font.pixelSize: Fonts.small
                         font.weight: Font.Bold
                         elide: Text.ElideRight
                     }
@@ -283,7 +283,7 @@ Item {
                         passwordCharacter: "•"
                         color: root.errorFlash ? Colors.error : Colors.on_surface
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.p - 2
+                        font.pixelSize: Fonts.small
                         readOnly: root.submitted || root.errorFlash
                         enabled: root.dialogVisible
                         onAccepted: root.submitResponse()
@@ -303,7 +303,7 @@ Item {
                         color: root.errorFlash ? Colors.error : Colors.on_surface_variant
                         opacity: root.errorFlash ? 1 : 0.6
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.p - 2
+                        font.pixelSize: Fonts.small
                         visible: passwordInput.text.length === 0
                     }
 
@@ -360,7 +360,7 @@ Item {
                             text: btn.label
                             color: btn.primary ? Colors.on_primary : Colors.on_surface
                             font.family: Fonts.font
-                            font.pixelSize: Fonts.p - 2
+                            font.pixelSize: Fonts.small
                             font.weight: btn.primary ? Font.Bold : Font.Normal
                         }
 

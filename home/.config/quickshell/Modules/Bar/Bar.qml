@@ -34,9 +34,15 @@ Variants {
         readonly property var activeToplevel: Hyprland.activeToplevel
         readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
         readonly property bool fullscreenOnScreen: fullscreenMode === hyprlandFullscreenModeExclusive
-        readonly property bool popupOpen: Visibilities.musicPanel || Visibilities.settingsPanel || Visibilities.notificationCenter
+        readonly property bool popupOpen: Visibilities.musicPanel || Visibilities.settingsPanel || Visibilities.soundPanel || Visibilities.bluetoothPanel || Visibilities.notificationCenter
         readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || popupOpen || Visibilities.barPinned
         property bool revealed: true
+
+        // The island overlay is a separate window; it follows this.
+        onRevealedChanged: {
+            if (modelData === Theme.primaryScreen)
+                Visibilities.barRevealed = revealed;
+        }
 
         onFullscreenOnScreenChanged: {
             if (fullscreenOnScreen && !wantRevealed) {
@@ -110,83 +116,89 @@ Variants {
             }
 
             Rectangle {
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.leftMargin: 8
+                anchors.verticalCenter: parent.verticalCenter
+                width: workspaceModule.implicitWidth + 28
+                height: Theme.topBarHeight - 8
+                radius: height / 2
                 color: Colors.surface
-            }
 
-            Workspaces {
-                id: workspaceModule
-                targetMonitor: modelData.name
-
-                anchors {
-                    left: parent.left
-                    leftMargin: 15
-                    verticalCenter: parent.verticalCenter
+                Workspaces {
+                    id: workspaceModule
+                    targetMonitor: modelData.name
+                    anchors.centerIn: parent
                 }
             }
 
-            MediaSection {
-                id: mediaSection
-                anchors.centerIn: parent
-                colYellow: Colors.secondary
-                colMuted: Colors.outline
-                fontSize: Fonts.p
-                fontFamily: Fonts.font
-                panelOpen: Visibilities.musicPanel
-                onTogglePanel: Visibilities.toggleMusicPanel()
-            }
+            // Center pill is the island — its own overlay window, see Modules/Island/Island.qml.
 
-            RowLayout {
+            Rectangle {
                 anchors.right: parent.right
+                anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.rightMargin: 16
-                spacing: 14
+                width: indicatorRow.implicitWidth + 28
+                height: Theme.topBarHeight - 8
+                radius: height / 2
+                color: Colors.surface
 
-                ScreenShare {}
+                RowLayout {
+                    id: indicatorRow
+                    anchors.centerIn: parent
+                    spacing: 14
 
-                TraySection {}
+                    TraySection {}
 
-                CpuIndicator {}
+                    CpuIndicator {}
 
-                BluetoothIndicator {}
+                    BluetoothIndicator {}
 
-                VolumeIndicator {}
+                    VolumeIndicator {}
 
-                SettingsButton {}
+                    SettingsButton {}
 
-                ClockButton {}
+                    NotificationBellButton {}
+                }
             }
         }
 
         LazyLoader {
-            active: modelData.name === Theme.primaryMonitor
-
-            MusicPanel {
-                anchor.window: topBar
-                anchor.rect.x: (topBar.width - 480) / 2
-                anchor.rect.y: topBar.height + 8
-                visible: Visibilities.musicPanel
-                onVisibleChanged: Visibilities.musicPanel = visible
-            }
-        }
-
-        LazyLoader {
-            active: modelData.name === Theme.primaryMonitor
+            active: modelData === Theme.primaryScreen
 
             SettingsPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + 6
+                anchor.rect.y: topBar.height + Theme.popup.gap
             }
         }
 
         LazyLoader {
-            active: modelData.name === Theme.primaryMonitor
+            active: modelData === Theme.primaryScreen
 
-            CalendarPopup {
+            SoundPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + 6
+                anchor.rect.y: topBar.height + Theme.popup.gap
+            }
+        }
+
+        LazyLoader {
+            active: modelData === Theme.primaryScreen
+
+            BluetoothPopup {
+                anchor.window: topBar
+                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.y: topBar.height + Theme.popup.gap
+            }
+        }
+
+        LazyLoader {
+            active: modelData === Theme.primaryScreen
+
+            NotificationPopup {
+                anchor.window: topBar
+                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.y: topBar.height + Theme.popup.gap
             }
         }
     }

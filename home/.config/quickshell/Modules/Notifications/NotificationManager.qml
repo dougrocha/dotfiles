@@ -30,7 +30,7 @@ Variants {
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: modelData.name === Theme.primaryMonitor && localNotifications.length > 0 && !Visibilities.notificationCenter
+        visible: modelData === Theme.primaryScreen && localNotifications.length > 0 && !Visibilities.notificationCenter
 
         anchors {
             top: true
@@ -84,7 +84,7 @@ Variants {
                 onHoveredChanged: {
                     if (hovered) {
                         unhoverTimer.stop();
-                        NotificationService.stackPaused = true;
+                        NotificationService.hoverPaused = true;
                     } else {
                         unhoverTimer.restart();
                     }
@@ -95,7 +95,7 @@ Variants {
                 id: unhoverTimer
                 interval: 100
                 repeat: false
-                onTriggered: NotificationService.stackPaused = false
+                onTriggered: NotificationService.hoverPaused = false
             }
 
             Repeater {

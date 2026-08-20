@@ -103,4 +103,7 @@ Singleton {
     readonly property color tertiary_fixed: "#bdeaf3"
 
     readonly property color tertiary_fixed_dim: "#a1ced6"
+
+    // Fixed, not theme-derived: a privacy indicator has to stay recognisable.
+    readonly property color micActive: "#ff9f0a"
 }

@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Constants
 import qs.Components
 import qs.Services
@@ -19,7 +18,7 @@ Item {
         font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {
-                duration: 150
+                duration: Theme.animations.fast
             }
         }
     }
@@ -30,20 +29,12 @@ Item {
 
     TapHandler {
         cursorShape: Qt.PointingHandCursor
-        onTapped: {
-            Visibilities.closePopups();
-            proc.running = true;
-        }
+        onTapped: Visibilities.toggleBluetoothPanel()
     }
 
     Tooltip {
         targetItem: root
         text: BluetoothService.hasConnectedDevices ? "Bluetooth · Connected" : (BluetoothService.bluetoothEnabled ? "Bluetooth · On" : "Bluetooth · Off")
         hovered: hover.hovered
-    }
-
-    Process {
-        id: proc
-        command: ["launch-or-focus-tui", "bluetui"]
     }
 }

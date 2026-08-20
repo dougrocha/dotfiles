@@ -30,8 +30,12 @@ Singleton {
         nextProcess.running = true;
     }
 
+    // Past 3 seconds, "previous" restarts the song rather than leaving the track.
     function previous() {
-        prevProcess.running = true;
+        if (position > 3)
+            seek(0);
+        else
+            prevProcess.running = true;
     }
 
     function pause() {
@@ -134,16 +138,19 @@ Singleton {
                 }
                 if (eventType === "playbackStatus.playbackStateDidChange" || eventType === "playbackStatus.nowPlayingItemDidChange") {
                     var attrs = data.attributes || data;
-                    trackTitle = attrs.name || "";
-                    trackArtist = attrs.artistName || "";
-                    albumName = attrs.albumName || "";
-                    trackArtUrl = resolveArtUrl(attrs.artwork ? (attrs.artwork.url || "") : "");
-                    duration = (attrs.durationInMillis || 0) / 1000;
-                    if (attrs.currentPlaybackTime !== undefined)
-                        position = attrs.currentPlaybackTime;
+                    if (attrs.name) {
+                        trackTitle = attrs.name;
+                        trackArtist = attrs.artistName || "";
+                        albumName = attrs.albumName || "";
+                        trackArtUrl = resolveArtUrl(attrs.artwork ? (attrs.artwork.url || "") : "");
+                        duration = (attrs.durationInMillis || 0) / 1000;
+                        if (attrs.currentPlaybackTime !== undefined)
+                            position = attrs.currentPlaybackTime;
+
+                        trackChanged();
+                    }
 
                     isOnline = true;
-                    trackChanged();
                 }
                 if (eventType === "playbackStatus.playbackStateDidChange") {
                     var state = data.state;

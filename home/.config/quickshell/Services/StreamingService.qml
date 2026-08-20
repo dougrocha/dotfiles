@@ -16,6 +16,7 @@ Singleton {
             return;
 
         let foundStreaming = false;
+        let foundRecording = false;
         let apps = [];
         let nodesList = Pipewire.nodes.values;
         for (let i = 0; i < nodesList.length; i++) {
@@ -27,6 +28,10 @@ Singleton {
                 const mediaName = node.properties["media.name"] || "";
                 const appName = node.properties["application.name"] || "";
                 const clientName = node.properties["client.name"] || "";
+                const binary = node.properties["application.process.binary"] || "";
+
+                if (binary.includes("gpu-screen-recorder"))
+                    foundRecording = true;
 
                 if (mediaName.includes("xdph-streaming")) {
                     foundStreaming = true;
@@ -49,6 +54,7 @@ Singleton {
             }
         }
         isScreenshare = foundStreaming;
+        isRecordingScreen = foundRecording;
         screenAccessApps = apps;
     }
 
@@ -86,42 +92,9 @@ Singleton {
     }
 
     Process {
-        id: recordingProcess
-
-        command: ["screen-recording"]
-        running: false
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode !== 0)
-                console.warn("StreamingService: Recording process exited with code", exitCode);
-        }
-
-        stdout: SplitParser {
-            onRead: data => {
-                try {
-                    const json = JSON.parse(data);
-                    root.isRecordingScreen = json.text && json.text !== "";
-                } catch (e) {
-                    console.error("Failed to parse recording status:", e);
-                }
-            }
-        }
-    }
-
-    Process {
         id: toggleRecordingProcess
 
         command: ["toggle-recording"]
         running: false
-        onExited: (exitCode, exitStatus) => {
-            recordingProcess.running = true;
-        }
-    }
-
-    Timer {
-        interval: 2000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: recordingProcess.running = true
     }
 }

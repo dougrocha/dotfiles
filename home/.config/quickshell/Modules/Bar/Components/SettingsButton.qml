@@ -18,7 +18,7 @@ Item {
         font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {
-                duration: 150
+                duration: Theme.animations.fast
             }
         }
     }

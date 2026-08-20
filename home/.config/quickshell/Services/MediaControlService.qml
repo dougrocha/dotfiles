@@ -11,68 +11,54 @@ Singleton {
 
     function next() {
         if (shouldUseCiderRpc()) {
-            console.log("[MediaControl] Routing next() to CiderRPC");
             CiderRpcService.next();
         } else {
-            console.log("[MediaControl] Routing next() to MPRIS");
-            MprisService.activePlayer?.next();
+            MprisService.musicPlayer?.next();
         }
     }
 
     function previous() {
         if (shouldUseCiderRpc()) {
+            // Past 3 seconds, restart the song instead of skipping to the previous track.
             if (CiderRpcService.position > 3) {
-                // Past 3 seconds - restart the song
                 CiderRpcService.seek(0);
             } else {
-                // Before 3 seconds - go to previous track
                 CiderRpcService.previous();
             }
         } else {
-            console.log("[MediaControl] Routing previous() to MPRIS");
-            MprisService.activePlayer?.previous();
+            MprisService.musicPlayer?.previous();
         }
     }
 
     function pause() {
         if (shouldUseCiderRpc()) {
-            console.log("[MediaControl] Routing pause() to CiderRPC");
             CiderRpcService.pause();
         } else {
-            console.log("[MediaControl] Routing pause() to MPRIS");
-            MprisService.activePlayer?.pause();
+            MprisService.musicPlayer?.pause();
         }
     }
 
     function play() {
         if (shouldUseCiderRpc()) {
-            console.log("[MediaControl] Routing play() to CiderRPC");
             CiderRpcService.play();
         } else {
-            console.log("[MediaControl] Routing play() to MPRIS");
-            MprisService.activePlayer?.play();
+            MprisService.musicPlayer?.play();
         }
     }
 
     function playpause() {
         if (shouldUseCiderRpc()) {
-            console.log("[MediaControl] Routing playpause() to CiderRPC");
             CiderRpcService.playpause();
         } else {
-            console.log("[MediaControl] Routing playpause() to MPRIS");
-            MprisService.activePlayer?.togglePlaying();
+            MprisService.musicPlayer?.togglePlaying();
         }
     }
 
     function seek(seconds) {
         if (shouldUseCiderRpc()) {
-            console.log("[MediaControl] Routing seek() to CiderRPC");
             CiderRpcService.seek(seconds);
-        } else {
-            console.log("[MediaControl] Routing seek() to MPRIS");
-            if (MprisService.activePlayer) {
-                MprisService.activePlayer.position = seconds * 1000000;  // Convert to microseconds
-            }
+        } else if (MprisService.musicPlayer) {
+            MprisService.musicPlayer.position = seconds * 1000000; // Convert to microseconds
         }
     }
 }

@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Constants
 import qs.Components
 import qs.Services
@@ -38,20 +37,12 @@ Item {
 
     TapHandler {
         cursorShape: Qt.PointingHandCursor
-        onTapped: {
-            Visibilities.closePopups();
-            proc.running = true;
-        }
+        onTapped: Visibilities.toggleSoundPanel()
     }
 
     Tooltip {
         targetItem: root
         text: AudioService.muted ? "Volume · Muted" : "Volume · " + Math.round(AudioService.volume * 100) + "%"
         hovered: hover.hovered
-    }
-
-    Process {
-        id: proc
-        command: ["launch-or-focus-tui", "wiremix"]
     }
 }

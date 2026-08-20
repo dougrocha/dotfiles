@@ -93,13 +93,13 @@ Item {
 
             Behavior on Layout.preferredWidth {
                 NumberAnimation {
-                    duration: 150
+                    duration: Theme.animations.fast
                     easing.type: Easing.OutCubic
                 }
             }
             Behavior on Layout.leftMargin {
                 NumberAnimation {
-                    duration: 150
+                    duration: Theme.animations.fast
                     easing.type: Easing.OutCubic
                 }
             }
