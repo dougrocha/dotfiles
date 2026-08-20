@@ -13,6 +13,7 @@ paru -S --noconfirm --needed "${packages[@]}"
 "$DOTFILES_DIR/install/tools/neovim.sh"
 "$DOTFILES_DIR/install/tools/odin.sh"
 "$DOTFILES_DIR/install/system/sddm.sh"
+"$DOTFILES_DIR/install/system/snapper.sh"
 
 if [ "$PLATFORM_GPU" = "nvidia" ]; then
     "$DOTFILES_DIR/install/system/nvidia.sh"
