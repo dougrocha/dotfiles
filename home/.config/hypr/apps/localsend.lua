@@ -1,7 +1,7 @@
 -- LocalSend floating window
 hl.window_rule({
     match = {
-        class = "localsend",
+        class = "org.localsend.localsend_app",
         title = "LocalSend",
     },
     tag = "+floating-window",
