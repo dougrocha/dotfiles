@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# set-kraken-image [image-path]
+#
+# With an argument: center-crops the image to square, copies it into
+# dotfiles storage, makes it the current image (prunes storage down to the
+# 10 most recent), and applies it. With no argument: just re-applies
+# whatever is already current.
+#
+# The crop matters because liquidctl stretches (non-uniform resize) whatever
+# it's given to the LCD's exact resolution, distorting anything non-square.
+
+set -euo pipefail
+
+images_dir="$DOTFILES_DIR/default/systemd/kraken/images"
+current="$images_dir/current"
+max_images=10
+lcd_size=320
+
+mkdir -p "$images_dir"
+
+if [[ $# -eq 0 ]]; then
+    if [[ ! -L "$current" ]]; then
+        echo "Error: no current image set. Usage: set-kraken-image <image-path>" >&2
+        exit 1
+    fi
+    target="$(readlink -f "$current")"
+else
+    src="$(realpath "$1")"
+
+    if [[ ! -f "$src" ]]; then
+        echo "Error: file not found: $src" >&2
+        exit 1
+    fi
+
+    if ! command -v ffmpeg &> /dev/null; then
+        echo "Error: ffmpeg not found (pacman -S ffmpeg)" >&2
+        exit 1
+    fi
+
+    # Timestamp-prefix to avoid name collisions while keeping recency-sortable names
+    dest="$images_dir/$(date +%s)-$(basename "$src")"
+
+    # Center-crop to square, then scale to the LCD's exact resolution.
+    # -loop 0 keeps gifs looping infinitely (ffmpeg doesn't preserve it by default).
+    ffmpeg -y -loglevel warning -i "$src" \
+        -vf "crop='min(iw,ih)':'min(iw,ih)',scale=${lcd_size}:${lcd_size}:flags=lanczos" \
+        -loop 0 \
+        "$dest" < /dev/null
+
+    ln -sfn "$(basename "$dest")" "$current"
+    target="$dest"
+
+    # Prune to the max_images most recent real files (current's target is
+    # always among the newest, so it's never at risk of being pruned)
+    mapfile -t old_files < <(
+        find "$images_dir" -maxdepth 1 -type f -printf '%T@ %p\n' |
+        sort -rn | tail -n +"$((max_images + 1))" | cut -d' ' -f2-
+    )
+    for f in "${old_files[@]:-}"; do
+        [[ -n "$f" ]] && rm -f -- "$f"
+    done
+fi
+
+if ! command -v liquidctl &> /dev/null; then
+    echo "Error: liquidctl not found (pacman -S liquidctl)" >&2
+    exit 1
+fi
+
+case "$target" in
+    *.gif) mode="gif" ;;
+    *)     mode="static" ;;
+esac
+
+liquidctl --match kraken initialize all >/dev/null
+liquidctl --match kraken set lcd screen "$mode" "$target"
+
+echo "Kraken LCD set: $target"

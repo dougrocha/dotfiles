@@ -1,0 +1,32 @@
+diff --git i/Controllers/LianLiController/LianLiUniHubSLController/LianLiUniHubSLController.cpp w/Controllers/LianLiController/LianLiUniHubSLController/LianLiUniHubSLController.cpp
+index bba932f..7674e3d 100644
+--- i/Controllers/LianLiController/LianLiUniHubSLController/LianLiUniHubSLController.cpp
++++ w/Controllers/LianLiController/LianLiUniHubSLController/LianLiUniHubSLController.cpp
+@@ -336,9 +336,9 @@ void LianLiUniHubSLController::SendColor(size_t channel, const unsigned char *co
+ 
+     memcpy(&buf[0x02], colors, num_colors);
+ 
+-    this->LogBuffer("SendColor", buf, sizeof(buf));
++    this->LogBuffer("SendColor", buf, (2 + num_colors));
+ 
+-    hid_write(this->device, buf, sizeof(buf));
++    hid_write(this->device, buf, (2 + num_colors));
+     std::this_thread::sleep_for(5ms);
+ 
+     delete[] buf;
+diff --git i/Controllers/LianLiController/LianLiUniHubSLController/RGBController_LianLiUniHubSL.cpp w/Controllers/LianLiController/LianLiUniHubSLController/RGBController_LianLiUniHubSL.cpp
+index 0451871..09b16c6 100644
+--- i/Controllers/LianLiController/LianLiUniHubSLController/RGBController_LianLiUniHubSL.cpp
++++ w/Controllers/LianLiController/LianLiUniHubSLController/RGBController_LianLiUniHubSL.cpp
+@@ -392,11 +392,6 @@ void RGBController_LianLiUniHubSL::DeviceUpdateSingleLED(int /* led */)
+ 
+ void RGBController_LianLiUniHubSL::DeviceUpdateMode()
+ {
+-    if(active_mode == 0)
+-    {
+-        return;
+-    }
+-
+     controller->UpdateMode(zones, modes[active_mode]);
+     initialized = true;
+ }

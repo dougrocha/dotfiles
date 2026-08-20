@@ -1,0 +1,11 @@
+[Unit]
+Description=Set NZXT Kraken LCD image
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/doug/dev/dotfiles/default/systemd/kraken/apply-current-image.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
