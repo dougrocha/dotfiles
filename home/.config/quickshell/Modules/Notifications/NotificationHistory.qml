@@ -106,7 +106,7 @@ Column {
                                 anchors.centerIn: parent
                                 text: "Show less"
                                 color: showLessHover.hovered ? Colors.primary : Colors.on_surface_variant
-                                font.family: Fonts.notificationFont
+                                font.family: Fonts.font
                                 font.pixelSize: Fonts.label.size
                                 font.weight: Fonts.label.weight
 
@@ -194,7 +194,7 @@ Column {
                         y: stackCard.height + 8
                         text: "+" + (group.modelData.items.length - 1) + " notification" + (group.modelData.items.length - 1 > 1 ? "s" : "")
                         color: moreLinkHover.hovered ? Colors.primary : Colors.on_surface_variant
-                        font.family: Fonts.notificationFont
+                        font.family: Fonts.font
                         font.pixelSize: Fonts.label.size
                         font.weight: Fonts.label.weight
 

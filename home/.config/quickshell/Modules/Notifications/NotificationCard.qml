@@ -105,7 +105,7 @@ Item {
             text: modelData.text
             color: actionHover.hovered ? Colors.primary : Colors.on_surface_variant
             elide: Text.ElideRight
-            font.family: Fonts.notificationFont
+            font.family: Fonts.font
             font.pixelSize: Fonts.label.size
             font.weight: Fonts.label.weight
             Behavior on color {
@@ -199,7 +199,7 @@ Item {
                     Layout.fillWidth: true
                     text: card.modelData?.appName ?? ""
                     color: Colors.on_surface_variant
-                    font.family: Fonts.notificationFont
+                    font.family: Fonts.font
                     font.pixelSize: Fonts.label.size
                     font.weight: Fonts.label.weight
                     elide: Text.ElideRight
@@ -209,7 +209,7 @@ Item {
                     visible: card.showTimestamp
                     text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
                     color: Colors.on_surface_variant
-                    font.family: Fonts.notificationFont
+                    font.family: Fonts.font
                     font.pixelSize: Fonts.label.size
                     font.weight: Fonts.label.weight
                 }
@@ -307,7 +307,7 @@ Item {
                         text: card.modelData?.summary ?? ""
                         visible: text !== ""
                         color: Colors.on_surface
-                        font.family: Fonts.notificationFont
+                        font.family: Fonts.font
                         font.pixelSize: Fonts.title.size
                         font.weight: Fonts.title.weight
                         elide: Text.ElideRight
@@ -318,7 +318,7 @@ Item {
                         text: card.styledBody(card.modelData?.body ?? "")
                         visible: text !== ""
                         color: Colors.on_surface_variant
-                        font.family: Fonts.notificationFont
+                        font.family: Fonts.font
                         font.pixelSize: Fonts.body.size
                         font.weight: Fonts.body.weight
                         wrapMode: Text.WordWrap
@@ -418,7 +418,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             text: menuItem.modelData.text
                             color: Colors.on_surface_variant
-                            font.family: Fonts.notificationFont
+                            font.family: Fonts.font
                             font.pixelSize: Fonts.label.size
                             font.weight: Fonts.label.weight
                         }

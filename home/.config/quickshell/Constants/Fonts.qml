@@ -22,7 +22,6 @@ Singleton {
     }
 
     readonly property string font: "JetBrainsMono Nerd Font Propo"
-    readonly property string notificationFont: "Inter"
     readonly property string iconFont: "Material Symbols Outlined Filled"
     readonly property string iconFontOutline: "Material Symbols Outlined"
     readonly property string phosphorFont: "Phosphor"

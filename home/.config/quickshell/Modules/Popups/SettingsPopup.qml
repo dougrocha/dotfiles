@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
-import Quickshell.Widgets
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -11,7 +10,6 @@ PopupWindow {
     id: panel
 
     color: "transparent"
-
     implicitWidth: card.cardWidth
     implicitHeight: {
         const win = anchor.window;
@@ -30,24 +28,161 @@ PopupWindow {
     }
 
     onVisibleChanged: {
-        if (visible) {
+        if (visible)
             IdleService.refresh();
-            SunsetService.refresh();
+    }
+
+    component Toggle: Rectangle {
+        id: toggle
+
+        property bool checked: false
+
+        width: 38
+        height: 22
+        radius: height / 2
+        color: checked ? Colors.primary : Colors.surface_container_highest
+        border.color: checked ? Colors.primary : Colors.outline
+        border.width: 1
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+        Behavior on border.color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+
+        Rectangle {
+            width: 14
+            height: 14
+            radius: width / 2
+            y: (parent.height - height) / 2
+            x: toggle.checked ? toggle.width - width - 4 : 4
+            color: toggle.checked ? Colors.on_primary : Colors.outline
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: Theme.animations.fast
+                    easing.type: Easing.OutCubic
+                }
+            }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.animations.fast
+                }
+            }
         }
     }
 
-    component Tile: Rectangle {
-        id: tile
+    component DeviceBatteryRow: Item {
+        id: deviceRow
+
+        property string iconText: ""
+        property string name: ""
+        property int pct: 0
+        property bool charging: false
+
+        width: parent.width
+        height: 32
+
+        readonly property color batteryColor: pct <= 10 && !charging ? Colors.error : Colors.primary
+
+        Text {
+            id: deviceIcon
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: deviceRow.iconText
+            color: deviceRow.batteryColor
+            font.pixelSize: 16
+            font.family: Fonts.phosphorFont
+        }
+
+        Text {
+            anchors.left: deviceIcon.right
+            anchors.leftMargin: 10
+            anchors.right: batteryStatus.left
+            anchors.rightMargin: 12
+            anchors.verticalCenter: parent.verticalCenter
+            text: deviceRow.name
+            color: Colors.on_surface
+            font.pixelSize: Fonts.body.size
+            font.family: Fonts.font
+            elide: Text.ElideRight
+        }
+
+        Row {
+            id: batteryStatus
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 6
+
+            Text {
+                visible: deviceRow.charging
+                anchors.verticalCenter: parent.verticalCenter
+                text: PhosphorIcons.batteryCharging
+                color: Colors.primary
+                font.pixelSize: 13
+                font.family: Fonts.phosphorFont
+            }
+
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 44
+                height: 5
+                radius: height / 2
+                color: Colors.outline_variant
+                clip: true
+
+                Rectangle {
+                    width: parent.width * Math.max(0, Math.min(100, deviceRow.pct)) / 100
+                    height: parent.height
+                    radius: parent.radius
+                    color: deviceRow.batteryColor
+
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: Theme.animations.normal
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
+                    }
+                }
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 30
+                horizontalAlignment: Text.AlignRight
+                text: deviceRow.pct + "%"
+                color: deviceRow.batteryColor
+                font.pixelSize: Fonts.label.size
+                font.weight: Fonts.label.weight
+                font.family: Fonts.font
+            }
+        }
+    }
+
+    component PowerButton: Rectangle {
+        id: powerButton
+
+        property string iconText: ""
         property string label: ""
-        property bool active: false
         property color accent: Colors.primary
 
         signal tapped
 
-        height: 28
+        activeFocusOnTab: true
+        height: 48
         radius: Theme.blockRadius
-        color: active ? Qt.rgba(accent.r, accent.g, accent.b, 0.15) : tileHover.hovered ? Colors.surface_container_high : Colors.surface_container
-        border.color: (active || tileHover.hovered) ? accent : Colors.outline_variant
+        color: powerHover.hovered || activeFocus ? Qt.rgba(accent.r, accent.g, accent.b, 0.14) : Colors.surface_container_high
+        border.color: powerHover.hovered || activeFocus ? accent : Colors.outline_variant
         border.width: 1
 
         Behavior on color {
@@ -62,117 +197,41 @@ PopupWindow {
         }
 
         Text {
-            anchors.centerIn: parent
-            elide: Text.ElideRight
-            text: parent.label
-            color: (parent.active || tileHover.hovered) ? parent.accent : Colors.on_surface_variant
-            font.pixelSize: Fonts.small
-            font.family: Fonts.font
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
-            }
-        }
-
-        HoverHandler {
-            id: tileHover
-            cursorShape: Qt.PointingHandCursor
-        }
-        TapHandler {
-            onTapped: parent.tapped()
-        }
-    }
-
-    component PowerTile: Rectangle {
-        property string iconText: ""
-        property color iconColor: Colors.on_surface_variant
-
-        signal tapped
-
-        height: 36
-        radius: Theme.blockRadius
-        color: pwHover.hovered ? Colors.surface_container_high : Colors.surface_container
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-
-        Text {
-            anchors.centerIn: parent
-            text: parent.iconText
-            color: parent.iconColor
-            font.pixelSize: Fonts.h2
-            font.family: Fonts.phosphorFont
-        }
-
-        HoverHandler {
-            id: pwHover
-            cursorShape: Qt.PointingHandCursor
-        }
-        TapHandler {
-            onTapped: parent.tapped()
-        }
-    }
-
-    component DeviceBatteryRow: Item {
-        id: deviceRow
-
-        property string iconText: ""
-        property string name: ""
-        property int pct: 0
-        property bool charging: false
-
-        width: parent.width
-        height: 20
-
-        Text {
+            id: powerIcon
             anchors.left: parent.left
+            anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
-            text: deviceRow.iconText
-            color: Colors.primary
-            font.pixelSize: Fonts.p
+            text: powerButton.iconText
+            color: powerButton.accent
+            font.pixelSize: 18
             font.family: Fonts.phosphorFont
         }
 
         Text {
-            anchors.left: parent.left
-            anchors.leftMargin: 26
-            anchors.right: pctText.left
+            anchors.left: powerIcon.right
+            anchors.leftMargin: 9
+            anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            text: deviceRow.name
-            color: Colors.on_surface_variant
-            font.pixelSize: Fonts.small
+            text: powerButton.label
+            color: Colors.on_surface
+            font.pixelSize: Fonts.body.size
+            font.weight: Font.Medium
             font.family: Fonts.font
             elide: Text.ElideRight
         }
 
-        Text {
-            visible: deviceRow.charging
-            anchors.right: pctText.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            text: PhosphorIcons.batteryCharging
-            color: Colors.primary
-            font.pixelSize: Fonts.p
-            font.family: Fonts.phosphorFont
+        HoverHandler {
+            id: powerHover
+            cursorShape: Qt.PointingHandCursor
         }
-
-        Text {
-            id: pctText
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: deviceRow.pct + "%"
-            color: deviceRow.pct <= 10 && !deviceRow.charging ? Colors.error : Colors.on_surface_variant
-            font.pixelSize: Fonts.small
-            font.family: Fonts.font
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
+        TapHandler {
+            onTapped: powerButton.tapped()
+        }
+        Keys.onPressed: function (event) {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                powerButton.tapped();
+                event.accepted = true;
             }
         }
     }
@@ -180,7 +239,7 @@ PopupWindow {
     PopupCard {
         id: card
 
-        readonly property int cardWidth: 280
+        readonly property int cardWidth: 300
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -191,25 +250,30 @@ PopupWindow {
 
         Item {
             width: parent.width
-            height: 24
+            height: 28
 
             Text {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Settings"
+                text: "System"
                 color: Colors.on_surface
-                font.pixelSize: Fonts.h4
+                font.pixelSize: 16
                 font.family: Fonts.font
-                font.weight: Font.DemiBold
+                font.weight: Font.Medium
             }
 
             Rectangle {
+                id: closeButton
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                width: 24
-                height: 24
-                radius: 12
-                color: closeHover.hovered ? Colors.surface_container_high : "transparent"
+                width: 28
+                height: 28
+                radius: 14
+                activeFocusOnTab: true
+                color: closeHover.hovered || activeFocus ? Colors.surface_container_highest : "transparent"
+                border.width: activeFocus ? 1 : 0
+                border.color: Colors.primary
+
                 Behavior on color {
                     ColorAnimation {
                         duration: Theme.animations.fast
@@ -219,9 +283,9 @@ PopupWindow {
                 Text {
                     anchors.centerIn: parent
                     text: Icons.closeSmall
-                    color: Colors.on_surface_variant
+                    color: closeHover.hovered || closeButton.activeFocus ? Colors.on_surface : Colors.on_surface_variant
                     font.family: Fonts.iconFont
-                    font.pixelSize: Fonts.h4
+                    font.pixelSize: 18
                 }
 
                 HoverHandler {
@@ -231,21 +295,24 @@ PopupWindow {
                 TapHandler {
                     onTapped: Visibilities.settingsPanel = false
                 }
+                Keys.onPressed: function (event) {
+                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                        Visibilities.settingsPanel = false;
+                        event.accepted = true;
+                    }
+                }
             }
         }
 
-        PopupDivider {}
-
-        SectionLabel {
-            text: "CONNECTIONS"
-        }
-
         Rectangle {
+            id: idleRow
+
             width: parent.width
-            height: 28
-            radius: Theme.blockRadius
-            color: btHover.hovered ? Colors.surface_container_high : Colors.surface_container
-            border.color: BluetoothService.bluetoothEnabled ? Colors.primary : Colors.outline_variant
+            height: 44
+            radius: 10
+            activeFocusOnTab: true
+            color: idleHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container_high
+            border.color: idleHover.hovered || activeFocus ? Colors.primary : Colors.outline_variant
             border.width: 1
 
             Behavior on color {
@@ -260,200 +327,151 @@ PopupWindow {
             }
 
             Text {
-                id: btIcon
                 anchors.left: parent.left
-                anchors.leftMargin: 10
+                anchors.leftMargin: 12
+                anchors.right: idleToggle.left
+                anchors.rightMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
-                text: BluetoothService.hasConnectedDevices ? Icons.bluetoothConnected : Icons.bluetooth
-                color: BluetoothService.bluetoothEnabled ? Colors.primary : Colors.on_surface_variant
-                font.pixelSize: Fonts.h5
-                font.family: Fonts.iconFont
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-            }
-
-            Text {
-                anchors.left: btIcon.right
-                anchors.leftMargin: 8
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                text: {
-                    if (!BluetoothService.bluetoothEnabled)
-                        return "Off";
-                    if (BluetoothService.connectedDevices.length === 0)
-                        return "Not connected";
-                    return BluetoothService.connectedDevices.map(d => BluetoothService.deviceLabel(d)).join(", ");
-                }
-                color: BluetoothService.bluetoothEnabled ? Colors.on_surface : Colors.on_surface_variant
-                font.pixelSize: Fonts.small
+                text: "Idle lock"
+                color: Colors.on_surface
+                font.pixelSize: Fonts.body.size
+                font.weight: Font.Medium
                 font.family: Fonts.font
                 elide: Text.ElideRight
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
+            }
+
+            Toggle {
+                id: idleToggle
+                anchors.right: parent.right
+                anchors.rightMargin: 12
+                anchors.verticalCenter: parent.verticalCenter
+                checked: IdleService.active
             }
 
             HoverHandler {
-                id: btHover
+                id: idleHover
                 cursorShape: Qt.PointingHandCursor
             }
             TapHandler {
-                onTapped: Visibilities.openBluetoothPanel()
-            }
-        }
-
-        // Wrapped so the divider and label vanish together when nothing has a battery.
-        Column {
-            width: parent.width
-            spacing: Theme.popup.spacing
-            visible: DeviceBatteryService.hasDevices
-
-            PopupDivider {}
-
-            SectionLabel {
-                text: "DEVICES"
-            }
-
-            Repeater {
-                model: ScriptModel {
-                    values: DeviceBatteryService.upowerDevices
-                }
-
-                delegate: DeviceBatteryRow {
-                    required property var modelData
-                    iconText: DeviceBatteryService.upowerIcon(modelData)
-                    name: modelData.model
-                    pct: Math.round(modelData.percentage * 100)
-                    charging: modelData.state === UPowerDeviceState.Charging
-                }
-            }
-
-            Repeater {
-                model: ScriptModel {
-                    values: DeviceBatteryService.bluetoothDevices
-                    objectProp: "address"
-                }
-
-                delegate: DeviceBatteryRow {
-                    required property var modelData
-                    iconText: modelData.icon
-                    name: modelData.name
-                    pct: Math.round(modelData.battery * 100)
-                }
-            }
-        }
-
-        PopupDivider {}
-
-        SectionLabel {
-            text: "QUICK"
-        }
-
-        Row {
-            width: parent.width
-            spacing: 8
-
-            Tile {
-                width: (parent.width - 8) / 2
-                label: "Idle"
-                active: IdleService.active
                 onTapped: IdleService.toggle()
             }
-
-            Tile {
-                width: (parent.width - 8) / 2
-                label: "Night"
-                active: SunsetService.active
-                onTapped: SunsetService.toggle()
+            Keys.onPressed: function (event) {
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                    IdleService.toggle();
+                    event.accepted = true;
+                }
             }
         }
 
-        // Hidden while recording; the island owns stopping it.
         Column {
             width: parent.width
-            spacing: Theme.popup.spacing
-            visible: !StreamingService.isRecordingScreen
+            spacing: 8
+            visible: DeviceBatteryService.hasDevices
 
-            PopupDivider {}
-
-            SectionLabel {
-                text: "RECORD"
+            Text {
+                text: "Devices"
+                color: Colors.on_surface_variant
+                font.pixelSize: Fonts.label.size
+                font.weight: Fonts.label.weight
+                font.family: Fonts.font
             }
 
-            Row {
-                id: recordRow
-
-                readonly property var targets: ["screen"].concat(Quickshell.screens.map(s => s.name))
-
+            Rectangle {
                 width: parent.width
-                spacing: 8
+                height: deviceList.implicitHeight + 12
+                radius: 10
+                color: Colors.surface_container_high
+                border.width: 1
+                border.color: Colors.outline_variant
 
-                Repeater {
-                    model: recordRow.targets
+                Column {
+                    id: deviceList
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
 
-                    delegate: Tile {
-                        required property string modelData
+                    Repeater {
+                        model: ScriptModel {
+                            values: DeviceBatteryService.upowerDevices
+                        }
 
-                        width: (recordRow.width - 8 * (recordRow.targets.length - 1)) / recordRow.targets.length
-                        label: modelData === "screen" ? "Full" : modelData
-                        onTapped: {
-                            recordProcess.command = ["start-recording", modelData];
-                            recordProcess.running = true;
-                            Visibilities.settingsPanel = false;
+                        delegate: DeviceBatteryRow {
+                            required property var modelData
+                            iconText: DeviceBatteryService.upowerIcon(modelData)
+                            name: modelData.model
+                            pct: Math.round(modelData.percentage * 100)
+                            charging: modelData.state === UPowerDeviceState.Charging
+                        }
+                    }
+
+                    Repeater {
+                        model: ScriptModel {
+                            values: DeviceBatteryService.bluetoothDevices
+                            objectProp: "address"
+                        }
+
+                        delegate: DeviceBatteryRow {
+                            required property var modelData
+                            iconText: modelData.icon
+                            name: modelData.name
+                            pct: Math.round(modelData.battery * 100)
                         }
                     }
                 }
             }
         }
 
-        PopupDivider {}
-
-        Row {
+        Column {
             width: parent.width
             spacing: 8
 
-            PowerTile {
-                width: (parent.width - 24) / 4
-                iconText: PhosphorIcons.power
-                iconColor: Colors.error
-                onTapped: shutdownProcess.running = true
+            Row {
+                width: parent.width
+                spacing: 8
+
+                PowerButton {
+                    width: (parent.width - 8) / 2
+                    iconText: PhosphorIcons.lockSimple
+                    label: "Lock"
+                    accent: Colors.secondary
+                    onTapped: {
+                        lockProcess.running = true;
+                        Visibilities.settingsPanel = false;
+                    }
+                }
+
+                PowerButton {
+                    width: (parent.width - 8) / 2
+                    iconText: PhosphorIcons.signOut
+                    label: "Log out"
+                    accent: Colors.primary
+                    onTapped: logoutProcess.running = true
+                }
             }
 
-            PowerTile {
-                width: (parent.width - 24) / 4
-                iconText: PhosphorIcons.arrowCounterClockwise
-                iconColor: Colors.tertiary
-                onTapped: rebootProcess.running = true
-            }
+            Row {
+                width: parent.width
+                spacing: 8
 
-            PowerTile {
-                width: (parent.width - 24) / 4
-                iconText: PhosphorIcons.signOut
-                iconColor: Colors.primary
-                onTapped: logoutProcess.running = true
-            }
+                PowerButton {
+                    width: (parent.width - 8) / 2
+                    iconText: PhosphorIcons.arrowCounterClockwise
+                    label: "Restart"
+                    accent: Colors.tertiary
+                    onTapped: rebootProcess.running = true
+                }
 
-            PowerTile {
-                width: (parent.width - 24) / 4
-                iconText: PhosphorIcons.lockSimple
-                iconColor: Colors.secondary
-                onTapped: {
-                    lockProcess.running = true;
-                    Visibilities.settingsPanel = false;
+                PowerButton {
+                    width: (parent.width - 8) / 2
+                    iconText: PhosphorIcons.power
+                    label: "Shut down"
+                    accent: Colors.error
+                    onTapped: shutdownProcess.running = true
                 }
             }
         }
-    }
-
-    Process {
-        id: recordProcess
-        command: ["start-recording", "screen"]
     }
 
     Process {
