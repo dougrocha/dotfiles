@@ -45,7 +45,7 @@ Item {
                 radius: Theme.blockRadius
                 color: headerClearHover.hovered ? Colors.surface_container_high : Colors.surface_container
                 border.width: 1
-                border.color: headerClearHover.hovered ? Colors.primary : Colors.outline_variant
+                border.color: headerClearHover.hovered ? Colors.error : Colors.outline_variant
 
                 Behavior on color {
                     ColorAnimation {
@@ -61,7 +61,7 @@ Item {
                 Text {
                     anchors.centerIn: parent
                     text: Icons.deleteSweep
-                    color: headerClearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                    color: headerClearHover.hovered ? Colors.error : Colors.on_surface_variant
                     font.family: Fonts.iconFont
                     font.pixelSize: 14
 

@@ -106,8 +106,9 @@ Column {
                                 anchors.centerIn: parent
                                 text: "Show less"
                                 color: showLessHover.hovered ? Colors.primary : Colors.on_surface_variant
-                                font.family: Fonts.font
-                                font.pixelSize: Fonts.small
+                                font.family: Fonts.notificationFont
+                                font.pixelSize: Fonts.label.size
+                                font.weight: Fonts.label.weight
 
                                 Behavior on color {
                                     ColorAnimation {
@@ -132,7 +133,7 @@ Column {
                             radius: Theme.blockRadius
                             color: clearHover.hovered ? Colors.surface_container_high : Colors.surface_container
                             border.width: 1
-                            border.color: clearHover.hovered ? Colors.primary : Colors.outline_variant
+                            border.color: clearHover.hovered ? Colors.error : Colors.outline_variant
 
                             Behavior on color {
                                 ColorAnimation {
@@ -148,7 +149,7 @@ Column {
                             Text {
                                 anchors.centerIn: parent
                                 text: Icons.close
-                                color: clearHover.hovered ? Colors.primary : Colors.on_surface_variant
+                                color: clearHover.hovered ? Colors.error : Colors.on_surface_variant
                                 font.family: Fonts.iconFont
                                 font.pixelSize: 14
 
@@ -171,35 +172,11 @@ Column {
                     }
                 }
 
-                // Collapsed: newest card on top, older ones peeking out below.
+                // Collapsed: newest card on top; a "+N notifications" link expands the rest.
                 Item {
                     visible: !group.expanded
                     width: parent.width
-                    height: stackCard.height + (group.modelData.items.length > 2 ? 12 : (group.stacked ? 6 : 0))
-
-                    Rectangle {
-                        visible: group.modelData.items.length > 2
-                        x: 26
-                        width: parent.width - 42
-                        height: 24
-                        y: stackCard.height - height + 12
-                        radius: 12
-                        color: Colors.surface_container
-                        border.width: 1
-                        border.color: Colors.outline_variant
-                    }
-
-                    Rectangle {
-                        visible: group.stacked
-                        x: 18
-                        width: parent.width - 26
-                        height: 24
-                        y: stackCard.height - height + 6
-                        radius: 12
-                        color: Colors.surface_container
-                        border.width: 1
-                        border.color: Colors.outline_variant
-                    }
+                    height: stackCard.height + (group.stacked ? moreLink.height + 12 : 0)
 
                     NotificationCard {
                         id: stackCard
@@ -207,6 +184,30 @@ Column {
                         modelData: group.modelData.items[0]
                         showTimestamp: true
                         interactive: !group.stacked
+                        flat: true
+                    }
+
+                    Text {
+                        id: moreLink
+                        visible: group.stacked
+                        x: 16
+                        y: stackCard.height + 8
+                        text: "+" + (group.modelData.items.length - 1) + " notification" + (group.modelData.items.length - 1 > 1 ? "s" : "")
+                        color: moreLinkHover.hovered ? Colors.primary : Colors.on_surface_variant
+                        font.family: Fonts.notificationFont
+                        font.pixelSize: Fonts.label.size
+                        font.weight: Fonts.label.weight
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animations.fast
+                            }
+                        }
+
+                        HoverHandler {
+                            id: moreLinkHover
+                            cursorShape: Qt.PointingHandCursor
+                        }
                     }
 
                     HoverHandler {
@@ -229,6 +230,7 @@ Column {
                     delegate: NotificationCard {
                         width: content.width
                         showTimestamp: true
+                        flat: true
                     }
                 }
             }

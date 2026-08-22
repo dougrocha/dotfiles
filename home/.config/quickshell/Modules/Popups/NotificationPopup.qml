@@ -30,9 +30,7 @@ PopupWindow {
     PopupCard {
         id: container
 
-        width: center.implicitWidth
-        color: "transparent"
-        padding: 0
+        width: center.implicitWidth + padding * 2
 
         shown: Visibilities.notificationCenter
         onDismissed: Visibilities.notificationCenter = false

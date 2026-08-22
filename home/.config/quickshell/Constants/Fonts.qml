@@ -22,6 +22,7 @@ Singleton {
     }
 
     readonly property string font: "JetBrainsMono Nerd Font Propo"
+    readonly property string notificationFont: "Inter"
     readonly property string iconFont: "Material Symbols Outlined Filled"
     readonly property string iconFontOutline: "Material Symbols Outlined"
     readonly property string phosphorFont: "Phosphor"
@@ -36,4 +37,17 @@ Singleton {
     readonly property int h4: 18
     readonly property int h5: 16
     readonly property int h6: 14
+
+    readonly property QtObject title: QtObject {
+        readonly property int size: 14
+        readonly property int weight: Font.Medium
+    }
+    readonly property QtObject body: QtObject {
+        readonly property int size: 12
+        readonly property int weight: Font.Normal
+    }
+    readonly property QtObject label: QtObject {
+        readonly property int size: 11
+        readonly property int weight: Font.Medium
+    }
 }
