@@ -11,8 +11,13 @@ Rectangle {
 
     property var trayItem: modelData
     property bool menuOpen: false
+    property bool dragging: dragHandler.active
     signal menuRequested(var trayItem, Item anchorItem)
     signal disappearing(Item anchorItem)
+    signal dragStarted(Item sourceItem)
+    signal dragMoved(Item sourceItem, point translation)
+    signal dragFinished(Item sourceItem, point translation, bool cancelled)
+    signal organizeRequested(string command)
 
     function requestPrimaryAction() {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
@@ -26,7 +31,7 @@ Rectangle {
     Layout.preferredWidth: 24
     Layout.preferredHeight: 24
     activeFocusOnTab: true
-    radius: 4
+    radius: height / 2
     color: menuOpen || activeFocus ? Colors.surface_container_highest : hoverHandler.hovered ? Colors.surface_container_high : "transparent"
     border.width: trayItem.status === Status.NeedsAttention || activeFocus ? 1 : 0
     border.color: trayItem.status === Status.NeedsAttention ? Colors.primary : Colors.outline
@@ -42,7 +47,7 @@ Rectangle {
         width: 16
         height: 16
         source: root.trayItem.icon
-        visible: status === Image.Ready
+        visible: status === Image.Ready && !root.dragging
         mipmap: true
     }
 
@@ -54,15 +59,32 @@ Rectangle {
     Tooltip {
         text: root.trayItem.tooltipTitle || root.trayItem.title || root.trayItem.id
         targetItem: root
-        hovered: hoverHandler.hovered
+        hovered: hoverHandler.hovered && !root.dragging
+    }
+
+    DragHandler {
+        id: dragHandler
+        target: null
+        acceptedButtons: Qt.LeftButton
+        onActiveChanged: {
+            if (active)
+                root.dragStarted(root);
+            else
+                root.dragFinished(root, translation, false);
+        }
+        onTranslationChanged: if (active)
+            root.dragMoved(root, translation)
+        onCanceled: root.dragFinished(root, translation, true)
     }
 
     TapHandler {
+        enabled: !root.dragging
         acceptedButtons: Qt.LeftButton
         onTapped: root.requestPrimaryAction()
     }
 
     TapHandler {
+        enabled: !root.dragging
         acceptedButtons: Qt.RightButton
         onTapped: {
             if (root.trayItem.hasMenu)
@@ -71,6 +93,7 @@ Rectangle {
     }
 
     TapHandler {
+        enabled: !root.dragging
         acceptedButtons: Qt.MiddleButton
         onTapped: {
             Visibilities.closePopups();
@@ -79,6 +102,7 @@ Rectangle {
     }
 
     WheelHandler {
+        enabled: !root.dragging
         onWheel: event => {
             const horizontal = Math.abs(event.angleDelta.x) > Math.abs(event.angleDelta.y);
             const delta = horizontal ? event.angleDelta.x : event.angleDelta.y;
@@ -94,8 +118,22 @@ Rectangle {
         } else if (event.key === Qt.Key_Menu && root.trayItem.hasMenu) {
             root.menuRequested(root.trayItem, root);
             event.accepted = true;
+        } else if (event.modifiers & Qt.ControlModifier) {
+            if (event.key === Qt.Key_Left)
+                root.organizeRequested("left");
+            else if (event.key === Qt.Key_Right)
+                root.organizeRequested("right");
+            else if (event.key === Qt.Key_Up || event.key === Qt.Key_Down)
+                root.organizeRequested("other");
+            else
+                return;
+            event.accepted = true;
         }
     }
 
-    Component.onDestruction: root.disappearing(root)
+    Component.onDestruction: {
+        if (root.dragging)
+            root.dragFinished(root, dragHandler.translation, true);
+        root.disappearing(root);
+    }
 }

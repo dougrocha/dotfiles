@@ -108,6 +108,15 @@ Variants {
             height: parent.height
             y: topBar.revealed ? 0 : -height
 
+            TapHandler {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                onTapped: eventPoint => {
+                    const point = traySection.mapFromItem(content, eventPoint.position.x, eventPoint.position.y);
+                    if (point.x < 0 || point.x > traySection.width || point.y < 0 || point.y > traySection.height)
+                        Visibilities.closeTrayMenus();
+                }
+            }
+
             Behavior on y {
                 NumberAnimation {
                     duration: 180
@@ -134,20 +143,29 @@ Variants {
             // Center pill is the island — its own overlay window, see Modules/Island/Island.qml.
 
             Rectangle {
+                id: indicatorPill
+
+                readonly property int leftPadding: traySection.visible ? 3 : 14
+                readonly property int rightPadding: 14
+
                 anchors.right: parent.right
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                width: indicatorRow.implicitWidth + 28
+                width: indicatorRow.implicitWidth + leftPadding + rightPadding
                 height: Theme.topBarHeight - 8
                 radius: height / 2
                 color: Colors.surface
 
                 RowLayout {
                     id: indicatorRow
-                    anchors.centerIn: parent
+                    anchors.right: parent.right
+                    anchors.rightMargin: indicatorPill.rightPadding
+                    anchors.verticalCenter: parent.verticalCenter
                     spacing: 14
 
-                    TraySection {}
+                    TraySection {
+                        id: traySection
+                    }
 
                     CpuIndicator {}
 
