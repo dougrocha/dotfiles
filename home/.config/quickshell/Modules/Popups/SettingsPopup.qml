@@ -181,7 +181,7 @@ PopupWindow {
         activeFocusOnTab: true
         height: 48
         radius: Theme.blockRadius
-        color: powerHover.hovered || activeFocus ? Qt.rgba(accent.r, accent.g, accent.b, 0.14) : Colors.surface_container_high
+        color: powerHover.hovered || activeFocus ? Qt.rgba(accent.r, accent.g, accent.b, 0.14) : Qt.rgba(accent.r, accent.g, accent.b, 0)
         border.color: powerHover.hovered || activeFocus ? accent : Colors.outline_variant
         border.width: 1
 
@@ -270,7 +270,7 @@ PopupWindow {
                 height: 28
                 radius: 14
                 activeFocusOnTab: true
-                color: closeHover.hovered || activeFocus ? Colors.surface_container_highest : "transparent"
+                color: closeHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
                 border.width: activeFocus ? 1 : 0
                 border.color: Colors.primary
 
@@ -304,23 +304,20 @@ PopupWindow {
             }
         }
 
+        PopupDivider {}
+
         Rectangle {
             id: idleRow
 
             width: parent.width
             height: 44
-            radius: 10
+            radius: Theme.blockRadius
             activeFocusOnTab: true
-            color: idleHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container_high
-            border.color: idleHover.hovered || activeFocus ? Colors.primary : Colors.outline_variant
-            border.width: 1
+            color: idleHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
+            border.width: activeFocus ? 1 : 0
+            border.color: Colors.primary
 
             Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
-            }
-            Behavior on border.color {
                 ColorAnimation {
                     duration: Theme.animations.fast
                 }
@@ -353,11 +350,11 @@ PopupWindow {
                 cursorShape: Qt.PointingHandCursor
             }
             TapHandler {
-                onTapped: IdleService.toggle()
+                onTapped: IdleService.toggle(true)
             }
             Keys.onPressed: function (event) {
                 if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                    IdleService.toggle();
+                    IdleService.toggle(true);
                     event.accepted = true;
                 }
             }
@@ -365,62 +362,51 @@ PopupWindow {
 
         Column {
             width: parent.width
-            spacing: 8
+            spacing: Theme.popup.spacing
             visible: DeviceBatteryService.hasDevices
 
-            Text {
-                text: "Devices"
-                color: Colors.on_surface_variant
-                font.pixelSize: Fonts.label.size
-                font.weight: Fonts.label.weight
-                font.family: Fonts.font
+            PopupDivider {}
+
+            SectionLabel {
+                text: "DEVICES"
             }
 
-            Rectangle {
+            Column {
                 width: parent.width
-                height: deviceList.implicitHeight + 12
-                radius: 10
-                color: Colors.surface_container_high
-                border.width: 1
-                border.color: Colors.outline_variant
+                spacing: 2
 
-                Column {
-                    id: deviceList
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-
-                    Repeater {
-                        model: ScriptModel {
-                            values: DeviceBatteryService.upowerDevices
-                        }
-
-                        delegate: DeviceBatteryRow {
-                            required property var modelData
-                            iconText: DeviceBatteryService.upowerIcon(modelData)
-                            name: modelData.model
-                            pct: Math.round(modelData.percentage * 100)
-                            charging: modelData.state === UPowerDeviceState.Charging
-                        }
+                Repeater {
+                    model: ScriptModel {
+                        values: DeviceBatteryService.upowerDevices
                     }
 
-                    Repeater {
-                        model: ScriptModel {
-                            values: DeviceBatteryService.bluetoothDevices
-                            objectProp: "address"
-                        }
+                    delegate: DeviceBatteryRow {
+                        required property var modelData
+                        iconText: DeviceBatteryService.upowerIcon(modelData)
+                        name: modelData.model
+                        pct: Math.round(modelData.percentage * 100)
+                        charging: modelData.state === UPowerDeviceState.Charging
+                    }
+                }
 
-                        delegate: DeviceBatteryRow {
-                            required property var modelData
-                            iconText: modelData.icon
-                            name: modelData.name
-                            pct: Math.round(modelData.battery * 100)
-                        }
+                Repeater {
+                    model: ScriptModel {
+                        values: DeviceBatteryService.bluetoothDevices
+                        objectProp: "address"
+                    }
+
+                    delegate: DeviceBatteryRow {
+                        required property var modelData
+                        iconText: modelData.icon
+                        name: modelData.name
+                        pct: Math.round(modelData.battery * 100)
                     }
                 }
             }
+        }
+
+        PopupDivider {
+            visible: DeviceBatteryService.hasDevices
         }
 
         Column {

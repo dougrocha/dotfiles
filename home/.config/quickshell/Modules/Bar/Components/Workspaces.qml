@@ -49,7 +49,7 @@ Item {
                         anchors.fill: parent
                         radius: 5
                         color: isActive ? Colors.primary : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, hasWindows ? 0.15 : 0.0)
-                        border.color: isActive ? "transparent" : Colors.primary
+                        border.color: isActive ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0) : Colors.primary
                         border.width: 1.5
                         opacity: isActive || hasWindows ? 1.0 : 0.35
 

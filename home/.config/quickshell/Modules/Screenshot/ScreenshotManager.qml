@@ -253,7 +253,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 40
                         radius: 8
-                        color: cursorOptArea.containsMouse ? Colors.surface_container_high : "transparent"
+                        color: cursorOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
                         Behavior on color {
                             ColorAnimation {
                                 duration: Theme.animations.fast
@@ -301,7 +301,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 40
                         radius: 8
-                        color: micOptArea.containsMouse ? Colors.surface_container_high : "transparent"
+                        color: micOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
                         Behavior on color {
                             ColorAnimation {
                                 duration: Theme.animations.fast
@@ -425,7 +425,7 @@ Item {
                             implicitWidth: 44
                             implicitHeight: 44
                             radius: 10
-                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Colors.surface_container_high : "transparent"
+                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
 
                             Behavior on color {
                                 ColorAnimation {
@@ -481,7 +481,7 @@ Item {
                         implicitWidth: 44
                         implicitHeight: 44
                         radius: 10
-                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Colors.surface_container_high : "transparent"
+                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
 
                         Behavior on color {
                             ColorAnimation {
@@ -536,7 +536,7 @@ Item {
                         implicitWidth: optionsLabel.implicitWidth + 20
                         implicitHeight: 44
                         radius: 10
-                        color: manager.optionsOpen ? Colors.surface_container_high : (optionsBtn.containsMouse ? Colors.surface_container_high : "transparent")
+                        color: manager.optionsOpen ? Colors.surface_container_high : (optionsBtn.containsMouse ? Colors.surface_container_high : Colors.surface_container)
 
                         Behavior on color {
                             ColorAnimation {

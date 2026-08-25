@@ -10,7 +10,7 @@ Rectangle {
     width: parent.width
     height: Theme.blockHeight
     radius: Theme.blockRadius
-    color: rowHover.hovered ? Colors.surface_container_high : "transparent"
+    color: rowHover.hovered ? Colors.surface_container_high : Colors.surface_container
     Behavior on color {
         ColorAnimation {
             duration: Theme.animations.fast

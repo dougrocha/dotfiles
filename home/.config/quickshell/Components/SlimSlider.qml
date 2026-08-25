@@ -7,7 +7,6 @@ Item {
 
     property string iconSource: ""
     property string labelText: ""
-    // Optional second line under the label; empty hides it.
     property string sublabelText: ""
     property real sliderValue: 0
     property real sliderMax: 1.5
@@ -29,7 +28,7 @@ Item {
 
         Item {
             width: parent.width
-            height: slimRoot.sublabelText !== "" ? 30 : 16
+            height: slimRoot.sublabelText !== "" ? 36 : 32
 
             IconImage {
                 anchors.left: parent.left
@@ -57,7 +56,7 @@ Item {
             Text {
                 anchors.left: parent.left
                 anchors.leftMargin: slimRoot.labelIndent
-                anchors.right: parent.right
+                anchors.right: muteBtn.left
                 anchors.rightMargin: 8
                 anchors.top: mainLabel.bottom
                 anchors.topMargin: 1
@@ -80,19 +79,44 @@ Item {
                 font.family: Fonts.font
             }
 
-            Text {
+            Rectangle {
                 id: muteBtn
                 anchors.right: parent.right
-                anchors.verticalCenter: mainLabel.verticalCenter
-                text: slimRoot.muted ? slimRoot.mutedIcon : slimRoot.muteIcon
-                color: Colors.primary
-                font.pixelSize: Fonts.h5
-                font.family: Fonts.iconFont
+                anchors.verticalCenter: parent.verticalCenter
+                width: 32
+                height: 32
+                radius: Theme.blockRadius
+                activeFocusOnTab: true
+                color: muteHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
+                border.width: activeFocus ? 1 : 0
+                border.color: slimRoot.muted ? Colors.error : Colors.primary
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: slimRoot.muted ? slimRoot.mutedIcon : slimRoot.muteIcon
+                    color: slimRoot.muted ? Colors.error : Colors.primary
+                    font.pixelSize: Fonts.h5
+                    font.family: Fonts.iconFont
+                }
+
                 HoverHandler {
+                    id: muteHover
                     cursorShape: Qt.PointingHandCursor
                 }
                 TapHandler {
                     onTapped: slimRoot.muteToggled()
+                }
+                Keys.onPressed: function (event) {
+                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                        slimRoot.muteToggled();
+                        event.accepted = true;
+                    }
                 }
             }
         }

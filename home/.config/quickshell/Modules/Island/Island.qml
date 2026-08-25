@@ -610,7 +610,7 @@ Variants {
                                     width: tabLabel.implicitWidth + 24
                                     height: 28
                                     radius: Theme.blockRadius
-                                    color: tabChip.active ? "transparent" : tabHover.hovered ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.08) : "transparent"
+                                    color: tabChip.active ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0) : tabHover.hovered ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.08) : Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0)
 
                                     Behavior on color {
                                         ColorAnimation {

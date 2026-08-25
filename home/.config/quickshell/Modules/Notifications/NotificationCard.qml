@@ -403,7 +403,7 @@ Item {
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: menuItemLabel.implicitWidth + 20
                         radius: Theme.blockRadius
-                        color: menuItemHover.hovered ? Colors.surface_container_highest : "transparent"
+                        color: menuItemHover.hovered ? Colors.surface_container_highest : Colors.surface_container_high
 
                         Behavior on color {
                             ColorAnimation {
