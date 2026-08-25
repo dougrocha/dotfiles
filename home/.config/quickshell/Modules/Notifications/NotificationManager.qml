@@ -39,7 +39,9 @@ Variants {
 
         // +10 for the gutter the cards' close badges hang into.
         implicitWidth: Theme.notifications.panelWidth + 10
-        implicitHeight: cardColumn.implicitHeight + Theme.notifications.margin * 2
+        // Keep the layer surface stable while notification cards collapse.
+        // The mask below limits input to the visible card stack.
+        implicitHeight: Math.max(1, modelData.height - Theme.topBarHeight)
 
         property var localNotifications: []
 
