@@ -12,12 +12,30 @@ Rectangle {
     property var trayItem: modelData
     property bool menuOpen: false
     property bool dragging: dragHandler.active
+    property real previewOffsetX: 0
     signal menuRequested(var trayItem, Item anchorItem)
     signal disappearing(Item anchorItem)
     signal dragStarted(Item sourceItem)
     signal dragMoved(Item sourceItem, point translation)
     signal dragFinished(Item sourceItem, point translation, bool cancelled)
     signal organizeRequested(string command)
+
+    function formatTrayTitle(tooltipTitle, title, id) {
+        if (tooltipTitle)
+            return tooltipTitle;
+        if (title) {
+            const looksLikeBundleId = /^[a-z0-9-]+(\.[a-z0-9_-]+){2,}$/.test(title) && /[a-z]/.test(title);
+            if (looksLikeBundleId) {
+                const lastPart = title.slice(title.lastIndexOf(".") + 1);
+                const cleaned = lastPart.replace(/[_-]+/g, " ")
+                    .replace(/\b\w/g, c => c.toUpperCase())
+                    .replace(/\sApp$/i, "");
+                return cleaned || title;
+            }
+            return title;
+        }
+        return id;
+    }
 
     function requestPrimaryAction() {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
@@ -35,10 +53,19 @@ Rectangle {
     color: menuOpen || activeFocus ? Colors.surface_container_highest : hoverHandler.hovered ? Colors.surface_container_high : "transparent"
     border.width: trayItem.status === Status.NeedsAttention || activeFocus ? 1 : 0
     border.color: trayItem.status === Status.NeedsAttention ? Colors.primary : Colors.outline
+    transform: Translate {
+        x: root.previewOffsetX
+    }
 
     Behavior on color {
         ColorAnimation {
             duration: Theme.animations.fast
+        }
+    }
+    Behavior on previewOffsetX {
+        NumberAnimation {
+            duration: 180
+            easing.type: Easing.OutCubic
         }
     }
 
@@ -57,7 +84,7 @@ Rectangle {
     }
 
     Tooltip {
-        text: root.trayItem.tooltipTitle || root.trayItem.title || root.trayItem.id
+        text: root.formatTrayTitle(root.trayItem.tooltipTitle, root.trayItem.title, root.trayItem.id)
         targetItem: root
         hovered: hoverHandler.hovered && !root.dragging
     }
@@ -123,8 +150,6 @@ Rectangle {
                 root.organizeRequested("left");
             else if (event.key === Qt.Key_Right)
                 root.organizeRequested("right");
-            else if (event.key === Qt.Key_Up || event.key === Qt.Key_Down)
-                root.organizeRequested("other");
             else
                 return;
             event.accepted = true;

@@ -164,8 +164,11 @@ Variants {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 14
 
+                    readonly property int trayGap: 8
+
                     TraySection {
                         id: traySection
+                        Layout.rightMargin: indicatorRow.trayGap - indicatorRow.spacing
                     }
 
                     CpuIndicator {}

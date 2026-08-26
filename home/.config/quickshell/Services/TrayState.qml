@@ -3,13 +3,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.SystemTray
 
-// Reconciles durable tray placement with the currently connected protocol items.
 Singleton {
     id: root
 
     readonly property var liveItems: SystemTray.items.values
-    property var visibleItems: []
-    property var drawerItems: []
+    property var items: []
 
     function validId(item) {
         return item && typeof item.id === "string" ? item.id.trim() : "";
@@ -27,21 +25,11 @@ Singleton {
         return result;
     }
 
-    function reconciledIds() {
-        const seen = {};
-        const visible = cleanIds(SettingsService.trayVisible, seen);
-        const drawer = cleanIds(SettingsService.trayDrawer, seen);
-        return {
-            visible,
-            drawer
-        };
-    }
-
     function reconcile() {
         if (!SettingsService.loaded)
             return;
 
-        const saved = reconciledIds();
+        const saved = cleanIds(SettingsService.trayOrder, {});
         const byId = {};
         const anonymous = [];
         for (const item of liveItems) {
@@ -52,32 +40,23 @@ Singleton {
                 anonymous.push(item);
         }
 
-        const visible = [];
-        const drawer = [];
+        const ordered = [];
         const placed = {};
-        for (const id of saved.visible) {
+        for (const id of saved) {
             if (byId[id]) {
-                visible.push(byId[id]);
+                ordered.push(byId[id]);
                 placed[id] = true;
             }
         }
-        for (const id of saved.drawer) {
-            if (byId[id]) {
-                drawer.push(byId[id]);
-                placed[id] = true;
-            }
-        }
-        // New and not-yet-identifiable items are visible, in protocol order.
         for (const item of liveItems) {
             const id = validId(item);
             if (id && !placed[id]) {
-                visible.push(item);
+                ordered.push(item);
                 placed[id] = true;
             }
         }
-        visible.push(...anonymous);
-        visibleItems = visible;
-        drawerItems = drawer;
+        ordered.push(...anonymous);
+        items = ordered;
     }
 
     function insertAtLiveIndex(stored, live, itemId, index) {
@@ -96,44 +75,30 @@ Singleton {
         return result;
     }
 
-    // destination is "visible" or "drawer"; index is in the live destination region.
-    function move(itemId, destination, index) {
+    function move(itemId, index) {
         itemId = typeof itemId === "string" ? itemId.trim() : "";
-        if (!itemId || (destination !== "visible" && destination !== "drawer"))
+        if (!itemId)
             return false;
 
         const item = liveItems.find(candidate => validId(candidate) === itemId);
         if (!item)
             return false;
 
-        const saved = reconciledIds();
-        const sourceRegion = saved.drawer.includes(itemId) ? "drawer" : "visible";
-        const sourceLive = sourceRegion === "drawer" ? drawerItems : visibleItems;
-        const sourceIndex = sourceLive.findIndex(candidate => validId(candidate) === itemId);
-        if (sourceRegion === destination && sourceIndex >= 0 && sourceIndex < index)
+        const saved = cleanIds(SettingsService.trayOrder, {});
+        const sourceIndex = items.findIndex(candidate => validId(candidate) === itemId);
+        if (sourceIndex >= 0 && sourceIndex < index)
             index--;
-        // Include newly discovered IDs only when an actual organization change is committed.
-        for (const live of visibleItems) {
+        for (const live of items) {
             const id = validId(live);
-            if (id && !saved.visible.includes(id) && !saved.drawer.includes(id))
-                saved.visible.push(id);
-        }
-        for (const live of drawerItems) {
-            const id = validId(live);
-            if (id && !saved.visible.includes(id) && !saved.drawer.includes(id))
-                saved.drawer.push(id);
+            if (id && !saved.includes(id))
+                saved.push(id);
         }
 
-        saved.visible = saved.visible.filter(id => id !== itemId);
-        saved.drawer = saved.drawer.filter(id => id !== itemId);
-        if (destination === "visible")
-            saved.visible = insertAtLiveIndex(saved.visible, visibleItems, itemId, index);
-        else
-            saved.drawer = insertAtLiveIndex(saved.drawer, drawerItems, itemId, index);
+        const filtered = saved.filter(id => id !== itemId);
+        const reordered = insertAtLiveIndex(filtered, items, itemId, index);
 
         SettingsService.trayVersion = 1;
-        SettingsService.trayVisible = saved.visible;
-        SettingsService.trayDrawer = saved.drawer;
+        SettingsService.trayOrder = reordered;
         reconcile();
         return true;
     }
@@ -145,10 +110,7 @@ Singleton {
         function onLoadedChanged() {
             root.reconcile();
         }
-        function onTrayVisibleChanged() {
-            root.reconcile();
-        }
-        function onTrayDrawerChanged() {
+        function onTrayOrderChanged() {
             root.reconcile();
         }
     }

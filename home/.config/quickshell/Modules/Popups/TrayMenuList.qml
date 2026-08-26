@@ -65,6 +65,8 @@ Item {
                             onToggleRequested: entryColumn.expanded = !entryColumn.expanded
                             onTriggerRequested: {
                                 entryColumn.modelData.triggered();
+                                // A Quit entry can remove its DBus service immediately;
+                                // release every opener in the same event-loop turn.
                                 branch.closeRequested();
                             }
                         }

@@ -15,8 +15,7 @@ Singleton {
     property alias weekStart: adapter.weekStart
     property alias clockFormat: adapter.clockFormat
     property alias trayVersion: traySettings.version
-    property alias trayVisible: traySettings.visible
-    property alias trayDrawer: traySettings.drawer
+    property alias trayOrder: traySettings.order
 
     property alias screenshotCaptureMode: screenshotSettings.captureMode
     property alias screenshotTimerDelay: screenshotSettings.timerDelay
@@ -73,8 +72,7 @@ Singleton {
                 id: traySettings
 
                 property int version: 0
-                property list<string> visible: []
-                property list<string> drawer: []
+                property list<string> order: []
             }
 
             property JsonObject screenshot: JsonObject {

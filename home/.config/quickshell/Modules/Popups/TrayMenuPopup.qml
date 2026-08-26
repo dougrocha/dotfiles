@@ -9,6 +9,7 @@ PopupWindow {
 
     property Item anchorItem
     property var menuOpener: null
+    signal closeRequested
     readonly property var barWindow: anchorItem ? anchorItem.QsWindow.window : null
     readonly property real maximumHeight: barWindow && barWindow.screen ? Math.max(120, barWindow.screen.height - barWindow.height - 24) : 600
 
@@ -39,13 +40,13 @@ PopupWindow {
     PopupGrab {
         popup: root
         anchorWindow: root.barWindow
-        onDismissed: root.visible = false
+        onDismissed: root.closeRequested()
     }
 
     Connections {
         target: Visibilities
         function onCloseTrayMenus() {
-            root.visible = false;
+            root.closeRequested();
         }
     }
 
@@ -71,7 +72,7 @@ PopupWindow {
         focus: root.visible
         Keys.onPressed: function (event) {
             if (event.key === Qt.Key_Escape) {
-                root.visible = false;
+                root.closeRequested();
                 event.accepted = true;
             }
         }
@@ -110,7 +111,7 @@ PopupWindow {
                 TrayMenuList {
                     width: menuColumn.width
                     menuHandle: root.menuOpener ? root.menuOpener.menu : null
-                    onCloseRequested: root.visible = false
+                    onCloseRequested: root.closeRequested()
                 }
             }
         }
