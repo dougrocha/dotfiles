@@ -22,8 +22,16 @@ Rectangle {
     radius: Theme.popup.radius
     color: Colors.surface_container
     opacity: reveal
+    clip: true
     transform: Translate {
         y: (1 - card.reveal) * -6
+    }
+
+    Behavior on height {
+        NumberAnimation {
+            duration: Theme.animations.normal
+            easing.type: Easing.OutCubic
+        }
     }
 
     focus: shown

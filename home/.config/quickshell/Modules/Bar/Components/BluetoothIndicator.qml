@@ -34,7 +34,7 @@ Item {
 
     Tooltip {
         targetItem: root
-        text: BluetoothService.hasConnectedDevices ? "Bluetooth · Connected" : (BluetoothService.bluetoothEnabled ? "Bluetooth · On" : "Bluetooth · Off")
+        text: BluetoothService.hasConnectedDevices ? "Bluetooth: Connected" : (BluetoothService.bluetoothEnabled ? "Bluetooth: On" : "Bluetooth: Off")
         hovered: hover.hovered
     }
 }

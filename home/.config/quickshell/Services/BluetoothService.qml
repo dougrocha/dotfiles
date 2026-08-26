@@ -26,11 +26,9 @@ Singleton {
         return connectedDevices.length + " Devices Connected";
     }
 
-    // A device is "discovered" until it has a pairing record, then "paired", then "connected".
     readonly property var namedDevices: devices.filter(d => hasHumanName(d))
     readonly property var connectedRows: sortedRows(namedDevices.filter(d => d.connected))
     readonly property var pairedRows: sortedRows(namedDevices.filter(d => !d.connected && isKnown(d)))
-    readonly property var discoveredRows: sortedRows(namedDevices.filter(d => !d.connected && !isKnown(d)))
 
     function deviceLabel(device) {
         if (!device)
@@ -217,7 +215,6 @@ Singleton {
 
     onConnectedRowsChanged: syncPending()
     onPairedRowsChanged: syncPending()
-    onDiscoveredRowsChanged: syncPending()
 
     // Fallback so a silent device doesn't sit at "Connecting…" forever.
     Timer {

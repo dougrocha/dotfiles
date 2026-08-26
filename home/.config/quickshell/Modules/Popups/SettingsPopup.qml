@@ -6,75 +6,15 @@ import qs.Components
 import qs.Constants
 import qs.Services
 
-PopupWindow {
+Popup {
     id: panel
 
-    color: "transparent"
-    implicitWidth: card.cardWidth
-    implicitHeight: {
-        const win = anchor.window;
-        return (win && win.screen) ? Math.max(400, win.screen.height - win.height - 12) : 800;
-    }
-
-    mask: Region {
-        item: card
-    }
-
-    visible: Visibilities.settingsPanel
-
-    PopupGrab {
-        popup: panel
-        onDismissed: Visibilities.settingsPanel = false
-    }
+    shown: Visibilities.settingsPanel
+    onDismissed: Visibilities.settingsPanel = false
 
     onVisibleChanged: {
         if (visible)
             IdleService.refresh();
-    }
-
-    component Toggle: Rectangle {
-        id: toggle
-
-        property bool checked: false
-
-        width: 38
-        height: 22
-        radius: height / 2
-        color: checked ? Colors.primary : Colors.surface_container_highest
-        border.color: checked ? Colors.primary : Colors.outline
-        border.width: 1
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-        Behavior on border.color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-
-        Rectangle {
-            width: 14
-            height: 14
-            radius: width / 2
-            y: (parent.height - height) / 2
-            x: toggle.checked ? toggle.width - width - 4 : 4
-            color: toggle.checked ? Colors.on_primary : Colors.outline
-
-            Behavior on x {
-                NumberAnimation {
-                    duration: Theme.animations.fast
-                    easing.type: Easing.OutCubic
-                }
-            }
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
-            }
-        }
     }
 
     component DeviceBatteryRow: Item {
@@ -179,18 +119,11 @@ PopupWindow {
         signal tapped
 
         activeFocusOnTab: true
-        height: 48
+        height: 44
         radius: Theme.blockRadius
-        color: powerHover.hovered || activeFocus ? Qt.rgba(accent.r, accent.g, accent.b, 0.14) : Qt.rgba(accent.r, accent.g, accent.b, 0)
-        border.color: powerHover.hovered || activeFocus ? accent : Colors.outline_variant
-        border.width: 1
+        color: powerHover.hovered || activeFocus ? Colors.surface_container_high : Colors.surface_container
 
         Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-        Behavior on border.color {
             ColorAnimation {
                 duration: Theme.animations.fast
             }
@@ -236,21 +169,13 @@ PopupWindow {
         }
     }
 
-    PopupCard {
-        id: card
-
-        readonly property int cardWidth: 300
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        shown: Visibilities.settingsPanel
-        onDismissed: Visibilities.settingsPanel = false
+    Column {
+        width: parent.width
+        spacing: 6
 
         Item {
             width: parent.width
-            height: 28
+            height: 24
 
             Text {
                 anchors.left: parent.left
@@ -258,23 +183,21 @@ PopupWindow {
                 text: "System"
                 color: Colors.on_surface
                 font.pixelSize: 16
-                font.family: Fonts.font
                 font.weight: Font.Medium
+                font.family: Fonts.font
             }
         }
-
-        PopupDivider {}
 
         Rectangle {
             id: idleRow
 
+            readonly property bool active: IdleService.active
+
             width: parent.width
-            height: 44
+            height: 34
             radius: Theme.blockRadius
             activeFocusOnTab: true
-            color: idleHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
-            border.width: activeFocus ? 1 : 0
-            border.color: Colors.primary
+            color: active ? Colors.primary : (idleHover.hovered || activeFocus ? Colors.surface_container_high : Colors.surface_container)
 
             Behavior on color {
                 ColorAnimation {
@@ -283,25 +206,39 @@ PopupWindow {
             }
 
             Text {
+                id: idleIcon
                 anchors.left: parent.left
-                anchors.leftMargin: 12
-                anchors.right: idleToggle.left
-                anchors.rightMargin: 12
+                anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Idle lock"
-                color: Colors.on_surface
-                font.pixelSize: Fonts.body.size
-                font.weight: Font.Medium
-                font.family: Fonts.font
-                elide: Text.ElideRight
+                text: PhosphorIcons.lockSimple
+                color: idleRow.active ? Colors.on_primary : Colors.on_surface_variant
+                font.pixelSize: 15
+                font.family: Fonts.phosphorFont
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
             }
 
-            Toggle {
-                id: idleToggle
+            Text {
+                anchors.left: idleIcon.right
+                anchors.leftMargin: 8
                 anchors.right: parent.right
-                anchors.rightMargin: 12
+                anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                checked: IdleService.active
+                text: "Idle lock"
+                color: idleRow.active ? Colors.on_primary : Colors.on_surface
+                font.pixelSize: Fonts.body.size
+                font.family: Fonts.font
+                elide: Text.ElideRight
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
+                }
             }
 
             HoverHandler {
@@ -321,10 +258,13 @@ PopupWindow {
 
         Column {
             width: parent.width
-            spacing: Theme.popup.spacing
+            spacing: 6
             visible: DeviceBatteryService.hasDevices
 
-            PopupDivider {}
+            Item {
+                width: parent.width
+                height: 4
+            }
 
             SectionLabel {
                 text: "DEVICES"
@@ -364,13 +304,11 @@ PopupWindow {
             }
         }
 
-        PopupDivider {
-            visible: DeviceBatteryService.hasDevices
-        }
-
         Column {
             width: parent.width
             spacing: 8
+
+            Divider {}
 
             Row {
                 width: parent.width

@@ -68,6 +68,7 @@ PopupWindow {
         transformOrigin: Item.Top
         scale: root.visible ? 1.0 : 0.92
         opacity: root.visible ? 1.0 : 0.0
+        clip: true
 
         focus: root.visible
         Keys.onPressed: function (event) {
@@ -87,6 +88,12 @@ PopupWindow {
         Behavior on opacity {
             NumberAnimation {
                 duration: 80
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on height {
+            NumberAnimation {
+                duration: Theme.animations.normal
                 easing.type: Easing.OutCubic
             }
         }

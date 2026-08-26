@@ -24,7 +24,7 @@ Rectangle {
         id: iconBadge
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: 6
+        anchors.leftMargin: 8
         width: 22
         height: 22
         radius: 11

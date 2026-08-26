@@ -6,94 +6,11 @@ import qs.Components
 import qs.Constants
 import qs.Services
 
-PopupWindow {
+Popup {
     id: panel
 
-    color: "transparent"
-
-    implicitWidth: card.cardWidth
-    implicitHeight: card.height
-
-    mask: Region {
-        item: card
-    }
-
-    visible: Visibilities.bluetoothPanel
-
-    PopupGrab {
-        popup: panel
-        onDismissed: Visibilities.bluetoothPanel = false
-    }
-
-    // Stop scanning when the panel closes; pending actions live in the service.
-    onVisibleChanged: {
-        if (!visible && BluetoothService.adapter)
-            BluetoothService.adapter.discovering = false;
-    }
-
-    // Re-assert discovery while the panel is open; it times out on its own.
-    Timer {
-        id: discoveryRetry
-        interval: 1000
-        repeat: true
-        triggeredOnStart: true
-        running: panel.visible && BluetoothService.adapterPowered && !(BluetoothService.adapter?.discovering ?? true)
-        onTriggered: BluetoothService.adapter.discovering = true
-    }
-
-    component Toggle: Rectangle {
-        id: toggle
-
-        property bool checked: false
-
-        signal tapped
-
-        width: 34
-        height: 18
-        radius: height / 2
-        color: checked ? Colors.primary : Colors.surface_container_high
-        border.color: checked ? Colors.primary : Colors.outline
-        border.width: 1
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-        Behavior on border.color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-
-        Rectangle {
-            width: 12
-            height: 12
-            radius: width / 2
-            y: (parent.height - height) / 2
-            x: toggle.checked ? toggle.width - width - 3 : 3
-            color: toggle.checked ? Colors.on_primary : Colors.outline
-
-            Behavior on x {
-                NumberAnimation {
-                    duration: Theme.animations.fast
-                    easing.type: Easing.OutCubic
-                }
-            }
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
-            }
-        }
-
-        HoverHandler {
-            cursorShape: Qt.PointingHandCursor
-        }
-        TapHandler {
-            onTapped: toggle.tapped()
-        }
-    }
+    shown: Visibilities.bluetoothPanel
+    onDismissed: Visibilities.bluetoothPanel = false
 
     component DeviceEntry: Rectangle {
         id: entry
@@ -105,20 +22,20 @@ PopupWindow {
         readonly property bool hovered: rowMouse.containsMouse || forgetMouse.containsMouse
         readonly property string statusText: {
             if (action === "forgetting")
-                return "Forgetting…";
+                return "Forgetting";
             if (action === "disconnecting" || row.state === BluetoothDeviceState.Disconnecting)
-                return "Disconnecting…";
+                return "Disconnecting";
             if (action === "pairing")
-                return "Pairing…";
+                return "Pairing";
             if (action === "connecting" || row.state === BluetoothDeviceState.Connecting)
-                return "Connecting…";
+                return "Connecting";
             if (row.connected)
                 return BluetoothService.batteryLabel(row.address) || "Connected";
             return "";
         }
 
         width: parent.width
-        height: 40
+        height: 34
         radius: Theme.blockRadius
         // Animate to the card's own colour, not "transparent", or the fill flashes dark.
         color: entry.hovered ? Colors.surface_container_high : Colors.surface_container
@@ -141,11 +58,11 @@ PopupWindow {
         Text {
             id: entryIcon
             anchors.left: parent.left
-            anchors.leftMargin: 10
+            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             text: entry.row.icon
             color: entry.row.connected ? Colors.primary : Colors.on_surface_variant
-            font.pixelSize: Fonts.h5
+            font.pixelSize: 15
             font.family: Fonts.phosphorFont
 
             Behavior on color {
@@ -157,7 +74,7 @@ PopupWindow {
 
         Column {
             anchors.left: entryIcon.right
-            anchors.leftMargin: 10
+            anchors.leftMargin: 8
             anchors.right: forgetButton.left
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
@@ -190,7 +107,7 @@ PopupWindow {
             visible: entry.row.known && entry.hovered
 
             anchors.right: parent.right
-            anchors.rightMargin: 8
+            anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
             width: 22
             height: 22
@@ -228,29 +145,50 @@ PopupWindow {
         }
     }
 
-    PopupCard {
-        id: card
-
-        readonly property int cardWidth: 300
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        shown: Visibilities.bluetoothPanel
-        onDismissed: Visibilities.bluetoothPanel = false
+    Column {
+        width: parent.width
+        spacing: 6
 
         Item {
             width: parent.width
-            height: 34
+            height: 24
 
             Text {
-                id: heroIcon
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                text: BluetoothService.hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (BluetoothService.bluetoothEnabled ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
-                color: BluetoothService.bluetoothEnabled ? Colors.primary : Colors.on_surface_variant
-                font.pixelSize: Fonts.h2
+                text: "Bluetooth"
+                color: Colors.on_surface
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                font.family: Fonts.font
+            }
+        }
+
+        Rectangle {
+            id: powerRow
+
+            readonly property bool active: BluetoothService.bluetoothEnabled
+
+            width: parent.width
+            height: 34
+            radius: Theme.blockRadius
+            activeFocusOnTab: true
+            color: active ? Colors.primary : (powerHover.hovered || activeFocus ? Colors.surface_container_high : Colors.surface_container)
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.animations.fast
+                }
+            }
+
+            Text {
+                id: powerIcon
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                text: BluetoothService.hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (powerRow.active ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
+                color: powerRow.active ? Colors.on_primary : Colors.on_surface_variant
+                font.pixelSize: 15
                 font.family: Fonts.phosphorFont
 
                 Behavior on color {
@@ -260,52 +198,56 @@ PopupWindow {
                 }
             }
 
-            Column {
-                anchors.left: heroIcon.right
-                anchors.leftMargin: 12
-                anchors.right: powerToggle.left
+            Text {
+                anchors.left: powerIcon.right
+                anchors.leftMargin: 8
+                anchors.right: parent.right
                 anchors.rightMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 1
+                text: BluetoothService.statusText.replace(/^Bluetooth\s+/, "")
+                color: powerRow.active ? Colors.on_primary : Colors.on_surface
+                font.pixelSize: Fonts.body.size
+                font.family: Fonts.font
+                elide: Text.ElideRight
 
-                Text {
-                    width: parent.width
-                    text: "Bluetooth"
-                    color: Colors.on_surface
-                    font.pixelSize: Fonts.h4
-                    font.family: Fonts.font
-                    font.weight: Font.DemiBold
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    width: parent.width
-                    text: BluetoothService.statusText
-                    color: Colors.on_surface_variant
-                    font.pixelSize: Fonts.caption
-                    font.family: Fonts.font
-                    elide: Text.ElideRight
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animations.fast
+                    }
                 }
             }
 
-            Toggle {
-                id: powerToggle
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                checked: BluetoothService.bluetoothEnabled
+            HoverHandler {
+                id: powerHover
+                cursorShape: Qt.PointingHandCursor
+            }
+            TapHandler {
                 onTapped: BluetoothService.togglePower()
+            }
+            Keys.onPressed: function (event) {
+                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                    BluetoothService.togglePower();
+                    event.accepted = true;
+                }
             }
         }
 
         Column {
             width: parent.width
-            spacing: Theme.popup.spacing
+            spacing: 6
             visible: BluetoothService.connectedRows.length > 0
 
-            PopupDivider {}
+            Item {
+                width: parent.width
+                height: 4
+            }
 
-            SectionLabel {
-                text: "CONNECTED"
+            Text {
+                text: "Connected"
+                color: Colors.on_surface_variant
+                font.pixelSize: Fonts.caption
+                font.weight: Font.Medium
+                font.family: Fonts.font
             }
 
             Column {
@@ -328,76 +270,50 @@ PopupWindow {
 
         Column {
             width: parent.width
-            spacing: Theme.popup.spacing
-            visible: BluetoothService.pairedRows.length > 0 || BluetoothService.discoveredRows.length > 0
+            spacing: 6
+            visible: BluetoothService.pairedRows.length > 0
 
-            PopupDivider {}
+            Divider {
+                visible: BluetoothService.connectedRows.length > 0
+            }
+
+            Item {
+                width: parent.width
+                height: 4
+                visible: BluetoothService.connectedRows.length === 0
+            }
+
+            Text {
+                text: "Paired"
+                color: Colors.on_surface
+                font.pixelSize: Fonts.body.size
+                font.weight: Font.Medium
+                font.family: Fonts.font
+            }
 
             // Capped so a busy room can't run the card off-screen.
             Flickable {
                 width: parent.width
-                height: Math.min(scrollContent.implicitHeight, 240)
-                contentHeight: scrollContent.implicitHeight
+                height: Math.min(pairedColumn.implicitHeight, 240)
+                contentHeight: pairedColumn.implicitHeight
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
                 interactive: contentHeight > height
 
                 Column {
-                    id: scrollContent
+                    id: pairedColumn
                     width: parent.width
-                    spacing: Theme.popup.spacing
+                    spacing: 2
 
-                    Column {
-                        width: parent.width
-                        spacing: Theme.popup.spacing
-                        visible: BluetoothService.pairedRows.length > 0
-
-                        SectionLabel {
-                            text: "PAIRED"
+                    Repeater {
+                        model: ScriptModel {
+                            values: BluetoothService.pairedRows
+                            objectProp: "address"
                         }
 
-                        Column {
-                            width: parent.width
-                            spacing: 2
-
-                            Repeater {
-                                model: ScriptModel {
-                                    values: BluetoothService.pairedRows
-                                    objectProp: "address"
-                                }
-
-                                delegate: DeviceEntry {
-                                    required property var modelData
-                                    row: modelData
-                                }
-                            }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.popup.spacing
-                        visible: BluetoothService.discoveredRows.length > 0
-
-                        SectionLabel {
-                            text: "AVAILABLE"
-                        }
-
-                        Column {
-                            width: parent.width
-                            spacing: 2
-
-                            Repeater {
-                                model: ScriptModel {
-                                    values: BluetoothService.discoveredRows
-                                    objectProp: "address"
-                                }
-
-                                delegate: DeviceEntry {
-                                    required property var modelData
-                                    row: modelData
-                                }
-                            }
+                        delegate: DeviceEntry {
+                            required property var modelData
+                            row: modelData
                         }
                     }
                 }
@@ -405,14 +321,14 @@ PopupWindow {
         }
 
         Text {
-            visible: BluetoothService.connectedRows.length === 0 && BluetoothService.pairedRows.length === 0 && BluetoothService.discoveredRows.length === 0
+            visible: BluetoothService.connectedRows.length === 0 && BluetoothService.pairedRows.length === 0
             width: parent.width
             text: {
                 if (!BluetoothService.adapter)
                     return "No Bluetooth adapter";
                 if (!BluetoothService.bluetoothEnabled)
-                    return "Turn Bluetooth on to scan";
-                return "Scanning for devices…";
+                    return "Turn Bluetooth on";
+                return "No paired devices";
             }
             color: Colors.on_surface_variant
             font.pixelSize: Fonts.body.size
@@ -420,19 +336,18 @@ PopupWindow {
             wrapMode: Text.WordWrap
         }
 
-        PopupDivider {}
-
         PopupActionButton {
-            label: "Bluetooth Settings…"
+            label: "Bluetui"
+            leftAlign: true
             onTapped: {
                 Visibilities.bluetoothPanel = false;
                 bluetoothSettingsProc.running = true;
             }
         }
+    }
 
-        Process {
-            id: bluetoothSettingsProc
-            command: ["launch-or-focus-tui", "bluetui"]
-        }
+    Process {
+        id: bluetoothSettingsProc
+        command: ["launch-or-focus-tui", "bluetui"]
     }
 }
