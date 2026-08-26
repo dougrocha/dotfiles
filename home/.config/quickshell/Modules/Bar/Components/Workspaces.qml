@@ -35,18 +35,22 @@ Item {
                     readonly property bool isActive: modelData.active
                     readonly property bool hasWindows: (modelData.lastIpcObject?.windows ?? 0) > 0
 
+                    readonly property int resizeDuration: 120
+                    readonly property int stateDuration: 100
+
                     visible: width > 0
                     width: belongsToMonitor ? 10 : 0
                     height: 10
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 120
+                            duration: resizeDuration
                             easing.type: Easing.OutCubic
                         }
                     }
 
                     Rectangle {
+                        id: dot
                         anchors.fill: parent
                         radius: 5
                         color: isActive ? Colors.primary : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, hasWindows ? 0.15 : 0.0)
@@ -56,18 +60,18 @@ Item {
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: 100
+                                duration: dot.parent.stateDuration
                             }
                         }
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: 100
+                                duration: dot.parent.stateDuration
                                 easing.type: Easing.OutCubic
                             }
                         }
                         Behavior on border.color {
                             ColorAnimation {
-                                duration: 100
+                                duration: dot.parent.stateDuration
                             }
                         }
                     }

@@ -15,7 +15,7 @@ Item {
         anchors.centerIn: parent
         text: PhosphorIcons.cpu
         color: CpuService.usage > 80 ? Colors.error : Colors.on_surface_variant
-        font.pixelSize: 14
+        font.pixelSize: Fonts.p
         font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {

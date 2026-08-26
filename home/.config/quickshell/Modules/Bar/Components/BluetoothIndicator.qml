@@ -14,7 +14,7 @@ Item {
         anchors.centerIn: parent
         text: BluetoothService.hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (BluetoothService.bluetoothEnabled ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
         color: BluetoothService.hasConnectedDevices ? Colors.primary : Colors.on_surface_variant
-        font.pixelSize: 14
+        font.pixelSize: Fonts.p
         font.family: Fonts.phosphorFont
         Behavior on color {
             ColorAnimation {

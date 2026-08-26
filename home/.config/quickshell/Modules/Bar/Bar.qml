@@ -14,13 +14,6 @@ Variants {
     id: root
     model: Quickshell.screens
 
-    component Separator: Rectangle {
-        Layout.preferredWidth: 1
-        Layout.preferredHeight: 12
-        Layout.alignment: Qt.AlignVCenter
-        color: Qt.rgba(Colors.on_surface_variant.r, Colors.on_surface_variant.g, Colors.on_surface_variant.b, 0.25)
-    }
-
     delegate: PanelWindow {
         id: topBar
 
