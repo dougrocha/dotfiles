@@ -374,7 +374,7 @@ Item {
                                 text: modelData
                                 color: root.isWeekendColumn(index) ? Colors.tertiary : Colors.on_surface_variant
                                 font.family: Fonts.font
-                                font.pixelSize: Fonts.small
+                                font.pixelSize: Fonts.body.size
                                 font.letterSpacing: 1
                                 opacity: 0.8
                             }
@@ -507,7 +507,7 @@ Item {
                 text: root.selectedDayDetail.toUpperCase()
                 color: Colors.on_surface_variant
                 font.family: Fonts.font
-                font.pixelSize: Fonts.small
+                font.pixelSize: Fonts.body.size
                 font.letterSpacing: 1
             }
 
@@ -517,7 +517,7 @@ Item {
                 text: root.selectedDayHoliday.toUpperCase()
                 color: Colors.tertiary
                 font.family: Fonts.font
-                font.pixelSize: Fonts.small
+                font.pixelSize: Fonts.body.size
                 font.letterSpacing: 1
                 font.weight: Font.DemiBold
             }

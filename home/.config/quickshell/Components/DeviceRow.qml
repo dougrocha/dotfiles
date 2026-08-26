@@ -2,13 +2,16 @@ import QtQuick
 import qs.Constants
 
 Rectangle {
+    id: root
+
     property string label: ""
+    property string icon: ""
     property bool active: false
 
     signal tapped
 
     width: parent.width
-    height: Theme.blockHeight
+    height: 34
     radius: Theme.blockRadius
     color: rowHover.hovered ? Colors.surface_container_high : Colors.surface_container
     Behavior on color {
@@ -18,26 +21,44 @@ Rectangle {
     }
 
     Rectangle {
+        id: iconBadge
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
-        anchors.leftMargin: 10
-        width: 6
-        height: 6
-        radius: 3
-        color: parent.active ? Colors.primary : Colors.outline
+        anchors.leftMargin: 6
+        width: 22
+        height: 22
+        radius: 11
+        color: root.active ? Colors.primary : "transparent"
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+
+        Text {
+            anchors.centerIn: parent
+            text: root.icon
+            color: root.active ? Colors.on_primary : Colors.on_surface_variant
+            font.pixelSize: 13
+            font.family: Fonts.phosphorFont
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.animations.fast
+                }
+            }
+        }
     }
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: 24
+        anchors.left: iconBadge.right
+        anchors.leftMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 10
-        text: parent.label
-        color: parent.active ? Colors.primary : Colors.on_surface_variant
-        font.pixelSize: Fonts.small
+        text: root.label
+        color: Colors.on_surface
+        font.pixelSize: Fonts.body.size
         font.family: Fonts.font
-        font.weight: parent.active ? Font.Medium : Font.Normal
         elide: Text.ElideRight
     }
 
@@ -46,6 +67,6 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
     }
     TapHandler {
-        onTapped: parent.tapped()
+        onTapped: root.tapped()
     }
 }

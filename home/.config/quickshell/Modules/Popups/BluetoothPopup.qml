@@ -167,7 +167,7 @@ PopupWindow {
                 width: parent.width
                 text: entry.row.label
                 color: entry.row.connected ? Colors.on_surface : Colors.on_surface_variant
-                font.pixelSize: Fonts.small
+                font.pixelSize: Fonts.body.size
                 font.family: Fonts.font
                 font.weight: entry.row.connected ? Font.Medium : Font.Normal
                 elide: Text.ElideRight
@@ -207,7 +207,7 @@ PopupWindow {
                 anchors.centerIn: parent
                 text: PhosphorIcons.x
                 color: forgetMouse.containsMouse ? Colors.error : Colors.on_surface_variant
-                font.pixelSize: Fonts.small
+                font.pixelSize: Fonts.body.size
                 font.family: Fonts.phosphorFont
 
                 Behavior on color {
@@ -226,7 +226,6 @@ PopupWindow {
                 onClicked: BluetoothService.forget(entry.row)
             }
         }
-
     }
 
     PopupCard {
@@ -416,7 +415,7 @@ PopupWindow {
                 return "Scanning for devices…";
             }
             color: Colors.on_surface_variant
-            font.pixelSize: Fonts.small
+            font.pixelSize: Fonts.body.size
             font.family: Fonts.font
             wrapMode: Text.WordWrap
         }

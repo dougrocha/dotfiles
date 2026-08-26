@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Widgets
+import qs.Constants
 
 Singleton {
     id: root
@@ -69,12 +70,6 @@ Singleton {
 
     function decrementVolume(amount) {
         setVolume(volume - (amount || 0.05));
-    }
-
-    function toggleMute() {
-        if (sink?.ready && sink?.audio) {
-            sink.audio.muted = !sink.audio.muted;
-        }
     }
 
     function setSourceVolumeValue(newVolume) {
@@ -154,6 +149,23 @@ Singleton {
             return outMatch[1].trim();
 
         return desc;
+    }
+
+    // PipeWire rarely exposes device.form-factor/icon-name for plain ALSA/USB hardware
+    // (only genuine Bluetooth nodes tend to carry it), so pick an icon from the name instead.
+    function deviceIcon(node) {
+        if (!node)
+            return PhosphorIcons.speakerHigh;
+
+        const name = (node.name || "").toLowerCase();
+        const desc = (node.description || node.nickname || "").toLowerCase();
+
+        if (name.includes("bluez") || desc.includes("headset") || desc.includes("headphone"))
+            return PhosphorIcons.headphones;
+        if (name.includes("hdmi") || desc.includes("hdmi"))
+            return PhosphorIcons.monitor;
+
+        return node.isSink ? PhosphorIcons.speakerHigh : PhosphorIcons.microphone;
     }
 
     // A replaced on-disk binary shows as " (deleted)", which breaks MPRIS name matching.

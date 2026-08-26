@@ -56,22 +56,19 @@ Item {
         }
     }
     Component.onCompleted: if (SettingsService.loaded)
-        manager.hydrate();
+        manager.hydrate()
 
     function hydrate() {
         const validModes = ["region", "windows", "fullscreen", "video"];
-        selectedMode = validModes.includes(SettingsService.screenshotCaptureMode)
-            ? SettingsService.screenshotCaptureMode : "region";
+        selectedMode = validModes.includes(SettingsService.screenshotCaptureMode) ? SettingsService.screenshotCaptureMode : "region";
         const validDelays = [0, 3, 5, 10];
-        timerDelay = validDelays.includes(SettingsService.screenshotTimerDelay)
-            ? SettingsService.screenshotTimerDelay : 0;
+        timerDelay = validDelays.includes(SettingsService.screenshotTimerDelay) ? SettingsService.screenshotTimerDelay : 0;
         showCursor = !!SettingsService.screenshotShowCursor;
         showNotification = !!SettingsService.screenshotShowNotification;
         micEnabled = !!SettingsService.screenshotMicEnabled;
         systemAudioEnabled = !!SettingsService.screenshotSystemAudioEnabled;
         rememberLastSelection = !!SettingsService.screenshotRememberLastSelection;
-        saveDirectory = typeof SettingsService.screenshotSaveDirectory === "string"
-            ? SettingsService.screenshotSaveDirectory : "";
+        saveDirectory = typeof SettingsService.screenshotSaveDirectory === "string" ? SettingsService.screenshotSaveDirectory : "";
         const saved = SettingsService.screenshotRecentSaveLocations;
         const sanitized = Array.isArray(saved) ? saved.filter(loc => typeof loc === "string" && loc !== "") : [];
         recentSaveLocations = [...new Set(sanitized)].slice(0, 3);
@@ -108,21 +105,14 @@ Item {
             return;
 
         const toolbarSaved = entry.toolbar;
-        if (toolbarSaved != null && Number.isFinite(toolbarSaved.x) && Number.isFinite(toolbarSaved.y)
-                && toolbarSaved.x >= 0 && toolbarSaved.y >= 0) {
+        if (toolbarSaved != null && Number.isFinite(toolbarSaved.x) && Number.isFinite(toolbarSaved.y) && toolbarSaved.x >= 0 && toolbarSaved.y >= 0) {
             toolbarMonitor = controlMonitor;
             toolbarX = toolbarSaved.x;
             toolbarY = toolbarSaved.y;
         }
 
         const regionSaved = entry.region;
-        if (rememberLastSelection && regionSaved != null
-                && Number.isFinite(regionSaved.x) && Number.isFinite(regionSaved.y)
-                && Number.isFinite(regionSaved.width) && Number.isFinite(regionSaved.height)
-                && regionSaved.width >= 2 && regionSaved.height >= 2
-                && regionSaved.x >= 0 && regionSaved.y >= 0
-                && regionSaved.x + regionSaved.width <= monitor.width
-                && regionSaved.y + regionSaved.height <= monitor.height) {
+        if (rememberLastSelection && regionSaved != null && Number.isFinite(regionSaved.x) && Number.isFinite(regionSaved.y) && Number.isFinite(regionSaved.width) && Number.isFinite(regionSaved.height) && regionSaved.width >= 2 && regionSaved.height >= 2 && regionSaved.x >= 0 && regionSaved.y >= 0 && regionSaved.x + regionSaved.width <= monitor.width && regionSaved.y + regionSaved.height <= monitor.height) {
             selectionX = monitor.x + regionSaved.x;
             selectionY = monitor.y + regionSaved.y;
             selectionWidth = regionSaved.width;
@@ -139,10 +129,7 @@ Item {
             return;
         const monitors = Object.assign({}, SettingsService.screenshotMonitors);
         const existing = Object.assign({}, monitors[controlMonitor]);
-        const contained = hasSelection && selectionWidth >= 2 && selectionHeight >= 2
-            && selectionX >= monitor.x && selectionY >= monitor.y
-            && selectionX + selectionWidth <= monitor.x + monitor.width
-            && selectionY + selectionHeight <= monitor.y + monitor.height;
+        const contained = hasSelection && selectionWidth >= 2 && selectionHeight >= 2 && selectionX >= monitor.x && selectionY >= monitor.y && selectionX + selectionWidth <= monitor.x + monitor.width && selectionY + selectionHeight <= monitor.y + monitor.height;
         if (contained) {
             existing.region = {
                 x: selectionX - monitor.x,
@@ -162,7 +149,10 @@ Item {
             return;
         const monitors = Object.assign({}, SettingsService.screenshotMonitors);
         const existing = Object.assign({}, monitors[controlMonitor]);
-        existing.toolbar = { x: toolbarX, y: toolbarY };
+        existing.toolbar = {
+            x: toolbarX,
+            y: toolbarY
+        };
         monitors[controlMonitor] = existing;
         SettingsService.screenshotMonitors = monitors;
     }
@@ -244,12 +234,10 @@ Item {
     function capture() {
         if (countdownActive)
             return;
-        if ((selectedMode === "region" && !hasSelection)
-                || (selectedMode === "windows" && selectedWindow == null))
+        if ((selectedMode === "region" && !hasSelection) || (selectedMode === "windows" && selectedWindow == null))
             return;
         pendingMode = selectedMode;
-        pendingGeometry = selectedMode === "region" ? selectionGeometry()
-            : selectedMode === "windows" ? windowGeometry(selectedWindow) : "";
+        pendingGeometry = selectedMode === "region" ? selectionGeometry() : selectedMode === "windows" ? windowGeometry(selectedWindow) : "";
         optionsOpen = false;
         if (timerDelay > 0) {
             pendingUsesUiCountdown = true;
@@ -308,8 +296,7 @@ Item {
     }
 
     function windowGeometry(window) {
-        return Math.round(window.x) + "," + Math.round(window.y) + " "
-            + Math.round(window.width) + "x" + Math.round(window.height);
+        return Math.round(window.x) + "," + Math.round(window.y) + " " + Math.round(window.width) + "x" + Math.round(window.height);
     }
 
     function selectSaveDirectory(path) {
@@ -342,10 +329,8 @@ Item {
     function windowAt(px, py) {
         const candidates = Hyprland.toplevels.values.filter(toplevel => {
             const data = toplevel.lastIpcObject;
-            return data != null && data.mapped !== false && !data.hidden
-                && toplevel.workspace != null && toplevel.workspace.active;
-        }).sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999)
-            - (b.lastIpcObject.focusHistoryID ?? 9999));
+            return data != null && data.mapped !== false && !data.hidden && toplevel.workspace != null && toplevel.workspace.active;
+        }).sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999) - (b.lastIpcObject.focusHistoryID ?? 9999));
 
         for (let i = 0; i < candidates.length; ++i) {
             const data = candidates[i].lastIpcObject;
@@ -354,7 +339,13 @@ Item {
             const width = data.size[0];
             const height = data.size[1];
             if (px >= x && px < x + width && py >= y && py < y + height)
-                return { address: candidates[i].address, x: x, y: y, width: width, height: height };
+                return {
+                    address: candidates[i].address,
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height
+                };
         }
         return null;
     }
@@ -401,7 +392,11 @@ Item {
 
             function hitTest(px, py): var {
                 if (!ownsSelection())
-                    return { mode: "create", horizontal: 0, vertical: 0 };
+                    return {
+                        mode: "create",
+                        horizontal: 0,
+                        vertical: 0
+                    };
 
                 const hit = 10;
                 const left = manager.selectionX;
@@ -410,16 +405,26 @@ Item {
                 const bottom = top + manager.selectionHeight;
                 const withinX = px >= left - hit && px <= right + hit;
                 const withinY = py >= top - hit && py <= bottom + hit;
-                const horizontal = withinY && Math.abs(px - left) <= hit ? -1
-                    : withinY && Math.abs(px - right) <= hit ? 1 : 0;
-                const vertical = withinX && Math.abs(py - top) <= hit ? -1
-                    : withinX && Math.abs(py - bottom) <= hit ? 1 : 0;
+                const horizontal = withinY && Math.abs(px - left) <= hit ? -1 : withinY && Math.abs(px - right) <= hit ? 1 : 0;
+                const vertical = withinX && Math.abs(py - top) <= hit ? -1 : withinX && Math.abs(py - bottom) <= hit ? 1 : 0;
 
                 if (horizontal !== 0 || vertical !== 0)
-                    return { mode: "resize", horizontal: horizontal, vertical: vertical };
+                    return {
+                        mode: "resize",
+                        horizontal: horizontal,
+                        vertical: vertical
+                    };
                 if (px > left && px < right && py > top && py < bottom)
-                    return { mode: "move", horizontal: 0, vertical: 0 };
-                return { mode: "create", horizontal: 0, vertical: 0 };
+                    return {
+                        mode: "move",
+                        horizontal: 0,
+                        vertical: 0
+                    };
+                return {
+                    mode: "create",
+                    horizontal: 0,
+                    vertical: 0
+                };
             }
 
             function desktopBounds(): var {
@@ -434,7 +439,12 @@ Item {
                     right = Math.max(right, monitors[i].x + monitors[i].width);
                     bottom = Math.max(bottom, monitors[i].y + monitors[i].height);
                 }
-                return { left: left, top: top, right: right, bottom: bottom };
+                return {
+                    left: left,
+                    top: top,
+                    right: right,
+                    bottom: bottom
+                };
             }
 
             function updateReadoutDirection(px, py) {
@@ -465,8 +475,7 @@ Item {
                 let nearestDistance = Infinity;
                 for (let i = 0; i < monitors.length; ++i) {
                     const monitor = monitors[i];
-                    if (px >= monitor.x && px < monitor.x + monitor.width
-                            && py >= monitor.y && py < monitor.y + monitor.height) {
+                    if (px >= monitor.x && px < monitor.x + monitor.width && py >= monitor.y && py < monitor.y + monitor.height) {
                         manager.readoutMonitor = monitor.name;
                         return;
                     }
@@ -640,8 +649,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: manager.optionsOpen
-                    || (manager.selectedMode !== "region" && manager.selectedMode !== "windows")
+                enabled: manager.optionsOpen || (manager.selectedMode !== "region" && manager.selectedMode !== "windows")
                 onClicked: {
                     if (manager.optionsOpen)
                         manager.optionsOpen = false;
@@ -677,8 +685,7 @@ Item {
                 hoverEnabled: true
                 cursorShape: manager.pointerCursorShape
                 onEntered: {
-                    manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.monitorX + mouseX,
-                        overlayWindow.monitorY + mouseY);
+                    manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.monitorX + mouseX, overlayWindow.monitorY + mouseY);
                 }
                 onPressed: mouse => {
                     const globalX = overlayWindow.monitorX + mouse.x;
@@ -765,14 +772,45 @@ Item {
                 readonly property real intersectionTop: Math.max(0, sy)
                 readonly property real intersectionRight: Math.min(width, sx + sw)
                 readonly property real intersectionBottom: Math.min(height, sy + sh)
-                readonly property bool hasIntersection: manager.hasSelection
-                    && intersectionRight > intersectionLeft && intersectionBottom > intersectionTop
+                readonly property bool hasIntersection: manager.hasSelection && intersectionRight > intersectionLeft && intersectionBottom > intersectionTop
 
-                Rectangle { anchors.fill: parent; visible: !parent.hasIntersection; color: "#66000000" }
-                Rectangle { x: 0; y: 0; width: parent.width; height: parent.intersectionTop; visible: parent.hasIntersection; color: "#66000000" }
-                Rectangle { x: 0; y: parent.intersectionTop; width: parent.intersectionLeft; height: parent.intersectionBottom - y; visible: parent.hasIntersection; color: "#66000000" }
-                Rectangle { x: parent.intersectionRight; y: parent.intersectionTop; width: parent.width - x; height: parent.intersectionBottom - y; visible: parent.hasIntersection; color: "#66000000" }
-                Rectangle { x: 0; y: parent.intersectionBottom; width: parent.width; height: parent.height - y; visible: parent.hasIntersection; color: "#66000000" }
+                Rectangle {
+                    anchors.fill: parent
+                    visible: !parent.hasIntersection
+                    color: "#66000000"
+                }
+                Rectangle {
+                    x: 0
+                    y: 0
+                    width: parent.width
+                    height: parent.intersectionTop
+                    visible: parent.hasIntersection
+                    color: "#66000000"
+                }
+                Rectangle {
+                    x: 0
+                    y: parent.intersectionTop
+                    width: parent.intersectionLeft
+                    height: parent.intersectionBottom - y
+                    visible: parent.hasIntersection
+                    color: "#66000000"
+                }
+                Rectangle {
+                    x: parent.intersectionRight
+                    y: parent.intersectionTop
+                    width: parent.width - x
+                    height: parent.intersectionBottom - y
+                    visible: parent.hasIntersection
+                    color: "#66000000"
+                }
+                Rectangle {
+                    x: 0
+                    y: parent.intersectionBottom
+                    width: parent.width
+                    height: parent.height - y
+                    visible: parent.hasIntersection
+                    color: "#66000000"
+                }
 
                 Rectangle {
                     x: parent.sx
@@ -786,14 +824,38 @@ Item {
 
                 Repeater {
                     model: manager.hasSelection ? [
-                        { x: parent.sx, y: parent.sy },
-                        { x: parent.sx + parent.sw / 2, y: parent.sy },
-                        { x: parent.sx + parent.sw, y: parent.sy },
-                        { x: parent.sx, y: parent.sy + parent.sh / 2 },
-                        { x: parent.sx + parent.sw, y: parent.sy + parent.sh / 2 },
-                        { x: parent.sx, y: parent.sy + parent.sh },
-                        { x: parent.sx + parent.sw / 2, y: parent.sy + parent.sh },
-                        { x: parent.sx + parent.sw, y: parent.sy + parent.sh }
+                        {
+                            x: parent.sx,
+                            y: parent.sy
+                        },
+                        {
+                            x: parent.sx + parent.sw / 2,
+                            y: parent.sy
+                        },
+                        {
+                            x: parent.sx + parent.sw,
+                            y: parent.sy
+                        },
+                        {
+                            x: parent.sx,
+                            y: parent.sy + parent.sh / 2
+                        },
+                        {
+                            x: parent.sx + parent.sw,
+                            y: parent.sy + parent.sh / 2
+                        },
+                        {
+                            x: parent.sx,
+                            y: parent.sy + parent.sh
+                        },
+                        {
+                            x: parent.sx + parent.sw / 2,
+                            y: parent.sy + parent.sh
+                        },
+                        {
+                            x: parent.sx + parent.sw,
+                            y: parent.sy + parent.sh
+                        }
                     ] : []
 
                     delegate: Rectangle {
@@ -813,17 +875,10 @@ Item {
                     id: sizeReadout
                     readonly property real localPointerX: manager.pointerGlobalX - overlayWindow.monitorX
                     readonly property real localPointerY: manager.pointerGlobalY - overlayWindow.monitorY
-                    readonly property bool clampedOnBothAxes:
-                        overlayWindow.labelIsClamped(localPointerX, width, manager.readoutDirectionX, parent.width)
-                        && overlayWindow.labelIsClamped(localPointerY, height, manager.readoutDirectionY, parent.height)
-                    visible: manager.readoutVisible
-                        && manager.readoutMonitor === overlayWindow.modelData.name
-                    x: overlayWindow.labelPosition(localPointerX, width,
-                        clampedOnBothAxes ? -manager.readoutDirectionX : manager.readoutDirectionX,
-                        parent.width)
-                    y: overlayWindow.labelPosition(localPointerY, height,
-                        clampedOnBothAxes ? -manager.readoutDirectionY : manager.readoutDirectionY,
-                        parent.height)
+                    readonly property bool clampedOnBothAxes: overlayWindow.labelIsClamped(localPointerX, width, manager.readoutDirectionX, parent.width) && overlayWindow.labelIsClamped(localPointerY, height, manager.readoutDirectionY, parent.height)
+                    visible: manager.readoutVisible && manager.readoutMonitor === overlayWindow.modelData.name
+                    x: overlayWindow.labelPosition(localPointerX, width, clampedOnBothAxes ? -manager.readoutDirectionX : manager.readoutDirectionX, parent.width)
+                    y: overlayWindow.labelPosition(localPointerY, height, clampedOnBothAxes ? -manager.readoutDirectionY : manager.readoutDirectionY, parent.height)
                     width: sizeText.implicitWidth + 16
                     height: sizeText.implicitHeight + 10
                     radius: 6
@@ -863,9 +918,7 @@ Item {
                 enabled: manager.optionsOpen
 
                 x: Math.max(8, Math.min(parent.width - width - 8, toolbar.x + (toolbar.width - width) / 2))
-                y: toolbar.y >= height + 8
-                    ? toolbar.y - height - 8
-                    : Math.min(parent.height - height - 8, toolbar.y + toolbar.height + 8)
+                y: toolbar.y >= height + 8 ? toolbar.y - height - 8 : Math.min(parent.height - height - 8, toolbar.y + toolbar.height + 8)
 
                 implicitWidth: 248
                 implicitHeight: optionsColumn.implicitHeight + 16
@@ -1048,10 +1101,22 @@ Item {
 
                         Repeater {
                             model: [
-                                { delay: 0, label: "None" },
-                                { delay: 3, label: "3s" },
-                                { delay: 5, label: "5s" },
-                                { delay: 10, label: "10s" }
+                                {
+                                    delay: 0,
+                                    label: "None"
+                                },
+                                {
+                                    delay: 3,
+                                    label: "3s"
+                                },
+                                {
+                                    delay: 5,
+                                    label: "5s"
+                                },
+                                {
+                                    delay: 10,
+                                    label: "10s"
+                                }
                             ]
 
                             delegate: Rectangle {
@@ -1059,9 +1124,7 @@ Item {
                                 Layout.fillWidth: true
                                 implicitHeight: 26
                                 radius: 6
-                                color: manager.timerDelay === modelData.delay
-                                    ? Colors.surface_container_high
-                                    : (timerOptArea.containsMouse ? Colors.surface_container_high : "transparent")
+                                color: manager.timerDelay === modelData.delay ? Colors.surface_container_high : (timerOptArea.containsMouse ? Colors.surface_container_high : "transparent")
 
                                 Text {
                                     anchors.centerIn: parent
@@ -1349,12 +1412,8 @@ Item {
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52
-                x: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarX >= 0
-                    ? Math.max(0, Math.min(parent.width - width, manager.toolbarX))
-                    : (parent.width - width) / 2
-                y: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarY >= 0
-                    ? Math.max(0, Math.min(parent.height - height, manager.toolbarY))
-                    : parent.height - height - 52
+                x: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(parent.width - width, manager.toolbarX)) : (parent.width - width) / 2
+                y: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(parent.height - height, manager.toolbarY)) : parent.height - height - 52
                 radius: 14
                 color: Colors.surface_container
                 border.width: 1
@@ -1576,8 +1635,7 @@ Item {
                         implicitWidth: captureLabel.implicitWidth + 22
                         implicitHeight: 36
                         radius: 8
-                        readonly property bool canCapture: manager.selectedMode === "region" ? manager.hasSelection
-                            : manager.selectedMode === "windows" ? manager.selectedWindow != null : true
+                        readonly property bool canCapture: manager.selectedMode === "region" ? manager.hasSelection : manager.selectedMode === "windows" ? manager.selectedWindow != null : true
                         opacity: canCapture ? 1.0 : 0.45
                         color: captureBtn.containsMouse && captureBtn.enabled ? Qt.lighter(Colors.primary, 1.1) : Colors.primary
                         Layout.leftMargin: 3
@@ -1619,9 +1677,7 @@ Item {
                         implicitWidth: cancelCountdownLabel.implicitWidth + 16
                         implicitHeight: 32
                         radius: 7
-                        color: cancelCountdownArea.containsMouse
-                            ? Colors.surface_container_high
-                            : Colors.surface_container
+                        color: cancelCountdownArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
 
                         Text {
                             id: cancelCountdownLabel

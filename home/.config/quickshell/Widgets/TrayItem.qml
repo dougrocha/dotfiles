@@ -20,26 +20,11 @@ Rectangle {
     signal dragFinished(Item sourceItem, point translation, bool cancelled)
     signal organizeRequested(string command)
 
-    function formatTrayTitle(tooltipTitle, title, id) {
-        if (tooltipTitle)
-            return tooltipTitle;
-        if (title) {
-            const looksLikeBundleId = /^[a-z0-9-]+(\.[a-z0-9_-]+){2,}$/.test(title) && /[a-z]/.test(title);
-            if (looksLikeBundleId) {
-                const lastPart = title.slice(title.lastIndexOf(".") + 1);
-                const cleaned = lastPart.replace(/[_-]+/g, " ")
-                    .replace(/\b\w/g, c => c.toUpperCase())
-                    .replace(/\sApp$/i, "");
-                return cleaned || title;
-            }
-            return title;
-        }
-        return id;
-    }
-
     function requestPrimaryAction() {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
             root.menuRequested(root.trayItem, root);
+        } else if (trayOverrides.triggerPrimaryAction()) {
+            Visibilities.closePopups();
         } else {
             Visibilities.closePopups();
             root.trayItem.activate();
@@ -78,13 +63,18 @@ Rectangle {
         mipmap: true
     }
 
+    TrayItemOverrides {
+        id: trayOverrides
+        trayItem: root.trayItem
+    }
+
     HoverHandler {
         id: hoverHandler
         cursorShape: Qt.PointingHandCursor
     }
 
     Tooltip {
-        text: root.formatTrayTitle(root.trayItem.tooltipTitle, root.trayItem.title, root.trayItem.id)
+        text: trayOverrides.displayTitle()
         targetItem: root
         hovered: hoverHandler.hovered && !root.dragging
     }

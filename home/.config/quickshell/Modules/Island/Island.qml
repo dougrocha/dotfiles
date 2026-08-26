@@ -359,7 +359,7 @@ Variants {
                         anchors.verticalCenter: parent.verticalCenter
                         text: IslandService.osdLabel !== "" ? IslandService.osdLabel : Math.round(IslandService.osdLevel * 100) + "%"
                         color: Colors.on_surface
-                        font.pixelSize: Fonts.small
+                        font.pixelSize: Fonts.body.size
                         font.family: Fonts.font
                     }
 
@@ -397,7 +397,7 @@ Variants {
                         anchors.verticalCenter: parent.verticalCenter
                         text: StreamingService.isRecordingScreen ? "Recording" : "Screen shared"
                         color: Colors.error
-                        font.pixelSize: Fonts.small
+                        font.pixelSize: Fonts.body.size
                         font.family: Fonts.font
                         font.weight: Font.Medium
 
@@ -438,7 +438,7 @@ Variants {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: modelData
                                 color: Colors.on_surface_variant
-                                font.pixelSize: Fonts.small
+                                font.pixelSize: Fonts.body.size
                                 font.family: Fonts.font
                             }
                         }
@@ -458,7 +458,7 @@ Variants {
                                 anchors.centerIn: parent
                                 text: "Stop"
                                 color: stopHover.hovered ? Colors.on_primary : Colors.error
-                                font.pixelSize: Fonts.small
+                                font.pixelSize: Fonts.body.size
                                 font.family: Fonts.font
                                 font.weight: Font.Medium
                             }

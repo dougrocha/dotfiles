@@ -42,13 +42,13 @@ Item {
                 id: mainLabel
                 anchors.left: parent.left
                 anchors.leftMargin: slimRoot.labelIndent
-                anchors.right: pctLabel.left
+                anchors.right: muteBtn.left
                 anchors.rightMargin: 8
                 anchors.top: slimRoot.sublabelText !== "" ? parent.top : undefined
                 anchors.verticalCenter: slimRoot.sublabelText !== "" ? undefined : parent.verticalCenter
                 text: slimRoot.labelText
                 color: Colors.on_surface_variant
-                font.pixelSize: Fonts.small
+                font.pixelSize: Fonts.body.size
                 font.family: Fonts.font
                 elide: Text.ElideRight
             }
@@ -66,17 +66,6 @@ Item {
                 font.pixelSize: Fonts.caption
                 font.family: Fonts.font
                 elide: Text.ElideRight
-            }
-
-            Text {
-                id: pctLabel
-                anchors.right: muteBtn.left
-                anchors.rightMargin: 8
-                anchors.verticalCenter: mainLabel.verticalCenter
-                text: Math.round(slimRoot.sliderValue * 100) + "%"
-                color: Colors.on_surface_variant
-                font.pixelSize: Fonts.small
-                font.family: Fonts.font
             }
 
             Rectangle {

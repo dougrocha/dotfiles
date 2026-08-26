@@ -261,47 +261,6 @@ PopupWindow {
                 font.family: Fonts.font
                 font.weight: Font.Medium
             }
-
-            Rectangle {
-                id: closeButton
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                width: 28
-                height: 28
-                radius: 14
-                activeFocusOnTab: true
-                color: closeHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
-                border.width: activeFocus ? 1 : 0
-                border.color: Colors.primary
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.closeSmall
-                    color: closeHover.hovered || closeButton.activeFocus ? Colors.on_surface : Colors.on_surface_variant
-                    font.family: Fonts.iconFont
-                    font.pixelSize: 18
-                }
-
-                HoverHandler {
-                    id: closeHover
-                    cursorShape: Qt.PointingHandCursor
-                }
-                TapHandler {
-                    onTapped: Visibilities.settingsPanel = false
-                }
-                Keys.onPressed: function (event) {
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                        Visibilities.settingsPanel = false;
-                        event.accepted = true;
-                    }
-                }
-            }
         }
 
         PopupDivider {}

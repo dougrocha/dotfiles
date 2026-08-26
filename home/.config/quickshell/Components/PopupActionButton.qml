@@ -4,6 +4,7 @@ import qs.Constants
 // Footer row that hands the user off to a real settings app.
 Rectangle {
     property string label: ""
+    property bool leftAlign: false
 
     signal tapped
 
@@ -19,10 +20,13 @@ Rectangle {
     }
 
     Text {
-        anchors.centerIn: parent
+        anchors.left: parent.leftAlign ? parent.left : undefined
+        anchors.leftMargin: parent.leftAlign ? 10 : 0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.leftAlign ? undefined : parent.horizontalCenter
         text: parent.label
         color: buttonHover.hovered ? Colors.primary : Colors.on_surface_variant
-        font.pixelSize: Fonts.small
+        font.pixelSize: Fonts.body.size
         font.family: Fonts.font
 
         Behavior on color {

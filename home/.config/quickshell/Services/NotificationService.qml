@@ -280,7 +280,8 @@ Singleton {
         onTriggered: liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))))
     }
 
-    onNotificationsChanged: if (root.liveLoaded) liveSaveDebounce.restart()
+    onNotificationsChanged: if (root.liveLoaded)
+        liveSaveDebounce.restart()
 
     property bool liveLoaded: false
 

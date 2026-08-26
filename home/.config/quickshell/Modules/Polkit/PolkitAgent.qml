@@ -160,8 +160,12 @@ Item {
             Qt.callLater(() => passwordInput.forceActiveFocus());
         }
 
-        function onInputPromptChanged() { root.syncFromFlow(); }
-        function onResponseVisibleChanged() { root.syncFromFlow(); }
+        function onInputPromptChanged() {
+            root.syncFromFlow();
+        }
+        function onResponseVisibleChanged() {
+            root.syncFromFlow();
+        }
 
         function onAuthenticationFailed() {
             root.syncFromFlow();
@@ -216,7 +220,9 @@ Item {
             border.color: root.errorFlash ? Colors.error : Colors.outline_variant
 
             Behavior on border.color {
-                ColorAnimation { duration: Theme.animations.fast }
+                ColorAnimation {
+                    duration: Theme.animations.fast
+                }
             }
 
             Item {
@@ -254,7 +260,7 @@ Item {
                         text: root.message
                         color: Colors.on_surface
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.small
+                        font.pixelSize: Fonts.body.size
                         font.weight: Font.Bold
                         elide: Text.ElideRight
                     }
@@ -269,7 +275,9 @@ Item {
                     border.color: passwordInput.activeFocus ? Colors.primary : Colors.outline_variant
 
                     Behavior on border.color {
-                        ColorAnimation { duration: Theme.animations.fast }
+                        ColorAnimation {
+                            duration: Theme.animations.fast
+                        }
                     }
 
                     TextInput {
@@ -283,7 +291,7 @@ Item {
                         passwordCharacter: "•"
                         color: root.errorFlash ? Colors.error : Colors.on_surface
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.small
+                        font.pixelSize: Fonts.body.size
                         readOnly: root.submitted || root.errorFlash
                         enabled: root.dialogVisible
                         onAccepted: root.submitResponse()
@@ -303,7 +311,7 @@ Item {
                         color: root.errorFlash ? Colors.error : Colors.on_surface_variant
                         opacity: root.errorFlash ? 1 : 0.6
                         font.family: Fonts.font
-                        font.pixelSize: Fonts.small
+                        font.pixelSize: Fonts.body.size
                         visible: passwordInput.text.length === 0
                     }
 
@@ -331,47 +339,8 @@ Item {
                     Layout.topMargin: 4
                     spacing: 8
 
-                    Item { Layout.fillWidth: true }
-
-                    component DialogButton: Rectangle {
-                        id: btn
-                        required property string label
-                        property bool primary: false
-                        property bool enabled: true
-                        signal clicked
-
-                        implicitWidth: btnLabel.implicitWidth + 24
-                        implicitHeight: 30
-                        radius: Theme.blockRadius
-                        opacity: enabled ? 1 : 0.5
-                        color: primary
-                            ? (btnArea.pressed ? Qt.darker(Colors.primary, 1.15) : (btnArea.containsMouse ? Qt.lighter(Colors.primary, 1.1) : Colors.primary))
-                            : (btnArea.pressed ? Colors.surface_container_highest : (btnArea.containsMouse ? Colors.surface_container_high : Colors.surface_container_low))
-                        border.width: primary ? 0 : 1
-                        border.color: Colors.outline_variant
-
-                        Behavior on color {
-                            ColorAnimation { duration: Theme.animations.fast }
-                        }
-
-                        Text {
-                            id: btnLabel
-                            anchors.centerIn: parent
-                            text: btn.label
-                            color: btn.primary ? Colors.on_primary : Colors.on_surface
-                            font.family: Fonts.font
-                            font.pixelSize: Fonts.small
-                            font.weight: btn.primary ? Font.Bold : Font.Normal
-                        }
-
-                        MouseArea {
-                            id: btnArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            enabled: btn.enabled
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: btn.clicked()
-                        }
+                    Item {
+                        Layout.fillWidth: true
                     }
 
                     DialogButton {
@@ -387,6 +356,47 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    component DialogButton: Rectangle {
+        id: btn
+        required property string label
+        property bool primary: false
+        property bool enabled: true
+        signal clicked
+
+        implicitWidth: btnLabel.implicitWidth + 24
+        implicitHeight: 30
+        radius: Theme.blockRadius
+        opacity: enabled ? 1 : 0.5
+        color: primary ? (btnArea.pressed ? Qt.darker(Colors.primary, 1.15) : (btnArea.containsMouse ? Qt.lighter(Colors.primary, 1.1) : Colors.primary)) : (btnArea.pressed ? Colors.surface_container_highest : (btnArea.containsMouse ? Colors.surface_container_high : Colors.surface_container_low))
+        border.width: primary ? 0 : 1
+        border.color: Colors.outline_variant
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.animations.fast
+            }
+        }
+
+        Text {
+            id: btnLabel
+            anchors.centerIn: parent
+            text: btn.label
+            color: btn.primary ? Colors.on_primary : Colors.on_surface
+            font.family: Fonts.font
+            font.pixelSize: Fonts.body.size
+            font.weight: btn.primary ? Font.Bold : Font.Normal
+        }
+
+        MouseArea {
+            id: btnArea
+            anchors.fill: parent
+            hoverEnabled: true
+            enabled: btn.enabled
+            cursorShape: Qt.PointingHandCursor
+            onClicked: btn.clicked()
         }
     }
 }
