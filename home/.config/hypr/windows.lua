@@ -63,6 +63,16 @@ hl.window_rule({
     tag = "+floating-window",
 })
 
+-- Screenshot save-location picker (portal-backed Zenity dialog)
+hl.window_rule({
+    name = "screenshot-save-location",
+    match = {
+        class = "^xdg-desktop-portal-gtk$",
+        title = "^Save Screenshot To$",
+    },
+    tag = "+floating-window",
+})
+
 -- No opacity for media apps
 hl.window_rule({
     name = "no-opacity-on-media",

@@ -18,6 +18,17 @@ Singleton {
     property alias trayVisible: traySettings.visible
     property alias trayDrawer: traySettings.drawer
 
+    property alias screenshotCaptureMode: screenshotSettings.captureMode
+    property alias screenshotTimerDelay: screenshotSettings.timerDelay
+    property alias screenshotShowCursor: screenshotSettings.showCursor
+    property alias screenshotShowNotification: screenshotSettings.showNotification
+    property alias screenshotMicEnabled: screenshotSettings.micEnabled
+    property alias screenshotSystemAudioEnabled: screenshotSettings.systemAudioEnabled
+    property alias screenshotRememberLastSelection: screenshotSettings.rememberLastSelection
+    property alias screenshotSaveDirectory: screenshotSettings.saveDirectory
+    property alias screenshotRecentSaveLocations: screenshotSettings.recentSaveLocations
+    property alias screenshotMonitors: screenshotSettings.monitors
+
     // Async load: nothing is saved until loaded, or defaults would overwrite the real file.
     property bool loaded: false
 
@@ -64,6 +75,22 @@ Singleton {
                 property int version: 0
                 property list<string> visible: []
                 property list<string> drawer: []
+            }
+
+            property JsonObject screenshot: JsonObject {
+                id: screenshotSettings
+
+                property string captureMode: "region"
+                property int timerDelay: 0
+                property bool showCursor: false
+                property bool showNotification: true
+                property bool micEnabled: false
+                property bool systemAudioEnabled: true
+                property bool rememberLastSelection: false
+                property string saveDirectory: ""
+                property list<string> recentSaveLocations: []
+                // Keyed by monitor name; each entry may hold local `region` and/or `toolbar` coordinates.
+                property var monitors: ({})
             }
         }
     }

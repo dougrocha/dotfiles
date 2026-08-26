@@ -1,14 +1,33 @@
 #!/bin/bash
 
-TARGET="${1:-screen}" # "screen", "DP-1", "DP-2"
 RECORDING_DIR="${HOME}/Videos"
+
+MIC=false
+SYSTEM_AUDIO=false
+ARGS=()
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --mic) MIC=true; shift ;;
+        --system-audio) SYSTEM_AUDIO=true; shift ;;
+        *) ARGS+=("$1"); shift ;;
+    esac
+done
+set -- "${ARGS[@]}"
+TARGET="${1:-screen}" # "screen", "DP-1", "DP-2"
+
 mkdir -p "$RECORDING_DIR"
+
+AUDIO_ARGS=()
+if [[ "$SYSTEM_AUDIO" == "true" && "$MIC" == "true" ]]; then
+  AUDIO_ARGS=(-a "default_output|default_input")
+elif [[ "$SYSTEM_AUDIO" == "true" ]]; then
+  AUDIO_ARGS=(-a "default_output")
+elif [[ "$MIC" == "true" ]]; then
+  AUDIO_ARGS=(-a "default_input")
+fi
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 OUTPUT_FILE="$RECORDING_DIR/recording_${TIMESTAMP}.mp4"
-
-AUDIO_ARGS=(-a "default_output|default_input")
-[[ "$*" == *"--no-audio"* ]] && AUDIO_ARGS=()
 
 setsid gpu-screen-recorder -w "$TARGET" -f 60 -q high -c mp4 "${AUDIO_ARGS[@]}" -o "$OUTPUT_FILE" &>/dev/null &
 

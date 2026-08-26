@@ -13,6 +13,9 @@ pkill slurp && exit 0
 DELAY=0
 CURSOR=false
 FREEZE=false
+GEOMETRY=""
+OUTPUT_DIR_OVERRIDE=""
+SHOW_NOTIFICATION=true
 SLURP_THEME="-b #00000055 -c #9acbfaFF -B #00000055"
 ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -20,6 +23,9 @@ while [[ $# -gt 0 ]]; do
         --delay) DELAY="$2"; shift 2 ;;
         --cursor) CURSOR=true; shift ;;
         --freeze) FREEZE=true; shift ;;
+        --geometry) GEOMETRY="$2"; shift 2 ;;
+        --output-dir) OUTPUT_DIR_OVERRIDE="$2"; shift 2 ;;
+        --no-notification) SHOW_NOTIFICATION=false; shift ;;
         *) ARGS+=("$1"); shift ;;
     esac
 done
@@ -68,14 +74,17 @@ save() {
   [[ -z $selection ]] && exit 0
 
   FILENAME="Screenshot-$(date +'%Y-%m-%d-at-%I.%M.%S%p').png"
-  FILEPATH="$OUTPUT_DIR/Screenshots/$FILENAME"
-  mkdir -p "$OUTPUT_DIR/Screenshots"
+  SAVE_DIR="${OUTPUT_DIR_OVERRIDE:-$OUTPUT_DIR/Screenshots}"
+  FILEPATH="$SAVE_DIR/$FILENAME"
+  mkdir -p "$SAVE_DIR"
 
   GRIM_ARGS=(-g "$selection")
   [[ "$CURSOR" == "true" ]] && GRIM_ARGS+=(-c)
   grim "${GRIM_ARGS[@]}" "$FILEPATH" || exit 1
   wl-copy <"$FILEPATH"
-  notify-send "Screenshot captured" "Saved to clipboard and file" -a "Screenshot" -t 10000 -i "$FILEPATH"
+  if [[ $SHOW_NOTIFICATION == true ]]; then
+    notify-send "Screenshot captured" "Saved to clipboard and file" -a "Screenshot" -t 10000 -i "$FILEPATH"
+  fi
 }
 
 grab() {
@@ -90,10 +99,18 @@ grab() {
 
   case "$mode" in
     region)
-      selection=$(slurp $SLURP_THEME 2>/dev/null)
+      if [[ -n $GEOMETRY ]]; then
+        selection="$GEOMETRY"
+      else
+        selection=$(slurp $SLURP_THEME 2>/dev/null)
+      fi
       ;;
     windows)
-      selection=$(get_visible_clients | slurp -r $SLURP_THEME 2>/dev/null)
+      if [[ -n $GEOMETRY ]]; then
+        selection="$GEOMETRY"
+      else
+        selection=$(get_visible_clients | slurp -r $SLURP_THEME 2>/dev/null)
+      fi
       if [[ -n $selection && $DELAY -gt 0 ]]; then
         WIN_ADDR=$(hyprctl clients -j | jq -r --arg geo "$selection" \
           '.[] | select("\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])" == $geo) | .address' | head -1)
