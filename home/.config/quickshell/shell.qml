@@ -24,6 +24,8 @@ ShellRoot {
 
     ScreenshotManager {}
 
+    ScreenshotToast {}
+
     Island {}
 
     PolkitAgent {}

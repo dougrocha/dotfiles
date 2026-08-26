@@ -192,6 +192,14 @@ Item {
         }
     }
 
+    IpcHandler {
+        target: "screenshot-toast"
+
+        function notify(path: string): void {
+            ScreenshotToastService.show(path);
+        }
+    }
+
     Process {
         id: screenshotProcess
     }

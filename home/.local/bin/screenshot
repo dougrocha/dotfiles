@@ -83,7 +83,7 @@ save() {
   grim "${GRIM_ARGS[@]}" "$FILEPATH" || exit 1
   wl-copy <"$FILEPATH"
   if [[ $SHOW_NOTIFICATION == true ]]; then
-    notify-send "Screenshot captured" "Saved to clipboard and file" -a "Screenshot" -t 10000 -i "$FILEPATH"
+    quickshell ipc call screenshot-toast notify "$FILEPATH"
   fi
 }
 
