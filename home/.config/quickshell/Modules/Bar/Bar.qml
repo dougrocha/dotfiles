@@ -29,7 +29,8 @@ Variants {
 
         readonly property int hyprlandFullscreenModeExclusive: 2
 
-        readonly property var workspace: Hyprland.monitorFor(modelData)?.activeWorkspace
+        readonly property var monitor: Hyprland.monitorFor(modelData)
+        readonly property var workspace: monitor?.activeWorkspace
         readonly property bool hasFullscreen: workspace?.hasFullscreen ?? false
         readonly property var activeToplevel: Hyprland.activeToplevel
         readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
@@ -135,7 +136,7 @@ Variants {
 
                 Workspaces {
                     id: workspaceModule
-                    targetMonitor: modelData.name
+                    monitor: topBar.monitor
                     anchors.centerIn: parent
                 }
             }

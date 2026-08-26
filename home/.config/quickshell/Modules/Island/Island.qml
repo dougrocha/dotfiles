@@ -118,8 +118,12 @@ Variants {
                 // The calendar keeps its month; send it back to today when it reappears.
                 onTabChanged: if (tab === 1)
                     calendarView.reset()
-                onFullChanged: if (full && tab === 1)
-                    calendarView.reset()
+                onFullChanged: {
+                    if (full)
+                        recDetails = false;
+                    if (full && tab === 1)
+                        calendarView.reset();
+                }
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 4
@@ -570,7 +574,7 @@ Variants {
                         Rectangle {
                             id: tabHighlight
 
-                            readonly property Item chip: tabBar.children[pill.tab]
+                            readonly property Item chip: tabRepeater.itemAt(pill.tab)
 
                             x: chip ? chip.x : 0
                             width: chip ? chip.width : 0
@@ -597,6 +601,7 @@ Variants {
                             spacing: 6
 
                             Repeater {
+                                id: tabRepeater
                                 model: ["Now Playing", "Calendar"]
 
                                 delegate: Rectangle {

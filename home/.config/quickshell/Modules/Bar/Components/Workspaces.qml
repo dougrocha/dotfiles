@@ -8,13 +8,13 @@ import qs.Services
 Item {
     id: root
 
-    property string targetMonitor: ""
+    required property var monitor
 
     implicitWidth: mainLayout.implicitWidth
     implicitHeight: Theme.topBarHeight
 
-    readonly property var focusedWs: Hyprland.focusedWorkspace
-    readonly property bool onNamedWs: focusedWs && !/^\d+$/.test(focusedWs.name) && !focusedWs.name.startsWith("special:")
+    readonly property var activeWorkspace: monitor?.activeWorkspace
+    readonly property bool onNamedWorkspace: !!activeWorkspace && !/^\d+$/.test(activeWorkspace.name) && !activeWorkspace.name.startsWith("special:")
 
     RowLayout {
         id: mainLayout
@@ -31,11 +31,12 @@ Item {
                 delegate: Item {
                     required property var modelData
 
-                    readonly property bool isActive: modelData.focused && !root.onNamedWs
+                    readonly property bool belongsToMonitor: modelData.id >= 0 && /^\d+$/.test(modelData.name) && modelData.monitor === root.monitor
+                    readonly property bool isActive: modelData.active
                     readonly property bool hasWindows: (modelData.lastIpcObject?.windows ?? 0) > 0
 
-                    visible: modelData.id >= 0 && /^\d+$/.test(modelData.name) && modelData.monitor?.name === root.targetMonitor
-                    width: visible ? 10 : 0
+                    visible: width > 0
+                    width: belongsToMonitor ? 10 : 0
                     height: 10
 
                     Behavior on width {
@@ -88,8 +89,8 @@ Item {
             clip: true
             implicitHeight: 16
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: root.onNamedWs ? namedBadge.implicitWidth + 5 : 0
-            Layout.leftMargin: root.onNamedWs ? 5 : 0
+            Layout.preferredWidth: root.onNamedWorkspace ? namedBadge.implicitWidth + 5 : 0
+            Layout.leftMargin: root.onNamedWorkspace ? 5 : 0
 
             Behavior on Layout.preferredWidth {
                 NumberAnimation {
@@ -117,7 +118,7 @@ Item {
                     id: namedLabel
                     anchors.centerIn: parent
                     renderType: Text.NativeRendering
-                    text: root.focusedWs?.name ?? ""
+                    text: root.activeWorkspace?.name ?? ""
                     color: Colors.on_tertiary_container
                     font.family: Fonts.font
                     font.pixelSize: 10
