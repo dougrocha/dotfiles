@@ -11,11 +11,7 @@
 git clone git@github.com:dougrocha/dotfiles.git
 cd dotfiles
 
-# Linux
 ./setup
-
-# Macos
-./stow
 ```
 ## Useful Links
 

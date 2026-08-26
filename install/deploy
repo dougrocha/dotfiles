@@ -10,6 +10,11 @@ if ! command -v stow &> /dev/null; then
 fi
 
 echo "Installing dotfiles from $DOTFILES_DIR/home to ~"
+
+# Keep ~/.local/bin as a real directory so package managers and other tools can
+# install binaries alongside the scripts managed by Stow.
+mkdir -p "$HOME/.local/bin"
+
 stow -R -v -t ~ -d "$DOTFILES_DIR" home
 
 echo "Dotfiles deployed successfully!"
