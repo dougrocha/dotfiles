@@ -14,6 +14,7 @@ Item {
 
     property bool overlayVisible: false
     property string controlMonitor: ""
+    readonly property string toolbarHostMonitor: Theme.primaryScreen?.name ?? ""
     property string toolbarMonitor: ""
     property real toolbarX: -1
     property real toolbarY: -1
@@ -35,6 +36,7 @@ Item {
     property real pointerGlobalY: 0
     property int readoutDirectionX: 1
     property int readoutDirectionY: 1
+    property string readoutEdgeAxis: "none"
     property string readoutMonitor: ""
     property bool readoutVisible: false
     property int pointerCursorShape: Qt.CrossCursor
@@ -47,6 +49,39 @@ Item {
     property bool micEnabled: false
     property bool systemAudioEnabled: true
     property bool optionsOpen: false
+    readonly property var desktopGeometry: calculateDesktopGeometry()
+
+    function calculateDesktopGeometry(): var {
+        const monitors = Hyprland.monitors.values;
+        if (monitors.length === 0)
+            return {
+                left: 0,
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 0,
+                height: 0
+            };
+
+        let left = monitors[0].x;
+        let top = monitors[0].y;
+        let right = monitors[0].x + monitors[0].width;
+        let bottom = monitors[0].y + monitors[0].height;
+        for (let i = 1; i < monitors.length; ++i) {
+            left = Math.min(left, monitors[i].x);
+            top = Math.min(top, monitors[i].y);
+            right = Math.max(right, monitors[i].x + monitors[i].width);
+            bottom = Math.max(bottom, monitors[i].y + monitors[i].height);
+        }
+        return {
+            left: left,
+            top: top,
+            right: right,
+            bottom: bottom,
+            width: right - left,
+            height: bottom - top
+        };
+    }
 
     Connections {
         target: SettingsService
@@ -91,11 +126,39 @@ Item {
         return entry != null && typeof entry === "object" ? entry : null;
     }
 
-    function restoreForControlMonitor() {
+    function isValidSavedToolbarPosition(pos): bool {
+        return pos != null && Number.isFinite(pos.x) && Number.isFinite(pos.y) && pos.x >= 0 && pos.y >= 0;
+    }
+
+    function isValidSavedRegion(region, monitor): bool {
+        if (region == null || monitor == null)
+            return false;
+        if (!Number.isFinite(region.x) || !Number.isFinite(region.y) || !Number.isFinite(region.width) || !Number.isFinite(region.height))
+            return false;
+        if (region.width < 2 || region.height < 2 || region.x < 0 || region.y < 0)
+            return false;
+        return region.x + region.width <= monitor.width && region.y + region.height <= monitor.height;
+    }
+
+    function selectionContainedByMonitor(monitor): bool {
+        return hasSelection && selectionWidth >= 2 && selectionHeight >= 2 && selectionX >= monitor.x && selectionY >= monitor.y && selectionX + selectionWidth <= monitor.x + monitor.width && selectionY + selectionHeight <= monitor.y + monitor.height;
+    }
+
+    function restoreOverlayState() {
         toolbarMonitor = "";
         toolbarX = -1;
         toolbarY = -1;
-        if (!SettingsService.loaded || controlMonitor === "")
+        if (!SettingsService.loaded)
+            return;
+
+        const toolbarSaved = monitorEntry(toolbarHostMonitor)?.toolbar;
+        if (isValidSavedToolbarPosition(toolbarSaved)) {
+            toolbarMonitor = toolbarHostMonitor;
+            toolbarX = toolbarSaved.x;
+            toolbarY = toolbarSaved.y;
+        }
+
+        if (controlMonitor === "")
             return;
         const entry = monitorEntry(controlMonitor);
         if (entry == null)
@@ -104,15 +167,8 @@ Item {
         if (monitor == null)
             return;
 
-        const toolbarSaved = entry.toolbar;
-        if (toolbarSaved != null && Number.isFinite(toolbarSaved.x) && Number.isFinite(toolbarSaved.y) && toolbarSaved.x >= 0 && toolbarSaved.y >= 0) {
-            toolbarMonitor = controlMonitor;
-            toolbarX = toolbarSaved.x;
-            toolbarY = toolbarSaved.y;
-        }
-
         const regionSaved = entry.region;
-        if (rememberLastSelection && regionSaved != null && Number.isFinite(regionSaved.x) && Number.isFinite(regionSaved.y) && Number.isFinite(regionSaved.width) && Number.isFinite(regionSaved.height) && regionSaved.width >= 2 && regionSaved.height >= 2 && regionSaved.x >= 0 && regionSaved.y >= 0 && regionSaved.x + regionSaved.width <= monitor.width && regionSaved.y + regionSaved.height <= monitor.height) {
+        if (rememberLastSelection && isValidSavedRegion(regionSaved, monitor)) {
             selectionX = monitor.x + regionSaved.x;
             selectionY = monitor.y + regionSaved.y;
             selectionWidth = regionSaved.width;
@@ -129,8 +185,7 @@ Item {
             return;
         const monitors = Object.assign({}, SettingsService.screenshotMonitors);
         const existing = Object.assign({}, monitors[controlMonitor]);
-        const contained = hasSelection && selectionWidth >= 2 && selectionHeight >= 2 && selectionX >= monitor.x && selectionY >= monitor.y && selectionX + selectionWidth <= monitor.x + monitor.width && selectionY + selectionHeight <= monitor.y + monitor.height;
-        if (contained) {
+        if (selectionContainedByMonitor(monitor)) {
             existing.region = {
                 x: selectionX - monitor.x,
                 y: selectionY - monitor.y,
@@ -145,15 +200,15 @@ Item {
     }
 
     function persistToolbarPosition() {
-        if (!SettingsService.loaded || controlMonitor === "")
+        if (!SettingsService.loaded || toolbarHostMonitor === "")
             return;
         const monitors = Object.assign({}, SettingsService.screenshotMonitors);
-        const existing = Object.assign({}, monitors[controlMonitor]);
+        const existing = Object.assign({}, monitors[toolbarHostMonitor]);
         existing.toolbar = {
             x: toolbarX,
             y: toolbarY
         };
-        monitors[controlMonitor] = existing;
+        monitors[toolbarHostMonitor] = existing;
         SettingsService.screenshotMonitors = monitors;
     }
 
@@ -175,7 +230,7 @@ Item {
             manager.resetSelection();
             Hyprland.refreshToplevels();
             manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
-            manager.restoreForControlMonitor();
+            manager.restoreOverlayState();
             manager.overlayVisible = true;
         }
         function hide(): void {
@@ -186,7 +241,7 @@ Item {
                 manager.resetSelection();
                 Hyprland.refreshToplevels();
                 manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
-                manager.restoreForControlMonitor();
+                manager.restoreOverlayState();
             }
             manager.overlayVisible = !manager.overlayVisible;
         }
@@ -197,6 +252,10 @@ Item {
 
         function notify(path: string): void {
             ScreenshotToastService.show(path);
+        }
+
+        function notifyBatch(encodedPaths: string): void {
+            ScreenshotToastService.showBatch(encodedPaths.split("|").map(path => decodeURIComponent(path)));
         }
     }
 
@@ -234,6 +293,9 @@ Item {
     }
 
     onOverlayVisibleChanged: {
+        if (!overlayVisible) {
+            readoutVisible = false;
+        }
         if (!overlayVisible && pendingMode !== "") {
             executeAction();
         }
@@ -334,26 +396,29 @@ Item {
         return parts.length > 0 ? parts[parts.length - 1] : path;
     }
 
+    function isVisibleMappedToplevel(toplevel): bool {
+        const data = toplevel.lastIpcObject;
+        return data != null && data.mapped !== false && !data.hidden && toplevel.workspace != null && toplevel.workspace.active;
+    }
+
+    function toplevelGeometry(toplevel) {
+        const data = toplevel.lastIpcObject;
+        return {
+            address: toplevel.address,
+            x: data.at[0],
+            y: data.at[1],
+            width: data.size[0],
+            height: data.size[1]
+        };
+    }
+
     function windowAt(px, py) {
-        const candidates = Hyprland.toplevels.values.filter(toplevel => {
-            const data = toplevel.lastIpcObject;
-            return data != null && data.mapped !== false && !data.hidden && toplevel.workspace != null && toplevel.workspace.active;
-        }).sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999) - (b.lastIpcObject.focusHistoryID ?? 9999));
+        const candidates = Hyprland.toplevels.values.filter(isVisibleMappedToplevel).sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999) - (b.lastIpcObject.focusHistoryID ?? 9999));
 
         for (let i = 0; i < candidates.length; ++i) {
-            const data = candidates[i].lastIpcObject;
-            const x = data.at[0];
-            const y = data.at[1];
-            const width = data.size[0];
-            const height = data.size[1];
-            if (px >= x && px < x + width && py >= y && py < y + height)
-                return {
-                    address: candidates[i].address,
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: height
-                };
+            const geometry = toplevelGeometry(candidates[i]);
+            if (px >= geometry.x && px < geometry.x + geometry.width && py >= geometry.y && py < geometry.y + geometry.height)
+                return geometry;
         }
         return null;
     }
@@ -370,17 +435,53 @@ Item {
     }
 
     Variants {
-        model: manager.overlayVisible ? Quickshell.screens : []
+        model: manager.overlayVisible ? Quickshell.screens.filter(screen => screen.name !== manager.toolbarHostMonitor) : []
+
+        delegate: PanelWindow {
+            id: visualWindow
+            required property var modelData
+            screen: modelData
+
+            readonly property var monitor: Hyprland.monitorFor(modelData)
+
+            color: "transparent"
+            mask: Region {}
+
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "qs.screenshot_overlay_visuals"
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
+
+            anchors.top: true
+            anchors.bottom: true
+            anchors.left: true
+            anchors.right: true
+
+            ScreenshotOverlayVisuals {
+                anchors.fill: parent
+                manager: manager
+                monitorName: visualWindow.modelData.name
+                monitorX: visualWindow.monitor?.x ?? 0
+                monitorY: visualWindow.monitor?.y ?? 0
+            }
+        }
+    }
+
+    Variants {
+        model: manager.overlayVisible && Theme.primaryScreen != null ? [Theme.primaryScreen] : []
 
         delegate: PanelWindow {
             id: overlayWindow
             required property var modelData
             screen: modelData
 
-            readonly property bool isControlScreen: modelData.name === manager.controlMonitor
             readonly property var monitor: Hyprland.monitorFor(modelData)
-            readonly property real monitorX: monitor != null ? monitor.x : 0
-            readonly property real monitorY: monitor != null ? monitor.y : 0
+            readonly property real monitorX: manager.desktopGeometry.left
+            readonly property real monitorY: manager.desktopGeometry.top
+            readonly property real toolbarHostX: monitor != null ? monitor.x - monitorX : 0
+            readonly property real toolbarHostY: monitor != null ? monitor.y - monitorY : 0
+            readonly property real toolbarHostWidth: monitor != null ? monitor.width : width
+            readonly property real toolbarHostHeight: monitor != null ? monitor.height : height
             property real dragStartX: 0
             property real dragStartY: 0
             property real pointerX: 0
@@ -398,6 +499,23 @@ Item {
                 return manager.hasSelection;
             }
 
+            function isNearEdge(value, edge, hit): bool {
+                return Math.abs(value - edge) <= hit;
+            }
+
+            function edgeHitDirection(px, py, left, right, top, bottom, hit): var {
+                const withinX = px >= left - hit && px <= right + hit;
+                const withinY = py >= top - hit && py <= bottom + hit;
+                return {
+                    horizontal: withinY && isNearEdge(px, left, hit) ? -1 : withinY && isNearEdge(px, right, hit) ? 1 : 0,
+                    vertical: withinX && isNearEdge(py, top, hit) ? -1 : withinX && isNearEdge(py, bottom, hit) ? 1 : 0
+                };
+            }
+
+            function isInsideSelection(px, py, left, right, top, bottom): bool {
+                return px > left && px < right && py > top && py < bottom;
+            }
+
             function hitTest(px, py): var {
                 if (!ownsSelection())
                     return {
@@ -411,18 +529,15 @@ Item {
                 const right = left + manager.selectionWidth;
                 const top = manager.selectionY;
                 const bottom = top + manager.selectionHeight;
-                const withinX = px >= left - hit && px <= right + hit;
-                const withinY = py >= top - hit && py <= bottom + hit;
-                const horizontal = withinY && Math.abs(px - left) <= hit ? -1 : withinY && Math.abs(px - right) <= hit ? 1 : 0;
-                const vertical = withinX && Math.abs(py - top) <= hit ? -1 : withinX && Math.abs(py - bottom) <= hit ? 1 : 0;
+                const edge = edgeHitDirection(px, py, left, right, top, bottom, hit);
 
-                if (horizontal !== 0 || vertical !== 0)
+                if (edge.horizontal !== 0 || edge.vertical !== 0)
                     return {
                         mode: "resize",
-                        horizontal: horizontal,
-                        vertical: vertical
+                        horizontal: edge.horizontal,
+                        vertical: edge.vertical
                     };
-                if (px > left && px < right && py > top && py < bottom)
+                if (isInsideSelection(px, py, left, right, top, bottom))
                     return {
                         mode: "move",
                         horizontal: 0,
@@ -436,45 +551,30 @@ Item {
             }
 
             function desktopBounds(): var {
-                const monitors = Hyprland.monitors.values;
-                let left = monitors[0].x;
-                let top = monitors[0].y;
-                let right = monitors[0].x + monitors[0].width;
-                let bottom = monitors[0].y + monitors[0].height;
-                for (let i = 1; i < monitors.length; ++i) {
-                    left = Math.min(left, monitors[i].x);
-                    top = Math.min(top, monitors[i].y);
-                    right = Math.max(right, monitors[i].x + monitors[i].width);
-                    bottom = Math.max(bottom, monitors[i].y + monitors[i].height);
-                }
-                return {
-                    left: left,
-                    top: top,
-                    right: right,
-                    bottom: bottom
-                };
+                return manager.desktopGeometry;
+            }
+
+            function axisReadoutDirection(pointer, resizeSign, initialStart, initialExtent, selectionStart, selectionExtent): int {
+                if (resizeSign < 0)
+                    return pointer <= initialStart + initialExtent ? -1 : 1;
+                if (resizeSign > 0)
+                    return pointer >= initialStart ? 1 : -1;
+                return pointer < selectionStart + selectionExtent / 2 ? -1 : 1;
             }
 
             function updateReadoutDirection(px, py) {
                 if (interaction === "create") {
                     manager.readoutDirectionX = px < dragStartX ? -1 : 1;
                     manager.readoutDirectionY = py < dragStartY ? -1 : 1;
+                    manager.readoutEdgeAxis = "none";
                     return;
                 }
 
-                if (resizeHorizontal < 0)
-                    manager.readoutDirectionX = px <= initialX + initialWidth ? -1 : 1;
-                else if (resizeHorizontal > 0)
-                    manager.readoutDirectionX = px >= initialX ? 1 : -1;
-                else
-                    manager.readoutDirectionX = px < manager.selectionX + manager.selectionWidth / 2 ? -1 : 1;
-
-                if (resizeVertical < 0)
-                    manager.readoutDirectionY = py <= initialY + initialHeight ? -1 : 1;
-                else if (resizeVertical > 0)
-                    manager.readoutDirectionY = py >= initialY ? 1 : -1;
-                else
-                    manager.readoutDirectionY = py < manager.selectionY + manager.selectionHeight / 2 ? -1 : 1;
+                manager.readoutDirectionX = axisReadoutDirection(px, resizeHorizontal, initialX, initialWidth, manager.selectionX, manager.selectionWidth);
+                manager.readoutDirectionY = axisReadoutDirection(py, resizeVertical, initialY, initialHeight, manager.selectionY, manager.selectionHeight);
+                // A pure edge drag (only one resize axis active) keeps the label level
+                // with the cursor on the other axis instead of offsetting diagonally.
+                manager.readoutEdgeAxis = resizeHorizontal !== 0 && resizeVertical === 0 ? "horizontal" : resizeVertical !== 0 && resizeHorizontal === 0 ? "vertical" : "none";
             }
 
             function updateReadoutMonitor(px, py) {
@@ -498,16 +598,35 @@ Item {
                 manager.readoutMonitor = nearest != null ? nearest.name : "";
             }
 
-            function labelPosition(pointer, extent, direction, available): real {
-                const gap = 14;
-                const preferred = direction < 0 ? pointer - gap - extent : pointer + gap;
-                return Math.max(8, Math.min(available - extent - 8, preferred));
+            function currentResizeAxes(): var {
+                let h = resizeHorizontal;
+                let v = resizeVertical;
+                if (h < 0)
+                    h = pointerX <= initialX + initialWidth ? -1 : 1;
+                else if (h > 0)
+                    h = pointerX >= initialX ? 1 : -1;
+                if (v < 0)
+                    v = pointerY <= initialY + initialHeight ? -1 : 1;
+                else if (v > 0)
+                    v = pointerY >= initialY ? 1 : -1;
+                return {
+                    horizontal: h,
+                    vertical: v
+                };
             }
 
-            function labelIsClamped(pointer, extent, direction, available): bool {
-                const gap = 14;
-                const preferred = direction < 0 ? pointer - gap - extent : pointer + gap;
-                return preferred < 8 || preferred > available - extent - 8;
+            function cursorForResize(horizontal, vertical): int {
+                if (horizontal !== 0 && vertical !== 0)
+                    return horizontal === vertical ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor;
+                return horizontal !== 0 ? Qt.SizeHorCursor : Qt.SizeVerCursor;
+            }
+
+            function cursorForHit(hit): int {
+                if (hit.mode === "move")
+                    return Qt.SizeAllCursor;
+                if (hit.mode !== "resize")
+                    return Qt.CrossCursor;
+                return cursorForResize(hit.horizontal, hit.vertical);
             }
 
             function cursorAt(px, py): int {
@@ -516,64 +635,28 @@ Item {
                 if (interaction === "create")
                     return Qt.CrossCursor;
                 if (interaction === "resize") {
-                    let h = resizeHorizontal;
-                    let v = resizeVertical;
-                    if (h < 0)
-                        h = pointerX <= initialX + initialWidth ? -1 : 1;
-                    else if (h > 0)
-                        h = pointerX >= initialX ? 1 : -1;
-                    if (v < 0)
-                        v = pointerY <= initialY + initialHeight ? -1 : 1;
-                    else if (v > 0)
-                        v = pointerY >= initialY ? 1 : -1;
-                    if (h !== 0 && v !== 0)
-                        return h === v ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor;
-                    return h !== 0 ? Qt.SizeHorCursor : Qt.SizeVerCursor;
+                    const axes = currentResizeAxes();
+                    return cursorForResize(axes.horizontal, axes.vertical);
                 }
 
-                const hit = hitTest(px, py);
-                if (hit.mode === "move")
-                    return Qt.SizeAllCursor;
-                if (hit.mode !== "resize")
-                    return Qt.CrossCursor;
-                if (hit.horizontal !== 0 && hit.vertical !== 0)
-                    return hit.horizontal === hit.vertical ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor;
-                return hit.horizontal !== 0 ? Qt.SizeHorCursor : Qt.SizeVerCursor;
+                return cursorForHit(hitTest(px, py));
             }
 
-            function updateInteraction(px, py) {
-                const dx = px - dragStartX;
-                const dy = py - dragStartY;
-                const bounds = desktopBounds();
-                const boundedX = Math.max(bounds.left, Math.min(bounds.right, px));
-                const boundedY = Math.max(bounds.top, Math.min(bounds.bottom, py));
-                pointerX = px;
-                pointerY = py;
-                manager.pointerCursorShape = cursorAt(px, py);
-                manager.pointerGlobalX = boundedX >= bounds.right ? bounds.right - 0.001 : boundedX;
-                manager.pointerGlobalY = boundedY >= bounds.bottom ? bounds.bottom - 0.001 : boundedY;
-                updateReadoutMonitor(manager.pointerGlobalX, manager.pointerGlobalY);
-                if (!interactionMoved && Math.hypot(dx, dy) < 3)
-                    return;
-                interactionMoved = true;
-                manager.readoutVisible = interaction === "create" || interaction === "resize";
+            function applyCreateInteraction(boundedX, boundedY) {
+                manager.selectionX = Math.min(dragStartX, boundedX);
+                manager.selectionY = Math.min(dragStartY, boundedY);
+                manager.selectionWidth = Math.abs(boundedX - dragStartX);
+                manager.selectionHeight = Math.abs(boundedY - dragStartY);
+                manager.hasSelection = manager.selectionWidth >= 2 && manager.selectionHeight >= 2;
+                updateReadoutDirection(boundedX, boundedY);
+            }
 
-                if (interaction === "create") {
-                    manager.selectionX = Math.min(dragStartX, boundedX);
-                    manager.selectionY = Math.min(dragStartY, boundedY);
-                    manager.selectionWidth = Math.abs(boundedX - dragStartX);
-                    manager.selectionHeight = Math.abs(boundedY - dragStartY);
-                    manager.hasSelection = manager.selectionWidth >= 2 && manager.selectionHeight >= 2;
-                    updateReadoutDirection(boundedX, boundedY);
-                    return;
-                }
+            function applyMoveInteraction(bounds, dx, dy) {
+                manager.selectionX = Math.max(bounds.left, Math.min(bounds.right - initialWidth, initialX + dx));
+                manager.selectionY = Math.max(bounds.top, Math.min(bounds.bottom - initialHeight, initialY + dy));
+            }
 
-                if (interaction === "move") {
-                    manager.selectionX = Math.max(bounds.left, Math.min(bounds.right - initialWidth, initialX + dx));
-                    manager.selectionY = Math.max(bounds.top, Math.min(bounds.bottom - initialHeight, initialY + dy));
-                    return;
-                }
-
+            function applyResizeInteraction(boundedX, boundedY) {
                 let left = initialX;
                 let right = initialX + initialWidth;
                 let top = initialY;
@@ -595,8 +678,38 @@ Item {
                 updateReadoutDirection(boundedX, boundedY);
             }
 
+            function updateInteraction(px, py) {
+                const dx = px - dragStartX;
+                const dy = py - dragStartY;
+                const bounds = desktopBounds();
+                const boundedX = Math.max(bounds.left, Math.min(bounds.right, px));
+                const boundedY = Math.max(bounds.top, Math.min(bounds.bottom, py));
+                pointerX = px;
+                pointerY = py;
+                manager.pointerCursorShape = cursorAt(px, py);
+                manager.pointerGlobalX = boundedX >= bounds.right ? bounds.right - 0.001 : boundedX;
+                manager.pointerGlobalY = boundedY >= bounds.bottom ? bounds.bottom - 0.001 : boundedY;
+                updateReadoutMonitor(manager.pointerGlobalX, manager.pointerGlobalY);
+                if (!interactionMoved && Math.hypot(dx, dy) < 3)
+                    return;
+                interactionMoved = true;
+                manager.readoutVisible = interaction === "create" || interaction === "resize";
+
+                if (interaction === "create") {
+                    applyCreateInteraction(boundedX, boundedY);
+                    return;
+                }
+                if (interaction === "move") {
+                    applyMoveInteraction(bounds, dx, dy);
+                    return;
+                }
+                applyResizeInteraction(boundedX, boundedY);
+            }
+
             visible: manager.overlayVisible
             color: "transparent"
+            implicitWidth: manager.desktopGeometry.width
+            implicitHeight: manager.desktopGeometry.height
 
             // Every output must explicitly accept pointer input. Without a mask,
             // a transparent non-keyboard-owning layer can remain click-through.
@@ -611,14 +724,14 @@ Item {
             WlrLayershell.namespace: "qs.screenshot_overlay"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.margins.left: monitor != null ? manager.desktopGeometry.left - monitor.x : 0
+            WlrLayershell.margins.top: monitor != null ? manager.desktopGeometry.top - monitor.y : 0
 
             anchors.top: true
-            anchors.bottom: true
             anchors.left: true
-            anchors.right: true
 
             onVisibleChanged: {
-                if (visible && overlayWindow.isControlScreen) {
+                if (visible) {
                     keyHandler.forceActiveFocus();
                 }
             }
@@ -692,9 +805,7 @@ Item {
                 enabled: manager.selectedMode === "region" && !manager.optionsOpen && !manager.countdownActive
                 hoverEnabled: true
                 cursorShape: manager.pointerCursorShape
-                onEntered: {
-                    manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.monitorX + mouseX, overlayWindow.monitorY + mouseY);
-                }
+                onEntered: manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.monitorX + mouseX, overlayWindow.monitorY + mouseY)
                 onPressed: mouse => {
                     const globalX = overlayWindow.monitorX + mouse.x;
                     const globalY = overlayWindow.monitorY + mouse.y;
@@ -753,156 +864,15 @@ Item {
                 }
             }
 
-            Rectangle {
-                readonly property var targetWindow: manager.hoveredWindow ?? manager.selectedWindow
-                visible: manager.selectedMode === "windows" && targetWindow != null
-                x: targetWindow != null ? targetWindow.x - overlayWindow.monitorX : 0
-                y: targetWindow != null ? targetWindow.y - overlayWindow.monitorY : 0
-                width: targetWindow != null ? targetWindow.width : 0
-                height: targetWindow != null ? targetWindow.height : 0
-                radius: 8 // Matches decoration.rounding in Hyprland's looknfeel.lua.
-                color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.055)
-                border.width: 1
-                border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.7)
-            }
-
-            // Dim everything outside the selected region while leaving the capture visible.
-            Item {
-                anchors.fill: parent
-                visible: manager.selectedMode === "region"
-                clip: true
-
-                readonly property real sx: manager.selectionX - overlayWindow.monitorX
-                readonly property real sy: manager.selectionY - overlayWindow.monitorY
-                readonly property real sw: manager.selectionWidth
-                readonly property real sh: manager.selectionHeight
-                readonly property real intersectionLeft: Math.max(0, sx)
-                readonly property real intersectionTop: Math.max(0, sy)
-                readonly property real intersectionRight: Math.min(width, sx + sw)
-                readonly property real intersectionBottom: Math.min(height, sy + sh)
-                readonly property bool hasIntersection: manager.hasSelection && intersectionRight > intersectionLeft && intersectionBottom > intersectionTop
-
-                Rectangle {
-                    anchors.fill: parent
-                    visible: !parent.hasIntersection
-                    color: "#66000000"
-                }
-                Rectangle {
-                    x: 0
-                    y: 0
-                    width: parent.width
-                    height: parent.intersectionTop
-                    visible: parent.hasIntersection
-                    color: "#66000000"
-                }
-                Rectangle {
-                    x: 0
-                    y: parent.intersectionTop
-                    width: parent.intersectionLeft
-                    height: parent.intersectionBottom - y
-                    visible: parent.hasIntersection
-                    color: "#66000000"
-                }
-                Rectangle {
-                    x: parent.intersectionRight
-                    y: parent.intersectionTop
-                    width: parent.width - x
-                    height: parent.intersectionBottom - y
-                    visible: parent.hasIntersection
-                    color: "#66000000"
-                }
-                Rectangle {
-                    x: 0
-                    y: parent.intersectionBottom
-                    width: parent.width
-                    height: parent.height - y
-                    visible: parent.hasIntersection
-                    color: "#66000000"
-                }
-
-                Rectangle {
-                    x: parent.sx
-                    y: parent.sy
-                    width: parent.sw
-                    height: parent.sh
-                    color: "transparent"
-                    border.width: manager.hasSelection && parent.sw > 0 ? 2 : 0
-                    border.color: Colors.primary
-                }
-
-                Repeater {
-                    model: manager.hasSelection ? [
-                        {
-                            x: parent.sx,
-                            y: parent.sy
-                        },
-                        {
-                            x: parent.sx + parent.sw / 2,
-                            y: parent.sy
-                        },
-                        {
-                            x: parent.sx + parent.sw,
-                            y: parent.sy
-                        },
-                        {
-                            x: parent.sx,
-                            y: parent.sy + parent.sh / 2
-                        },
-                        {
-                            x: parent.sx + parent.sw,
-                            y: parent.sy + parent.sh / 2
-                        },
-                        {
-                            x: parent.sx,
-                            y: parent.sy + parent.sh
-                        },
-                        {
-                            x: parent.sx + parent.sw / 2,
-                            y: parent.sy + parent.sh
-                        },
-                        {
-                            x: parent.sx + parent.sw,
-                            y: parent.sy + parent.sh
-                        }
-                    ] : []
-
-                    delegate: Rectangle {
-                        required property var modelData
-                        x: modelData.x - width / 2
-                        y: modelData.y - height / 2
-                        width: 8
-                        height: 8
-                        radius: 4
-                        color: Colors.primary
-                        border.width: 1
-                        border.color: Colors.on_primary
-                    }
-                }
-
-                Rectangle {
-                    id: sizeReadout
-                    readonly property real localPointerX: manager.pointerGlobalX - overlayWindow.monitorX
-                    readonly property real localPointerY: manager.pointerGlobalY - overlayWindow.monitorY
-                    readonly property bool clampedOnBothAxes: overlayWindow.labelIsClamped(localPointerX, width, manager.readoutDirectionX, parent.width) && overlayWindow.labelIsClamped(localPointerY, height, manager.readoutDirectionY, parent.height)
-                    visible: manager.readoutVisible && manager.readoutMonitor === overlayWindow.modelData.name
-                    x: overlayWindow.labelPosition(localPointerX, width, clampedOnBothAxes ? -manager.readoutDirectionX : manager.readoutDirectionX, parent.width)
-                    y: overlayWindow.labelPosition(localPointerY, height, clampedOnBothAxes ? -manager.readoutDirectionY : manager.readoutDirectionY, parent.height)
-                    width: sizeText.implicitWidth + 16
-                    height: sizeText.implicitHeight + 10
-                    radius: 6
-                    color: Colors.surface_container
-                    border.width: 1
-                    border.color: Colors.outline_variant
-
-                    Text {
-                        id: sizeText
-                        anchors.centerIn: parent
-                        text: Math.round(manager.selectionWidth) + " × " + Math.round(manager.selectionHeight)
-                        color: Colors.on_surface
-                        font.pixelSize: 12
-                        font.family: Fonts.font
-                    }
-                }
+            ScreenshotOverlayVisuals {
+                x: overlayWindow.toolbarHostX
+                y: overlayWindow.toolbarHostY
+                width: overlayWindow.toolbarHostWidth
+                height: overlayWindow.toolbarHostHeight
+                manager: manager
+                monitorName: overlayWindow.modelData.name
+                monitorX: overlayWindow.monitor?.x ?? 0
+                monitorY: overlayWindow.monitor?.y ?? 0
             }
 
             Item {
@@ -922,7 +892,7 @@ Item {
             // Options panel
             Rectangle {
                 id: optionsPanel
-                visible: overlayWindow.isControlScreen && manager.overlayVisible
+                visible: manager.overlayVisible
                 enabled: manager.optionsOpen
 
                 x: Math.max(8, Math.min(parent.width - width - 8, toolbar.x + (toolbar.width - width) / 2))
@@ -1416,12 +1386,12 @@ Item {
             // Toolbar
             Rectangle {
                 id: toolbar
-                visible: overlayWindow.isControlScreen && manager.overlayVisible
+                visible: manager.overlayVisible
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52
-                x: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(parent.width - width, manager.toolbarX)) : (parent.width - width) / 2
-                y: manager.toolbarMonitor === manager.controlMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(parent.height - height, manager.toolbarY)) : parent.height - height - 52
+                x: overlayWindow.toolbarHostX + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostWidth - width, manager.toolbarX)) : (overlayWindow.toolbarHostWidth - width) / 2)
+                y: overlayWindow.toolbarHostY + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostHeight - height, manager.toolbarY)) : overlayWindow.toolbarHostHeight - height - 52)
                 radius: 14
                 color: Colors.surface_container
                 border.width: 1
@@ -1441,14 +1411,14 @@ Item {
                     anchors.fill: parent
                     cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                     drag.target: toolbar
-                    drag.minimumX: 0
-                    drag.maximumX: overlayWindow.width - toolbar.width
-                    drag.minimumY: 0
-                    drag.maximumY: overlayWindow.height - toolbar.height
+                    drag.minimumX: overlayWindow.toolbarHostX
+                    drag.maximumX: overlayWindow.toolbarHostX + overlayWindow.toolbarHostWidth - toolbar.width
+                    drag.minimumY: overlayWindow.toolbarHostY
+                    drag.maximumY: overlayWindow.toolbarHostY + overlayWindow.toolbarHostHeight - toolbar.height
                     onReleased: {
-                        manager.toolbarMonitor = manager.controlMonitor;
-                        manager.toolbarX = toolbar.x;
-                        manager.toolbarY = toolbar.y;
+                        manager.toolbarMonitor = manager.toolbarHostMonitor;
+                        manager.toolbarX = toolbar.x - overlayWindow.toolbarHostX;
+                        manager.toolbarY = toolbar.y - overlayWindow.toolbarHostY;
                         manager.persistToolbarPosition();
                     }
                 }
@@ -1715,6 +1685,7 @@ Item {
                     }
                 }
             }
+
         }
     }
 }

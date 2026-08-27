@@ -9,7 +9,8 @@ Singleton {
 
     readonly property int duration: 5000
 
-    property string path: ""
+    property var paths: []
+    readonly property string path: paths.length > 0 ? paths[0] : ""
     property double shownAt: 0
     property bool hoverPaused: false
     property double pausedAt: 0
@@ -23,20 +24,27 @@ Singleton {
     }
 
     function show(filePath) {
-        root.path = filePath;
+        root.showBatch([filePath]);
+    }
+
+    function showBatch(filePaths) {
+        const sanitized = Array.isArray(filePaths) ? filePaths.filter(path => typeof path === "string" && path !== "") : [];
+        if (sanitized.length === 0)
+            return;
+        root.paths = sanitized;
         root.shownAt = Date.now();
         root.hoverPaused = false;
     }
 
     function dismiss() {
-        root.path = "";
+        root.paths = [];
         root.hoverPaused = false;
     }
 
     Timer {
         interval: 100
         repeat: true
-        running: root.path !== "" && !root.hoverPaused
+        running: root.paths.length > 0 && !root.hoverPaused
         onTriggered: {
             if (Date.now() - root.shownAt > root.duration)
                 root.dismiss();
