@@ -19,15 +19,19 @@ Variants {
         required property var modelData
         screen: modelData
 
-        readonly property bool shown: ScreenshotToastService.path !== ""
+        readonly property bool shown: ScreenshotToastService.paths.length > 0
+        readonly property int previewCount: ScreenshotToastService.paths.length
 
         readonly property real maxDimension: 220
+        readonly property real groupedPreviewWidth: 180
+        readonly property real groupedPreviewHeight: 112
+        readonly property real groupedSpacing: 2
         readonly property real framePadding: 2
-        readonly property real naturalW: thumb.sourceSize.width > 0 ? thumb.sourceSize.width : 16
-        readonly property real naturalH: thumb.sourceSize.height > 0 ? thumb.sourceSize.height : 9
+        readonly property real naturalW: thumbProbe.sourceSize.width > 0 ? thumbProbe.sourceSize.width : 16
+        readonly property real naturalH: thumbProbe.sourceSize.height > 0 ? thumbProbe.sourceSize.height : 9
         readonly property real fitScale: Math.min(maxDimension / naturalW, maxDimension / naturalH, 1)
-        readonly property real cardWidth: Math.round(naturalW * fitScale)
-        readonly property real cardHeight: Math.round(naturalH * fitScale)
+        readonly property real cardWidth: previewCount > 1 ? previewCount * groupedPreviewWidth + (previewCount - 1) * groupedSpacing : Math.round(naturalW * fitScale)
+        readonly property real cardHeight: previewCount > 1 ? groupedPreviewHeight : Math.round(naturalH * fitScale)
 
         color: "transparent"
         focusable: false
@@ -100,12 +104,30 @@ Variants {
                 color: "transparent"
 
                 Image {
-                    id: thumb
-                    anchors.fill: parent
+                    id: thumbProbe
+                    visible: false
                     source: ScreenshotToastService.path !== "" ? "file://" + ScreenshotToastService.path : ""
-                    fillMode: Image.PreserveAspectFit
                     asynchronous: true
                     cache: false
+                }
+
+                Row {
+                    anchors.fill: parent
+                    spacing: toastWindow.previewCount > 1 ? toastWindow.groupedSpacing : 0
+
+                    Repeater {
+                        model: ScreenshotToastService.paths
+
+                        delegate: Image {
+                            required property string modelData
+                            width: toastWindow.previewCount > 1 ? toastWindow.groupedPreviewWidth : parent.width
+                            height: parent.height
+                            source: "file://" + modelData
+                            fillMode: Image.PreserveAspectFit
+                            asynchronous: true
+                            cache: false
+                        }
+                    }
                 }
 
                 HoverHandler {
@@ -115,9 +137,9 @@ Variants {
 
                 TapHandler {
                     onTapped: {
-                        if (ScreenshotToastService.path === "")
+                        if (ScreenshotToastService.paths.length === 0)
                             return;
-                        openProcess.command = ["imv", ScreenshotToastService.path];
+                        openProcess.command = ["imv"].concat(ScreenshotToastService.paths);
                         openProcess.running = true;
                         ScreenshotToastService.dismiss();
                     }

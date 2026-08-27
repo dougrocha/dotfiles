@@ -71,19 +71,23 @@ get_rectangles() {
 
 save() {
   local selection="$1"
-  [[ -z $selection ]] && exit 0
+  local suffix="$2"
+  local notify="${3:-true}"
+  LAST_SAVED_PATH=""
+  [[ -z $selection ]] && return 0
 
-  FILENAME="Screenshot-$(date +'%Y-%m-%d-at-%I.%M.%S%p').png"
+  FILENAME="Screenshot-$(date +'%Y-%m-%d-at-%I.%M.%S%p')${suffix:+-$suffix}.png"
   SAVE_DIR="${OUTPUT_DIR_OVERRIDE:-$OUTPUT_DIR/Screenshots}"
   FILEPATH="$SAVE_DIR/$FILENAME"
   mkdir -p "$SAVE_DIR"
 
   GRIM_ARGS=(-g "$selection")
   [[ "$CURSOR" == "true" ]] && GRIM_ARGS+=(-c)
-  grim "${GRIM_ARGS[@]}" "$FILEPATH" || exit 1
+  grim "${GRIM_ARGS[@]}" "$FILEPATH" || return 1
   wl-copy <"$FILEPATH"
-  if [[ $SHOW_NOTIFICATION == true ]]; then
-    quickshell ipc call screenshot-toast notify "$FILEPATH"
+  LAST_SAVED_PATH="$FILEPATH"
+  if [[ $SHOW_NOTIFICATION == true && $notify == true ]]; then
+    quickshell ipc call -- screenshot-toast notify "$FILEPATH"
   fi
 }
 
@@ -117,7 +121,7 @@ grab() {
       fi
       ;;
     fullscreen)
-      selection=$(hyprctl monitors -j | jq -r "${JQ_MONITOR_GEO} .[] | select(.focused == true) | format_geo")
+      mapfile -t fullscreen_targets < <(hyprctl monitors -j | jq -r "${JQ_MONITOR_GEO} .[] | [.name, format_geo] | @tsv")
       ;;
     smart|*)
       RECTS=$(get_rectangles)
@@ -143,6 +147,22 @@ grab() {
 
   [[ -n $FREEZE_PID ]] && kill $FREEZE_PID 2>/dev/null
   [[ $DELAY -gt 0 ]] && sleep "$DELAY"
+  if [[ $mode == fullscreen ]]; then
+    local target monitor geometry suffix="" paths_json
+    local -a fullscreen_paths=()
+    for target in "${fullscreen_targets[@]}"; do
+      monitor=${target%%$'\t'*}
+      geometry=${target#*$'\t'}
+      [[ ${#fullscreen_targets[@]} -gt 1 ]] && suffix=${monitor//[^[:alnum:]_.-]/_}
+      save "$geometry" "$suffix" false
+      [[ -n $LAST_SAVED_PATH ]] && fullscreen_paths+=("$LAST_SAVED_PATH")
+    done
+    if [[ $SHOW_NOTIFICATION == true && ${#fullscreen_paths[@]} -gt 0 ]]; then
+      paths_json=$(printf '%s\n' "${fullscreen_paths[@]}" | jq -Rrsc 'split("\n")[:-1] | map(@uri) | join("|")')
+      quickshell ipc call -- screenshot-toast notifyBatch "$paths_json"
+    fi
+    return
+  fi
   if [[ -n ${WIN_ADDR:-} ]]; then
     selection=$(hyprctl clients -j | jq -r --arg addr "$WIN_ADDR" \
       '.[] | select(.address == $addr) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
