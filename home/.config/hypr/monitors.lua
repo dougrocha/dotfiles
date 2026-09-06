@@ -12,6 +12,8 @@ hl.monitor({
     mode = "2560x1440@240",
     position = "0x0",
     scale = "1",
+    bitdepth = 10,
+    vrr = 2, -- Fullscreen only.
 })
 
 hl.monitor({
