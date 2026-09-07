@@ -4,7 +4,6 @@ import qs.Components
 import qs.Modules.Notifications
 import qs.Services
 
-// Window wrapper: NotificationCenter has no surface of its own.
 PopupWindow {
     id: panel
 

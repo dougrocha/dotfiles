@@ -2,69 +2,74 @@ import QtQuick
 import qs.Constants
 
 Item {
-    id: fadeRoot
+    id: root
 
     property string source: ""
     property int fillMode: Image.PreserveAspectCrop
-    property int duration: Theme.animations.normal
+    property int duration: Theme.motion.normal
 
-    readonly property bool ready: art.status === Image.Ready
+    property bool secondOnTop: false
+    readonly property Image shown: secondOnTop ? layer2 : layer1
+    readonly property Image pending: secondOnTop ? layer1 : layer2
+
+    readonly property bool ready: (layer1.status === Image.Ready && layer1.opacity > 0) || (layer2.status === Image.Ready && layer2.opacity > 0)
 
     onSourceChanged: {
         if (source === "") {
-            fadeOut.stop();
-            fadeIn.stop();
-            art.source = "";
-            art.opacity = 0;
+            fade.stop();
+            layer1.source = "";
+            layer2.source = "";
+            layer1.opacity = 0;
+            layer2.opacity = 0;
             return;
         }
-        if (art.source == "") {
-            art.source = source;
+        if (String(root.shown.source) === source)
             return;
-        }
-        fadeOut.restart();
+        if (fade.running)
+            fade.complete();
+        root.pending.source = source;
+        if (root.pending.status === Image.Ready)
+            root.promote();
+    }
+
+    function promote() {
+        fade.stop();
+        const incoming = root.pending;
+        incoming.opacity = 0;
+        incoming.z = 1;
+        root.shown.z = 0;
+        root.secondOnTop = !root.secondOnTop;
+        fade.target = incoming;
+        fade.restart();
     }
 
     Image {
-        source: fadeRoot.source
-        asynchronous: true
-        visible: false
-    }
-
-    Image {
-        id: art
+        id: layer1
         anchors.fill: parent
-        fillMode: fadeRoot.fillMode
+        fillMode: root.fillMode
         asynchronous: true
         opacity: 0
-        onStatusChanged: {
-            if (status === Image.Ready && source == fadeRoot.source && !fadeOut.running)
-                fadeIn.restart();
-        }
+        onStatusChanged: if (status === Image.Ready && root.pending === layer1 && String(source) === root.source)
+            root.promote()
+    }
+
+    Image {
+        id: layer2
+        anchors.fill: parent
+        fillMode: root.fillMode
+        asynchronous: true
+        opacity: 0
+        onStatusChanged: if (status === Image.Ready && root.pending === layer2 && String(source) === root.source)
+            root.promote()
     }
 
     NumberAnimation {
-        id: fadeOut
+        id: fade
 
-        target: art
-        property: "opacity"
-        to: 0
-        duration: fadeRoot.duration
-        easing.type: Easing.InCubic
-        onFinished: {
-            art.source = fadeRoot.source;
-            if (art.status === Image.Ready)
-                fadeIn.restart();
-        }
-    }
-
-    NumberAnimation {
-        id: fadeIn
-
-        target: art
         property: "opacity"
         to: 1
-        duration: fadeRoot.duration
-        easing.type: Easing.OutCubic
+        duration: root.duration
+        easing.type: Theme.motion.easeSmooth
+        onFinished: root.pending.opacity = 0
     }
 }

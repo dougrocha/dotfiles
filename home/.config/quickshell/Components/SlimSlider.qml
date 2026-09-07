@@ -24,7 +24,7 @@ Item {
     Column {
         id: slimCol
         width: parent.width
-        spacing: 4
+        spacing: Theme.space.xs
 
         Item {
             width: parent.width
@@ -47,9 +47,9 @@ Item {
                 anchors.top: slimRoot.sublabelText !== "" ? parent.top : undefined
                 anchors.verticalCenter: slimRoot.sublabelText !== "" ? undefined : parent.verticalCenter
                 text: slimRoot.labelText
-                color: Colors.on_surface_variant
-                font.pixelSize: Fonts.body.size
-                font.family: Fonts.font
+                color: Theme.text.secondary
+                font.pixelSize: Theme.type.body.size
+                font.family: Theme.font.ui
                 elide: Text.ElideRight
             }
 
@@ -62,9 +62,9 @@ Item {
                 anchors.topMargin: 1
                 visible: slimRoot.sublabelText !== ""
                 text: slimRoot.sublabelText
-                color: Colors.outline
-                font.pixelSize: Fonts.caption
-                font.family: Fonts.font
+                color: Theme.text.tertiary
+                font.pixelSize: Theme.type.caption.size
+                font.family: Theme.font.ui
                 elide: Text.ElideRight
             }
 
@@ -74,24 +74,24 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 32
                 height: 32
-                radius: Theme.blockRadius
+                radius: Theme.radius.md
                 activeFocusOnTab: true
-                color: muteHover.hovered || activeFocus ? Colors.surface_container_highest : Colors.surface_container
+                color: muteHover.hovered || activeFocus ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
                 border.width: activeFocus ? 1 : 0
-                border.color: slimRoot.muted ? Colors.error : Colors.primary
+                border.color: slimRoot.muted ? Theme.danger : Theme.accent
 
                 Behavior on color {
                     ColorAnimation {
-                        duration: Theme.animations.fast
+                        duration: Theme.motion.fast
                     }
                 }
 
                 Text {
                     anchors.centerIn: parent
                     text: slimRoot.muted ? slimRoot.mutedIcon : slimRoot.muteIcon
-                    color: slimRoot.muted ? Colors.error : Colors.primary
-                    font.pixelSize: Fonts.h5
-                    font.family: Fonts.iconFont
+                    color: slimRoot.muted ? Theme.danger : Theme.accent
+                    font.pixelSize: Theme.icon.md
+                    font.family: Theme.font.icon
                 }
 
                 HoverHandler {

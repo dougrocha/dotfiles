@@ -1,4 +1,5 @@
 hl.env("GDK_SCALE", "1")
+hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto")
 
 hl.monitor({
     output = "",
@@ -13,7 +14,7 @@ hl.monitor({
     position = "0x0",
     scale = "1",
     bitdepth = 10,
-    vrr = 2, -- Fullscreen only.
+    vrr = 3,
 })
 
 hl.monitor({

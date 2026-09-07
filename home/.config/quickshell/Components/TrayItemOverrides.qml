@@ -68,8 +68,6 @@ QtObject {
         return false;
     }
 
-    // Some applications export Activate without implementing a handler. Keep
-    // their menu openers ready so the configured menu action can replace it.
     property QsMenuOpener menuOpener: QsMenuOpener {
         menu: root.trayItem.hasMenu ? root.trayItem.menu : null
     }

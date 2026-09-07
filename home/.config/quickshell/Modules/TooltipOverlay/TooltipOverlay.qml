@@ -29,9 +29,9 @@ PanelWindow {
 
         width: label.implicitWidth + padH * 2
         height: label.implicitHeight + padV * 2
-        radius: 6
-        color: Colors.surface_container_high
-        border.color: Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.15)
+        radius: Theme.radius.sm
+        color: Theme.colors.raised
+        border.color: Theme.stroke.strong
         border.width: 1
         opacity: TooltipService.tooltipShown ? 1 : 0
 
@@ -46,10 +46,10 @@ PanelWindow {
             id: label
             anchors.centerIn: parent
             text: TooltipService.tooltipText
-            color: Colors.on_surface
+            color: Theme.text.primary
             renderType: Text.NativeRendering
-            font.pixelSize: Fonts.p - 1
-            font.family: Fonts.font
+            font.pixelSize: Theme.type.body.size
+            font.family: Theme.font.ui
         }
     }
 }

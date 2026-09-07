@@ -1,12 +1,13 @@
 import QtQuick
 import Quickshell
+import qs.Constants
 
 PopupWindow {
     id: popup
 
     required property bool shown
     property int cardWidth: 300
-    property int cardPadding: 10
+    property int cardPadding: Theme.space.lg
     default property alias content: card.content
 
     signal dismissed

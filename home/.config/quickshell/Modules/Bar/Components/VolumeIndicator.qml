@@ -1,48 +1,21 @@
 import QtQuick
 import Quickshell
-import qs.Constants
 import qs.Components
+import qs.Constants
 import qs.Services
 
-Item {
-    id: root
-    implicitWidth: icon.implicitWidth
-    implicitHeight: Theme.topBarHeight
-
-    Text {
-        id: icon
-        anchors.centerIn: parent
-        text: {
-            if (AudioService.muted || AudioService.volume <= 0)
-                return PhosphorIcons.speakerSlash;
-            if (AudioService.volume < 0.34)
-                return PhosphorIcons.speakerNone;
-            if (AudioService.volume < 0.67)
-                return PhosphorIcons.speakerLow;
-            return PhosphorIcons.speakerHigh;
-        }
-        color: AudioService.muted ? Colors.error : Colors.on_surface_variant
-        font.pixelSize: Fonts.p
-        font.family: Fonts.phosphorFont
-        Behavior on color {
-            ColorAnimation {
-                duration: 180
-            }
-        }
+IconButton {
+    glyph: {
+        if (AudioService.muted || AudioService.volume <= 0)
+            return PhosphorIcons.speakerSlash;
+        if (AudioService.volume < 0.34)
+            return PhosphorIcons.speakerNone;
+        if (AudioService.volume < 0.67)
+            return PhosphorIcons.speakerLow;
+        return PhosphorIcons.speakerHigh;
     }
-
-    HoverHandler {
-        id: hover
-    }
-
-    TapHandler {
-        cursorShape: Qt.PointingHandCursor
-        onTapped: Visibilities.toggleSoundPanel()
-    }
-
-    Tooltip {
-        targetItem: root
-        text: AudioService.muted ? "Volume · Muted" : "Volume · " + Math.round(AudioService.volume * 100) + "%"
-        hovered: hover.hovered
-    }
+    active: AudioService.muted
+    activeColor: Theme.danger
+    tooltipText: AudioService.muted ? "Volume · Muted" : "Volume · " + Math.round(AudioService.volume * 100) + "%"
+    onTapped: Visibilities.toggleSoundPanel()
 }

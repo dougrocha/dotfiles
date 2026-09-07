@@ -35,26 +35,27 @@ Rectangle {
     Layout.preferredHeight: 24
     activeFocusOnTab: true
     radius: height / 2
-    color: menuOpen || activeFocus ? Colors.surface_container_highest : hoverHandler.hovered ? Colors.surface_container_high : "transparent"
+    color: menuOpen || activeFocus ? Theme.fill.press : hoverHandler.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
     border.width: trayItem.status === Status.NeedsAttention || activeFocus ? 1 : 0
-    border.color: trayItem.status === Status.NeedsAttention ? Colors.primary : Colors.outline
+    border.color: trayItem.status === Status.NeedsAttention ? Theme.accent : Theme.stroke.strong
     transform: Translate {
         x: root.previewOffsetX
     }
 
     Behavior on color {
         ColorAnimation {
-            duration: Theme.animations.fast
+            duration: Theme.motion.fast
         }
     }
     Behavior on previewOffsetX {
         NumberAnimation {
-            duration: 180
-            easing.type: Easing.OutCubic
+            duration: Theme.motion.normal
+            easing.type: Theme.motion.easeStandard
         }
     }
 
     IconImage {
+        id: trayIcon
         anchors.centerIn: parent
         width: 16
         height: 16

@@ -1,33 +1,31 @@
 #!/usr/bin/env bash
-# set-wallpaper <image-path>
-# Runs matugen which writes $image into colors.conf, then restarts hyprpaper.
-# post-hooks: hyprctl reload, makoctl reload
-# quickshell auto-reloads Colors.qml via pragma Singleton
+# set-wallpaper <image> [--system-theme dark|light]
+# matugen regenerates every template in ~/.config/matugen/config.toml (incl. the
+# Base16 palette.json quickshell watches) and the GTK color-scheme; then hyprpaper.
 
 set -euo pipefail
 
-image="${1:-}"
+image=""
+mode="dark"
+while (($#)); do
+    case "$1" in
+        --system-theme) mode="${2:-}"; shift 2 ;;
+        -*) echo "Unknown option: $1" >&2; exit 1 ;;
+        *) image="$1"; shift ;;
+    esac
+done
 
-if [[ -z "$image" ]]; then
-    echo "Usage: set-wallpaper <image-path>" >&2
-    exit 1
-fi
-
+[[ -n "$image" ]] || { echo "Usage: set-wallpaper <image> [--system-theme dark|light]" >&2; exit 1; }
+[[ "$mode" == dark || "$mode" == light ]] || { echo "Error: --system-theme must be 'dark' or 'light'" >&2; exit 1; }
 image="$(realpath "$image")"
+[[ -f "$image" ]] || { echo "Error: file not found: $image" >&2; exit 1; }
 
-if [[ ! -f "$image" ]]; then
-    echo "Error: file not found: $image" >&2
-    exit 1
-fi
+matugen image -m "$mode" --source-color-index 0 "$image"
+gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode" 2>/dev/null || true
 
-# Run matugen — writes $image + all color vars into colors.conf
-# post-hooks handle: hyprctl reload, makoctl reload
-matugen image -m dark "$image"
-
-# Restart hyprpaper so it picks up the new $image from colors.conf
 pkill -x hyprpaper || true
 sleep 0.1
 uwsm-app -- hyprpaper &>/dev/null &
 disown
 
-echo "Wallpaper set: $image"
+echo "Wallpaper set: $image ($mode)"

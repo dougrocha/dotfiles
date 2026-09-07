@@ -2,9 +2,9 @@ import QtQuick
 import qs.Constants
 
 Text {
-    color: Colors.on_surface_variant
-    font.pixelSize: Fonts.caption
-    font.family: Fonts.font
-    font.letterSpacing: 1
-    font.weight: Font.Medium
+    color: Theme.text.secondary
+    font.pixelSize: Theme.type.label.size
+    font.family: Theme.font.ui
+    font.letterSpacing: Theme.type.label.tracking
+    font.weight: Theme.type.label.weight
 }

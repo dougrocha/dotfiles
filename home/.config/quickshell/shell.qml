@@ -1,7 +1,3 @@
-// pragma UseQApplication
-//@ pragma Env QT_QUICK_CONTROLS_STYLE=Basic
-//@ pragma Env QT_QPA_PLATFORMTHEME=
-
 import qs.Modules.Bar
 import qs.Modules.Island
 import qs.Modules.Notifications

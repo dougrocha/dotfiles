@@ -14,16 +14,15 @@ Item {
     id: card
 
     required property var modelData
-    // History entries show their age; live popups are always "now".
+
     property bool showTimestamp: false
-    // In a collapsed stack, a click expands the group instead of acting on the card.
+
     property bool interactive: true
-    // Borderless list-row style for the history panel; toasts stay card-style.
+
     property bool flat: false
 
     readonly property bool isCritical: modelData?.urgency === NotificationUrgency.Critical
 
-    // Room for the close badge to straddle the corner; flat rows use it as a small gap instead.
     readonly property int overhang: flat ? 4 : 10
 
     height: surface.height + overhang
@@ -56,7 +55,7 @@ Item {
     property bool menuExpanded: false
 
     function styledBody(text) {
-        return text.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Colors.primary}">$2</font></a>`);
+        return text.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
     }
 
     function openBodyLink(link) {
@@ -82,19 +81,19 @@ Item {
 
         Layout.preferredHeight: 28
         Layout.preferredWidth: actionLabel.implicitWidth + 24
-        radius: Theme.blockRadius
-        color: actionHover.hovered ? Colors.surface_container_high : Colors.surface_container
-        border.color: actionHover.hovered ? Colors.primary : Colors.outline_variant
+        radius: Theme.radius.md
+        color: actionHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        border.color: Theme.stroke.hairline
         border.width: 1
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
         Behavior on border.color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
 
@@ -103,14 +102,14 @@ Item {
             anchors.centerIn: parent
             anchors.margins: 4
             text: modelData.text
-            color: actionHover.hovered ? Colors.primary : Colors.on_surface_variant
+            color: actionHover.hovered ? Theme.text.primary : Theme.text.secondary
             elide: Text.ElideRight
-            font.family: Fonts.font
-            font.pixelSize: Fonts.label.size
-            font.weight: Fonts.label.weight
+            font.family: Theme.font.ui
+            font.pixelSize: Theme.type.label.size
+            font.weight: Theme.type.label.weight
             Behavior on color {
                 ColorAnimation {
-                    duration: Theme.animations.fast
+                    duration: Theme.motion.fast
                 }
             }
         }
@@ -134,15 +133,14 @@ Item {
         width: card.width - card.overhang
         height: cardContent.implicitHeight + 12 * 2
 
-        radius: card.flat ? 8 : 12
+        radius: card.flat ? Theme.radius.md : Theme.radius.xl
         border.width: card.flat ? 0 : 1
-        color: card.flat ? (cardHover.hovered ? Colors.surface_container_highest : Colors.surface_container_high) : Colors.surface_container
-        // Critical cards never expire, so make that look deliberate.
-        border.color: card.isCritical ? Colors.error : Colors.outline_variant
+        color: card.flat ? (cardHover.hovered ? Theme.colors.overlay : Theme.colors.raised) : Theme.colors.surface
+        border.color: card.isCritical ? Theme.danger : Theme.stroke.hairline
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
 
@@ -174,12 +172,12 @@ Item {
             id: cardContent
             anchors.fill: parent
             anchors.margins: card.flat ? 8 : 12
-            spacing: 2
+            spacing: Theme.space.xxs
 
             RowLayout {
                 id: headerRow
                 Layout.fillWidth: true
-                spacing: 6
+                spacing: Theme.space.sm
 
                 Item {
                     Layout.preferredWidth: 16
@@ -198,39 +196,39 @@ Item {
                 Text {
                     Layout.fillWidth: true
                     text: card.modelData?.appName ?? ""
-                    color: Colors.on_surface_variant
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.label.size
-                    font.weight: Fonts.label.weight
+                    color: Theme.text.secondary
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.label.size
+                    font.weight: Theme.type.label.weight
                     elide: Text.ElideRight
                 }
 
                 Text {
                     visible: card.showTimestamp
                     text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
-                    color: Colors.on_surface_variant
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.label.size
-                    font.weight: Fonts.label.weight
+                    color: Theme.text.secondary
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.label.size
+                    font.weight: Theme.type.label.weight
                 }
 
                 Text {
                     visible: card.interactive && card.menuActions().length > 0
                     activeFocusOnTab: visible
-                    text: Icons.expandMore
-                    font.family: Fonts.iconFont
-                    font.pixelSize: 14
-                    color: menuHover.hovered ? Colors.primary : Colors.on_surface_variant
+                    text: PhosphorIcons.caretDown
+                    font.family: Theme.font.icon
+                    font.pixelSize: Theme.icon.xs
+                    color: menuHover.hovered ? Theme.text.primary : Theme.text.secondary
                     rotation: card.menuExpanded ? 180 : 0
 
                     Behavior on rotation {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
                     Behavior on color {
                         ColorAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
@@ -256,19 +254,19 @@ Item {
                     visible: card.interactive && card.flat
                     opacity: cardHover.hovered || closeHoverInline.hovered ? 1 : 0
                     enabled: opacity > 0
-                    text: Icons.close
-                    font.family: Fonts.iconFont
-                    font.pixelSize: 14
-                    color: closeHoverInline.hovered ? Colors.primary : Colors.on_surface_variant
+                    text: PhosphorIcons.x
+                    font.family: Theme.font.icon
+                    font.pixelSize: Theme.icon.xs
+                    color: closeHoverInline.hovered ? Theme.text.primary : Theme.text.secondary
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
                     Behavior on color {
                         ColorAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
@@ -289,27 +287,27 @@ Item {
 
                 Behavior on Layout.preferredHeight {
                     NumberAnimation {
-                        duration: Theme.animations.fast
+                        duration: Theme.motion.fast
                     }
                 }
             }
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 8
+                spacing: Theme.space.md
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 6
+                    spacing: Theme.space.sm
 
                     Text {
                         Layout.fillWidth: true
                         text: card.modelData?.summary ?? ""
                         visible: text !== ""
-                        color: Colors.on_surface
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.title.size
-                        font.weight: Fonts.title.weight
+                        color: Theme.text.primary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.title.size
+                        font.weight: Theme.type.title.weight
                         elide: Text.ElideRight
                     }
 
@@ -317,10 +315,10 @@ Item {
                         Layout.fillWidth: true
                         text: card.styledBody(card.modelData?.body ?? "")
                         visible: text !== ""
-                        color: Colors.on_surface_variant
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.body.size
-                        font.weight: Fonts.body.weight
+                        color: Theme.text.secondary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
+                        font.weight: Theme.type.body.weight
                         wrapMode: Text.WordWrap
                         maximumLineCount: 2
                         elide: Text.ElideRight
@@ -332,7 +330,7 @@ Item {
                     Layout.preferredWidth: 48
                     Layout.preferredHeight: 48
                     Layout.alignment: Qt.AlignTop
-                    radius: 8
+                    radius: Theme.radius.md
                     color: "transparent"
                     visible: notifImage.status === Image.Ready
 
@@ -347,7 +345,7 @@ Item {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 8
+                spacing: Theme.space.md
                 visible: card.interactive && card.buttonActions().length > 0
 
                 Repeater {
@@ -369,10 +367,10 @@ Item {
             width: popoverColumn.implicitWidth + 8
             height: popoverColumn.implicitHeight + 8
 
-            radius: 10
-            color: Colors.surface_container_high
+            radius: Theme.radius.lg
+            color: Theme.colors.raised
             border.width: 1
-            border.color: Colors.outline_variant
+            border.color: Theme.stroke.hairline
 
             layer.enabled: true
             layer.effect: MultiEffect {
@@ -384,14 +382,14 @@ Item {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Theme.animations.fast
+                    duration: Theme.motion.fast
                 }
             }
 
             ColumnLayout {
                 id: popoverColumn
                 anchors.centerIn: parent
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Repeater {
                     model: card.menuActions()
@@ -402,12 +400,12 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: menuItemLabel.implicitWidth + 20
-                        radius: Theme.blockRadius
-                        color: menuItemHover.hovered ? Colors.surface_container_highest : Colors.surface_container_high
+                        radius: Theme.radius.md
+                        color: menuItemHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
@@ -417,10 +415,10 @@ Item {
                             anchors.leftMargin: 8
                             anchors.verticalCenter: parent.verticalCenter
                             text: menuItem.modelData.text
-                            color: Colors.on_surface_variant
-                            font.family: Fonts.font
-                            font.pixelSize: Fonts.label.size
-                            font.weight: Fonts.label.weight
+                            color: Theme.text.secondary
+                            font.family: Theme.font.ui
+                            font.pixelSize: Theme.type.label.size
+                            font.weight: Theme.type.label.weight
                         }
 
                         HoverHandler {
@@ -441,7 +439,6 @@ Item {
         }
     }
 
-    // Close badge centered on the surface's top-left corner, macOS style.
     Rectangle {
         id: closeBadge
 
@@ -449,35 +446,35 @@ Item {
         y: 0
         width: 20
         height: 20
-        radius: 10
-        color: Colors.surface_container_high
+        radius: width / 2
+        color: Theme.colors.raised
         border.width: 1
-        border.color: closeHover.hovered ? Colors.primary : Colors.outline_variant
+        border.color: closeHover.hovered ? Theme.stroke.accent : Theme.stroke.hairline
         visible: card.interactive && !card.flat
         opacity: cardHover.hovered || closeHover.hovered ? 1 : 0
         enabled: opacity > 0
 
         Behavior on opacity {
             NumberAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
         Behavior on border.color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
 
         Text {
             anchors.centerIn: parent
-            text: Icons.close
-            font.family: Fonts.iconFont
-            font.pixelSize: 12
-            color: closeHover.hovered ? Colors.primary : Colors.on_surface_variant
+            text: PhosphorIcons.x
+            font.family: Theme.font.icon
+            font.pixelSize: Theme.icon.xxs
+            color: closeHover.hovered ? Theme.text.primary : Theme.text.tertiary
 
             Behavior on color {
                 ColorAnimation {
-                    duration: Theme.animations.fast
+                    duration: Theme.motion.fast
                 }
             }
         }

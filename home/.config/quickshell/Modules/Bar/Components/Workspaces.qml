@@ -22,7 +22,7 @@ Item {
         spacing: 0
 
         Row {
-            spacing: 5
+            spacing: Theme.space.xs
             Layout.alignment: Qt.AlignVCenter
 
             Repeater {
@@ -45,16 +45,16 @@ Item {
                     Behavior on width {
                         NumberAnimation {
                             duration: resizeDuration
-                            easing.type: Easing.OutCubic
+                            easing.type: Theme.motion.easeStandard
                         }
                     }
 
                     Rectangle {
                         id: dot
                         anchors.fill: parent
-                        radius: 5
-                        color: isActive ? Colors.primary : Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, hasWindows ? 0.15 : 0.0)
-                        border.color: isActive ? Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0) : Colors.primary
+                        radius: Theme.radius.xs
+                        color: isActive ? Theme.accent : Theme.withAlpha(Theme.accent, hasWindows ? 0.15 : 0.0)
+                        border.color: isActive ? Theme.withAlpha(Theme.accent, 0) : Theme.accent
                         border.width: 1.5
                         opacity: isActive || hasWindows ? 1.0 : 0.35
 
@@ -66,7 +66,7 @@ Item {
                         Behavior on opacity {
                             NumberAnimation {
                                 duration: dot.parent.stateDuration
-                                easing.type: Easing.OutCubic
+                                easing.type: Theme.motion.easeStandard
                             }
                         }
                         Behavior on border.color {
@@ -98,14 +98,14 @@ Item {
 
             Behavior on Layout.preferredWidth {
                 NumberAnimation {
-                    duration: Theme.animations.fast
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.fast
+                    easing.type: Theme.motion.easeStandard
                 }
             }
             Behavior on Layout.leftMargin {
                 NumberAnimation {
-                    duration: Theme.animations.fast
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.fast
+                    easing.type: Theme.motion.easeStandard
                 }
             }
 
@@ -115,18 +115,18 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 implicitWidth: namedLabel.implicitWidth + 16
                 height: 16
-                radius: 8
-                color: Colors.tertiary_container
+                radius: Theme.radius.md
+                color: Theme.fill.selected
 
                 Text {
                     id: namedLabel
                     anchors.centerIn: parent
                     renderType: Text.NativeRendering
                     text: root.activeWorkspace?.name ?? ""
-                    color: Colors.on_tertiary_container
-                    font.family: Fonts.font
-                    font.pixelSize: 10
-                    font.weight: Font.Medium
+                    color: Theme.accent
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.label.size
+                    font.weight: Theme.type.label.weight
                 }
             }
         }

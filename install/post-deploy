@@ -8,10 +8,10 @@ echo "Running post-deploy configuration..."
 
 "$DOTFILES_DIR/install/post/setup-ghostty-config"
 "$DOTFILES_DIR/install/post/fonts"
-"$DOTFILES_DIR/install/post/defaults"
 "$DOTFILES_DIR/install/post/desktop-prefs"
 "$DOTFILES_DIR/install/post/nautilus-python"
 "$DOTFILES_DIR/install/post/setup-applications"
+"$DOTFILES_DIR/install/post/defaults"
 "$DOTFILES_DIR/install/post/fast-shutdown"
 
 systemctl --user enable --now hyprpaper.service

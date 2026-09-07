@@ -14,8 +14,7 @@ PopupWindow {
     readonly property real maximumHeight: barWindow && barWindow.screen ? Math.max(120, barWindow.screen.height - barWindow.height - 24) : 600
 
     implicitWidth: 200
-    // Keep the native window geometry stable while submenus animate. The mask
-    // limits input to the visible menu rectangle.
+
     implicitHeight: maximumHeight
     color: "transparent"
     visible: false
@@ -60,9 +59,9 @@ PopupWindow {
         anchors.left: parent.left
         anchors.right: parent.right
         height: Math.min(menuColumn.implicitHeight + 16, root.maximumHeight)
-        radius: 8
-        color: Colors.surface
-        border.color: Colors.outline_variant
+        radius: Theme.radius.lg
+        color: Theme.colors.raised
+        border.color: Theme.stroke.hairline
         border.width: 1
 
         transformOrigin: Item.Top
@@ -87,14 +86,14 @@ PopupWindow {
         }
         Behavior on opacity {
             NumberAnimation {
-                duration: 80
-                easing.type: Easing.OutCubic
+                duration: Theme.motion.instant
+                easing.type: Theme.motion.easeStandard
             }
         }
         Behavior on height {
             NumberAnimation {
-                duration: Theme.animations.normal
-                easing.type: Easing.OutCubic
+                duration: Theme.motion.normal
+                easing.type: Theme.motion.easeStandard
             }
         }
 

@@ -11,11 +11,10 @@ Singleton {
 
     property list<var> history: []
     property list<var> notifications: []
-    // Pointer over the popup stack keeps cards from expiring while being read.
+
     property bool hoverPaused: false
     property double pausedAt: 0
 
-    // Shift timestamps on resume so paused cards keep their remaining time.
     onHoverPausedChanged: {
         if (hoverPaused) {
             pausedAt = Date.now();
@@ -37,17 +36,15 @@ Singleton {
     }
 
     function calculateDuration(n) {
-        // stay forever
+
         if (n.expireTimeout === 0) {
             return -1;
         }
 
-        // app decides
         if (n.expireTimeout > 0) {
             return n.expireTimeout;
         }
 
-        // No timeout given: Critical stays, Low is brief, otherwise 3s.
         if (n.urgency === NotificationUrgency.Critical)
             return -1;
         if (n.urgency === NotificationUrgency.Low)
@@ -76,7 +73,6 @@ Singleton {
         };
     }
 
-    // replaces_id writes new content onto the same object; watch it so the snapshot redraws. Returns an unwatch.
     function watchForUpdates(notification, id) {
         const refresh = () => refreshSnapshot(notification, id);
         const signals = [notification.summaryChanged, notification.bodyChanged, notification.appNameChanged, notification.appIconChanged, notification.imageChanged, notification.actionsChanged];
@@ -85,7 +81,6 @@ Singleton {
         return () => signals.forEach(signal => signal.disconnect(refresh));
     }
 
-    // Replace, not mutate, so the card redraws; keep the original timestamp.
     function refreshSnapshot(notification, id) {
         const index = root.notifications.findIndex(n => n.id === id);
         if (index === -1)
@@ -125,7 +120,6 @@ Singleton {
 
         const data = snapshot(notification, metadata);
 
-        // "onClosed" would collide with the signal's slot, so it's named differently.
         const closeHandler = () => {
             notification.closed.disconnect(closeHandler);
             discardNotification(id);
@@ -133,7 +127,6 @@ Singleton {
         notification.closed.connect(closeHandler);
         data.closeHandler = closeHandler;
 
-        // Center is showing it, or DND: record to history instead of popping up. Critical always pops.
         if ((Visibilities.notificationCenter || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
             addToHistory(data);
             notification.expire();
@@ -142,15 +135,13 @@ Singleton {
 
         data.unwatch = watchForUpdates(notification, id);
 
-        // Restored twins carry different ids; drop a duplicate by content instead.
         root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id && !(notif.restored && notif.appName === data.appName && notif.summary === data.summary && notif.body === data.body))];
     }
 
-    // Live cards are dismissed server-side so the app is informed; the closed signal does bookkeeping.
     function removeNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (notif) {
-            // A restored card has no server object; retire it here.
+
             if (notif.ref)
                 notif.ref.dismiss();
             else
@@ -164,12 +155,11 @@ Singleton {
         }
     }
 
-    // Runs when the server reports a notification closed, whatever the cause.
     function discardNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (!notif)
             return;
-        // Drop signal handlers before the C++ object dies.
+
         if (notif.unwatch)
             notif.unwatch();
         notif.isPopup = false;
@@ -223,7 +213,6 @@ Singleton {
         }
     }
 
-    // Under XDG_STATE_HOME, not Quickshell.cacheDir — that path is keyed by a hash of the shell's path.
     FileView {
         id: historyFile
 
@@ -242,11 +231,8 @@ Singleton {
         }
     }
 
-    // One-shot: adopt the history from the old cacheDir location, then rewrite at the new path.
     property bool migrateLegacyHistory: false
 
-    // A config reload re-announces notifications; only a full restart drops them.
-    // Restored cards are inert: their ref was a dead process's object, so actions are dropped.
     function liveSnapshot(n) {
         return {
             id: n.id,
@@ -325,7 +311,6 @@ Singleton {
                 return notif.duration !== -1 && !root.hoverPaused && (now - notif.timestamp) > notif.duration;
             });
 
-            // Restored cards have no server object; retire them directly.
             expired.forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
         }
     }

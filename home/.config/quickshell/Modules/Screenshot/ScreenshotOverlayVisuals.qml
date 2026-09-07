@@ -23,14 +23,10 @@ Item {
         return preferred < 8 || preferred > available - extent - 8;
     }
 
-    // Used on the axis perpendicular to a single dragged edge, so the label stays
-    // level with the cursor instead of offsetting away from it.
     function centeredPosition(pointer, extent, available): real {
         return Math.max(8, Math.min(available - extent - 8, pointer - extent / 2));
     }
 
-    // Places the label off to one side of the cursor, flipping to the other side
-    // (inside the selection) when there isn't room for it on the preferred side.
     function directedPosition(pointer, extent, direction, available): real {
         const clamped = labelIsClamped(pointer, extent, direction, available);
         return labelPosition(pointer, extent, clamped ? -direction : direction, available);
@@ -43,10 +39,10 @@ Item {
         y: targetWindow != null ? targetWindow.y - root.monitorY : 0
         width: targetWindow != null ? targetWindow.width : 0
         height: targetWindow != null ? targetWindow.height : 0
-        radius: 8
-        color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.055)
+        radius: Theme.radius.md
+        color: Theme.withAlpha(Theme.accent, 0.055)
         border.width: 1
-        border.color: Qt.rgba(Colors.primary.r, Colors.primary.g, Colors.primary.b, 0.7)
+        border.color: Theme.withAlpha(Theme.accent, 0.7)
     }
 
     Item {
@@ -110,7 +106,7 @@ Item {
             height: regionVisuals.sh
             color: "transparent"
             border.width: root.manager.hasSelection && regionVisuals.sw > 0 ? 2 : 0
-            border.color: Colors.primary
+            border.color: Theme.accent
         }
 
         Repeater {
@@ -131,10 +127,10 @@ Item {
                 y: modelData.y - height / 2
                 width: 8
                 height: 8
-                radius: 4
-                color: Colors.primary
+                radius: Theme.radius.xs
+                color: Theme.accent
                 border.width: 1
-                border.color: Colors.on_primary
+                border.color: Theme.accentText
             }
         }
 
@@ -161,18 +157,18 @@ Item {
             }
             width: sizeText.implicitWidth + 16
             height: sizeText.implicitHeight + 10
-            radius: 6
-            color: Colors.surface_container
+            radius: Theme.radius.sm
+            color: Theme.colors.raised
             border.width: 1
-            border.color: Colors.outline_variant
+            border.color: Theme.stroke.hairline
 
             Text {
                 id: sizeText
                 anchors.centerIn: parent
                 text: Math.round(root.manager.selectionWidth) + " × " + Math.round(root.manager.selectionHeight)
-                color: Colors.on_surface
-                font.pixelSize: 12
-                font.family: Fonts.font
+                color: Theme.text.primary
+                font.pixelSize: Theme.type.body.size
+                font.family: Theme.font.ui
             }
         }
     }

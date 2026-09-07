@@ -2,62 +2,133 @@
 
 set -euo pipefail
 
+missing=()
+
+set_default() {
+    local handler="$1"
+    shift
+
+    local found="" dir
+    for dir in "$HOME/.local/share" ${XDG_DATA_DIRS//:/ }; do
+        if [ -f "$dir/applications/$handler" ]; then
+            found="yes"
+            break
+        fi
+    done
+
+    if [ -z "$found" ]; then
+        missing+=("$handler")
+        return 0
+    fi
+
+    local mime
+    for mime in "$@"; do
+        xdg-mime default "$handler" "$mime"
+    done
+}
+
+: "${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"
+
 # Browser defaults
 xdg-settings set default-web-browser chromium.desktop
-xdg-mime default chromium.desktop x-scheme-handler/http
-xdg-mime default chromium.desktop x-scheme-handler/https
-xdg-mime default chromium.desktop text/html
+set_default chromium.desktop \
+    text/html \
+    x-scheme-handler/http \
+    x-scheme-handler/https \
+    x-scheme-handler/about \
+    x-scheme-handler/unknown \
+    x-scheme-handler/mailto
 
 # PDF defaults
-xdg-mime default chromium.desktop application/pdf
+set_default chromium.desktop \
+    application/pdf \
+    application/x-pdf
+
+# Office document defaults (LibreOffice)
+set_default libreoffice-writer.desktop \
+    application/msword \
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+set_default libreoffice-calc.desktop \
+    application/vnd.ms-excel \
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+set_default libreoffice-impress.desktop \
+    application/vnd.ms-powerpoint \
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+set_default libreoffice-draw.desktop \
+    application/postscript
 
 # File manager defaults
-xdg-mime default org.gnome.Nautilus.desktop inode/directory
+set_default org.gnome.Nautilus.desktop inode/directory
 
 # Terminal defaults
-xdg-mime default ghostty.desktop x-scheme-handler/terminal
+set_default com.mitchellh.ghostty.desktop x-scheme-handler/terminal
 
 # Video player defaults (mpv)
-xdg-mime default mpv.desktop video/mp4
-xdg-mime default mpv.desktop video/x-msvideo
-xdg-mime default mpv.desktop video/x-matroska
-xdg-mime default mpv.desktop video/x-flv
-xdg-mime default mpv.desktop video/x-ms-wmv
-xdg-mime default mpv.desktop video/mpeg
-xdg-mime default mpv.desktop video/ogg
-xdg-mime default mpv.desktop video/webm
-xdg-mime default mpv.desktop video/quicktime
-xdg-mime default mpv.desktop video/3gpp
-xdg-mime default mpv.desktop video/3gpp2
-xdg-mime default mpv.desktop video/x-ms-asf
-xdg-mime default mpv.desktop video/x-ogm+ogg
-xdg-mime default mpv.desktop application/ogg
+set_default mpv.desktop \
+    video/mp4 \
+    video/x-msvideo \
+    video/x-matroska \
+    video/x-flv \
+    video/x-ms-wmv \
+    video/mpeg \
+    video/ogg \
+    video/webm \
+    video/quicktime \
+    video/3gpp \
+    video/3gpp2 \
+    video/x-ms-asf \
+    video/x-ogm+ogg \
+    video/x-theora+ogg \
+    application/ogg
 
 # Text editor defaults (nvim)
-xdg-mime default nvim.desktop text/plain
-xdg-mime default nvim.desktop text/english
-xdg-mime default nvim.desktop text/x-makefile
-xdg-mime default nvim.desktop text/x-c++hdr
-xdg-mime default nvim.desktop text/x-c++src
-xdg-mime default nvim.desktop text/x-chdr
-xdg-mime default nvim.desktop text/x-csrc
-xdg-mime default nvim.desktop text/x-java
-xdg-mime default nvim.desktop text/x-moc
-xdg-mime default nvim.desktop text/x-pascal
-xdg-mime default nvim.desktop text/x-tcl
-xdg-mime default nvim.desktop text/x-tex
-xdg-mime default nvim.desktop application/x-shellscript
-xdg-mime default nvim.desktop text/x-c
-xdg-mime default nvim.desktop text/x-c++
-xdg-mime default nvim.desktop application/xml
-xdg-mime default nvim.desktop text/xml
+set_default nvim.desktop \
+    text/plain \
+    text/english \
+    text/x-makefile \
+    text/x-c++hdr \
+    text/x-c++src \
+    text/x-chdr \
+    text/x-csrc \
+    text/x-java \
+    text/x-moc \
+    text/x-pascal \
+    text/x-tcl \
+    text/x-tex \
+    application/x-shellscript \
+    text/x-c \
+    text/x-c++ \
+    application/xml \
+    text/xml
 
-# Image viewer defaults (imv)
-xdg-mime default imv.desktop image/png
-xdg-mime default imv.desktop image/jpeg
-xdg-mime default imv.desktop image/gif
-xdg-mime default imv.desktop image/webp
-xdg-mime default imv.desktop image/bmp
-xdg-mime default imv.desktop image/tiff
+# Image viewer defaults (imv-dir)
+set_default imv-dir.desktop \
+    image/png \
+    image/jpeg \
+    image/gif \
+    image/webp \
+    image/bmp \
+    image/tiff \
+    image/svg+xml \
+    image/avif \
+    image/heif \
+    image/jxl
+
+# Application URL scheme handlers
+set_default vesktop.desktop x-scheme-handler/discord
+set_default cider.desktop \
+    x-scheme-handler/cider \
+    x-scheme-handler/itms \
+    x-scheme-handler/itmss \
+    x-scheme-handler/music \
+    x-scheme-handler/itunes
+set_default claude-code-url-handler.desktop x-scheme-handler/claude-cli
+set_default com.anthropic.Claude.desktop x-scheme-handler/claude
+
+if [ ${#missing[@]} -gt 0 ]; then
+    echo "  ! skipped (desktop entry not installed): ${missing[*]}"
+fi
+
+echo "✓ Default applications set"
 
 # vim: ft=sh

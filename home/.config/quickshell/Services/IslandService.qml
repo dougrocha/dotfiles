@@ -5,7 +5,6 @@ import Quickshell
 Singleton {
     id: root
 
-    // A (re)bound audio node replays its current state, so the first value per key is a baseline, not a user action.
     property var lastSeen: ({})
 
     function changed(key, value) {
@@ -15,7 +14,7 @@ Singleton {
         return known && differs;
     }
 
-    property string osdMode: "" // "volume" | "mic"
+    property string osdMode: ""
     property real osdLevel: 0
     property bool osdMuted: false
     property string osdLabel: ""
@@ -54,13 +53,25 @@ Singleton {
         }
     }
 
-    readonly property bool usingCider: CiderRpcService.isOnline && CiderRpcService.trackTitle !== ""
     readonly property var mprisPlayer: MprisService.musicPlayer
-    readonly property bool musicAvailable: usingCider || ((mprisPlayer?.trackTitle || "") !== "")
-    readonly property string trackTitle: usingCider ? CiderRpcService.trackTitle : (mprisPlayer?.trackTitle || "")
-    readonly property string trackArtist: usingCider ? CiderRpcService.trackArtist : (mprisPlayer?.trackArtist || "")
-    readonly property string trackArtUrl: usingCider ? CiderRpcService.trackArtUrl : (mprisPlayer?.trackArtUrl || "")
-    readonly property bool isPlaying: usingCider ? CiderRpcService.isPlaying : (mprisPlayer?.isPlaying ?? false)
+    readonly property bool musicAvailable: (mprisPlayer?.trackTitle || "") !== ""
+    readonly property string trackTitle: mprisPlayer?.trackTitle || ""
+    readonly property string trackArtist: mprisPlayer?.trackArtist || ""
+    readonly property string albumName: mprisPlayer?.trackAlbum || ""
+    readonly property string trackArtUrl: mprisPlayer?.trackArtUrl || ""
+    readonly property bool isPlaying: mprisPlayer?.isPlaying ?? false
+    readonly property bool canSeek: mprisPlayer?.canSeek ?? false
+    readonly property real position: mprisPlayer?.position ?? 0
+
+    readonly property real duration: (mprisPlayer && mprisPlayer.lengthSupported) ? mprisPlayer.length : 0
+
+    Timer {
+        interval: 250
+        repeat: true
+        triggeredOnStart: true
+        running: Visibilities.musicPanel && root.isPlaying && root.mprisPlayer !== null
+        onTriggered: root.mprisPlayer?.positionChanged()
+    }
 
     readonly property bool songNotif: songNotifTimer.running
     property string lastTrackKey: ""
@@ -82,7 +93,6 @@ Singleton {
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;
 
-        // What was already playing at startup, and tracks passing while the panel is open, still count as seen.
         if (!known || Visibilities.musicPanel)
             return;
         songNotifTimer.restart();
@@ -94,6 +104,5 @@ Singleton {
 
     readonly property bool recording: StreamingService.isRecordingScreen || StreamingService.isScreenshare
 
-    // A transient flash outranks everything; recording outranks ambient music.
     readonly property string activity: osdActive ? "osd" : recording ? "recording" : musicAvailable ? "music" : "idle"
 }

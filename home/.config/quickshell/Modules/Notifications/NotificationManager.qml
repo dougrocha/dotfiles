@@ -37,10 +37,8 @@ Variants {
             right: true
         }
 
-        // +10 for the gutter the cards' close badges hang into.
-        implicitWidth: Theme.notifications.panelWidth + 10
-        // Keep the layer surface stable while notification cards collapse.
-        // The mask below limits input to the visible card stack.
+        implicitWidth: 380 + 10
+
         implicitHeight: Math.max(1, modelData.height - Theme.topBarHeight)
 
         property var localNotifications: []
@@ -77,10 +75,10 @@ Variants {
             id: cardColumn
             anchors.top: parent.top
             anchors.right: parent.right
-            anchors.topMargin: Theme.notifications.margin
-            anchors.rightMargin: Theme.notifications.margin
-            width: Theme.notifications.cardWidth + 10
-            spacing: Theme.notifications.spacing
+            anchors.topMargin: Theme.space.lg
+            anchors.rightMargin: Theme.space.lg
+            width: 360 + 10
+            spacing: Theme.space.md
 
             HoverHandler {
                 onHoveredChanged: {
@@ -119,15 +117,15 @@ Variants {
 
                     Behavior on height {
                         NumberAnimation {
-                            duration: Theme.animations.fast
-                            easing.type: Easing.InCubic
+                            duration: Theme.motion.fast
+                            easing.type: Theme.motion.easeExit
                         }
                     }
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
-                            easing.type: Easing.InCubic
+                            duration: Theme.motion.fast
+                            easing.type: Theme.motion.easeExit
                         }
                     }
 
@@ -139,8 +137,8 @@ Variants {
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: Theme.animations.slow
-                        easing.type: Easing.OutCubic
+                        duration: Theme.motion.slow
+                        easing.type: Theme.motion.easeStandard
                     }
 
                     Connections {
@@ -159,7 +157,7 @@ Variants {
 
                     Timer {
                         id: removeTimer
-                        interval: Theme.animations.fast + 20
+                        interval: Theme.motion.fast + 20
                         repeat: false
                         onTriggered: notificationPanel.removeLocal(delegateWrapper.modelData.id)
                     }

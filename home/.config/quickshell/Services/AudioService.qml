@@ -16,7 +16,7 @@ Singleton {
             else if (node.audio)
                 acc.sources.push(node);
         } else if (node.isSink && node.audio) {
-            // Capture-only streams have no playback volume, so they are kept apart.
+
             acc.streams.push(node);
         } else if (node.audio) {
             acc.captures.push(node);
@@ -34,8 +34,6 @@ Singleton {
     readonly property var streams: nodes.streams
     readonly property var captures: nodes.captures
 
-    // Something is listening. A capture stream fed by a sink is recording desktop
-    // audio, not you, and the screen recorder already has its own indicator.
     readonly property bool micInUse: Pipewire.linkGroups.values.some(group => {
         const target = group.target;
         const source = group.source;
@@ -44,19 +42,15 @@ Singleton {
         return !getStreamBinary(target).includes("gpu-screen-recorder");
     })
 
-    // Default sink and source
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
 
-    // Sink (output/speakers/headphones) properties
     readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
     readonly property real volume: sink && sink.audio ? (sink.audio.volume ?? 0) : 0
 
-    // Source (input/microphone) properties
     readonly property bool sourceMuted: source && source.audio ? source.audio.muted : false
     readonly property real sourceVolume: source && source.audio ? (source.audio.volume ?? 0) : 0
 
-    // Master stops at 100%; only per-app streams may boost past it.
     function setVolume(newVolume) {
         if (sink?.ready && sink?.audio) {
             sink.audio.muted = false;
@@ -132,7 +126,7 @@ Singleton {
             var tag = paren[1].toUpperCase();
             if (tag === "IEC958")
                 return "Digital (S/PDIF)";
-            // Nvidia reports DisplayPort under the HDMI profile; the nickname is more useful.
+
             if (tag === "HDMI" && node.nickname)
                 return node.nickname;
             return tag;
@@ -151,8 +145,6 @@ Singleton {
         return desc;
     }
 
-    // PipeWire rarely exposes device.form-factor/icon-name for plain ALSA/USB hardware
-    // (only genuine Bluetooth nodes tend to carry it), so pick an icon from the name instead.
     function deviceIcon(node) {
         if (!node)
             return PhosphorIcons.speakerHigh;
@@ -168,7 +160,6 @@ Singleton {
         return node.isSink ? PhosphorIcons.speakerHigh : PhosphorIcons.microphone;
     }
 
-    // A replaced on-disk binary shows as " (deleted)", which breaks MPRIS name matching.
     function getStreamBinary(stream) {
         if (!stream || !stream.properties)
             return "";
@@ -193,7 +184,6 @@ Singleton {
         return acc;
     }, [])
 
-    // App named by its --user-data-dir; a miss caches "" so it isn't re-read.
     function rememberAppName(pid, cmdline) {
         const match = cmdline.match(/--user-data-dir=([^\0]+)/);
         appNames[pid] = match ? match[1].replace(/\/+$/, "").split("/").pop() : "";
@@ -220,8 +210,6 @@ Singleton {
         return binary;
     }
 
-    // A desktop entry can't change under a running stream, so resolve each app id once.
-    // Deliberately not signalled: this is a memo, not state anything should re-render on.
     property var appLookups: ({})
 
     function lookupFor(appId) {
@@ -235,7 +223,6 @@ Singleton {
         return appLookups[appId];
     }
 
-    // Every Electron app reports "Chromium"; the desktop entry yields the real name.
     function getStreamName(stream) {
         if (!stream)
             return "Unknown";
@@ -254,7 +241,6 @@ Singleton {
         return lookupFor(appId).icon;
     }
 
-    // Chromium opens a node per sound under one process; group them so the app isn't repeated.
     readonly property var streamGroups: {
         const groups = [];
         const seen = {};

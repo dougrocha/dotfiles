@@ -28,7 +28,7 @@ Popup {
         width: parent.width
         height: 32
 
-        readonly property color batteryColor: pct <= 10 && !charging ? Colors.error : Colors.primary
+        readonly property color batteryColor: pct <= 10 && !charging ? Theme.danger : Theme.accent
 
         Text {
             id: deviceIcon
@@ -36,8 +36,8 @@ Popup {
             anchors.verticalCenter: parent.verticalCenter
             text: deviceRow.iconText
             color: deviceRow.batteryColor
-            font.pixelSize: 16
-            font.family: Fonts.phosphorFont
+            font.pixelSize: Theme.icon.sm
+            font.family: Theme.font.icon
         }
 
         Text {
@@ -47,9 +47,9 @@ Popup {
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             text: deviceRow.name
-            color: Colors.on_surface
-            font.pixelSize: Fonts.body.size
-            font.family: Fonts.font
+            color: Theme.text.primary
+            font.pixelSize: Theme.type.body.size
+            font.family: Theme.font.ui
             elide: Text.ElideRight
         }
 
@@ -57,15 +57,15 @@ Popup {
             id: batteryStatus
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 6
+            spacing: Theme.space.sm
 
             Text {
                 visible: deviceRow.charging
                 anchors.verticalCenter: parent.verticalCenter
                 text: PhosphorIcons.batteryCharging
-                color: Colors.primary
-                font.pixelSize: 13
-                font.family: Fonts.phosphorFont
+                color: Theme.accent
+                font.pixelSize: Theme.icon.xxs
+                font.family: Theme.font.icon
             }
 
             Rectangle {
@@ -73,7 +73,7 @@ Popup {
                 width: 44
                 height: 5
                 radius: height / 2
-                color: Colors.outline_variant
+                color: Theme.stroke.strong
                 clip: true
 
                 Rectangle {
@@ -84,13 +84,13 @@ Popup {
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: Theme.animations.normal
-                            easing.type: Easing.OutCubic
+                            duration: Theme.motion.normal
+                            easing.type: Theme.motion.easeStandard
                         }
                     }
                     Behavior on color {
                         ColorAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
                 }
@@ -102,9 +102,9 @@ Popup {
                 horizontalAlignment: Text.AlignRight
                 text: deviceRow.pct + "%"
                 color: deviceRow.batteryColor
-                font.pixelSize: Fonts.label.size
-                font.weight: Fonts.label.weight
-                font.family: Fonts.font
+                font.pixelSize: Theme.type.label.size
+                font.weight: Theme.type.label.weight
+                font.family: Theme.font.ui
             }
         }
     }
@@ -114,18 +114,18 @@ Popup {
 
         property string iconText: ""
         property string label: ""
-        property color accent: Colors.primary
+        property color accent: Theme.accent
 
         signal tapped
 
         activeFocusOnTab: true
         height: 44
-        radius: Theme.blockRadius
-        color: powerHover.hovered || activeFocus ? Colors.surface_container_high : Colors.surface_container
+        radius: Theme.radius.md
+        color: powerHover.hovered || activeFocus ? Theme.colors.overlay : Theme.colors.raised
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
 
@@ -136,8 +136,8 @@ Popup {
             anchors.verticalCenter: parent.verticalCenter
             text: powerButton.iconText
             color: powerButton.accent
-            font.pixelSize: 18
-            font.family: Fonts.phosphorFont
+            font.pixelSize: Theme.icon.md
+            font.family: Theme.font.icon
         }
 
         Text {
@@ -147,10 +147,10 @@ Popup {
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             text: powerButton.label
-            color: Colors.on_surface
-            font.pixelSize: Fonts.body.size
+            color: Theme.text.primary
+            font.pixelSize: Theme.type.body.size
             font.weight: Font.Medium
-            font.family: Fonts.font
+            font.family: Theme.font.ui
             elide: Text.ElideRight
         }
 
@@ -171,7 +171,7 @@ Popup {
 
     Column {
         width: parent.width
-        spacing: 6
+        spacing: Theme.space.sm
 
         Item {
             width: parent.width
@@ -181,84 +181,24 @@ Popup {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "System"
-                color: Colors.on_surface
-                font.pixelSize: 16
-                font.weight: Font.Medium
-                font.family: Fonts.font
+                color: Theme.text.primary
+                font.pixelSize: Theme.type.display.size
+                font.weight: Theme.type.display.weight
+                font.family: Theme.font.ui
             }
         }
 
-        Rectangle {
-            id: idleRow
-
-            readonly property bool active: IdleService.active
-
+        ToggleRow {
             width: parent.width
-            height: 34
-            radius: Theme.blockRadius
-            activeFocusOnTab: true
-            color: active ? Colors.primary : (idleHover.hovered || activeFocus ? Colors.surface_container_high : Colors.surface_container)
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.animations.fast
-                }
-            }
-
-            Text {
-                id: idleIcon
-                anchors.left: parent.left
-                anchors.leftMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                text: PhosphorIcons.lockSimple
-                color: idleRow.active ? Colors.on_primary : Colors.on_surface_variant
-                font.pixelSize: 15
-                font.family: Fonts.phosphorFont
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-            }
-
-            Text {
-                anchors.left: idleIcon.right
-                anchors.leftMargin: 8
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Idle lock"
-                color: idleRow.active ? Colors.on_primary : Colors.on_surface
-                font.pixelSize: Fonts.body.size
-                font.family: Fonts.font
-                elide: Text.ElideRight
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-            }
-
-            HoverHandler {
-                id: idleHover
-                cursorShape: Qt.PointingHandCursor
-            }
-            TapHandler {
-                onTapped: IdleService.toggle(true)
-            }
-            Keys.onPressed: function (event) {
-                if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                    IdleService.toggle(true);
-                    event.accepted = true;
-                }
-            }
+            glyph: PhosphorIcons.lockSimple
+            label: "Idle lock"
+            active: IdleService.active
+            onToggled: IdleService.toggle(true)
         }
 
         Column {
             width: parent.width
-            spacing: 6
+            spacing: Theme.space.sm
             visible: DeviceBatteryService.hasDevices
 
             Item {
@@ -272,7 +212,7 @@ Popup {
 
             Column {
                 width: parent.width
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Repeater {
                     model: ScriptModel {
@@ -306,19 +246,19 @@ Popup {
 
         Column {
             width: parent.width
-            spacing: 8
+            spacing: Theme.space.md
 
             Divider {}
 
             Row {
                 width: parent.width
-                spacing: 8
+                spacing: Theme.space.md
 
                 PowerButton {
                     width: (parent.width - 8) / 2
                     iconText: PhosphorIcons.lockSimple
                     label: "Lock"
-                    accent: Colors.secondary
+                    accent: Theme.accent
                     onTapped: {
                         lockProcess.running = true;
                         Visibilities.settingsPanel = false;
@@ -329,20 +269,20 @@ Popup {
                     width: (parent.width - 8) / 2
                     iconText: PhosphorIcons.signOut
                     label: "Log out"
-                    accent: Colors.primary
+                    accent: Theme.accent
                     onTapped: logoutProcess.running = true
                 }
             }
 
             Row {
                 width: parent.width
-                spacing: 8
+                spacing: Theme.space.md
 
                 PowerButton {
                     width: (parent.width - 8) / 2
                     iconText: PhosphorIcons.arrowCounterClockwise
                     label: "Restart"
-                    accent: Colors.tertiary
+                    accent: Theme.accent
                     onTapped: rebootProcess.running = true
                 }
 
@@ -350,7 +290,7 @@ Popup {
                     width: (parent.width - 8) / 2
                     iconText: PhosphorIcons.power
                     label: "Shut down"
-                    accent: Colors.error
+                    accent: Theme.danger
                     onTapped: shutdownProcess.running = true
                 }
             }

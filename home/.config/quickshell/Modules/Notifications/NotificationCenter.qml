@@ -1,16 +1,13 @@
 import QtQuick
+import qs.Components
 import qs.Constants
 import qs.Services
 
-// The notification centre's content, with no window of its own — a plain Item
-// so it can sit in a popup or the island; the caller supplies the surface.
 Item {
     id: root
 
-    // Height budget; the list scrolls within whatever's left after the header.
     property int maxHeight: 0
 
-    // Gutter for the cards' close badges to hang into.
     readonly property int gutter: 10
 
     implicitWidth: 332
@@ -19,7 +16,7 @@ Item {
     Column {
         id: stack
         width: parent.width
-        spacing: 6
+        spacing: Theme.space.sm
 
         Item {
             id: header
@@ -31,55 +28,19 @@ Item {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Notification Center"
-                color: Colors.on_surface
-                font.family: Fonts.font
-                font.pixelSize: Fonts.h4
-                font.weight: Font.DemiBold
+                color: Theme.text.primary
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.display.size
+                font.weight: Theme.type.display.weight
             }
 
-            Rectangle {
+            IconActionButton {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                width: 24
-                height: 24
-                radius: Theme.blockRadius
-                color: headerClearHover.hovered ? Colors.surface_container_high : Colors.surface_container
-                border.width: 1
-                border.color: headerClearHover.hovered ? Colors.error : Colors.outline_variant
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-                Behavior on border.color {
-                    ColorAnimation {
-                        duration: Theme.animations.fast
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: Icons.deleteSweep
-                    color: headerClearHover.hovered ? Colors.error : Colors.on_surface_variant
-                    font.family: Fonts.iconFont
-                    font.pixelSize: 14
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.animations.fast
-                        }
-                    }
-                }
-
-                HoverHandler {
-                    id: headerClearHover
-                    cursorShape: Qt.PointingHandCursor
-                }
-
-                TapHandler {
-                    onTapped: NotificationService.clearHistory()
-                }
+                glyph: PhosphorIcons.broom
+                bordered: true
+                danger: true
+                onTapped: NotificationService.clearHistory()
             }
         }
 
@@ -92,9 +53,9 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "No Notifications"
-                color: Colors.on_surface_variant
-                font.family: Fonts.font
-                font.pixelSize: Fonts.p
+                color: Theme.text.secondary
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.body.size
             }
         }
 

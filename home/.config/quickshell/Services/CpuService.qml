@@ -10,7 +10,6 @@ Singleton {
     property var _lastCpuIdle: 0
     property var _lastCpuTotal: 0
 
-    // Read in-process; forking `cat` every two seconds forever is not worth it.
     FileView {
         id: cpuFile
 

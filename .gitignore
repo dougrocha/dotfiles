@@ -13,3 +13,6 @@ home/.config/tmux/plugins
 
 # User-specific system configs (if using templates)
 default/sddm/autologin.conf.deployed
+
+# Local Claude Code config / skills
+home/.config/quickshell/.claude/
