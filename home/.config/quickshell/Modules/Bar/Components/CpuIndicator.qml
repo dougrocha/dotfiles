@@ -1,45 +1,18 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Constants
 import qs.Components
+import qs.Constants
 import qs.Services
 
-Item {
-    id: root
-    implicitWidth: icon.implicitWidth
-    implicitHeight: Theme.topBarHeight
-
-    Text {
-        id: icon
-        anchors.centerIn: parent
-        text: PhosphorIcons.cpu
-        color: CpuService.usage > 80 ? Colors.error : Colors.on_surface_variant
-        font.pixelSize: Fonts.p
-        font.family: Fonts.phosphorFont
-        Behavior on color {
-            ColorAnimation {
-                duration: 180
-            }
-        }
-    }
-
-    HoverHandler {
-        id: hover
-    }
-
-    TapHandler {
-        cursorShape: Qt.PointingHandCursor
-        onTapped: {
-            Visibilities.closePopups();
-            proc.running = true;
-        }
-    }
-
-    Tooltip {
-        targetItem: root
-        text: "CPU  " + CpuService.usage + "%"
-        hovered: hover.hovered
+IconButton {
+    glyph: PhosphorIcons.cpu
+    active: CpuService.usage > 80
+    activeColor: Theme.danger
+    tooltipText: "CPU  " + CpuService.usage + "%"
+    onTapped: {
+        Visibilities.closePopups();
+        proc.running = true;
     }
 
     Process {

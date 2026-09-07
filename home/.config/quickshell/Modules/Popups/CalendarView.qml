@@ -7,17 +7,27 @@ import qs.Services
 Item {
     id: root
 
-    implicitWidth: 322
+    implicitWidth: weekColumnWidth + gutterWidth + dayCellWidth * 7
     implicitHeight: col.implicitHeight
 
     property int monthOffset: 0
     property int selectedDay: 0
     property var baseDate: new Date()
 
-    // 1 = Monday, 0 = Sunday.
     readonly property int weekStart: SettingsService.weekStart
-    readonly property int weekColumnWidth: 26
     readonly property int rowCount: cells.length / 7
+
+    readonly property int weekColumnWidth: 26
+    readonly property int gutterWidth: 14
+    readonly property int dayCellWidth: 40
+    readonly property int dayCellHeight: 34
+    readonly property int dayPillWidth: 32
+    readonly property int dayPillHeight: 28
+    readonly property int dayMarkerWidth: 12
+    readonly property int dayMarkerHeight: 2
+    readonly property int dayMarkerInset: 3
+    readonly property int headerRowHeight: 20
+    readonly property int headerGap: Theme.space.md
 
     readonly property var weekdayLabels: {
         const base = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
@@ -27,7 +37,6 @@ Item {
         return labels;
     }
 
-    // Colour weekends by weekday, not by position.
     function isWeekendColumn(column) {
         const weekday = (root.weekStart + column) % 7;
         return weekday === 0 || weekday === 6;
@@ -50,7 +59,6 @@ Item {
         monthOffset = 0;
     }
 
-    // Anonymous Gregorian algorithm — returns a Date for Easter Sunday.
     function easterDate(year) {
         const a = year % 19;
         const b = Math.floor(year / 100);
@@ -109,7 +117,6 @@ Item {
         return "";
     }
 
-    // ISO-8601: anchor on the week's Thursday to handle year boundaries.
     function isoWeek(date) {
         const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         target.setDate(target.getDate() + 3 - ((target.getDay() + 6) % 7));
@@ -120,7 +127,6 @@ Item {
         return 1 + Math.round((target.getTime() - firstThursday.getTime()) / (7 * 86400000));
     }
 
-    // Number a row by its Thursday; a Sunday-start row spans two ISO weeks.
     readonly property int thursdayColumn: (4 - weekStart + 7) % 7
 
     function weekNumberForRow(row) {
@@ -128,7 +134,6 @@ Item {
         return cell ? isoWeek(cell.date) : "";
     }
 
-    // `today` comes in as an argument so the binding re-runs when reset() refreshes it.
     function buildCells(year, month, today) {
         const cells = [];
         const firstDay = new Date(year, month, 1);
@@ -137,7 +142,6 @@ Item {
         const todayDay = (today.getFullYear() === year && today.getMonth() === month) ? today.getDate() : -1;
         const easter = easterDate(year);
 
-        // Padding cells carry their real date for the week-number column.
         for (let i = 0; i < offset; i++)
             cells.push({
                 day: 0,
@@ -182,28 +186,27 @@ Item {
     ColumnLayout {
         id: col
         width: parent.width
-        spacing: 12
+        spacing: Theme.space.lg
 
-        // Header
         RowLayout {
             Layout.fillWidth: true
 
             ColumnLayout {
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Text {
                     text: root.monthName.toUpperCase()
-                    color: Colors.on_surface
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.h4
-                    font.weight: Font.DemiBold
+                    color: Theme.text.primary
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.display.size
+                    font.weight: Font.Medium
                     font.letterSpacing: 2
                 }
                 Text {
                     text: root.displayYear
-                    color: Colors.on_surface_variant
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.p
+                    color: Theme.text.secondary
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.body.size
                 }
             }
 
@@ -212,23 +215,21 @@ Item {
             }
 
             Row {
-                spacing: 8
+                spacing: 0
 
                 Chevron {
-                    text: "‹"
+                    glyph: "‹"
                     onTriggered: {
                         root.monthOffset--;
                         root.selectedDay = root.monthOffset === 0 ? root.baseDate.getDate() : 0;
                     }
                 }
                 Chevron {
-                    text: "•"
-                    isToday: true
-                    font.pixelSize: Fonts.h2
+                    dot: true
                     onTriggered: root.reset()
                 }
                 Chevron {
-                    text: "›"
+                    glyph: "›"
                     onTriggered: {
                         root.monthOffset++;
                         root.selectedDay = root.monthOffset === 0 ? root.baseDate.getDate() : 0;
@@ -239,68 +240,57 @@ Item {
 
         Rectangle {
             Layout.fillWidth: true
-            height: 1
-            color: Colors.outline_variant
+            Layout.preferredHeight: 1
+            color: Theme.stroke.hairline
         }
 
         RowLayout {
             Layout.fillWidth: true
             spacing: 0
 
-            // ISO week numbers, aligned to the day rows.
-            Item {
+            ColumnLayout {
                 Layout.alignment: Qt.AlignTop
-                implicitWidth: root.weekColumnWidth
-                implicitHeight: weekColumn.implicitHeight
+                Layout.preferredWidth: root.weekColumnWidth
+                spacing: root.headerGap
 
-                Column {
-                    id: weekColumn
-                    spacing: 2
+                Rectangle {
+                    Layout.preferredWidth: root.weekColumnWidth
+                    Layout.preferredHeight: root.headerRowHeight
+                    radius: Theme.radius.md
+                    color: weekStartHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
-                    // Header doubles as week-start toggle; hovering previews the target day.
-                    Item {
-                        width: root.weekColumnWidth
-                        height: 32
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.motion.fast
+                        }
+                    }
 
-                        Rectangle {
-                            anchors.top: parent.top
-                            width: root.weekColumnWidth
-                            height: 22
-                            radius: Theme.blockRadius
-                            color: weekStartHover.hovered ? Colors.surface_container_high : "transparent"
+                    Text {
+                        anchors.centerIn: parent
+                        text: weekStartHover.hovered ? (root.weekStart === 1 ? "SU" : "MO") : "W"
+                        color: weekStartHover.hovered ? Theme.accent : Theme.text.tertiary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.caption.size
+                        font.letterSpacing: 1
+                        font.weight: Font.Medium
 
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.animations.fast
-                                }
-                            }
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: weekStartHover.hovered ? (root.weekStart === 1 ? "SU" : "MO") : "W"
-                                color: weekStartHover.hovered ? Colors.primary : Colors.outline
-                                font.family: Fonts.font
-                                font.pixelSize: Fonts.caption
-                                font.letterSpacing: 1
-                                font.weight: Font.DemiBold
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.animations.fast
-                                    }
-                                }
-                            }
-
-                            HoverHandler {
-                                id: weekStartHover
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                            TapHandler {
-                                onTapped: SettingsService.weekStart = root.weekStart === 1 ? 0 : 1
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.motion.fast
                             }
                         }
                     }
 
+                    HoverHandler {
+                        id: weekStartHover
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    TapHandler {
+                        onTapped: SettingsService.weekStart = root.weekStart === 1 ? 0 : 1
+                    }
+                }
+
+                Column {
                     Repeater {
                         model: root.rowCount
 
@@ -308,47 +298,33 @@ Item {
                             required property int index
 
                             width: root.weekColumnWidth
-                            height: 40
+                            height: root.dayCellHeight
 
                             Text {
-                                anchors.centerIn: parent
-                                anchors.verticalCenterOffset: -4
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                y: Math.round((root.dayPillHeight - height) / 2)
                                 text: root.weekNumberForRow(parent.index)
-                                color: Colors.outline
-                                font.family: Fonts.font
-                                font.pixelSize: Fonts.caption
-                                font.weight: Font.Light
+                                color: Theme.text.tertiary
+                                font.family: Theme.font.ui
+                                font.pixelSize: Theme.type.caption.size
+                                font.weight: Font.Normal
                             }
                         }
                     }
                 }
+            }
 
-                TextMetrics {
-                    id: weekNumberMetrics
-                    text: "52"
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.caption
-                    font.weight: Font.Light
-                }
+            Item {
+                Layout.alignment: Qt.AlignTop
+                Layout.preferredWidth: root.gutterWidth
+                Layout.preferredHeight: root.headerRowHeight + root.headerGap + root.rowCount * root.dayCellHeight
 
-                TextMetrics {
-                    id: dayNumberMetrics
-                    text: "30"
-                    font.family: Fonts.font
-                    font.pixelSize: Fonts.p
-                    font.weight: Font.Light
-                }
-
-                // Centred between the widest week and day numbers.
                 Rectangle {
-                    readonly property real weekEdge: (root.weekColumnWidth + weekNumberMetrics.width) / 2
-                    readonly property real dayEdge: root.weekColumnWidth + (gridArea.width / 7 - dayNumberMetrics.width) / 2
-
-                    x: Math.round((weekEdge + dayEdge) / 2)
-                    y: 34
+                    x: Math.round((root.gutterWidth - width) / 2)
+                    y: root.headerRowHeight + root.headerGap
                     width: 1
-                    height: weekColumn.implicitHeight - y
-                    color: Colors.outline_variant
+                    height: (root.rowCount - 1) * root.dayCellHeight + root.dayPillHeight
+                    color: Theme.stroke.hairline
                 }
             }
 
@@ -356,9 +332,8 @@ Item {
                 id: gridArea
 
                 Layout.fillWidth: true
-                spacing: 12
+                spacing: root.headerGap
 
-                // Weekday headers — first column follows the week-start setting
                 Row {
                     Layout.fillWidth: true
 
@@ -367,25 +342,24 @@ Item {
                         delegate: Item {
                             required property string modelData
                             required property int index
-                            width: gridArea.width / 7
-                            height: 22
+                            width: root.dayCellWidth
+                            height: root.headerRowHeight
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData
-                                color: root.isWeekendColumn(index) ? Colors.tertiary : Colors.on_surface_variant
-                                font.family: Fonts.font
-                                font.pixelSize: Fonts.body.size
+                                color: root.isWeekendColumn(index) ? Theme.text.tertiary : Theme.text.secondary
+                                font.family: Theme.font.ui
+                                font.pixelSize: Theme.type.caption.size
                                 font.letterSpacing: 1
-                                opacity: 0.8
+                                font.weight: Font.Medium
                             }
                         }
                     }
                 }
 
-                // Day grid
                 Grid {
                     columns: 7
-                    rowSpacing: 2
+                    rowSpacing: 0
                     columnSpacing: 0
                     Layout.fillWidth: true
 
@@ -396,8 +370,8 @@ Item {
                             required property var modelData
                             required property int index
 
-                            width: gridArea.width / 7
-                            height: 40
+                            width: root.dayCellWidth
+                            height: root.dayCellHeight
 
                             readonly property bool isCurrentMonth: modelData.day !== 0
                             readonly property bool isToday: modelData.today
@@ -405,66 +379,65 @@ Item {
                             readonly property bool isHoliday: modelData.holiday !== ""
                             readonly property bool isSelected: isCurrentMonth && root.selectedDay === modelData.day
 
-                            Rectangle {
-                                anchors.centerIn: parent
-                                anchors.verticalCenterOffset: -4
-                                width: 32
-                                height: 28
-                                radius: Theme.blockRadius
-                                color: Colors.primary
-                                visible: dayCell.isToday
-                                antialiasing: true
-                            }
-                            Rectangle {
-                                anchors.centerIn: parent
-                                anchors.verticalCenterOffset: -4
-                                width: 32
-                                height: 28
-                                radius: Theme.blockRadius
-                                color: Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.08)
-                                visible: dayMouse.containsMouse && !dayCell.isToday && dayCell.isCurrentMonth
-                                antialiasing: true
-                            }
-                            Rectangle {
-                                anchors.centerIn: parent
-                                anchors.verticalCenterOffset: -4
-                                width: 32
-                                height: 28
-                                radius: Theme.blockRadius
-                                color: "transparent"
-                                border.color: Colors.primary
-                                border.width: 1
-                                visible: dayCell.isSelected && !dayCell.isToday
-                                antialiasing: true
-                            }
-                            Text {
-                                anchors.centerIn: parent
-                                anchors.verticalCenterOffset: -4
-                                text: modelData.day === 0 ? "" : modelData.day
-                                color: {
-                                    if (dayCell.isToday)
-                                        return Colors.on_primary;
-                                    if (!dayCell.isCurrentMonth)
-                                        return Colors.outline;
-                                    if (dayCell.isWeekend || dayCell.isHoliday)
-                                        return Colors.tertiary;
-                                    return Colors.on_surface;
-                                }
-                                opacity: dayCell.isCurrentMonth ? 1.0 : 0.35
-                                font.family: Fonts.font
-                                font.pixelSize: Fonts.p
-                                font.weight: dayCell.isToday ? Font.Medium : Font.Light
-                            }
-                            Rectangle {
-                                width: 4
-                                height: 4
-                                radius: 2
+                            Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottom: parent.bottom
-                                anchors.bottomMargin: 4
-                                color: Colors.tertiary
-                                visible: dayCell.isHoliday && dayCell.isCurrentMonth
-                                antialiasing: true
+                                anchors.top: parent.top
+                                width: root.dayPillWidth
+                                height: root.dayPillHeight
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.radius.md
+                                    color: Theme.fill.selectedSolid
+                                    visible: dayCell.isToday
+                                    antialiasing: true
+                                }
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.radius.md
+                                    color: Theme.fill.hover
+                                    visible: dayMouse.containsMouse && !dayCell.isToday && dayCell.isCurrentMonth
+                                    antialiasing: true
+                                }
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.radius.md
+                                    color: "transparent"
+                                    border.color: Theme.fill.selectedSolid
+                                    border.width: 1
+                                    visible: dayCell.isSelected && !dayCell.isToday
+                                    antialiasing: true
+                                }
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.verticalCenterOffset: -2
+                                    text: dayCell.modelData.day === 0 ? "" : dayCell.modelData.day
+                                    color: {
+                                        if (dayCell.isToday)
+                                            return Theme.accentText;
+                                        if (!dayCell.isCurrentMonth)
+                                            return Theme.text.tertiary;
+                                        if (dayCell.isWeekend || dayCell.isHoliday)
+                                            return Theme.text.tertiary;
+                                        return Theme.text.primary;
+                                    }
+                                    opacity: dayCell.isCurrentMonth ? 1.0 : 0.35
+                                    font.family: Theme.font.ui
+                                    font.pixelSize: Theme.type.body.size
+                                    font.weight: dayCell.isToday ? Font.Medium : Font.Normal
+                                }
+                                Rectangle {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.bottom: parent.bottom
+                                    anchors.bottomMargin: root.dayMarkerInset
+                                    width: root.dayMarkerWidth
+                                    height: root.dayMarkerHeight
+                                    radius: height / 2
+                                    color: dayCell.isToday ? Theme.accentText : Theme.accent
+                                    visible: dayCell.isHoliday && dayCell.isCurrentMonth
+                                    antialiasing: true
+                                }
                             }
 
                             MouseArea {
@@ -481,33 +454,31 @@ Item {
             }
         }
 
-        // Selected day detail
         ColumnLayout {
             Layout.fillWidth: true
             opacity: root.selectedDay > 0 ? 1 : 0
             visible: opacity > 0
-            spacing: 8
+            spacing: Theme.space.md
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Theme.animations.normal
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.normal
+                    easing.type: Theme.motion.easeStandard
                 }
             }
 
             Rectangle {
                 Layout.fillWidth: true
-                height: 1
-                color: Colors.outline_variant
+                Layout.preferredHeight: 1
+                color: Theme.stroke.hairline
             }
 
             Text {
                 Layout.fillWidth: true
-                Layout.topMargin: 2
                 text: root.selectedDayDetail.toUpperCase()
-                color: Colors.on_surface_variant
-                font.family: Fonts.font
-                font.pixelSize: Fonts.body.size
+                color: Theme.text.secondary
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.body.size
                 font.letterSpacing: 1
             }
 
@@ -515,32 +486,61 @@ Item {
                 Layout.fillWidth: true
                 visible: root.selectedDayHoliday.length > 0
                 text: root.selectedDayHoliday.toUpperCase()
-                color: Colors.tertiary
-                font.family: Fonts.font
-                font.pixelSize: Fonts.body.size
+                color: Theme.accent
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.body.size
                 font.letterSpacing: 1
-                font.weight: Font.DemiBold
+                font.weight: Font.Medium
             }
         }
     }
 
-    // Boxed so the glyph is not the click target.
-    component Chevron: Text {
+    component Chevron: Item {
         id: chev
-        property bool isToday: false
-        width: 28
-        height: 28
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        color: chevHover.hovered ? (isToday ? Colors.primary : Colors.on_surface) : Colors.on_surface_variant
-        font.family: Fonts.font
-        font.pixelSize: Fonts.h3
+
+        property string glyph
+        property bool dot: false
+        property int dotSize: 6
+        property int dotOffset: 1
+        readonly property color tint: chevHover.hovered ? Theme.accent : Theme.text.primary
         signal triggered
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
+
+        width: 24
+        height: 24
+
+        Text {
+            anchors.fill: parent
+            visible: !chev.dot
+            text: chev.glyph
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            color: chev.tint
+            font.family: Theme.font.ui
+            font.pixelSize: Theme.type.display.size
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
             }
         }
+
+        Rectangle {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: chev.dotOffset
+            visible: chev.dot
+            width: chev.dotSize
+            height: chev.dotSize
+            radius: width / 2
+            color: chev.tint
+            antialiasing: true
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
+            }
+        }
+
         HoverHandler {
             id: chevHover
             cursorShape: Qt.PointingHandCursor

@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Constants
 
-// Footer row that hands the user off to a real settings app.
 Rectangle {
     property string label: ""
     property bool leftAlign: false
@@ -10,28 +9,31 @@ Rectangle {
 
     width: parent.width
     height: 28
-    radius: Theme.blockRadius
-    color: buttonHover.hovered ? Colors.surface_container_high : Colors.surface_container
+    radius: Theme.radius.md
+    color: buttonHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+    border.width: 1
+    border.color: Theme.stroke.hairline
 
     Behavior on color {
         ColorAnimation {
-            duration: Theme.animations.fast
+            duration: Theme.motion.instant
         }
     }
 
     Text {
         anchors.left: parent.leftAlign ? parent.left : undefined
-        anchors.leftMargin: parent.leftAlign ? 10 : 0
+        anchors.leftMargin: parent.leftAlign ? Theme.space.lg : 0
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.leftAlign ? undefined : parent.horizontalCenter
         text: parent.label
-        color: buttonHover.hovered ? Colors.primary : Colors.on_surface_variant
-        font.pixelSize: Fonts.body.size
-        font.family: Fonts.font
+        color: buttonHover.hovered ? Theme.text.primary : Theme.text.secondary
+        font.pixelSize: Theme.type.label.size
+        font.family: Theme.font.ui
+        font.weight: Theme.type.label.weight
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.instant
             }
         }
     }

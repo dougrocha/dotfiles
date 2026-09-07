@@ -13,9 +13,6 @@ import qs.Modules.Popups
 import qs.Services
 import qs.Widgets
 
-// Dynamic-island pill in the bar's center gap: shows the highest-priority
-// activity (osd > recording > music > idle), expands on hover, and morphs into
-// the full player on click. Everything outside the pill is click-through.
 Variants {
     id: root
     model: Theme.primaryScreens
@@ -26,7 +23,6 @@ Variants {
         required property var modelData
         screen: modelData
 
-        // Right-clicking the clock cycles these; an unknown stored value restarts at the first.
         readonly property var clockFormats: ["h:mmAP", "ddd h:mmAP", "MMM d  h:mmAP"]
 
         function cycleClockFormat() {
@@ -48,16 +44,14 @@ Variants {
             left: true
             right: true
         }
-        // Fixed: resizing the surface mid-animation tears.
+
         implicitHeight: 560
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "qs.island"
 
-        // Transients still drop over fullscreen, where the bar's hover strip is unreachable.
         readonly property bool revealed: Visibilities.barRevealed || IslandService.osdActive || IslandService.songNotif
 
-        // Bound to geometry, not the item: the pill resizes constantly and a region bound to the item wouldn't track.
         mask: Region {
             x: pill.x
             y: slide.y + pill.y
@@ -65,14 +59,12 @@ Variants {
             height: overlay.revealed ? pill.height : 0
         }
 
-        // Click-away collapses the full player, matching popup behavior.
         HyprlandFocusGrab {
             windows: [overlay]
             active: overlay.visible && Visibilities.musicPanel
             onCleared: Visibilities.musicPanel = false
         }
 
-        // Slides with the bar, and far enough that no state peeks past the top edge.
         Item {
             id: slide
             width: parent.width
@@ -81,8 +73,8 @@ Variants {
 
             Behavior on y {
                 NumberAnimation {
-                    duration: 180
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.normal
+                    easing.type: Theme.motion.easeStandard
                 }
             }
 
@@ -95,27 +87,23 @@ Variants {
                 property bool recDetails: false
                 readonly property int compactHeight: Theme.topBarHeight - 8
 
-                // Where the pill is heading; +28 is the 14px inset top and bottom.
-                readonly property int targetHeight: full ? fullContent.implicitHeight + 28 : notif ? notifContent.implicitHeight + 28 : recDetails ? compactHeight + recArea.implicitHeight + 12 : compactHeight
+                readonly property int inset: 16
 
-                // Which tab the expanded panel shows: 0 = now playing,
-                // 1 = calendar. Remembered between opens.
+                readonly property int targetHeight: full ? fullContent.implicitHeight + inset * 2 : notif ? notifContent.implicitHeight + inset * 2 : recDetails ? compactHeight + recArea.implicitHeight + 12 : compactHeight
+
                 property int tab: 0
 
-                // Drives the tab swap: the panes derive opacity from this, so
-                // one is fully out before the other starts.
                 property real tabProgress: tab
 
                 Behavior on tabProgress {
                     NumberAnimation {
-                        duration: Theme.animations.normal
-                        easing.type: Easing.InOutQuad
+                        duration: Theme.motion.normal
+                        easing.type: Theme.motion.easeSmooth
                     }
                 }
 
                 onActivityChanged: recDetails = false
 
-                // The calendar keeps its month; send it back to today when it reappears.
                 onTabChanged: if (tab === 1)
                     calendarView.reset()
                 onFullChanged: {
@@ -127,15 +115,13 @@ Variants {
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 4
-                // The calendar is narrower than the player, so the pill tightens
-                // around it rather than leaving the tab swimming in dead space.
+
                 width: full ? (tab === 0 ? 560 : 420) : notif ? 380 : compactRow.implicitWidth + 28
                 height: targetHeight
-                radius: full ? 24 : notif ? 20 : recDetails ? 18 : compactHeight / 2
-                color: Colors.surface
+                radius: full ? Theme.radius.xxl : notif ? Theme.radius.xl : recDetails ? Theme.radius.lg : compactHeight / 2
+                color: pill.full ? Theme.colors.overlay : Theme.colors.surface
                 clip: true
 
-                // Open (not toggle): a click over a child fires both handlers, and two toggles cancel.
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
                 }
@@ -147,27 +133,25 @@ Variants {
                     }
                 }
 
-                // Not a spring: the pill clips, so overshoot squeezes its contents.
                 Behavior on width {
                     NumberAnimation {
-                        duration: Theme.animations.normal
-                        easing.type: Easing.OutCubic
+                        duration: Theme.motion.normal
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
                 Behavior on height {
                     NumberAnimation {
-                        duration: Theme.animations.normal
-                        easing.type: Easing.OutCubic
+                        duration: Theme.motion.normal
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
                 Behavior on radius {
                     NumberAnimation {
-                        duration: Theme.animations.fast
-                        easing.type: Easing.OutCubic
+                        duration: Theme.motion.fast
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
 
-                // Blurred album art fills the pill in full-player mode.
                 ClippingRectangle {
                     anchors.fill: parent
                     radius: pill.radius
@@ -175,7 +159,7 @@ Variants {
                     opacity: pill.notif ? 1 : pill.full ? Math.max(0, 1 - pill.tabProgress * 2) : 0
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
@@ -193,7 +177,7 @@ Variants {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Qt.rgba(Colors.scrim.r, Colors.scrim.g, Colors.scrim.b, 0.6)
+                        color: Theme.withAlpha(Theme.shadow, 0.6)
                         visible: backgroundArt.ready
                     }
                 }
@@ -203,28 +187,27 @@ Variants {
                     anchors.horizontalCenter: parent.horizontalCenter
                     y: (pill.compactHeight - height) / 2
                     height: 20
-                    spacing: 8
+                    spacing: Theme.space.md
                     opacity: (pill.full || pill.notif) ? 0 : 1
                     visible: opacity > 0
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
-                    // Always-on clock; the pill's own handler opens the full player.
                     ClockWidget {
                         anchors.verticalCenter: parent.verticalCenter
                         format: SettingsService.clockFormat
-                        color: clockHover.hovered ? Colors.on_surface : Colors.on_surface_variant
-                        font.pixelSize: Fonts.p
-                        font.family: Fonts.font
-                        font.weight: Font.Light
-                        font.letterSpacing: 1
+                        color: clockHover.hovered ? Theme.text.primary : Theme.text.secondary
+                        font.pixelSize: Theme.type.mono.size
+                        font.family: Theme.font.mono
+                        font.weight: Theme.type.mono.weight
+                        font.letterSpacing: Theme.type.mono.tracking
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
@@ -233,24 +216,20 @@ Variants {
                             cursorShape: Qt.PointingHandCursor
                         }
 
-                        // Left-click falls through to the pill, which opens the
-                        // full player; only the right button is claimed here.
                         TapHandler {
                             acceptedButtons: Qt.RightButton
                             onTapped: overlay.cycleClockFormat()
                         }
                     }
 
-                    // Divider between the clock and whatever activity is showing.
                     Rectangle {
                         visible: pill.activity !== "idle" || AudioService.micInUse
                         anchors.verticalCenter: parent.verticalCenter
                         width: 1
                         height: 14
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                     }
 
-                    // Music: track text (shown alongside recording too, mac-style)
                     Item {
                         id: musicTextClip
                         visible: pill.activity === "music" || (pill.activity === "recording" && IslandService.musicAvailable)
@@ -262,14 +241,13 @@ Variants {
                         Text {
                             id: musicText
                             text: MprisService.nowPlaying(IslandService.trackTitle, IslandService.trackArtist)
-                            color: Colors.secondary
-                            font.pixelSize: Fonts.p
-                            font.family: Fonts.font
-                            font.bold: true
+                            color: Theme.text.primary
+                            font.pixelSize: Theme.type.body.size
+                            font.family: Theme.font.ui
+                            font.weight: Font.Medium
 
                             readonly property real overflow: Math.max(0, implicitWidth - musicTextClip.width)
 
-                            // No point scrolling while the row is swapped out or the island is tucked away.
                             readonly property bool scrolling: musicText.overflow > 0 && musicTextClip.visible && overlay.revealed
 
                             onTextChanged: x = 0
@@ -286,7 +264,7 @@ Variants {
                                     from: 0
                                     to: -musicText.overflow
                                     duration: musicText.overflow * 40
-                                    easing.type: Easing.InOutQuad
+                                    easing.type: Theme.motion.easeSmooth
                                 }
                                 PauseAnimation {
                                     duration: 2000
@@ -295,7 +273,7 @@ Variants {
                                     from: -musicText.overflow
                                     to: 0
                                     duration: musicText.overflow * 40
-                                    easing.type: Easing.InOutQuad
+                                    easing.type: Theme.motion.easeSmooth
                                 }
                             }
                         }
@@ -305,18 +283,15 @@ Variants {
                         }
                     }
 
-                    // Someone is listening. Sits outside the activity chain, so it can
-                    // show next to music, a recording, or nothing at all.
                     Rectangle {
                         visible: AudioService.micInUse
                         anchors.verticalCenter: parent.verticalCenter
                         width: 8
                         height: 8
-                        radius: 4
-                        color: Colors.micActive
+                        radius: Theme.radius.xs
+                        color: Theme.caution
                     }
 
-                    // OSD flash: icon + level bar + readout
                     Text {
                         visible: pill.activity === "osd"
                         anchors.verticalCenter: parent.verticalCenter
@@ -329,27 +304,27 @@ Variants {
                                 return PhosphorIcons.speakerNone;
                             return IslandService.osdLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
                         }
-                        color: IslandService.osdMuted ? Colors.on_surface_variant : Colors.primary
-                        font.pixelSize: Fonts.h5
-                        font.family: Fonts.phosphorFont
+                        color: IslandService.osdMuted ? Theme.text.secondary : Theme.accent
+                        font.pixelSize: Theme.icon.md
+                        font.family: Theme.font.icon
                     }
                     Rectangle {
                         visible: pill.activity === "osd"
                         anchors.verticalCenter: parent.verticalCenter
                         width: 120
                         height: 4
-                        radius: 2
-                        color: Colors.outline_variant
+                        radius: Theme.radius.xxs
+                        color: Theme.stroke.strong
 
                         Rectangle {
                             width: Math.min(IslandService.osdLevel, 1) * parent.width
                             height: parent.height
-                            radius: 2
-                            color: IslandService.osdMuted ? Colors.outline : Colors.primary
+                            radius: Theme.radius.xxs
+                            color: IslandService.osdMuted ? Theme.text.tertiary : Theme.accent
                             Behavior on width {
                                 NumberAnimation {
-                                    duration: 80
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.instant
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
                         }
@@ -358,19 +333,18 @@ Variants {
                         visible: pill.activity === "osd"
                         anchors.verticalCenter: parent.verticalCenter
                         text: IslandService.osdLabel !== "" ? IslandService.osdLabel : Math.round(IslandService.osdLevel * 100) + "%"
-                        color: Colors.on_surface
-                        font.pixelSize: Fonts.body.size
-                        font.family: Fonts.font
+                        color: Theme.text.primary
+                        font.pixelSize: Theme.type.body.size
+                        font.family: Theme.font.ui
                     }
 
-                    // Recording: pulsing dot + label
                     Rectangle {
                         visible: pill.activity === "recording"
                         anchors.verticalCenter: parent.verticalCenter
                         width: 8
                         height: 8
-                        radius: 4
-                        color: Colors.error
+                        radius: Theme.radius.xs
+                        color: Theme.danger
 
                         SequentialAnimation on opacity {
                             running: pill.activity === "recording"
@@ -396,9 +370,9 @@ Variants {
                         visible: pill.activity === "recording" && !IslandService.musicAvailable
                         anchors.verticalCenter: parent.verticalCenter
                         text: StreamingService.isRecordingScreen ? "Recording" : "Screen shared"
-                        color: Colors.error
-                        font.pixelSize: Fonts.body.size
-                        font.family: Fonts.font
+                        color: Theme.danger
+                        font.pixelSize: Theme.type.body.size
+                        font.family: Theme.font.ui
                         font.weight: Font.Medium
 
                         TapHandler {
@@ -415,20 +389,19 @@ Variants {
                     anchors.top: parent.top
                     anchors.topMargin: pill.compactHeight
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 6
+                    spacing: Theme.space.sm
                     opacity: pill.recDetails ? 1 : 0
                     visible: opacity > 0
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
-                    // Accessing apps + stop
                     Column {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: 4
+                        spacing: Theme.space.xs
 
                         Repeater {
                             model: StreamingService.screenAccessApps
@@ -437,9 +410,9 @@ Variants {
                                 required property string modelData
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: modelData
-                                color: Colors.on_surface_variant
-                                font.pixelSize: Fonts.body.size
-                                font.family: Fonts.font
+                                color: Theme.text.secondary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -448,18 +421,18 @@ Variants {
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: stopLabel.implicitWidth + 24
                             height: 24
-                            radius: Theme.blockRadius
-                            color: stopHover.hovered ? Colors.error : "transparent"
+                            radius: Theme.radius.md
+                            color: stopHover.hovered ? Theme.danger : "transparent"
                             border.width: 1
-                            border.color: Colors.error
+                            border.color: Theme.danger
 
                             Text {
                                 id: stopLabel
                                 anchors.centerIn: parent
                                 text: "Stop"
-                                color: stopHover.hovered ? Colors.on_primary : Colors.error
-                                font.pixelSize: Fonts.body.size
-                                font.family: Fonts.font
+                                color: stopHover.hovered ? Theme.dangerText : Theme.danger
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                                 font.weight: Font.Medium
                             }
 
@@ -477,24 +450,24 @@ Variants {
                 Row {
                     id: notifContent
                     anchors.top: parent.top
-                    anchors.topMargin: 14
+                    anchors.topMargin: pill.inset
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 380 - 24
-                    spacing: 12
+                    width: 380 - pill.inset * 2
+                    spacing: Theme.space.lg
                     opacity: pill.notif ? 1 : 0
                     visible: opacity > 0
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
                     ClippingRectangle {
                         width: 44
                         height: 44
-                        radius: Theme.blockRadius
-                        color: Colors.surface_container
+                        radius: Theme.radius.md
+                        color: Theme.colors.raised
 
                         CrossfadeImage {
                             anchors.fill: parent
@@ -503,10 +476,10 @@ Variants {
 
                         Text {
                             anchors.centerIn: parent
-                            text: Icons.musicNote2
-                            font.family: Fonts.iconFont
-                            font.pixelSize: 20
-                            color: Colors.on_surface_variant
+                            text: PhosphorIcons.musicNoteSimple
+                            font.family: Theme.font.icon
+                            font.pixelSize: Theme.icon.lg
+                            color: Theme.text.secondary
                             visible: IslandService.trackArtUrl === ""
                         }
                     }
@@ -514,15 +487,15 @@ Variants {
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width - 44 - 12 - 28 - 12
-                        spacing: 3
+                        spacing: Theme.space.xxs
 
                         Text {
                             width: parent.width
                             text: IslandService.trackTitle || ""
-                            color: Colors.on_surface
-                            font.pixelSize: 13
-                            font.family: Fonts.font
-                            font.weight: Font.Bold
+                            color: Theme.text.primary
+                            font.pixelSize: Theme.type.body.size
+                            font.family: Theme.font.ui
+                            font.weight: Font.Medium
                             elide: Text.ElideRight
                             maximumLineCount: 1
                         }
@@ -531,9 +504,9 @@ Variants {
                             width: parent.width
                             visible: (IslandService.trackArtist || "") !== ""
                             text: IslandService.trackArtist || ""
-                            color: Colors.on_surface_variant
-                            font.pixelSize: Fonts.caption
-                            font.family: Fonts.font
+                            color: Theme.text.secondary
+                            font.pixelSize: Theme.type.caption.size
+                            font.family: Theme.font.ui
                             elide: Text.ElideRight
                             maximumLineCount: 1
                         }
@@ -545,25 +518,23 @@ Variants {
 
                     MediaControlButton {
                         anchors.verticalCenter: parent.verticalCenter
-                        icon: Icons.skipNext
-                        iconSize: 24
+                        icon: PhosphorIcons.skipForward
                         onTapped: MediaControlService.next()
                     }
                 }
 
-                // Tab bar over swappable content, with quick controls beside whichever tab is up.
                 Column {
                     id: fullContent
                     anchors.top: parent.top
-                    anchors.topMargin: 14
+                    anchors.topMargin: pill.inset
                     anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: 12
+                    spacing: Theme.space.lg
                     opacity: pill.full ? 1 : 0
                     visible: opacity > 0
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
@@ -574,31 +545,31 @@ Variants {
                         Rectangle {
                             id: tabHighlight
 
-                            readonly property Item chip: tabRepeater.itemAt(pill.tab)
+                            readonly property Item chip: tabRepeater.count > pill.tab ? tabRepeater.itemAt(pill.tab) : null
 
                             x: chip ? chip.x : 0
                             width: chip ? chip.width : 0
                             height: tabBar.implicitHeight
-                            radius: Theme.blockRadius
-                            color: Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.18)
+                            radius: Theme.radius.md
+                            color: Theme.fill.selected
 
                             Behavior on x {
                                 NumberAnimation {
-                                    duration: Theme.animations.normal
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.normal
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
                             Behavior on width {
                                 NumberAnimation {
-                                    duration: Theme.animations.normal
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.normal
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
                         }
 
                         Row {
                             id: tabBar
-                            spacing: 6
+                            spacing: Theme.space.sm
 
                             Repeater {
                                 id: tabRepeater
@@ -614,12 +585,12 @@ Variants {
 
                                     width: tabLabel.implicitWidth + 24
                                     height: 28
-                                    radius: Theme.blockRadius
-                                    color: tabChip.active ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0) : tabHover.hovered ? Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.08) : Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0)
+                                    radius: Theme.radius.md
+                                    color: tabChip.active ? Theme.withAlpha(Theme.fill.hover, 0) : tabHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                                     Behavior on color {
                                         ColorAnimation {
-                                            duration: Theme.animations.fast
+                                            duration: Theme.motion.fast
                                         }
                                     }
 
@@ -627,14 +598,14 @@ Variants {
                                         id: tabLabel
                                         anchors.centerIn: parent
                                         text: tabChip.modelData
-                                        color: tabChip.active ? Colors.on_surface : Colors.on_surface_variant
-                                        font.family: Fonts.font
-                                        font.pixelSize: Fonts.caption
-                                        font.weight: Font.DemiBold
+                                        color: tabChip.active ? Theme.text.primary : Theme.text.secondary
+                                        font.family: Theme.font.ui
+                                        font.pixelSize: Theme.type.caption.size
+                                        font.weight: Font.Medium
 
                                         Behavior on color {
                                             ColorAnimation {
-                                                duration: Theme.animations.normal
+                                                duration: Theme.motion.normal
                                             }
                                         }
                                     }
@@ -653,27 +624,24 @@ Variants {
 
                     Row {
                         id: tabContent
-                        spacing: 14
+                        spacing: Theme.space.lg
 
-                        // Stacked rather than side by side so the tabs can cross-fade.
                         Item {
                             id: tabSlot
 
                             width: pill.tab === 1 ? calendarView.width : musicColumn.width
                             height: pill.tab === 1 ? calendarView.height : (IslandService.musicAvailable ? musicColumn.height : musicEmpty.height)
 
-                            // Same curve as the pill, or the centred content
-                            // snaps across while the pill is still travelling.
                             Behavior on width {
                                 NumberAnimation {
-                                    duration: Theme.animations.normal
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.normal
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
                             Behavior on height {
                                 NumberAnimation {
-                                    duration: Theme.animations.normal
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.normal
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
 
@@ -686,22 +654,24 @@ Variants {
 
                             Column {
                                 id: musicColumn
-                                width: 462
+
+                                readonly property int artSize: 96
+
+                                width: 460
                                 x: -16 * pill.tabProgress
                                 opacity: IslandService.musicAvailable ? Math.max(0, 1 - pill.tabProgress * 2) : 0
                                 visible: opacity > 0
-                                spacing: 6
+                                spacing: Theme.space.lg
 
-                                // Top row: art + title/artist
                                 Row {
                                     width: parent.width
-                                    spacing: 14
+                                    spacing: Theme.space.lg
 
                                     ClippingRectangle {
-                                        width: 72
-                                        height: 72
-                                        radius: Theme.blockRadius
-                                        color: Colors.surface_container
+                                        width: musicColumn.artSize
+                                        height: musicColumn.artSize
+                                        radius: Theme.radius.md
+                                        color: Theme.colors.raised
 
                                         CrossfadeImage {
                                             anchors.fill: parent
@@ -710,26 +680,26 @@ Variants {
 
                                         Text {
                                             anchors.centerIn: parent
-                                            text: Icons.musicNote2
-                                            font.family: Fonts.iconFont
-                                            font.pixelSize: 28
-                                            color: Colors.on_surface_variant
+                                            text: PhosphorIcons.musicNoteSimple
+                                            font.family: Theme.font.icon
+                                            font.pixelSize: Theme.icon.xxl
+                                            color: Theme.text.secondary
                                             visible: IslandService.trackArtUrl === ""
                                         }
                                     }
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width - 72 - 14
-                                        spacing: 3
+                                        width: parent.width - musicColumn.artSize - Theme.space.lg
+                                        spacing: Theme.space.xs
 
                                         Text {
                                             width: parent.width
                                             text: IslandService.trackTitle
-                                            color: Colors.on_surface
-                                            font.pixelSize: 15
-                                            font.family: Fonts.font
-                                            font.weight: Font.Bold
+                                            color: Theme.text.primary
+                                            font.pixelSize: Theme.type.display.size
+                                            font.family: Theme.font.ui
+                                            font.weight: Font.Medium
                                             elide: Text.ElideRight
                                             maximumLineCount: 1
                                         }
@@ -738,30 +708,29 @@ Variants {
                                             width: parent.width
                                             visible: (IslandService.trackArtist || "") !== ""
                                             text: IslandService.trackArtist || ""
-                                            color: Colors.on_surface_variant
-                                            font.pixelSize: 12
-                                            font.family: Fonts.font
+                                            color: Theme.text.secondary
+                                            font.pixelSize: Theme.type.body.size
+                                            font.family: Theme.font.ui
                                             elide: Text.ElideRight
                                             maximumLineCount: 1
                                         }
 
                                         Text {
                                             width: parent.width
-                                            visible: (CiderRpcService.albumName || "") !== ""
-                                            text: CiderRpcService.albumName || ""
-                                            color: Colors.on_surface_variant
-                                            font.pixelSize: Fonts.caption
-                                            font.family: Fonts.font
+                                            visible: IslandService.albumName !== ""
+                                            text: IslandService.albumName
+                                            color: Theme.text.tertiary
+                                            font.pixelSize: Theme.type.caption.size
+                                            font.family: Theme.font.ui
                                             elide: Text.ElideRight
                                             maximumLineCount: 1
                                         }
                                     }
                                 }
 
-                                // Seek bar + timestamps
                                 Column {
                                     width: parent.width
-                                    spacing: 2
+                                    spacing: Theme.space.xxs
 
                                     Timer {
                                         id: seekDebounce
@@ -773,17 +742,17 @@ Variants {
 
                                         width: parent.width
                                         from: 0
-                                        to: CiderRpcService.duration > 0 ? CiderRpcService.duration : 1
-                                        boundValue: CiderRpcService.position
-                                        // Cider keeps pushing position mid-seek, so the bar stays ours until the debounce clears.
+                                        to: IslandService.duration > 0 ? IslandService.duration : 1
+                                        boundValue: IslandService.position
+                                        enabled: IslandService.canSeek
+
                                         holding: seekDebounce.running
-                                        trackColor: Qt.rgba(Colors.on_surface_variant.r, Colors.on_surface_variant.g, Colors.on_surface_variant.b, 0.3)
-                                        accentColor: Colors.on_surface
-                                        pressedColor: Colors.on_surface
+                                        trackColor: Theme.stroke.strong
+                                        accentColor: Theme.accent
                                         handleSize: 10
                                         onPressedChanged: {
                                             if (!pressed) {
-                                                CiderRpcService.seek(value);
+                                                MediaControlService.seek(value);
                                                 seekDebounce.start();
                                             }
                                         }
@@ -797,147 +766,102 @@ Variants {
                                             id: elapsedLabel
                                             anchors.left: parent.left
                                             text: overlay.formatTime(seekSlider.value)
-                                            color: Colors.on_surface_variant
-                                            font.pixelSize: Fonts.caption
-                                            font.family: Fonts.font
+                                            color: Theme.text.secondary
+                                            font.pixelSize: Theme.type.caption.size
+                                            font.family: Theme.font.ui
                                         }
                                         Text {
                                             anchors.right: parent.right
-                                            text: overlay.formatTime(CiderRpcService.duration)
-                                            color: Colors.on_surface_variant
-                                            font.pixelSize: Fonts.caption
-                                            font.family: Fonts.font
+                                            text: overlay.formatTime(IslandService.duration)
+                                            color: Theme.text.secondary
+                                            font.pixelSize: Theme.type.caption.size
+                                            font.family: Theme.font.ui
                                         }
                                     }
                                 }
 
-                                // Controls
                                 Row {
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 20
+                                    spacing: Theme.space.lg
 
                                     MediaControlButton {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        icon: Icons.skipPrevious
+                                        icon: PhosphorIcons.skipBack
                                         onTapped: MediaControlService.previous()
                                     }
 
                                     MediaControlButton {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        icon: CiderRpcService.isPlaying ? Icons.pause : Icons.play
-                                        iconSize: 32
+                                        icon: IslandService.isPlaying ? PhosphorIcons.pause : PhosphorIcons.play
+                                        iconSize: 22
                                         filled: true
                                         onTapped: MediaControlService.playpause()
                                     }
 
                                     MediaControlButton {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        icon: Icons.skipNext
+                                        icon: PhosphorIcons.skipForward
                                         onTapped: MediaControlService.next()
                                     }
                                 }
                             }
 
-                            // Cider offline or nothing queued. Same width as the player so the pill doesn't resize.
                             Item {
                                 id: musicEmpty
                                 width: musicColumn.width
-                                height: 160
+                                height: musicColumn.implicitHeight
                                 x: -16 * pill.tabProgress
                                 opacity: IslandService.musicAvailable ? 0 : Math.max(0, 1 - pill.tabProgress * 2)
                                 visible: opacity > 0
 
                                 Column {
                                     anchors.centerIn: parent
-                                    spacing: 8
+                                    spacing: Theme.space.md
 
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: Icons.musicNote2
-                                        color: Colors.on_surface_variant
-                                        font.pixelSize: 40
-                                        font.family: Fonts.iconFont
+                                        text: PhosphorIcons.musicNoteSimple
+                                        color: Theme.text.secondary
+                                        font.pixelSize: Theme.icon.xxl
+                                        font.family: Theme.font.icon
                                     }
 
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Nothing playing"
-                                        color: Colors.on_surface_variant
-                                        font.pixelSize: Fonts.p
-                                        font.family: Fonts.font
+                                        color: Theme.text.secondary
+                                        font.pixelSize: Theme.type.body.size
+                                        font.family: Theme.font.ui
                                     }
                                 }
                             }
                         }
 
-                        // Mic, DND, night light; top-aligned so they don't float beside the taller calendar.
                         Column {
                             id: quickControls
                             width: 56
-                            spacing: 8
+                            spacing: Theme.space.md
 
-                            Rectangle {
-                                width: 56
-                                height: 40
-                                radius: 12
-                                color: AudioService.sourceMuted ? Colors.error_container : Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.15)
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: AudioService.sourceMuted ? Icons.micOff : Icons.mic
-                                    color: AudioService.sourceMuted ? Colors.on_error_container : Colors.on_surface
-                                    font.pixelSize: Fonts.h4
-                                    font.family: Fonts.iconFont
-                                }
-                                HoverHandler {
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: AudioService.toggleSourceMute()
-                                }
+                            ToggleRow {
+                                style: "compact"
+                                danger: true
+                                glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
+                                active: AudioService.sourceMuted
+                                onToggled: AudioService.toggleSourceMute()
                             }
 
-                            Rectangle {
-                                width: 56
-                                height: 40
-                                radius: 12
-                                color: SettingsService.doNotDisturb ? Colors.primary_container : Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.15)
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "DND"
-                                    color: SettingsService.doNotDisturb ? Colors.on_primary_container : Colors.on_surface
-                                    font.pixelSize: Fonts.caption
-                                    font.family: Fonts.font
-                                    font.weight: Font.Bold
-                                }
-                                HoverHandler {
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
-                                }
+                            ToggleRow {
+                                style: "compact"
+                                label: "DND"
+                                active: SettingsService.doNotDisturb
+                                onToggled: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
                             }
 
-                            Rectangle {
-                                width: 56
-                                height: 40
-                                radius: 12
-                                color: SunsetService.active ? Colors.tertiary_container : Qt.rgba(Colors.on_surface.r, Colors.on_surface.g, Colors.on_surface.b, 0.15)
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: SunsetService.active ? Icons.nightlight : Icons.wbSunny
-                                    color: SunsetService.active ? Colors.on_tertiary_container : Colors.on_surface
-                                    font.pixelSize: Fonts.h4
-                                    font.family: Fonts.iconFont
-                                }
-                                HoverHandler {
-                                    cursorShape: Qt.PointingHandCursor
-                                }
-                                TapHandler {
-                                    onTapped: SunsetService.toggle()
-                                }
+                            ToggleRow {
+                                style: "compact"
+                                glyph: SunsetService.active ? PhosphorIcons.moon : PhosphorIcons.sun
+                                active: SunsetService.active
+                                onToggled: SunsetService.toggle()
                             }
                         }
                     }

@@ -572,8 +572,7 @@ Item {
 
                 manager.readoutDirectionX = axisReadoutDirection(px, resizeHorizontal, initialX, initialWidth, manager.selectionX, manager.selectionWidth);
                 manager.readoutDirectionY = axisReadoutDirection(py, resizeVertical, initialY, initialHeight, manager.selectionY, manager.selectionHeight);
-                // A pure edge drag (only one resize axis active) keeps the label level
-                // with the cursor on the other axis instead of offsetting diagonally.
+
                 manager.readoutEdgeAxis = resizeHorizontal !== 0 && resizeVertical === 0 ? "horizontal" : resizeVertical !== 0 && resizeHorizontal === 0 ? "vertical" : "none";
             }
 
@@ -711,8 +710,6 @@ Item {
             implicitWidth: manager.desktopGeometry.width
             implicitHeight: manager.desktopGeometry.height
 
-            // Every output must explicitly accept pointer input. Without a mask,
-            // a transparent non-keyboard-owning layer can remain click-through.
             mask: Region {
                 x: 0
                 y: 0
@@ -736,9 +733,6 @@ Item {
                 }
             }
 
-            // A layer-shell window exists per monitor. Once a pointer grab leaves
-            // its originating surface, Wayland may stop delivering motion events,
-            // so sample Hyprland's global cursor position for the remainder of the drag.
             Process {
                 id: cursorPositionProcess
                 command: ["hyprctl", "cursorpos"]
@@ -889,7 +883,6 @@ Item {
                 }
             }
 
-            // Options panel
             Rectangle {
                 id: optionsPanel
                 visible: manager.overlayVisible
@@ -900,10 +893,10 @@ Item {
 
                 implicitWidth: 248
                 implicitHeight: optionsColumn.implicitHeight + 16
-                radius: 14
-                color: Colors.surface_container
+                radius: Theme.radius.lg
+                color: Theme.colors.surface
                 border.width: 1
-                border.color: Colors.outline_variant
+                border.color: Theme.stroke.hairline
 
                 opacity: manager.optionsOpen ? 1.0 : 0.0
                 scale: manager.optionsOpen ? 1.0 : 0.95
@@ -911,12 +904,12 @@ Item {
 
                 Behavior on opacity {
                     NumberAnimation {
-                        duration: Theme.animations.fast
+                        duration: Theme.motion.fast
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
-                        duration: Theme.animations.fast
+                        duration: Theme.motion.fast
                     }
                 }
 
@@ -937,9 +930,9 @@ Item {
 
                     Text {
                         text: "Save to"
-                        color: Colors.on_surface_variant
-                        font.pixelSize: 11
-                        font.family: Fonts.font
+                        color: Theme.text.secondary
+                        font.pixelSize: Theme.type.caption.size
+                        font.family: Theme.font.ui
                         Layout.topMargin: 7
                         Layout.leftMargin: 6
                         Layout.bottomMargin: 3
@@ -948,8 +941,8 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 28
-                        radius: 6
-                        color: defaultSaveArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: defaultSaveArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -959,17 +952,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 17
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.sm
+                                font.family: Theme.font.icon
                                 opacity: manager.saveDirectory === "" ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "Pictures/Screenshots"
-                                color: Colors.on_surface
-                                font.pixelSize: 12
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -989,8 +982,8 @@ Item {
                             required property string modelData
                             Layout.fillWidth: true
                             implicitHeight: 28
-                            radius: 6
-                            color: recentSaveArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                            radius: Theme.radius.sm
+                            color: recentSaveArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                             RowLayout {
                                 anchors.fill: parent
@@ -1000,17 +993,17 @@ Item {
                                 Text {
                                     Layout.preferredWidth: 16
                                     text: PhosphorIcons.check
-                                    color: Colors.primary
-                                    font.pixelSize: 17
-                                    font.family: Fonts.phosphorFont
+                                    color: Theme.accent
+                                    font.pixelSize: Theme.icon.sm
+                                    font.family: Theme.font.icon
                                     opacity: manager.saveDirectory === modelData ? 1 : 0
                                 }
                                 Text {
                                     Layout.fillWidth: true
                                     text: manager.locationLabel(modelData)
-                                    color: Colors.on_surface
-                                    font.pixelSize: 12
-                                    font.family: Fonts.font
+                                    color: Theme.text.primary
+                                    font.pixelSize: Theme.type.body.size
+                                    font.family: Theme.font.ui
                                     elide: Text.ElideMiddle
                                 }
                             }
@@ -1028,18 +1021,18 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 28
-                        radius: 6
-                        color: otherLocationArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: otherLocationArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Text {
                             anchors.left: parent.left
                             anchors.leftMargin: 28
                             anchors.verticalCenter: parent.verticalCenter
                             text: "Other Location…"
-                            color: Colors.primary
-                            font.pixelSize: 12
+                            color: Theme.accent
+                            font.pixelSize: Theme.type.body.size
                             font.weight: Font.Medium
-                            font.family: Fonts.font
+                            font.family: Theme.font.ui
                         }
 
                         MouseArea {
@@ -1058,23 +1051,23 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 1
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                         Layout.topMargin: 4
                         Layout.bottomMargin: 1
                     }
 
                     Text {
                         text: "Timer"
-                        color: Colors.on_surface_variant
-                        font.pixelSize: 11
-                        font.family: Fonts.font
+                        color: Theme.text.secondary
+                        font.pixelSize: Theme.type.caption.size
+                        font.family: Theme.font.ui
                         Layout.topMargin: 7
                         Layout.leftMargin: 6
                         Layout.bottomMargin: 3
                     }
 
                     RowLayout {
-                        spacing: 3
+                        spacing: Theme.space.xxs
                         Layout.fillWidth: true
 
                         Repeater {
@@ -1101,15 +1094,15 @@ Item {
                                 required property var modelData
                                 Layout.fillWidth: true
                                 implicitHeight: 26
-                                radius: 6
-                                color: manager.timerDelay === modelData.delay ? Colors.surface_container_high : (timerOptArea.containsMouse ? Colors.surface_container_high : "transparent")
+                                radius: Theme.radius.sm
+                                color: manager.timerDelay === modelData.delay ? Theme.fill.selected : (timerOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: modelData.label
-                                    color: manager.timerDelay === modelData.delay ? Colors.primary : Colors.on_surface_variant
-                                    font.pixelSize: 12
-                                    font.family: Fonts.font
+                                    color: manager.timerDelay === modelData.delay ? Theme.accent : Theme.text.secondary
+                                    font.pixelSize: Theme.type.body.size
+                                    font.family: Theme.font.ui
                                 }
 
                                 MouseArea {
@@ -1126,16 +1119,16 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 1
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                         Layout.topMargin: 4
                         Layout.bottomMargin: 1
                     }
 
                     Text {
                         text: "Options"
-                        color: Colors.on_surface_variant
-                        font.pixelSize: 11
-                        font.family: Fonts.font
+                        color: Theme.text.secondary
+                        font.pixelSize: Theme.type.caption.size
+                        font.family: Theme.font.ui
                         Layout.topMargin: 7
                         Layout.leftMargin: 6
                         Layout.bottomMargin: 3
@@ -1144,8 +1137,8 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
-                        color: notificationOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: notificationOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1155,17 +1148,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 18
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
                                 opacity: manager.showNotification ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "Show Notification"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -1185,8 +1178,8 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
-                        color: rememberSelectionArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: rememberSelectionArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1196,17 +1189,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 18
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
                                 opacity: manager.rememberLastSelection ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "Remember Last Selection"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -1229,11 +1222,11 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
-                        color: systemAudioOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: systemAudioOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
@@ -1245,17 +1238,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 18
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
                                 opacity: manager.systemAudioEnabled ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "System Audio"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -1275,11 +1268,11 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
-                        color: micOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: micOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
@@ -1291,17 +1284,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 18
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
                                 opacity: manager.micEnabled ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "Microphone"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -1321,16 +1314,16 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 1
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                         Layout.topMargin: 4
                         Layout.bottomMargin: 1
                     }
 
                     Text {
                         text: "Capture"
-                        color: Colors.on_surface_variant
-                        font.pixelSize: 11
-                        font.family: Fonts.font
+                        color: Theme.text.secondary
+                        font.pixelSize: Theme.type.caption.size
+                        font.family: Theme.font.ui
                         Layout.topMargin: 7
                         Layout.leftMargin: 6
                         Layout.bottomMargin: 3
@@ -1339,8 +1332,8 @@ Item {
                     Rectangle {
                         Layout.fillWidth: true
                         implicitHeight: 30
-                        radius: 6
-                        color: cursorOptArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: cursorOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1350,17 +1343,17 @@ Item {
                             Text {
                                 Layout.preferredWidth: 16
                                 text: PhosphorIcons.check
-                                color: Colors.primary
-                                font.pixelSize: 18
-                                font.family: Fonts.phosphorFont
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
                                 opacity: manager.showCursor ? 1 : 0
                             }
                             Text {
                                 Layout.fillWidth: true
                                 text: "Show Cursor"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                             }
                         }
 
@@ -1383,7 +1376,6 @@ Item {
                 }
             }
 
-            // Toolbar
             Rectangle {
                 id: toolbar
                 visible: manager.overlayVisible
@@ -1392,15 +1384,15 @@ Item {
                 implicitHeight: 52
                 x: overlayWindow.toolbarHostX + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostWidth - width, manager.toolbarX)) : (overlayWindow.toolbarHostWidth - width) / 2)
                 y: overlayWindow.toolbarHostY + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostHeight - height, manager.toolbarY)) : overlayWindow.toolbarHostHeight - height - 52)
-                radius: 14
-                color: Colors.surface_container
+                radius: Theme.radius.lg
+                color: Theme.colors.surface
                 border.width: 1
-                border.color: Colors.outline_variant
+                border.color: Theme.stroke.hairline
 
                 Behavior on implicitWidth {
                     NumberAnimation {
-                        duration: Theme.animations.slow
-                        easing.type: Easing.OutCubic
+                        duration: Theme.motion.slow
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
 
@@ -1426,10 +1418,9 @@ Item {
                 RowLayout {
                     id: toolbarRow
                     anchors.centerIn: parent
-                    spacing: 1
+                    spacing: Theme.space.xxs
                     visible: !manager.countdownActive
 
-                    // Close button
                     Item {
                         implicitWidth: 24
                         implicitHeight: 24
@@ -1438,9 +1429,9 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: PhosphorIcons.xCircle
-                            color: Colors.outline
-                            font.pixelSize: 20
-                            font.family: Fonts.phosphorFill
+                            color: Theme.text.tertiary
+                            font.pixelSize: Theme.icon.lg
+                            font.family: Theme.font.iconFill
                         }
 
                         MouseArea {
@@ -1452,7 +1443,6 @@ Item {
                         }
                     }
 
-                    // Screenshot buttons
                     Repeater {
                         model: [
                             {
@@ -1473,24 +1463,24 @@ Item {
                             required property var modelData
                             implicitWidth: 36
                             implicitHeight: 36
-                            radius: 8
-                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                            radius: Theme.radius.md
+                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: Theme.animations.fast
+                                    duration: Theme.motion.fast
                                 }
                             }
 
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                color: manager.selectedMode === modelData.mode ? Colors.primary : Colors.on_surface_variant
-                                font.pixelSize: 20
-                                font.family: Fonts.phosphorFont
+                                color: manager.selectedMode === modelData.mode ? Theme.accent : Theme.text.secondary
+                                font.pixelSize: Theme.icon.lg
+                                font.family: Theme.font.icon
                                 Behavior on color {
                                     ColorAnimation {
-                                        duration: Theme.animations.fast
+                                        duration: Theme.motion.fast
                                     }
                                 }
                             }
@@ -1509,33 +1499,32 @@ Item {
                         implicitWidth: 1
                         implicitHeight: 24
                         Layout.alignment: Qt.AlignVCenter
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                         Layout.leftMargin: 3
                         Layout.rightMargin: 3
                     }
 
-                    // Video button
                     Rectangle {
                         implicitWidth: 36
                         implicitHeight: 36
-                        radius: 8
-                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.md
+                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
                         Text {
                             anchors.centerIn: parent
                             text: PhosphorIcons.videoCamera
-                            color: manager.selectedMode === "video" ? Colors.primary : Colors.on_surface_variant
-                            font.pixelSize: 20
-                            font.family: Fonts.phosphorFont
+                            color: manager.selectedMode === "video" ? Theme.accent : Theme.text.secondary
+                            font.pixelSize: Theme.icon.lg
+                            font.family: Theme.font.icon
                             Behavior on color {
                                 ColorAnimation {
-                                    duration: Theme.animations.fast
+                                    duration: Theme.motion.fast
                                 }
                             }
                         }
@@ -1553,47 +1542,46 @@ Item {
                         implicitWidth: 1
                         implicitHeight: 24
                         Layout.alignment: Qt.AlignVCenter
-                        color: Colors.outline_variant
+                        color: Theme.stroke.hairline
                         Layout.leftMargin: 3
                         Layout.rightMargin: 3
                     }
 
-                    // Options text button
                     Rectangle {
                         implicitWidth: optionsLabel.implicitWidth + 16
                         implicitHeight: 36
-                        radius: 8
-                        color: manager.optionsOpen ? Colors.surface_container_high : (optionsBtn.containsMouse ? Colors.surface_container_high : Colors.surface_container)
+                        radius: Theme.radius.md
+                        color: manager.optionsOpen ? Theme.fill.hover : (optionsBtn.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
                         Row {
                             id: optionsLabel
                             anchors.centerIn: parent
-                            spacing: 4
+                            spacing: Theme.space.xs
 
                             Text {
                                 text: "Options"
-                                color: Colors.on_surface
-                                font.pixelSize: 13
-                                font.family: Fonts.font
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             Text {
                                 text: PhosphorIcons.caretDown
-                                color: Colors.on_surface_variant
-                                font.pixelSize: 14
-                                font.family: Fonts.phosphorFont
+                                color: Theme.text.secondary
+                                font.pixelSize: Theme.icon.xs
+                                font.family: Theme.font.icon
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 rotation: manager.optionsOpen ? 180 : 0
                                 Behavior on rotation {
                                     NumberAnimation {
-                                        duration: Theme.animations.fast
+                                        duration: Theme.motion.fast
                                     }
                                 }
                             }
@@ -1608,19 +1596,18 @@ Item {
                         }
                     }
 
-                    // Capture button
                     Rectangle {
                         implicitWidth: captureLabel.implicitWidth + 22
                         implicitHeight: 36
-                        radius: 8
+                        radius: Theme.radius.md
                         readonly property bool canCapture: manager.selectedMode === "region" ? manager.hasSelection : manager.selectedMode === "windows" ? manager.selectedWindow != null : true
                         opacity: canCapture ? 1.0 : 0.45
-                        color: captureBtn.containsMouse && captureBtn.enabled ? Qt.lighter(Colors.primary, 1.1) : Colors.primary
+                        color: captureBtn.containsMouse && captureBtn.enabled ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
                         Layout.leftMargin: 3
 
                         Behavior on color {
                             ColorAnimation {
-                                duration: Theme.animations.fast
+                                duration: Theme.motion.fast
                             }
                         }
 
@@ -1628,10 +1615,10 @@ Item {
                             id: captureLabel
                             anchors.centerIn: parent
                             text: "Capture"
-                            color: Colors.on_primary
-                            font.pixelSize: 13
+                            color: Theme.accentText
+                            font.pixelSize: Theme.type.body.size
                             font.weight: Font.Medium
-                            font.family: Fonts.font
+                            font.family: Theme.font.ui
                         }
 
                         MouseArea {
@@ -1648,22 +1635,22 @@ Item {
                 RowLayout {
                     id: countdownRow
                     anchors.centerIn: parent
-                    spacing: 8
+                    spacing: Theme.space.md
                     visible: manager.countdownActive
 
                     Rectangle {
                         implicitWidth: cancelCountdownLabel.implicitWidth + 16
                         implicitHeight: 32
-                        radius: 7
-                        color: cancelCountdownArea.containsMouse ? Colors.surface_container_high : Colors.surface_container
+                        radius: Theme.radius.sm
+                        color: cancelCountdownArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Text {
                             id: cancelCountdownLabel
                             anchors.centerIn: parent
                             text: "Cancel"
-                            color: Colors.on_surface
-                            font.pixelSize: 13
-                            font.family: Fonts.font
+                            color: Theme.text.primary
+                            font.pixelSize: Theme.type.body.size
+                            font.family: Theme.font.ui
                         }
 
                         MouseArea {
@@ -1677,10 +1664,10 @@ Item {
 
                     Text {
                         text: manager.countdown + "s"
-                        color: Colors.on_surface
-                        font.pixelSize: 16
-                        font.weight: Font.DemiBold
-                        font.family: Fonts.font
+                        color: Theme.text.primary
+                        font.pixelSize: Theme.type.title.size
+                        font.weight: Font.Medium
+                        font.family: Theme.font.ui
                         Layout.rightMargin: 6
                     }
                 }

@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Constants
-import qs.Components
 import qs.Modules.Bar.Components
 import qs.Modules.Popups
 import qs.Services
@@ -32,7 +31,6 @@ Variants {
         readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || popupOpen || Visibilities.barPinned
         property bool revealed: true
 
-        // The island overlay is a separate window; it follows this.
         onRevealedChanged: {
             if (modelData === Theme.primaryScreen)
                 Visibilities.barRevealed = revealed;
@@ -73,8 +71,6 @@ Variants {
         implicitHeight: Theme.topBarHeight
         color: "transparent"
 
-        // When hidden, only a 2px strip at the top edge accepts input so
-        // clicks pass through to the fullscreen window below.
         mask: Region {
             width: topBar.width
             height: topBar.revealed ? topBar.height : 2
@@ -86,8 +82,6 @@ Variants {
             right: true
         }
 
-        // Stationary, so it still catches hover on the strip while the
-        // content is slid out of view.
         Item {
             anchors.fill: parent
 
@@ -113,8 +107,8 @@ Variants {
 
             Behavior on y {
                 NumberAnimation {
-                    duration: 180
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.normal
+                    easing.type: Theme.motion.easeStandard
                 }
             }
 
@@ -125,7 +119,7 @@ Variants {
                 width: workspaceModule.implicitWidth + 28
                 height: Theme.topBarHeight - 8
                 radius: height / 2
-                color: Colors.surface
+                color: Theme.colors.surface
 
                 Workspaces {
                     id: workspaceModule
@@ -133,8 +127,6 @@ Variants {
                     anchors.centerIn: parent
                 }
             }
-
-            // Center pill is the island — its own overlay window, see Modules/Island/Island.qml.
 
             Rectangle {
                 id: indicatorPill
@@ -148,14 +140,14 @@ Variants {
                 width: indicatorRow.implicitWidth + leftPadding + rightPadding
                 height: Theme.topBarHeight - 8
                 radius: height / 2
-                color: Colors.surface
+                color: Theme.colors.surface
 
                 RowLayout {
                     id: indicatorRow
                     anchors.right: parent.right
                     anchors.rightMargin: indicatorPill.rightPadding
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 14
+                    spacing: Theme.space.lg
 
                     readonly property int trayGap: 8
 
@@ -183,7 +175,7 @@ Variants {
             SettingsPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + Theme.popup.gap
+                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -193,7 +185,7 @@ Variants {
             SoundPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + Theme.popup.gap
+                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -203,7 +195,7 @@ Variants {
             BluetoothPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + Theme.popup.gap
+                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -213,7 +205,7 @@ Variants {
             NotificationPopup {
                 anchor.window: topBar
                 anchor.rect.x: topBar.width - implicitWidth - 8
-                anchor.rect.y: topBar.height + Theme.popup.gap
+                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
     }

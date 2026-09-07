@@ -7,11 +7,6 @@ import Quickshell.Services.Polkit
 import Quickshell.Wayland
 import qs.Constants
 
-// Password-only polkit authentication agent. Registers itself with
-// polkit-1 and shows a centered card whenever an authentication request
-// comes in. Only one polkit agent can be registered at a time — make sure
-// nothing else (hyprpolkitagent, polkit-gnome-authentication-agent-1, etc.)
-// is running before enabling this.
 Item {
     id: root
 
@@ -113,21 +108,21 @@ Item {
             property: "shakeOffset"
             to: -8
             duration: 35
-            easing.type: Easing.OutQuad
+            easing.type: Theme.motion.easeSoft
         }
         NumberAnimation {
             target: root
             property: "shakeOffset"
             to: 8
             duration: 50
-            easing.type: Easing.InOutQuad
+            easing.type: Theme.motion.easeSmooth
         }
         NumberAnimation {
             target: root
             property: "shakeOffset"
             to: 0
             duration: 55
-            easing.type: Easing.OutQuad
+            easing.type: Theme.motion.easeSoft
         }
     }
 
@@ -200,7 +195,7 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            color: Qt.rgba(Colors.scrim.r, Colors.scrim.g, Colors.scrim.b, 0.5)
+            color: Theme.withAlpha(Theme.shadow, 0.5)
         }
 
         MouseArea {
@@ -212,16 +207,16 @@ Item {
             id: card
             width: 320
             height: 148
-            radius: Theme.blockRadius * 2
+            radius: Theme.radius.xl
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: root.shakeOffset
-            color: Colors.surface_container
+            color: Theme.colors.surface
             border.width: 1
-            border.color: root.errorFlash ? Colors.error : Colors.outline_variant
+            border.color: root.errorFlash ? Theme.danger : Theme.stroke.hairline
 
             Behavior on border.color {
                 ColorAnimation {
-                    duration: Theme.animations.fast
+                    duration: Theme.motion.fast
                 }
             }
 
@@ -242,26 +237,26 @@ Item {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 18
-                spacing: 10
+                spacing: Theme.space.md
 
                 RowLayout {
                     Layout.fillWidth: true
-                    spacing: 10
+                    spacing: Theme.space.md
 
                     Text {
                         text: PhosphorIcons.lock
-                        font.family: Fonts.phosphorFont
-                        font.pixelSize: 20
-                        color: root.errorFlash ? Colors.error : Colors.primary
+                        font.family: Theme.font.icon
+                        font.pixelSize: Theme.icon.lg
+                        color: root.errorFlash ? Theme.danger : Theme.accent
                     }
 
                     Text {
                         Layout.fillWidth: true
                         text: root.message
-                        color: Colors.on_surface
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.body.size
-                        font.weight: Font.Bold
+                        color: Theme.text.primary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
+                        font.weight: Font.Medium
                         elide: Text.ElideRight
                     }
                 }
@@ -269,14 +264,14 @@ Item {
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 36
-                    radius: Theme.blockRadius
-                    color: Colors.surface_container_low
+                    radius: Theme.radius.md
+                    color: Theme.colors.bg
                     border.width: 1
-                    border.color: passwordInput.activeFocus ? Colors.primary : Colors.outline_variant
+                    border.color: passwordInput.activeFocus ? Theme.accent : Theme.stroke.hairline
 
                     Behavior on border.color {
                         ColorAnimation {
-                            duration: Theme.animations.fast
+                            duration: Theme.motion.fast
                         }
                     }
 
@@ -289,9 +284,9 @@ Item {
                         clip: true
                         echoMode: (root.responseVisible || root.revealPassword) ? TextInput.Normal : TextInput.Password
                         passwordCharacter: "•"
-                        color: root.errorFlash ? Colors.error : Colors.on_surface
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.body.size
+                        color: root.errorFlash ? Theme.danger : Theme.text.primary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
                         readOnly: root.submitted || root.errorFlash
                         enabled: root.dialogVisible
                         onAccepted: root.submitResponse()
@@ -308,10 +303,10 @@ Item {
                         anchors.leftMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.errorFlash ? "Wrong password" : (root.submitted ? "Checking..." : (root.prompt || "Enter password"))
-                        color: root.errorFlash ? Colors.error : Colors.on_surface_variant
+                        color: root.errorFlash ? Theme.danger : Theme.text.secondary
                         opacity: root.errorFlash ? 1 : 0.6
-                        font.family: Fonts.font
-                        font.pixelSize: Fonts.body.size
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
                         visible: passwordInput.text.length === 0
                     }
 
@@ -320,9 +315,9 @@ Item {
                         anchors.rightMargin: 8
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.revealPassword ? PhosphorIcons.eyeSlash : PhosphorIcons.eye
-                        font.family: Fonts.phosphorFont
-                        font.pixelSize: 14
-                        color: Colors.on_surface_variant
+                        font.family: Theme.font.icon
+                        font.pixelSize: Theme.icon.xs
+                        color: Theme.text.secondary
                         visible: !root.responseVisible
 
                         MouseArea {
@@ -337,7 +332,7 @@ Item {
                 RowLayout {
                     Layout.fillWidth: true
                     Layout.topMargin: 4
-                    spacing: 8
+                    spacing: Theme.space.md
 
                     Item {
                         Layout.fillWidth: true
@@ -368,15 +363,15 @@ Item {
 
         implicitWidth: btnLabel.implicitWidth + 24
         implicitHeight: 30
-        radius: Theme.blockRadius
+        radius: Theme.radius.md
         opacity: enabled ? 1 : 0.5
-        color: primary ? (btnArea.pressed ? Qt.darker(Colors.primary, 1.15) : (btnArea.containsMouse ? Qt.lighter(Colors.primary, 1.1) : Colors.primary)) : (btnArea.pressed ? Colors.surface_container_highest : (btnArea.containsMouse ? Colors.surface_container_high : Colors.surface_container_low))
+        color: primary ? (btnArea.pressed ? Qt.darker(Theme.accent, 1.15) : (btnArea.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)) : (btnArea.pressed ? Theme.colors.overlay : (btnArea.containsMouse ? Theme.colors.raised : Theme.colors.bg))
         border.width: primary ? 0 : 1
-        border.color: Colors.outline_variant
+        border.color: Theme.stroke.hairline
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.animations.fast
+                duration: Theme.motion.fast
             }
         }
 
@@ -384,10 +379,10 @@ Item {
             id: btnLabel
             anchors.centerIn: parent
             text: btn.label
-            color: btn.primary ? Colors.on_primary : Colors.on_surface
-            font.family: Fonts.font
-            font.pixelSize: Fonts.body.size
-            font.weight: btn.primary ? Font.Bold : Font.Normal
+            color: btn.primary ? Theme.accentText : Theme.text.primary
+            font.family: Theme.font.ui
+            font.pixelSize: Theme.type.body.size
+            font.weight: btn.primary ? Font.Medium : Font.Normal
         }
 
         MouseArea {

@@ -12,9 +12,9 @@ post_hook = "hyprctl reload"
 input_path = "~/.config/matugen/templates/hyprland-colors.lua"
 output_path = "~/dev/dotfiles/home/.config/hypr/colors.lua"
 
-[templates.quickshell-colors]
-input_path = "~/.config/matugen/templates/quickshell-colors.qml"
-output_path = "~/dev/dotfiles/home/.config/quickshell/Constants/Colors.qml"
+[templates.quickshell-palette]
+input_path = "~/.config/matugen/templates/quickshell-palette.json"
+output_path = "~/dev/dotfiles/home/.config/quickshell/palette.json"
 
 [templates.walker]
 input_path = "~/.config/matugen/templates/walker.css"

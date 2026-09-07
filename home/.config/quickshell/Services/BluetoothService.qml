@@ -40,7 +40,6 @@ Singleton {
         return device.paired || device.bonded || device.trusted;
     }
 
-    // Drop entries whose only name is a MAC or service UUID.
     function hasHumanName(device) {
         const label = deviceLabel(device);
         if (label === "")
@@ -50,7 +49,6 @@ Singleton {
         return !uuid.test(label) && !address.test(label);
     }
 
-    // Project to primitives — live BluetoothDevice objects can be destroyed by BlueZ churn mid-incubation.
     function deviceRow(device) {
         return {
             address: device.address,
@@ -62,7 +60,6 @@ Singleton {
         };
     }
 
-    // Looked up per row, not projected into it: battery ticks would rebuild every list.
     function batteryLabel(address) {
         const device = deviceFor(address);
         if (!device || !device.batteryAvailable)
@@ -136,7 +133,6 @@ Singleton {
             device.forget();
     }
 
-    // address -> action in flight; BlueZ takes seconds, so rows show it.
     property var pendingActions: ({})
 
     function pendingAction(address) {
@@ -170,7 +166,6 @@ Singleton {
         removeDevice(row.address);
     }
 
-    // Lives here, not in the popup: a pairing outlives the panel that started it.
     function syncPending() {
         const next = ({});
         let changed = false;
@@ -179,18 +174,16 @@ Singleton {
             const action = pendingActions[address];
             const device = deviceFor(address);
 
-            // Device vanished mid-action; nothing left to wait on.
             if (!device) {
                 changed = true;
                 continue;
             }
 
-            // pair() only pairs, so carry a fresh pairing the rest of the way to connected.
             if (action === "pairing") {
                 if (!device.paired) {
                     next[address] = action;
                 } else if (device.connected) {
-                    // Some devices connect the moment they pair; nothing to carry on.
+
                     changed = true;
                 } else {
                     device.trusted = true;
@@ -216,7 +209,6 @@ Singleton {
     onConnectedRowsChanged: syncPending()
     onPairedRowsChanged: syncPending()
 
-    // Fallback so a silent device doesn't sit at "Connecting…" forever.
     Timer {
         id: pendingTimeout
         interval: 20000

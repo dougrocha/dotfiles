@@ -164,7 +164,7 @@ Item {
     RowLayout {
         id: visibleRow
         anchors.centerIn: parent
-        spacing: 4
+        spacing: Theme.space.xs
         Repeater {
             id: visibleRepeater
             model: TrayState.items
@@ -176,10 +176,10 @@ Item {
         visible: root.dragSource !== null
         width: 24
         height: 24
-        radius: 12
+        radius: Theme.radius.lg
         color: "transparent"
         border.width: 1
-        border.color: Colors.outline
+        border.color: Theme.stroke.strong
         z: 10
         y: (root.height - height) / 2
         x: root.mapFromItem(visibleRow, 0, 0).x + root.placeholderX()

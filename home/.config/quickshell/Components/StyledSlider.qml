@@ -5,17 +5,17 @@ import qs.Constants
 Slider {
     id: slider
 
-    // The value to show when not being dragged. Bound via the suspended Binding
-    // below so a drag (which writes `value`) doesn't tear the binding down.
     property real boundValue: 0
 
-    // Extends that hold past the drag, for a bar whose source keeps pushing values mid-seek.
     property bool holding: false
 
-    property color trackColor: Colors.outline_variant
-    property color accentColor: Colors.primary
-    property color pressedColor: Colors.primary_fixed
+    property color trackColor: Theme.stroke.strong
+    property color accentColor: Theme.accent
+    property color handleColor: Theme.text.primary
     property int handleSize: 12
+
+    leftPadding: 0
+    rightPadding: 0
 
     Binding {
         target: slider
@@ -33,20 +33,20 @@ Slider {
         x: slider.leftPadding
         y: slider.topPadding + slider.availableHeight / 2 - height / 2
         width: slider.availableWidth
-        height: 3
-        radius: 2
+        height: 4
+        radius: height / 2
         color: slider.trackColor
 
         Rectangle {
             width: slider.visualPosition * parent.width
             height: parent.height
             color: slider.accentColor
-            radius: 2
+            radius: Theme.radius.xxs
 
             Behavior on width {
                 NumberAnimation {
-                    duration: 80
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.instant
+                    easing.type: Theme.motion.easeStandard
                 }
             }
         }
@@ -58,6 +58,6 @@ Slider {
         implicitWidth: slider.handleSize
         implicitHeight: slider.handleSize
         radius: width / 2
-        color: slider.pressed ? slider.pressedColor : slider.accentColor
+        color: slider.handleColor
     }
 }

@@ -8,51 +8,14 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property bool isOnline: ciderSocket.status === WebSocket.Open
-    property bool isPlaying: false
+    readonly property bool isOnline: ciderSocket.status === WebSocket.Open
 
-    signal trackChanged
-
-    function resolveArtUrl(url) {
-        return url ? url.replace("{w}", "512").replace("{h}", "512") : "";
-    }
-
-    property string trackTitle: ""
-    property string trackArtist: ""
-    property string albumName: ""
-    property string trackArtUrl: ""
     property bool inFavorites: false
     property bool inLibrary: false
-    property real position: 0
-    property real duration: 0
 
-    function next() {
-        nextProcess.running = true;
-    }
-
-    // Past 3 seconds, "previous" restarts the song rather than leaving the track.
-    function previous() {
-        if (position > 3)
-            seek(0);
-        else
-            prevProcess.running = true;
-    }
-
-    function pause() {
-        pauseProcess.running = true;
-    }
-
-    function play() {
-        playProcess.running = true;
-    }
-
-    function playpause() {
-        playpauseProcess.running = true;
-    }
-
-    function seek(seconds) {
-        seekProcess.command = ["curl", "-s", "-X", "POST", "-H", "Content-Type: application/json", "-d", "{\"position\": " + seconds + "}", "http://localhost:10767/api/v1/playback/seek"];
-        seekProcess.running = true;
+    onIsOnlineChanged: if (!isOnline) {
+        inFavorites = false;
+        inLibrary = false;
     }
 
     function addToLibrary() {
@@ -94,13 +57,8 @@ Singleton {
                 try {
                     var response = JSON.parse(data);
                     if (response.status === "ok" && response.info) {
-                        var info = response.info;
-                        trackTitle = info.name || "";
-                        trackArtist = info.artistName || "";
-                        albumName = info.albumName || "";
-                        trackArtUrl = resolveArtUrl((info.artwork && info.artwork.url) || "");
-                        position = info.currentPlaybackTime || 0;
-                        duration = (info.durationInMillis || 0) / 1000;
+                        inFavorites = response.info.inFavorites === true;
+                        inLibrary = response.info.inLibrary === true;
                     }
                 } catch (e) {}
             }
@@ -114,99 +72,25 @@ Singleton {
         active: true
         onStatusChanged: {
             if (ciderSocket.status === WebSocket.Open) {
-                isOnline = true;
                 sendTextMessage("40");
                 initialDataProcess.running = true;
-            } else if (ciderSocket.status === WebSocket.Error) {
-                isOnline = false;
             }
         }
         onTextMessageReceived: function (message) {
-            // Socket.IO heart beat msg
+
             if (message === "2") {
                 sendTextMessage("3");
                 return;
             }
             if (message.startsWith("42")) {
                 var payload = JSON.parse(message.substring(2));
-                var eventType = payload[1].type;
-                var data = payload[1].data;
-                if (eventType === "playbackStatus.playbackTimeDidChange") {
-                    position = data.currentPlaybackTime || 0;
-                    duration = data.currentPlaybackDuration || 0;
-                    isPlaying = data.isPlaying === true;
-                }
-                if (eventType === "playbackStatus.playbackStateDidChange" || eventType === "playbackStatus.nowPlayingItemDidChange") {
-                    var attrs = data.attributes || data;
-                    if (attrs.name) {
-                        trackTitle = attrs.name;
-                        trackArtist = attrs.artistName || "";
-                        albumName = attrs.albumName || "";
-                        trackArtUrl = resolveArtUrl(attrs.artwork ? (attrs.artwork.url || "") : "");
-                        duration = (attrs.durationInMillis || 0) / 1000;
-                        if (attrs.currentPlaybackTime !== undefined)
-                            position = attrs.currentPlaybackTime;
-
-                        trackChanged();
-                    }
-
-                    isOnline = true;
-                }
-                if (eventType === "playbackStatus.playbackStateDidChange") {
-                    var state = data.state;
-                    if (state === "playing")
-                        isPlaying = true;
-                    else if (state === "paused" || state === "stopped")
-                        isPlaying = false;
-                }
-                if (eventType === "playbackStatus.nowPlayingStatusDidChange") {
+                if (payload[1].type === "playbackStatus.nowPlayingStatusDidChange") {
+                    var data = payload[1].data;
                     inFavorites = data.inFavorites === true;
                     inLibrary = data.inLibrary === true;
                 }
             }
         }
-    }
-
-    Process {
-        id: nextProcess
-
-        command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/next"]
-        running: false
-    }
-
-    Process {
-        id: prevProcess
-
-        command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/previous"]
-        running: false
-    }
-
-    Process {
-        id: pauseProcess
-
-        command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/pause"]
-        running: false
-    }
-
-    Process {
-        id: playProcess
-
-        command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/play"]
-        running: false
-    }
-
-    Process {
-        id: playpauseProcess
-
-        command: ["curl", "-s", "-X", "POST", "http://localhost:10767/api/v1/playback/playpause"]
-        running: false
-    }
-
-    Process {
-        id: seekProcess
-
-        command: ["curl", "-s", "-X", "POST", "-H", "Content-Type: application/json", "-d", "{\"position\": 0}", "http://localhost:10767/api/v1/playback/seek"]
-        running: false
     }
 
     Process {

@@ -13,7 +13,7 @@ Popup {
 
     Column {
         width: parent.width
-        spacing: 6
+        spacing: Theme.space.sm
 
         Item {
             width: parent.width
@@ -23,23 +23,23 @@ Popup {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Sound"
-                color: Colors.on_surface
-                font.pixelSize: 16
-                font.weight: Font.Medium
-                font.family: Fonts.font
+                color: Theme.text.primary
+                font.pixelSize: Theme.type.display.size
+                font.weight: Theme.type.display.weight
+                font.family: Theme.font.ui
             }
         }
 
         Column {
             width: parent.width
-            spacing: 6
+            spacing: Theme.space.sm
 
             Text {
                 text: "Output"
-                color: Colors.on_surface
-                font.pixelSize: Fonts.body.size
+                color: Theme.text.primary
+                font.pixelSize: Theme.type.body.size
                 font.weight: Font.Medium
-                font.family: Fonts.font
+                font.family: Theme.font.ui
             }
 
             StyledSlider {
@@ -54,7 +54,7 @@ Popup {
             Column {
                 width: parent.width
                 visible: AudioService.sinks.length > 1
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Repeater {
                     model: ScriptModel {
@@ -62,11 +62,11 @@ Popup {
                         objectProp: "id"
                     }
 
-                    delegate: DeviceRow {
+                    delegate: ListRow {
                         required property var modelData
                         width: parent.width
                         label: AudioService.shortLabel(modelData)
-                        icon: AudioService.deviceIcon(modelData)
+                        glyph: AudioService.deviceIcon(modelData)
                         active: AudioService.sink && modelData.id === AudioService.sink.id
                         onTapped: AudioService.setAudioSink(modelData)
                     }
@@ -78,14 +78,14 @@ Popup {
 
         Column {
             width: parent.width
-            spacing: 6
+            spacing: Theme.space.sm
 
             Text {
                 text: "Input"
-                color: Colors.on_surface
-                font.pixelSize: Fonts.body.size
+                color: Theme.text.primary
+                font.pixelSize: Theme.type.body.size
                 font.weight: Font.Medium
-                font.family: Fonts.font
+                font.family: Theme.font.ui
             }
 
             StyledSlider {
@@ -100,7 +100,7 @@ Popup {
             Column {
                 width: parent.width
                 visible: AudioService.sources.length > 1
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Repeater {
                     model: ScriptModel {
@@ -108,11 +108,11 @@ Popup {
                         objectProp: "id"
                     }
 
-                    delegate: DeviceRow {
+                    delegate: ListRow {
                         required property var modelData
                         width: parent.width
                         label: AudioService.shortLabel(modelData)
-                        icon: AudioService.deviceIcon(modelData)
+                        glyph: AudioService.deviceIcon(modelData)
                         active: AudioService.source && modelData.id === AudioService.source.id
                         onTapped: AudioService.setAudioSource(modelData)
                     }
@@ -122,17 +122,17 @@ Popup {
 
         Column {
             width: parent.width
-            spacing: 6
+            spacing: Theme.space.sm
             visible: AudioService.streamGroups.length > 0
 
             Divider {}
 
             Text {
                 text: "Apps"
-                color: Colors.on_surface_variant
-                font.pixelSize: Fonts.caption
+                color: Theme.text.secondary
+                font.pixelSize: Theme.type.caption.size
                 font.weight: Font.Medium
-                font.family: Fonts.font
+                font.family: Theme.font.ui
             }
 
             Repeater {
@@ -150,8 +150,8 @@ Popup {
                     sublabelText: MprisService.nowPlayingFor(modelData.name)
                     sliderValue: AudioService.getGroupVolume(modelData)
                     muted: AudioService.getGroupMuted(modelData)
-                    muteIcon: Icons.volumeUp
-                    mutedIcon: Icons.volumeMute
+                    muteIcon: PhosphorIcons.speakerHigh
+                    mutedIcon: PhosphorIcons.speakerSlash
                     onMoved: value => AudioService.setGroupVolume(modelData, value)
                     onMuteToggled: AudioService.setGroupMuted(modelData, !AudioService.getGroupMuted(modelData))
                 }

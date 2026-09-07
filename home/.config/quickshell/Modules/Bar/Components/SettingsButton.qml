@@ -1,34 +1,12 @@
 import QtQuick
 import Quickshell
+import qs.Components
 import qs.Constants
 import qs.Services
 
-Item {
-    id: root
-
-    implicitWidth: settingsIcon.implicitWidth
-    implicitHeight: Theme.topBarHeight
-
-    Text {
-        id: settingsIcon
-        anchors.centerIn: parent
-        text: PhosphorIcons.gear
-        color: Visibilities.settingsPanel ? Colors.on_surface : (hoverHandler.hovered ? Colors.on_surface : Colors.on_surface_variant)
-        font.pixelSize: Fonts.p
-        font.family: Fonts.phosphorFont
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.animations.fast
-            }
-        }
-    }
-
-    HoverHandler {
-        id: hoverHandler
-        cursorShape: Qt.PointingHandCursor
-    }
-
-    TapHandler {
-        onTapped: Visibilities.toggleSettings()
-    }
+IconButton {
+    glyph: PhosphorIcons.gear
+    active: Visibilities.settingsPanel
+    activeColor: Theme.text.primary
+    onTapped: Visibilities.toggleSettings()
 }

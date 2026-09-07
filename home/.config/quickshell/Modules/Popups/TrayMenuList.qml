@@ -14,8 +14,6 @@ Item {
 
     implicitHeight: rootLoader.item ? rootLoader.item.implicitHeight : 0
 
-    // An anonymous component can recursively load itself without making the
-    // TrayMenuList type statically recursive.
     Component {
         id: menuBranchComponent
 
@@ -37,7 +35,7 @@ Item {
             Column {
                 id: branchColumn
                 width: parent.width
-                spacing: 2
+                spacing: Theme.space.xxs
 
                 Repeater {
                     model: menuOpener.children.values
@@ -50,7 +48,7 @@ Item {
                         property bool submenuLoaded: false
 
                         width: branchColumn.width
-                        spacing: 2
+                        spacing: Theme.space.xxs
 
                         onExpandedChanged: {
                             if (expanded)
@@ -65,8 +63,7 @@ Item {
                             onToggleRequested: entryColumn.expanded = !entryColumn.expanded
                             onTriggerRequested: {
                                 entryColumn.modelData.triggered();
-                                // A Quit entry can remove its DBus service immediately;
-                                // release every opener in the same event-loop turn.
+
                                 branch.closeRequested();
                             }
                         }
@@ -80,8 +77,8 @@ Item {
 
                             Behavior on height {
                                 NumberAnimation {
-                                    duration: Theme.animations.fast
-                                    easing.type: Easing.OutCubic
+                                    duration: Theme.motion.fast
+                                    easing.type: Theme.motion.easeStandard
                                 }
                             }
 

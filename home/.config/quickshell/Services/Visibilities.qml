@@ -11,15 +11,13 @@ Singleton {
     property bool soundPanel: false
     property bool bluetoothPanel: false
     property bool notificationCenter: false
-    // Keybound: reveal the bar over fullscreen when the hover strip is unreachable.
+
     property bool barPinned: false
-    // Mirrors the bar's reveal so the island overlay slides in sync.
+
     property bool barRevealed: true
 
-    // Tray menus are one popup per item, so they listen for this.
     signal closeTrayMenus
 
-    // Any bar action closes whatever popup is open.
     function closePopups() {
         musicPanel = false;
         settingsPanel = false;
@@ -56,7 +54,7 @@ Singleton {
     function toggleNotificationCenter() {
         notificationCenter ? (notificationCenter = false) : openNotificationCenter();
     }
-    // Idempotent: re-opening resets the island's calendar.
+
     function openMusicPanel() {
         if (musicPanel)
             return;

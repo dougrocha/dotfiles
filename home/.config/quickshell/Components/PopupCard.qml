@@ -5,7 +5,7 @@ Rectangle {
     id: card
 
     required property bool shown
-    property int padding: Theme.popup.margin
+    property int padding: Theme.space.lg
     default property alias content: col.data
 
     signal dismissed
@@ -13,14 +13,14 @@ Rectangle {
     property real reveal: shown ? 1 : 0
     Behavior on reveal {
         NumberAnimation {
-            duration: card.shown ? 160 : 120
-            easing.type: card.shown ? Easing.OutCubic : Easing.InCubic
+            duration: card.shown ? Theme.motion.normal : Theme.motion.fast
+            easing.type: card.shown ? Theme.motion.easeStandard : Theme.motion.easeExit
         }
     }
 
     height: col.implicitHeight + padding * 2
-    radius: Theme.popup.radius
-    color: Colors.surface_container
+    radius: Theme.radius.xl
+    color: Theme.colors.surface
     opacity: reveal
     clip: true
     transform: Translate {
@@ -29,8 +29,8 @@ Rectangle {
 
     Behavior on height {
         NumberAnimation {
-            duration: Theme.animations.normal
-            easing.type: Easing.OutCubic
+            duration: Theme.motion.normal
+            easing.type: Theme.motion.easeStandard
         }
     }
 
@@ -48,6 +48,6 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: card.padding
-        spacing: Theme.popup.spacing
+        spacing: Theme.space.md
     }
 }

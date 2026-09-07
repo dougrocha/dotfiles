@@ -28,6 +28,11 @@ Singleton {
     readonly property string bellSlash: String.fromCodePoint(0xE0D4)
 
     readonly property string musicNoteSimple: String.fromCodePoint(0xE33E)
+    readonly property string play: String.fromCodePoint(0xE3D0)
+    readonly property string pause: String.fromCodePoint(0xE39E)
+    readonly property string skipForward: String.fromCodePoint(0xE5A6)
+    readonly property string skipBack: String.fromCodePoint(0xE5A4)
+    readonly property string broom: String.fromCodePoint(0xEC54)
 
     readonly property string camera: String.fromCodePoint(0xE10E)
     readonly property string image: String.fromCodePoint(0xE2CA)

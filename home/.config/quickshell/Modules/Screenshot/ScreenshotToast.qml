@@ -46,8 +46,8 @@ Variants {
             right: true
         }
 
-        implicitWidth: toastWindow.cardWidth + toastWindow.framePadding * 2 + Theme.notifications.margin * 2
-        implicitHeight: toastWindow.cardHeight + toastWindow.framePadding * 2 + Theme.notifications.margin * 2
+        implicitWidth: toastWindow.cardWidth + toastWindow.framePadding * 2 + Theme.space.lg * 2
+        implicitHeight: toastWindow.cardHeight + toastWindow.framePadding * 2 + Theme.space.lg * 2
 
         visible: toastWindow.shown
 
@@ -64,28 +64,28 @@ Variants {
 
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: Theme.notifications.margin
+            anchors.margins: Theme.space.lg
 
             width: toastWindow.cardWidth + toastWindow.framePadding * 2
             height: toastWindow.cardHeight + toastWindow.framePadding * 2
-            radius: 16
-            color: Colors.surface_container
+            radius: Theme.radius.xl
+            color: Theme.colors.surface
             border.width: 1
-            border.color: Colors.on_surface
+            border.color: Theme.stroke.strong
 
             opacity: toastWindow.shown ? 1 : 0
             scale: toastWindow.shown ? 1 : 0.92
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: Theme.animations.normal
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.normal
+                    easing.type: Theme.motion.easeStandard
                 }
             }
             Behavior on scale {
                 NumberAnimation {
-                    duration: Theme.animations.normal
-                    easing.type: Easing.OutCubic
+                    duration: Theme.motion.normal
+                    easing.type: Theme.motion.easeStandard
                 }
             }
 

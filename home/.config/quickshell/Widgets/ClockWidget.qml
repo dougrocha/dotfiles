@@ -6,7 +6,6 @@ Text {
     property string format: "h:mmAP"
     property int updateInterval: 1000
 
-    // Drive via `now` so the format binding survives the tick.
     property var now: new Date()
 
     text: Qt.formatDateTime(clockWidget.now, clockWidget.format)

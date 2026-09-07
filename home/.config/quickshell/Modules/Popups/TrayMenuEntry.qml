@@ -21,16 +21,16 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
         height: 1
-        color: Colors.on_surface_variant
+        color: Theme.text.secondary
     }
 
     Rectangle {
         visible: root.valid && !root.entry.isSeparator
         anchors.fill: parent
-        radius: 4
-        color: root.valid && (rowMouseArea.containsMouse || root.activeFocus) && root.entry.enabled ? Colors.surface_container : "transparent"
+        radius: Theme.radius.sm
+        color: root.valid && (rowMouseArea.containsMouse || root.activeFocus) && root.entry.enabled ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
         border.width: root.activeFocus ? 1 : 0
-        border.color: Colors.outline
+        border.color: Theme.stroke.accent
 
         RowLayout {
             anchors {
@@ -38,31 +38,31 @@ Item {
                 leftMargin: 8 + root.indentLevel * 12
                 rightMargin: 8
             }
-            spacing: 6
+            spacing: Theme.space.sm
 
             Text {
                 visible: root.valid && root.entry.checkState === Qt.Checked
-                text: Icons.check
-                color: Colors.primary
-                font.pixelSize: Fonts.p
-                font.family: Fonts.iconFont
+                text: PhosphorIcons.check
+                color: Theme.accent
+                font.pixelSize: Theme.type.body.size
+                font.family: Theme.font.icon
             }
 
             Text {
                 Layout.fillWidth: true
                 text: root.valid ? root.entry.text : ""
-                color: root.valid && root.entry.enabled ? Colors.on_surface : Colors.on_surface_variant
-                font.pixelSize: Fonts.p
-                font.family: Fonts.font
+                color: root.valid && root.entry.enabled ? Theme.text.primary : Theme.text.secondary
+                font.pixelSize: Theme.type.body.size
+                font.family: Theme.font.ui
                 elide: Text.ElideRight
             }
 
             Text {
                 visible: root.valid && root.entry.hasChildren
-                text: Icons.chevronRight
-                color: root.expanded ? Colors.on_surface : Colors.on_surface_variant
-                font.pixelSize: Fonts.p
-                font.family: Fonts.iconFont
+                text: PhosphorIcons.caretRight
+                color: root.expanded ? Theme.text.primary : Theme.text.secondary
+                font.pixelSize: Theme.type.body.size
+                font.family: Theme.font.icon
 
                 transform: Rotation {
                     origin.x: 4
@@ -71,8 +71,8 @@ Item {
 
                     Behavior on angle {
                         NumberAnimation {
-                            duration: Theme.animations.fast
-                            easing.type: Easing.OutCubic
+                            duration: Theme.motion.fast
+                            easing.type: Theme.motion.easeStandard
                         }
                     }
                 }

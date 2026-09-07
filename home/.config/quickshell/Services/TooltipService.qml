@@ -26,7 +26,6 @@ Singleton {
         }
     }
 
-    // Auto-hide when the owning widget disappears mid-hover
     Connections {
         target: root.tooltipOwner
         ignoreUnknownSignals: true
