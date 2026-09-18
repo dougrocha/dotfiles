@@ -1,27 +1,10 @@
 #!/bin/bash
+# Setup for every machine. Linux-only steps are skipped on macOS.
 
 set -euo pipefail
 
 export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-export BUILD_DIR="${BUILD_DIR:-$HOME/builds}"
-
-# Authenticate once and keep the sudo timestamp valid for the entire setup.
-sudo -v
-(
-    while true; do
-        sudo -n true
-        sleep 50
-    done
-) &
-SUDO_KEEPALIVE_PID=$!
-trap 'kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true' EXIT
-
-# Write env to ~/.config/env so the interactive shell picks it up
-mkdir -p "$HOME/.config"
-cat > "$HOME/.config/env" <<EOF
-export DOTFILES_DIR="$DOTFILES_DIR"
-export BUILD_DIR="$BUILD_DIR"
-EOF
+source "$DOTFILES_DIR/install/lib.sh"
 
 ansi_art='
  ______   _______           _______
@@ -34,18 +17,72 @@ ansi_art='
 (______/ (_______)(_______)(_______)
                                     '
 clear
-echo -e "\n$ansi_art\n"
+echo -e "\n$ansi_art"
+info "platform: $PLATFORM_OS/$PLATFORM_ARCH  gpu: $PLATFORM_GPU"
 
-mkdir -p "$BUILD_DIR"
+keep_sudo_alive || warn "no sudo; steps that need root will fail"
 
-source "$DOTFILES_DIR/install/platform"
+mkdir -p "$BUILD_DIR" "$HOME/.local/bin" "$HOME/.config"
 
-"$DOTFILES_DIR/install/deploy"
+# Sourced by config.fish.
+cat >"$HOME/.config/env" <<EOF
+export DOTFILES_DIR="$DOTFILES_DIR"
+export BUILD_DIR="$BUILD_DIR"
+EOF
 
-"$DOTFILES_DIR/install/base.sh"
+step "Packages"
+if is_linux; then
+    "$DOTFILES_DIR/install/tools/rust.sh"
+    "$DOTFILES_DIR/install/tools/paru.sh"
+    mapfile -t packages < <(read_package_list "$DOTFILES_DIR/install/packages.arch")
+    paru -S --noconfirm --needed "${packages[@]}"
+else
+    source "$DOTFILES_DIR/install/tools/brew.sh"
+    brew bundle --file="$DOTFILES_DIR/install/Brewfile"
+fi
 
-"$DOTFILES_DIR/install/post-deploy"
+# The linker is written in Odin.
+step "Toolchains"
+"$DOTFILES_DIR/install/tools/odin.sh"
 
-echo -e "Setup complete! Please reboot to start Hyprland."
+step "Dotfiles"
+"$DOTFILES_DIR/link" --prune --force
+
+# mise install needs the linked config.toml.
+step "Tools"
+"$DOTFILES_DIR/install/tools/neovim.sh"
+"$DOTFILES_DIR/install/tools/tmux.sh"
+"$DOTFILES_DIR/install/tools/opencode.sh"
+"$DOTFILES_DIR/install/tools/mise.sh"
+mise install
+
+if is_linux; then
+    step "System"
+    "$DOTFILES_DIR/install/system/sddm.sh"
+    "$DOTFILES_DIR/install/system/snapper.sh"
+    if [[ $PLATFORM_GPU == nvidia ]]; then
+        "$DOTFILES_DIR/install/system/nvidia.sh"
+    fi
+
+    step "Desktop"
+    "$DOTFILES_DIR/install/post/fonts"
+    "$DOTFILES_DIR/install/post/desktop-prefs"
+    "$DOTFILES_DIR/install/post/nautilus-python"
+    "$DOTFILES_DIR/install/post/setup-applications"
+    "$DOTFILES_DIR/install/post/defaults"
+    "$DOTFILES_DIR/install/post/fast-shutdown"
+
+    step "Services"
+    for service in hyprpaper hyprpolkitagent hypridle hyprsunset; do
+        systemctl --user enable --now "$service.service"
+    done
+fi
+
+step "Done"
+if is_linux; then
+    info "Reboot to start Hyprland."
+else
+    info "Open a new shell to pick up the new environment."
+fi
 
 # vim: ft=sh

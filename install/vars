@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -euo pipefail
-
-BUILD_DIR="${BUILD_DIR:-$HOME/builds}"
-
-export BUILD_DIR
-
-# vim: ft=sh

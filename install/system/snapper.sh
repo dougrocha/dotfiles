@@ -5,7 +5,7 @@ set -euo pipefail
 echo "Configuring snapper retention limits..."
 
 for cfg in home root; do
-    if snapper -c "$cfg" get-config &> /dev/null; then
+    if sudo snapper -c "$cfg" get-config &> /dev/null; then
         sudo snapper -c "$cfg" set-config \
             "TIMELINE_LIMIT_HOURLY=5" \
             "TIMELINE_LIMIT_DAILY=3" \

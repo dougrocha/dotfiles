@@ -15,16 +15,21 @@ if (( $# < 1 )); then
     exit 1
   fi
 
-  # Extract app names from desktop files that are webapps (use launch-webapp)
+  # Extract app names from current and legacy web app launchers.
   APP_OPTIONS=()
   for file in "$DESKTOP_DIR"/*.desktop; do
     [[ -f "$file" ]] || continue
-    if grep -q "^Exec=launch-webapp" "$file"; then
+    if grep -Eq '^Exec=(launch-or-focus-webapp|launch-webapp)([[:space:]]|$)' "$file"; then
       basename="${file##*/}"
       app_name="${basename%.desktop}"
       APP_OPTIONS+=("$app_name")
     fi
   done
+
+  if [[ ${#APP_OPTIONS[@]} -eq 0 ]]; then
+    echo "No web apps found."
+    exit 1
+  fi
 
   readarray -t SELECTED_APPS < <(printf '%s\n' "${APP_OPTIONS[@]}" | gum choose --no-limit --header "Select apps to remove (space to select, enter to confirm)")
   

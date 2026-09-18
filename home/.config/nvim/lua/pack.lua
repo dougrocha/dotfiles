@@ -12,21 +12,6 @@ local M = {}
 ---@field event? string|string[] Defer loading until this autocmd event fires (once)
 ---@field pattern? string|string[] Autocmd pattern passed alongside event (e.g. filetypes)
 
----@param name string
----@return string
-local function plugin_path(name)
-    return vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt', name)
-end
-
----@param path string
----@return string? commit
-local function plugin_commit(path)
-    if vim.fn.isdirectory(path) == 0 then return nil end
-    local result = vim.system({ 'git', 'rev-parse', 'HEAD' }, { cwd = path }):wait()
-    if result.code ~= 0 or not result.stdout then return nil end
-    return vim.trim(result.stdout)
-end
-
 ---@param path string
 ---@param on_update string|fun()
 local function run_on_update(path, on_update)
@@ -36,6 +21,28 @@ local function run_on_update(path, on_update)
         vim.schedule(on_update)
     end
 end
+
+local update_hooks = {}
+local pending_changes = {}
+local function handle_change(data)
+    if data.kind ~= 'install' and data.kind ~= 'update' then return end
+    local name = data.spec.name
+    local hook = update_hooks[name]
+    if not hook then
+        pending_changes[name] = data
+        return
+    end
+    pending_changes[name] = nil
+    vim.opt.runtimepath:append(data.path)
+    run_on_update(data.path, hook)
+end
+
+vim.api.nvim_create_autocmd('PackChanged', {
+    group = vim.api.nvim_create_augroup('DotfilesPackHooks', { clear = true }),
+    callback = function(ev)
+        handle_change(ev.data)
+    end,
+})
 
 ---@param plugins PluginSpec[]
 local function configure(plugins)
@@ -54,22 +61,7 @@ local function configure(plugins)
         if p.dir then vim.opt.runtimepath:prepend(vim.fn.expand(p.dir)) end
     end
 
-    local pending_updates = {}
-    for _, p in ipairs(plugins) do
-        if p.on_update then
-            local path = plugin_path(p[1]:match('[^/]+$'))
-            table.insert(pending_updates, { p = p, path = path, before = plugin_commit(path) })
-        end
-    end
-
     if #sources > 0 then vim.pack.add(sources) end
-
-    for _, entry in ipairs(pending_updates) do
-        local after = plugin_commit(entry.path)
-        if after and after ~= entry.before then
-            run_on_update(entry.path, entry.p.on_update)
-        end
-    end
 
     for _, p in ipairs(plugins) do
         if p.setup ~= false then
@@ -98,6 +90,13 @@ end
 
 ---@param plugins PluginSpec[]
 function M.add(plugins)
+    for _, p in ipairs(plugins) do
+        if p.on_update and not p.dir then
+            local name = p[1]:match('[^/]+$')
+            update_hooks[name] = p.on_update
+            if pending_changes[name] then handle_change(pending_changes[name]) end
+        end
+    end
     local event = plugins[1] and plugins[1].event
     local pattern = plugins[1] and plugins[1].pattern
     if event or pattern then

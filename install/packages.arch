@@ -8,6 +8,7 @@ limine
 limine-mkinitcpio-hook
 
 # System Utilities
+snapper
 xdg-desktop-portal-gtk
 
 uwsm
@@ -54,8 +55,8 @@ nautilus-python
 # Build Tools
 base-devel
 cmake
+llvm
 ninja
-odin
 
 # Terminal Stuff
 bat
@@ -75,8 +76,6 @@ gum
 imagemagick
 lazygit
 matugen-bin
-mise
-opencode-bin
 ripgrep
 starship
 tmux

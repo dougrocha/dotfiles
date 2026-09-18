@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -euo pipefail
+
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$DOTFILES_DIR/install/lib.sh"
+
+TOOLS="$DOTFILES_DIR/install/tools"
+
+is_excluded() {
+    case $1 in
+        brew) ! is_darwin ;;
+        paru) ! is_linux ;;
+        *) return 1 ;;
+    esac
+}
+
+targets() {
+    local path name
+    for path in "$TOOLS"/*.sh; do
+        name=$(basename "$path" .sh)
+        is_excluded "$name" || echo "$name"
+    done
+}
+
+usage() {
+    echo "usage: update [-f|--force] [tool...]"
+    echo
+    echo "with no arguments, updates every tool below"
+    echo "builds are skipped when the checked-out commit is already built"
+    echo
+    targets | sed 's/^/  /'
+}
+
+export FORCE=0
+
+while (($#)); do
+    case $1 in
+        -h | --help | -l | --list)
+            usage
+            exit 0
+            ;;
+        -f | --force)
+            FORCE=1
+            shift
+            ;;
+        -*)
+            echo "update: unknown option '$1'" >&2
+            exit 2
+            ;;
+        *) break ;;
+    esac
+done
+
+if (($# == 0)); then
+    wanted=($(targets))
+else
+    wanted=("$@")
+fi
+
+for name in "${wanted[@]}"; do
+    if is_excluded "$name" || [[ ! -x "$TOOLS/$name.sh" ]]; then
+        echo "update: unknown tool '$name'" >&2
+        echo >&2
+        usage >&2
+        exit 2
+    fi
+done
+
+failed=()
+for name in "${wanted[@]}"; do
+    step "$name"
+    if ! "$TOOLS/$name.sh"; then
+        warn "$name failed"
+        failed+=("$name")
+    fi
+done
+
+if ((${#failed[@]})); then
+    warn "failed: ${failed[*]}"
+    exit 1
+fi
+
+step "Done"
+
+# vim: ft=sh

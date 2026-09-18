@@ -7,12 +7,8 @@ set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx XDG_DATA_HOME "$HOME/.local/share"
 set -gx XDG_STATE_HOME "$HOME/.local/state"
 
-if test -f "$HOME/.cargo/env.fish"
-    source "$HOME/.cargo/env.fish"
-end
-
-fish_add_path "$HOME/.local/bin"
-fish_add_path "$HOME/.opencode/bin"
+fish_add_path -P "$HOME/.local/bin"
+fish_add_path -P "$HOME/.opencode/bin"
 
 set -gx EDITOR nvim
 set -gx GIT_EDITOR nvim
@@ -21,12 +17,6 @@ set -gx MANPAGER "nvim +Man!"
 set -gx PAGER bat
 
 set -gx SECOND_BRAIN "$HOME/second-brain"
-
-if status is-interactive
-    mise activate fish | source
-else
-    mise activate fish --shims | source
-end
 
 if status is-interactive
     set -g fish_greeting
@@ -42,4 +32,10 @@ if status is-interactive
     zoxide init fish | source
 
     alias cd z
+end
+
+if status is-interactive
+    mise activate fish | source
+else
+    mise activate fish --shims | source
 end

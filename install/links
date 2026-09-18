@@ -1,0 +1,48 @@
+# What gets symlinked into $HOME, and on which machines.
+#
+# Allow list: a config in home/ stays inert until it is listed here.
+# [all] stacks with the current platform's section.
+# An entry links as-is; a trailing /* links each child instead.
+#
+#   link       deploy           link -n   dry run
+#   link -P    deploy + prune   link -h   options
+
+[all]
+.bashrc
+.gitconfig
+
+.config/fish
+.config/lazygit
+.config/mise
+.config/nvim
+.config/starship.toml
+.config/tmux
+.config/wezterm
+
+# config pulls in whichever platform file exists (config-file = ?config-macos).
+# Listed separately so ~/.config/ghostty stays real and only one lands.
+.config/ghostty/config
+
+[darwin]
+.config/aerospace
+.config/ghostty/config-macos
+
+[linux]
+.config/chromium-flags.conf
+.config/elephant
+.config/ghostty/config-linux
+.config/gtk-3.0
+.config/gtk-4.0
+.config/hypr
+.config/hyprland-preview-share-picker
+.config/matugen
+.config/quickshell
+.config/user-dirs.dirs
+.config/uwsm
+.config/walker
+
+# All of these drive the Hyprland desktop. ~/.local/bin stays a real directory
+# because mise and cargo install binaries next to them.
+.local/bin/*
+
+# vim: set ft=conf:

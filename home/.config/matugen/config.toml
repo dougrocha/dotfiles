@@ -5,17 +5,17 @@ mode = "dark"
 
 [templates.hyprland-colors]
 input_path = "~/.config/matugen/templates/hyprland-colors.conf"
-output_path = "~/dev/dotfiles/home/.config/hypr/colors.conf"
+output_path = "~/.config/hypr/colors.conf"
 post_hook = "hyprctl reload"
 
 [templates.hyprland-colors-lua]
 input_path = "~/.config/matugen/templates/hyprland-colors.lua"
-output_path = "~/dev/dotfiles/home/.config/hypr/colors.lua"
+output_path = "~/.config/hypr/colors.lua"
 
 [templates.quickshell-palette]
 input_path = "~/.config/matugen/templates/quickshell-palette.json"
-output_path = "~/dev/dotfiles/home/.config/quickshell/palette.json"
+output_path = "~/.config/quickshell/palette.json"
 
 [templates.walker]
 input_path = "~/.config/matugen/templates/walker.css"
-output_path = "~/dev/dotfiles/home/.config/walker/themes/default/colors.css"
+output_path = "~/.config/walker/themes/default/colors.css"

@@ -1,0 +1,16 @@
+#!/bin/bash
+# Deploy the dotfiles listed in install/links. See ./link --help.
+
+set -euo pipefail
+
+export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if ! command -v odin >/dev/null 2>&1; then
+    echo "link: needs the odin compiler -- run ./install/tools/odin.sh" >&2
+    exit 1
+fi
+
+# Compiles in about half a second and leaves no binary behind.
+exec odin run "$DOTFILES_DIR/install/linker" -- "$@"
+
+# vim: ft=sh

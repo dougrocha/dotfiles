@@ -122,8 +122,6 @@ set_default cider.desktop \
     x-scheme-handler/itmss \
     x-scheme-handler/music \
     x-scheme-handler/itunes
-set_default claude-code-url-handler.desktop x-scheme-handler/claude-cli
-set_default com.anthropic.Claude.desktop x-scheme-handler/claude
 
 if [ ${#missing[@]} -gt 0 ]; then
     echo "  ! skipped (desktop entry not installed): ${missing[*]}"

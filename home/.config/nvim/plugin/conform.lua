@@ -31,7 +31,6 @@ add {
                 markdown = { 'prettier' },
                 objc = { lsp_format = 'prefer' },
                 objcpp = { lsp_format = 'prefer' },
-                python = { 'ruff_format' },
                 rust = { lsp_format = 'prefer' },
                 toml = { 'taplo' },
                 typescript = { 'prettier', lsp_format = 'fallback' },
