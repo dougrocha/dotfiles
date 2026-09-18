@@ -36,13 +36,21 @@ Popup {
 
         width: parent.width
         height: 34
-        radius: Theme.radius.md
+        radius: Theme.radius.sm
+        color: "transparent"
 
-        color: entry.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        Rectangle {
+            z: -1
+            anchors.fill: parent
+            anchors.leftMargin: -panel.rowBleed
+            anchors.rightMargin: -panel.rowBleed
+            radius: parent.radius
+            color: entry.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
             }
         }
 
@@ -57,11 +65,10 @@ Popup {
         Text {
             id: entryIcon
             anchors.left: parent.left
-            anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             text: entry.row.icon
             color: entry.row.connected ? Theme.accent : Theme.text.secondary
-            font.pixelSize: Theme.icon.xs
+            font.pixelSize: Theme.icon.sm
             font.family: Theme.font.icon
 
             Behavior on color {
@@ -73,9 +80,9 @@ Popup {
 
         Column {
             anchors.left: entryIcon.right
-            anchors.leftMargin: 8
+            anchors.leftMargin: 10
             anchors.right: forgetButton.left
-            anchors.rightMargin: 6
+            anchors.rightMargin: Theme.space.sm
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.space.xxs
 
@@ -104,7 +111,6 @@ Popup {
             id: forgetButton
             visible: entry.row.known && entry.hovered
             anchors.right: parent.right
-            anchors.rightMargin: Theme.space.xs
             anchors.verticalCenter: parent.verticalCenter
             size: 22
             circular: true
@@ -118,25 +124,12 @@ Popup {
         width: parent.width
         spacing: Theme.space.sm
 
-        Item {
-            width: parent.width
-            height: 24
-
-            Text {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Bluetooth"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.display.size
-                font.weight: Theme.type.display.weight
-                font.family: Theme.font.ui
-            }
-        }
-
         ToggleRow {
             width: parent.width
+            style: "switch"
+            bleed: panel.rowBleed
             glyph: BluetoothService.hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (active ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
-            label: BluetoothService.statusText.replace(/^Bluetooth\s+/, "")
+            label: "Bluetooth"
             active: BluetoothService.bluetoothEnabled
             onToggled: BluetoothService.togglePower()
         }
@@ -151,12 +144,8 @@ Popup {
                 height: 4
             }
 
-            Text {
-                text: "Connected"
-                color: Theme.text.secondary
-                font.pixelSize: Theme.type.caption.size
-                font.weight: Font.Medium
-                font.family: Theme.font.ui
+            SectionLabel {
+                text: "CONNECTED"
             }
 
             Column {
@@ -192,16 +181,14 @@ Popup {
                 visible: BluetoothService.connectedRows.length === 0
             }
 
-            Text {
-                text: "Paired"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.body.size
-                font.weight: Font.Medium
-                font.family: Theme.font.ui
+            SectionLabel {
+                text: "PAIRED"
             }
 
             Flickable {
-                width: parent.width
+                id: pairedScroll
+                x: -panel.rowBleed
+                width: parent.width + panel.rowBleed * 2
                 height: Math.min(pairedColumn.implicitHeight, 240)
                 contentHeight: pairedColumn.implicitHeight
                 clip: true
@@ -210,7 +197,8 @@ Popup {
 
                 Column {
                     id: pairedColumn
-                    width: parent.width
+                    x: panel.rowBleed
+                    width: pairedScroll.width - panel.rowBleed * 2
                     spacing: Theme.space.xxs
 
                     Repeater {
@@ -244,9 +232,11 @@ Popup {
             wrapMode: Text.WordWrap
         }
 
+        Divider {}
+
         PopupActionButton {
             label: "Bluetui"
-            leftAlign: true
+            bleed: panel.rowBleed
             onTapped: {
                 Visibilities.bluetoothPanel = false;
                 bluetoothSettingsProc.running = true;

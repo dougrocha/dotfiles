@@ -37,7 +37,7 @@ Variants {
             right: true
         }
 
-        implicitWidth: 380 + 10
+        implicitWidth: 384
 
         implicitHeight: Math.max(1, modelData.height - Theme.topBarHeight)
 
@@ -77,8 +77,8 @@ Variants {
             anchors.right: parent.right
             anchors.topMargin: Theme.space.lg
             anchors.rightMargin: Theme.space.lg
-            width: 360 + 10
-            spacing: Theme.space.md
+            width: 372
+            spacing: Theme.space.sm
 
             HoverHandler {
                 onHoveredChanged: {
@@ -110,8 +110,10 @@ Variants {
 
                     property bool leaving: false
 
+                    readonly property int badgeInset: Theme.space.lg
+
                     width: cardColumn.width
-                    height: leaving ? 0 : card.height
+                    height: leaving ? 0 : card.height + badgeInset
                     clip: true
                     opacity: leaving ? 0 : 1
 
@@ -164,7 +166,9 @@ Variants {
 
                     NotificationCard {
                         id: card
-                        width: delegateWrapper.width
+                        x: delegateWrapper.badgeInset
+                        y: delegateWrapper.badgeInset
+                        width: delegateWrapper.width - delegateWrapper.badgeInset
                         modelData: delegateWrapper.modelData
                     }
                 }

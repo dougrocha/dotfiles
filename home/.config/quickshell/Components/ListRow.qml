@@ -7,61 +7,58 @@ Rectangle {
     property string label: ""
     property string glyph: ""
     property bool active: false
+    property int bleed: 0
     default property alias trailing: trailingSlot.data
 
     signal tapped
 
     width: parent ? parent.width : implicitWidth
-    height: 34
-    radius: Theme.radius.md
-    color: root.active ? Theme.fill.selected : rowHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+    height: 30
+    radius: Theme.radius.sm
+    color: "transparent"
 
-    Behavior on color {
-        ColorAnimation {
-            duration: Theme.motion.instant
-        }
-    }
+    readonly property color fillColor: root.active ? Theme.fill.selected : rowHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
     Rectangle {
-        id: badge
-        visible: root.glyph !== ""
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: Theme.space.md
-        width: 22
-        height: 22
-        radius: width / 2
-        color: root.active ? Theme.fill.selectedSolid : Theme.withAlpha(Theme.fill.selectedSolid, 0)
+        z: -1
+        anchors.fill: parent
+        anchors.leftMargin: -root.bleed
+        anchors.rightMargin: -root.bleed
+        radius: root.radius
+        color: root.fillColor
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.motion.instant
+                duration: Theme.motion.fast
             }
         }
+    }
 
-        Text {
-            anchors.centerIn: parent
-            text: root.glyph
-            color: root.active ? Theme.accentText : Theme.text.secondary
-            font.pixelSize: Theme.icon.xxs
-            font.family: Theme.font.icon
+    Text {
+        id: rowIcon
+        visible: root.glyph !== ""
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text: root.glyph
+        color: root.active ? Theme.accent : Theme.text.secondary
+        font.pixelSize: Theme.icon.sm
+        font.family: Theme.font.icon
 
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.instant
-                }
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.motion.fast
             }
         }
     }
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: badge.visible ? badge.right : parent.left
-        anchors.leftMargin: badge.visible ? Theme.space.md : Theme.space.lg
+        anchors.left: rowIcon.visible ? rowIcon.right : parent.left
+        anchors.leftMargin: rowIcon.visible ? 10 : 0
         anchors.right: trailingSlot.left
         anchors.rightMargin: Theme.space.md
         text: root.label
-        color: root.active ? Theme.text.primary : Theme.text.secondary
+        color: Theme.text.primary
         font.pixelSize: Theme.type.body.size
         font.family: Theme.font.ui
         elide: Text.ElideRight
@@ -71,7 +68,6 @@ Rectangle {
         id: trailingSlot
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: Theme.space.md
         spacing: Theme.space.xs
     }
 

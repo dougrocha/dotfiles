@@ -1,0 +1,25 @@
+{
+  "providers": {
+    "ollama": {
+      "baseUrl": "http://localhost:11434/v1",
+      "api": "openai-completions",
+      "apiKey": "ollama",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false
+      },
+      "models": [
+        {
+          "id": "gpt-oss:20b",
+          "reasoning": true,
+          "contextWindow": 131072
+        },
+        {
+          "id": "qwen3:8b",
+          "reasoning": true,
+          "contextWindow": 40960
+        }
+      ]
+    }
+  }
+}

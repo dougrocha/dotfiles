@@ -31,6 +31,8 @@ Singleton {
 
     readonly property var sinks: nodes.sinks
     readonly property var sources: nodes.sources
+    readonly property var visibleSinks: nodes.sinks.filter(node => !isHidden(node))
+    readonly property var visibleSources: nodes.sources.filter(node => !isHidden(node))
     readonly property var streams: nodes.streams
     readonly property var captures: nodes.captures
 
@@ -87,6 +89,17 @@ Singleton {
         }
     }
 
+    function isHidden(node) {
+        if (!node || !node.name)
+            return false;
+        if (sink && node.id === sink.id)
+            return false;
+        if (source && node.id === source.id)
+            return false;
+        const hidden = node.isSink ? SettingsService.hiddenAudioOutputs : SettingsService.hiddenAudioInputs;
+        return !!hidden && hidden.indexOf(node.name) !== -1;
+    }
+
     function setAudioSink(newSink) {
         Pipewire.preferredDefaultAudioSink = newSink;
     }
@@ -120,6 +133,10 @@ Singleton {
         if (!node)
             return "Unknown";
         var desc = (node.description || node.nickname || node.name || "Unknown").trim();
+
+        var bracket = desc.match(/\[([^\]]+)\]\s*$/);
+        if (bracket)
+            return bracket[1].trim();
 
         var paren = desc.match(/\(([^)]+)\)\s*$/);
         if (paren && !/gen\.?$/i.test(paren[1])) {

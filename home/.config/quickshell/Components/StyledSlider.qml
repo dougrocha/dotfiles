@@ -55,9 +55,9 @@ Slider {
     handle: Rectangle {
         x: slider.leftPadding + slider.visualPosition * (slider.availableWidth - width)
         y: slider.topPadding + slider.availableHeight / 2 - height / 2
-        implicitWidth: slider.handleSize
+        implicitWidth: slider.handleSize * 1.5
         implicitHeight: slider.handleSize
-        radius: width / 2
+        radius: height / 2
         color: slider.handleColor
     }
 }

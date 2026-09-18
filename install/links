@@ -11,6 +11,12 @@
 .bashrc
 .gitconfig
 
+.pi/agent/AGENTS.md
+.pi/agent/models.json
+.pi/agent/settings.json
+.pi/agent/extensions
+.pi/agent/prompts
+
 .config/fish
 .config/lazygit
 .config/mise

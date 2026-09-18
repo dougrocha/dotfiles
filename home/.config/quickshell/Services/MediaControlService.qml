@@ -1,9 +1,26 @@
 pragma Singleton
 import QtQml
 import Quickshell
+import Quickshell.Io
 
 Singleton {
     id: root
+
+    IpcHandler {
+        target: "music-control"
+
+        function next(): void {
+            root.next();
+        }
+
+        function previous(): void {
+            root.previous();
+        }
+
+        function playpause(): void {
+            root.playpause();
+        }
+    }
 
     function next() {
         MprisService.musicPlayer?.next();

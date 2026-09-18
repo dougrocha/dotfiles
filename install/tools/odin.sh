@@ -59,8 +59,23 @@ build_and_install() {
     mark_built "$name" "$commit"
 }
 
+build_stb() {
+    local odin_root
+    odin_root="$(odin root)"
+
+    # Odin ships prebuilt STB for Windows/macOS/wasm only; the Linux .a files must
+    # be compiled locally, and a pacman upgrade of `odin` wipes them every time.
+    if [[ -f "$odin_root/vendor/stb/lib/stb_image.a" ]]; then
+        return
+    fi
+
+    sudo "$odin_root/vendor/stb/src/build_stb.sh"
+}
+
+build_stb
+
 build_and_install ols https://github.com/DanielGavin/ols.git master \
-    "./build.sh && ./odinfmt.sh" ols odinfmt
+    "./build.sh" ols
 
 build_and_install odin-tags https://github.com/GoNZooo/odin-tags.git main \
     "odin build tags -o:speed -out:bin/odin-tags" bin/odin-tags

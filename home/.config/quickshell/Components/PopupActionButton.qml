@@ -2,40 +2,63 @@ import QtQuick
 import qs.Constants
 
 Rectangle {
+    id: root
+
     property string label: ""
-    property bool leftAlign: false
+    property string glyph: PhosphorIcons.terminal
+    property int bleed: 0
 
     signal tapped
 
-    width: parent.width
-    height: 28
-    radius: Theme.radius.md
-    color: buttonHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-    border.width: 1
-    border.color: Theme.stroke.hairline
+    readonly property bool highlighted: buttonHover.hovered || activeFocus
 
-    Behavior on color {
-        ColorAnimation {
-            duration: Theme.motion.instant
+    activeFocusOnTab: true
+    width: parent.width
+    height: 30
+    radius: Theme.radius.sm
+    color: "transparent"
+
+    Rectangle {
+        z: -1
+        anchors.fill: parent
+        anchors.leftMargin: -root.bleed
+        anchors.rightMargin: -root.bleed
+        radius: parent.radius
+        color: root.highlighted ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.motion.fast
+            }
         }
     }
 
     Text {
-        anchors.left: parent.leftAlign ? parent.left : undefined
-        anchors.leftMargin: parent.leftAlign ? Theme.space.lg : 0
+        id: actionIcon
+        anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.leftAlign ? undefined : parent.horizontalCenter
-        text: parent.label
-        color: buttonHover.hovered ? Theme.text.primary : Theme.text.secondary
-        font.pixelSize: Theme.type.label.size
-        font.family: Theme.font.ui
-        font.weight: Theme.type.label.weight
+        text: root.glyph
+        color: root.highlighted ? Theme.accent : Theme.text.secondary
+        font.pixelSize: Theme.icon.sm
+        font.family: Theme.font.icon
 
         Behavior on color {
             ColorAnimation {
-                duration: Theme.motion.instant
+                duration: Theme.motion.fast
             }
         }
+    }
+
+    Text {
+        anchors.left: actionIcon.right
+        anchors.leftMargin: 10
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        text: root.label
+        color: Theme.text.primary
+        font.pixelSize: Theme.type.body.size
+        font.family: Theme.font.ui
+        elide: Text.ElideRight
     }
 
     HoverHandler {
@@ -43,6 +66,12 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
     }
     TapHandler {
-        onTapped: parent.tapped()
+        onTapped: root.tapped()
+    }
+    Keys.onPressed: function (event) {
+        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+            root.tapped();
+            event.accepted = true;
+        }
     }
 }

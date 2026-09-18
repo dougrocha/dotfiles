@@ -33,6 +33,7 @@ Singleton {
     readonly property string skipForward: String.fromCodePoint(0xE5A6)
     readonly property string skipBack: String.fromCodePoint(0xE5A4)
     readonly property string broom: String.fromCodePoint(0xEC54)
+    readonly property string dotsThree: String.fromCodePoint(0xE1FE)
 
     readonly property string camera: String.fromCodePoint(0xE10E)
     readonly property string image: String.fromCodePoint(0xE2CA)

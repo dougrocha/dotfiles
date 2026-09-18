@@ -68,34 +68,6 @@ Popup {
                 font.family: Theme.font.icon
             }
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 44
-                height: 5
-                radius: height / 2
-                color: Theme.stroke.strong
-                clip: true
-
-                Rectangle {
-                    width: parent.width * Math.max(0, Math.min(100, deviceRow.pct)) / 100
-                    height: parent.height
-                    radius: parent.radius
-                    color: deviceRow.batteryColor
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.motion.normal
-                            easing.type: Theme.motion.easeStandard
-                        }
-                    }
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
-                }
-            }
-
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 30
@@ -109,47 +81,62 @@ Popup {
         }
     }
 
-    component PowerButton: Rectangle {
-        id: powerButton
+    component PowerRow: Rectangle {
+        id: powerRow
 
         property string iconText: ""
         property string label: ""
-        property color accent: Theme.accent
+        property bool danger: false
 
         signal tapped
 
-        activeFocusOnTab: true
-        height: 44
-        radius: Theme.radius.md
-        color: powerHover.hovered || activeFocus ? Theme.colors.overlay : Theme.colors.raised
+        readonly property bool highlighted: powerHover.hovered || activeFocus
 
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
+        activeFocusOnTab: true
+        width: parent.width
+        height: 30
+        radius: Theme.radius.sm
+        color: "transparent"
+
+        Rectangle {
+            z: -1
+            anchors.fill: parent
+            anchors.leftMargin: -panel.rowBleed
+            anchors.rightMargin: -panel.rowBleed
+            radius: parent.radius
+            color: powerRow.highlighted ? (powerRow.danger ? Theme.withAlpha(Theme.danger, 0.10) : Theme.fill.hover) : Theme.withAlpha(Theme.fill.hover, 0)
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
             }
         }
 
         Text {
             id: powerIcon
             anchors.left: parent.left
-            anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
-            text: powerButton.iconText
-            color: powerButton.accent
-            font.pixelSize: Theme.icon.md
+            text: powerRow.iconText
+            color: powerRow.highlighted ? (powerRow.danger ? Theme.danger : Theme.accent) : Theme.text.secondary
+            font.pixelSize: Theme.icon.sm
             font.family: Theme.font.icon
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
+            }
         }
 
         Text {
             anchors.left: powerIcon.right
-            anchors.leftMargin: 9
+            anchors.leftMargin: 10
             anchors.right: parent.right
-            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            text: powerButton.label
+            text: powerRow.label
             color: Theme.text.primary
             font.pixelSize: Theme.type.body.size
-            font.weight: Font.Medium
             font.family: Theme.font.ui
             elide: Text.ElideRight
         }
@@ -159,11 +146,11 @@ Popup {
             cursorShape: Qt.PointingHandCursor
         }
         TapHandler {
-            onTapped: powerButton.tapped()
+            onTapped: powerRow.tapped()
         }
         Keys.onPressed: function (event) {
             if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                powerButton.tapped();
+                powerRow.tapped();
                 event.accepted = true;
             }
         }
@@ -173,23 +160,10 @@ Popup {
         width: parent.width
         spacing: Theme.space.sm
 
-        Item {
-            width: parent.width
-            height: 24
-
-            Text {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: "System"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.display.size
-                font.weight: Theme.type.display.weight
-                font.family: Theme.font.ui
-            }
-        }
-
         ToggleRow {
             width: parent.width
+            style: "switch"
+            bleed: panel.rowBleed
             glyph: PhosphorIcons.lockSimple
             label: "Idle lock"
             active: IdleService.active
@@ -246,53 +220,41 @@ Popup {
 
         Column {
             width: parent.width
-            spacing: Theme.space.md
+            spacing: 0
 
             Divider {}
 
-            Row {
+            Item {
                 width: parent.width
-                spacing: Theme.space.md
+                height: Theme.space.sm
+            }
 
-                PowerButton {
-                    width: (parent.width - 8) / 2
-                    iconText: PhosphorIcons.lockSimple
-                    label: "Lock"
-                    accent: Theme.accent
-                    onTapped: {
-                        lockProcess.running = true;
-                        Visibilities.settingsPanel = false;
-                    }
-                }
-
-                PowerButton {
-                    width: (parent.width - 8) / 2
-                    iconText: PhosphorIcons.signOut
-                    label: "Log out"
-                    accent: Theme.accent
-                    onTapped: logoutProcess.running = true
+            PowerRow {
+                iconText: PhosphorIcons.lockSimple
+                label: "Lock"
+                onTapped: {
+                    lockProcess.running = true;
+                    Visibilities.settingsPanel = false;
                 }
             }
 
-            Row {
-                width: parent.width
-                spacing: Theme.space.md
+            PowerRow {
+                iconText: PhosphorIcons.signOut
+                label: "Log out"
+                onTapped: logoutProcess.running = true
+            }
 
-                PowerButton {
-                    width: (parent.width - 8) / 2
-                    iconText: PhosphorIcons.arrowCounterClockwise
-                    label: "Restart"
-                    accent: Theme.accent
-                    onTapped: rebootProcess.running = true
-                }
+            PowerRow {
+                iconText: PhosphorIcons.arrowCounterClockwise
+                label: "Restart"
+                onTapped: rebootProcess.running = true
+            }
 
-                PowerButton {
-                    width: (parent.width - 8) / 2
-                    iconText: PhosphorIcons.power
-                    label: "Shut down"
-                    accent: Theme.danger
-                    onTapped: shutdownProcess.running = true
-                }
+            PowerRow {
+                iconText: PhosphorIcons.power
+                label: "Shut down"
+                danger: true
+                onTapped: shutdownProcess.running = true
             }
         }
     }

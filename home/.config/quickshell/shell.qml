@@ -14,6 +14,8 @@ import Quickshell
 ShellRoot {
     id: root
 
+    readonly property var mediaControls: MediaControlService
+
     Bar {}
 
     NotificationManager {}

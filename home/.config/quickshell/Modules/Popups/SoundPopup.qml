@@ -15,31 +15,12 @@ Popup {
         width: parent.width
         spacing: Theme.space.sm
 
-        Item {
-            width: parent.width
-            height: 24
-
-            Text {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Sound"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.display.size
-                font.weight: Theme.type.display.weight
-                font.family: Theme.font.ui
-            }
-        }
-
         Column {
             width: parent.width
             spacing: Theme.space.sm
 
-            Text {
-                text: "Output"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.body.size
-                font.weight: Font.Medium
-                font.family: Theme.font.ui
+            SectionLabel {
+                text: "OUTPUT"
             }
 
             StyledSlider {
@@ -53,18 +34,19 @@ Popup {
 
             Column {
                 width: parent.width
-                visible: AudioService.sinks.length > 1
+                visible: AudioService.visibleSinks.length > 0
                 spacing: Theme.space.xxs
 
                 Repeater {
                     model: ScriptModel {
-                        values: AudioService.sinks
+                        values: AudioService.visibleSinks
                         objectProp: "id"
                     }
 
                     delegate: ListRow {
                         required property var modelData
                         width: parent.width
+                        bleed: panel.rowBleed
                         label: AudioService.shortLabel(modelData)
                         glyph: AudioService.deviceIcon(modelData)
                         active: AudioService.sink && modelData.id === AudioService.sink.id
@@ -80,12 +62,8 @@ Popup {
             width: parent.width
             spacing: Theme.space.sm
 
-            Text {
-                text: "Input"
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.body.size
-                font.weight: Font.Medium
-                font.family: Theme.font.ui
+            SectionLabel {
+                text: "INPUT"
             }
 
             StyledSlider {
@@ -99,18 +77,19 @@ Popup {
 
             Column {
                 width: parent.width
-                visible: AudioService.sources.length > 1
+                visible: AudioService.visibleSources.length > 0
                 spacing: Theme.space.xxs
 
                 Repeater {
                     model: ScriptModel {
-                        values: AudioService.sources
+                        values: AudioService.visibleSources
                         objectProp: "id"
                     }
 
                     delegate: ListRow {
                         required property var modelData
                         width: parent.width
+                        bleed: panel.rowBleed
                         label: AudioService.shortLabel(modelData)
                         glyph: AudioService.deviceIcon(modelData)
                         active: AudioService.source && modelData.id === AudioService.source.id
@@ -127,12 +106,8 @@ Popup {
 
             Divider {}
 
-            Text {
-                text: "Apps"
-                color: Theme.text.secondary
-                font.pixelSize: Theme.type.caption.size
-                font.weight: Font.Medium
-                font.family: Theme.font.ui
+            SectionLabel {
+                text: "APPS"
             }
 
             Repeater {
@@ -158,9 +133,11 @@ Popup {
             }
         }
 
+        Divider {}
+
         PopupActionButton {
             label: "Wiremix"
-            leftAlign: true
+            bleed: panel.rowBleed
             onTapped: {
                 Visibilities.soundPanel = false;
                 soundSettingsProc.running = true;

@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import Quickshell.Widgets
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -19,13 +20,11 @@ Item {
 
     property bool interactive: true
 
-    property bool flat: false
+    property bool nested: false
 
     readonly property bool isCritical: modelData?.urgency === NotificationUrgency.Critical
 
-    readonly property int overhang: flat ? 4 : 10
-
-    height: surface.height + overhang
+    height: surface.height
 
     function relativeTime(timestamp) {
         const mins = Math.floor((Date.now() - timestamp) / 60000);
@@ -79,19 +78,12 @@ Item {
     component ActionButton: Rectangle {
         required property var modelData
 
-        Layout.preferredHeight: 28
+        Layout.preferredHeight: 26
         Layout.preferredWidth: actionLabel.implicitWidth + 24
-        radius: Theme.radius.md
-        color: actionHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-        border.color: Theme.stroke.hairline
-        border.width: 1
+        radius: Theme.radius.sm
+        color: actionHover.hovered ? Theme.fill.strong : Theme.fill.press
 
         Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
-            }
-        }
-        Behavior on border.color {
             ColorAnimation {
                 duration: Theme.motion.fast
             }
@@ -128,14 +120,18 @@ Item {
     Rectangle {
         id: surface
 
-        x: card.overhang
-        y: card.overhang
-        width: card.width - card.overhang
-        height: cardContent.implicitHeight + 12 * 2
+        width: card.width
+        height: cardContent.implicitHeight + Theme.space.lg * 2
 
-        radius: card.flat ? Theme.radius.md : Theme.radius.xl
-        border.width: card.flat ? 0 : 1
-        color: card.flat ? (cardHover.hovered ? Theme.colors.overlay : Theme.colors.raised) : Theme.colors.surface
+        radius: card.nested ? Theme.radius.lg : Theme.radius.xl
+        border.width: card.nested ? 0 : 1
+        color: {
+            if (card.isCritical)
+                return Theme.withAlpha(Theme.danger, 0.18);
+            if (!card.nested)
+                return Theme.colors.surface;
+            return cardHover.hovered ? Theme.fill.press : Theme.fill.hover;
+        }
         border.color: card.isCritical ? Theme.danger : Theme.stroke.hairline
 
         Behavior on color {
@@ -152,7 +148,7 @@ Item {
             enabled: card.interactive
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onTapped: function (eventPoint, button) {
-                if (closeHover.hovered || card.actionHovered || card.menuHovered || closeHoverInline.hovered)
+                if (card.actionHovered || card.menuHovered || closeHoverInline.hovered)
                     return;
                 if (card.menuExpanded) {
                     card.menuExpanded = false;
@@ -171,7 +167,7 @@ Item {
         ColumnLayout {
             id: cardContent
             anchors.fill: parent
-            anchors.margins: card.flat ? 8 : 12
+            anchors.margins: Theme.space.lg
             spacing: Theme.space.xxs
 
             RowLayout {
@@ -251,7 +247,7 @@ Item {
                 }
 
                 Text {
-                    visible: card.interactive && card.flat
+                    visible: card.interactive && card.nested
                     opacity: cardHover.hovered || closeHoverInline.hovered ? 1 : 0
                     enabled: opacity > 0
                     text: PhosphorIcons.x
@@ -367,7 +363,7 @@ Item {
             width: popoverColumn.implicitWidth + 8
             height: popoverColumn.implicitHeight + 8
 
-            radius: Theme.radius.lg
+            radius: Theme.radius.md
             color: Theme.colors.raised
             border.width: 1
             border.color: Theme.stroke.hairline
@@ -400,7 +396,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 26
                         Layout.preferredWidth: menuItemLabel.implicitWidth + 20
-                        radius: Theme.radius.md
+                        radius: Theme.radius.sm
                         color: menuItemHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {
@@ -439,53 +435,13 @@ Item {
         }
     }
 
-    Rectangle {
+    CloseBadge {
         id: closeBadge
 
-        x: 0
-        y: 0
-        width: 20
-        height: 20
-        radius: width / 2
-        color: Theme.colors.raised
-        border.width: 1
-        border.color: closeHover.hovered ? Theme.stroke.accent : Theme.stroke.hairline
-        visible: card.interactive && !card.flat
-        opacity: cardHover.hovered || closeHover.hovered ? 1 : 0
-        enabled: opacity > 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.motion.fast
-            }
-        }
-        Behavior on border.color {
-            ColorAnimation {
-                duration: Theme.motion.fast
-            }
-        }
-
-        Text {
-            anchors.centerIn: parent
-            text: PhosphorIcons.x
-            font.family: Theme.font.icon
-            font.pixelSize: Theme.icon.xxs
-            color: closeHover.hovered ? Theme.text.primary : Theme.text.tertiary
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
-        }
-
-        HoverHandler {
-            id: closeHover
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        TapHandler {
-            onTapped: NotificationService.removeNotification(card.modelData.id)
-        }
+        x: -width / 2
+        y: -height / 2
+        visible: card.interactive && !card.nested
+        revealed: cardHover.hovered
+        onTapped: NotificationService.removeNotification(card.modelData.id)
     }
 }

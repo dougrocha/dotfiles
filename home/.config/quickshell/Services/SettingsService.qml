@@ -26,6 +26,9 @@ Singleton {
     property alias screenshotRecentSaveLocations: screenshotSettings.recentSaveLocations
     property alias screenshotMonitors: screenshotSettings.monitors
 
+    property alias hiddenAudioOutputs: audioOutputSettings.hidden
+    property alias hiddenAudioInputs: audioInputSettings.hidden
+
     property bool loaded: false
 
     Timer {
@@ -83,6 +86,22 @@ Singleton {
                 property list<string> recentSaveLocations: []
 
                 property var monitors: ({})
+            }
+
+            property JsonObject audio: JsonObject {
+                id: audioSettings
+
+                property JsonObject outputs: JsonObject {
+                    id: audioOutputSettings
+
+                    property list<string> hidden: []
+                }
+
+                property JsonObject inputs: JsonObject {
+                    id: audioInputSettings
+
+                    property list<string> hidden: []
+                }
             }
         }
     }

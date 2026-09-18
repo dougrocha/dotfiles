@@ -8,6 +8,7 @@ PopupWindow {
     required property bool shown
     property int cardWidth: 300
     property int cardPadding: Theme.space.lg
+    readonly property int rowBleed: cardPadding - Theme.space.sm
     default property alias content: card.content
 
     signal dismissed

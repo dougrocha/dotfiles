@@ -103,6 +103,7 @@ Singleton {
     readonly property QtObject fill: QtObject {
         readonly property color hover: root.withAlpha(root.text.primary, 0.06)
         readonly property color press: root.withAlpha(root.text.primary, 0.10)
+        readonly property color strong: root.withAlpha(root.text.primary, 0.16)
         readonly property color selected: root.withAlpha(root.accent, 0.16)
         readonly property color selectedSolid: root.accent
     }

@@ -1,6 +1,7 @@
 pragma Singleton
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 
 Singleton {
     id: root
@@ -74,7 +75,32 @@ Singleton {
     }
 
     readonly property bool songNotif: songNotifTimer.running
+    readonly property bool scratchpadOpen: root.isInWorkspace("special:scratchpad")
     property string lastTrackKey: ""
+
+    function isInWorkspace(nameOrId) {
+        return Hyprland.monitors.values.some(monitor => {
+            const state = monitor.lastIpcObject;
+            return [state?.activeWorkspace, state?.specialWorkspace].some(workspace => {
+                if (!workspace || workspace.id === 0)
+                    return false;
+                return typeof nameOrId === "number" ? workspace.id === nameOrId : workspace.name === nameOrId;
+            });
+        });
+    }
+
+    onScratchpadOpenChanged: if (scratchpadOpen)
+        root.dismissSongNotif()
+
+    Component.onCompleted: Hyprland.refreshMonitors()
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (event.name === "activespecial" || event.name === "workspace")
+                Hyprland.refreshMonitors();
+        }
+    }
 
     Timer {
         id: songNotifTimer
@@ -93,7 +119,7 @@ Singleton {
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;
 
-        if (!known || Visibilities.musicPanel)
+        if (!known || Visibilities.musicPanel || root.scratchpadOpen)
             return;
         songNotifTimer.restart();
     }
