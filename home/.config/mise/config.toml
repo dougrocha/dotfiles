@@ -3,7 +3,6 @@
 biome = "latest"
 bun = "latest"
 go = "latest"
-java = "26"
 node = "lts"
 "npm:@astrojs/language-server" = "latest"
 "npm:@tailwindcss/language-server" = "latest"
@@ -11,3 +10,6 @@ node = "lts"
 opencode = "latest"
 taplo = "latest"
 usage = "latest"
+
+[settings]
+auto_update = true
