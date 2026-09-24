@@ -6,7 +6,6 @@ local dashed_bar = require('icons').misc.dashed_bar
 add {
     {
         'lewis6991/gitsigns.nvim',
-        event = { 'BufReadPre', 'BufNewFile' },
         opts = {
             signs = {
                 add = { text = vertical_bar },

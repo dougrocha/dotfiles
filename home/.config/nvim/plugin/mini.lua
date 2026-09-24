@@ -247,7 +247,6 @@ add {
     {
         'nvim-mini/mini.nvim',
         module_name = 'mini.ai',
-        event = { 'BufReadPre', 'BufNewFile' },
         opts = function()
             local gen_spec = require('mini.ai').gen_spec
             local gen_ai_spec = require('mini.extra').gen_ai_spec
@@ -270,7 +269,6 @@ add {
     {
         'nvim-mini/mini.nvim',
         module_name = 'mini.snippets',
-        event = 'InsertEnter',
         opts = function()
             local gen_loader = require('mini.snippets').gen_loader
             local lang_patterns = {

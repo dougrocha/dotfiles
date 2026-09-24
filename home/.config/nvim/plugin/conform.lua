@@ -3,7 +3,6 @@ local add = require('pack').add
 add {
     {
         'stevearc/conform.nvim',
-        event = 'BufWritePre',
         ---@module 'conform'
         ---@type conform.setupOpts
         opts = {

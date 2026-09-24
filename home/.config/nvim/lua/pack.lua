@@ -9,8 +9,6 @@ local M = {}
 ---@field setup? false Set to false to skip require/setup (for deps or vimscript plugins)
 ---@field on_update? string|fun() Command string (runs in plugin dir) or function, fired when the plugin's commit changes (install or update)
 ---@field version? string Git ref (branch, tag, or commit) passed to vim.pack.add
----@field event? string|string[] Defer loading until this autocmd event fires (once)
----@field pattern? string|string[] Autocmd pattern passed alongside event (e.g. filetypes)
 
 ---@param path string
 ---@param on_update string|fun()
@@ -77,17 +75,6 @@ local function configure(plugins)
     end
 end
 
----@param event vim.api.keyset.events|vim.api.keyset.events[]
----@param pattern? string|string[]
----@param plugins PluginSpec[]
-local function add_on_event(event, pattern, plugins)
-    vim.api.nvim_create_autocmd(event, {
-        pattern = pattern,
-        once = true,
-        callback = function() configure(plugins) end,
-    })
-end
-
 ---@param plugins PluginSpec[]
 function M.add(plugins)
     for _, p in ipairs(plugins) do
@@ -97,13 +84,7 @@ function M.add(plugins)
             if pending_changes[name] then handle_change(pending_changes[name]) end
         end
     end
-    local event = plugins[1] and plugins[1].event
-    local pattern = plugins[1] and plugins[1].pattern
-    if event or pattern then
-        add_on_event(event or 'FileType', pattern, plugins)
-    else
-        configure(plugins)
-    end
+    configure(plugins)
 end
 
 return M
