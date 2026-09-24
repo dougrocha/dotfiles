@@ -9,6 +9,7 @@ require 'autocmds'
 require 'statusline'
 require 'winbar'
 require 'marks'
+require 'tmux'
 require 'lsp'
 
 vim.cmd.packadd 'nvim.undotree'
