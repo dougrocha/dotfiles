@@ -149,7 +149,7 @@ Variants {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.space.lg
 
-                    readonly property int trayGap: Theme.space.xxl
+                    readonly property int trayGap: Theme.space.md
 
                     TraySection {
                         id: traySection
