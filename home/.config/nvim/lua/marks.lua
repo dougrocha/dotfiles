@@ -118,8 +118,6 @@ local function toggle_menu()
             return
         end
         vim.cmd.delmarks(mark)
-        -- Write ShaDa now, otherwise the deleted mark comes back on restart.
-        vim.cmd 'wshada!'
         close()
         toggle_menu()
     end, { buffer = buf, desc = 'Delete mark' })
