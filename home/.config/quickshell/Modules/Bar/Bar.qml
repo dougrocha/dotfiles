@@ -131,8 +131,8 @@ Variants {
             Rectangle {
                 id: indicatorPill
 
-                readonly property int leftPadding: traySection.visible ? 3 : 14
                 readonly property int rightPadding: 14
+                readonly property int leftPadding: traySection.visible ? rightPadding - 4 : rightPadding
 
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.space.md

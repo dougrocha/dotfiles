@@ -37,7 +37,6 @@ Singleton {
         return paletteOverrides[name] ?? fallback;
     }
 
-    // Generated palettes can land danger on the accent hue; rotate it away so the two never read as one color.
     function separateHue(c, from, minDegrees) {
         if (c.hslHue < 0 || from.hslHue < 0)
             return c;
