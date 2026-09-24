@@ -213,35 +213,6 @@ local treesitter = {
     ['@variable.parameter'] = { fg = colors.orange },
 }
 
--- Semantic tokens.
----@type table<string, vim.api.keyset.highlight>
-local semantic_tokens = {
-    ['@class'] = { fg = colors.cyan },
-    ['@decorator'] = { fg = colors.cyan },
-    ['@enum'] = { fg = colors.cyan },
-    ['@enumMember'] = { fg = colors.purple },
-    ['@event'] = { fg = colors.cyan },
-    ['@interface'] = { fg = colors.cyan },
-    ['@lsp.type.class'] = { fg = colors.cyan },
-    ['@lsp.type.decorator'] = { fg = colors.green },
-    ['@lsp.type.enum'] = { fg = colors.cyan },
-    ['@lsp.type.enumMember'] = { fg = colors.purple },
-    ['@lsp.type.function'] = { fg = colors.green },
-    ['@lsp.type.interface'] = { fg = colors.cyan },
-    ['@lsp.type.macro'] = { fg = colors.cyan },
-    ['@lsp.type.method'] = { fg = colors.green },
-    ['@lsp.type.namespace'] = { fg = colors.orange },
-    ['@lsp.type.parameter'] = { fg = colors.orange },
-    ['@lsp.type.property'] = { fg = colors.purple },
-    ['@lsp.type.struct'] = { fg = colors.cyan },
-    ['@lsp.type.type'] = { fg = colors.bright_cyan },
-    ['@lsp.type.variable'] = { fg = colors.fg },
-    ['@modifier'] = { fg = colors.cyan },
-    ['@regexp'] = { fg = colors.yellow },
-    ['@struct'] = { fg = colors.cyan },
-    ['@typeParameter'] = { fg = colors.cyan },
-}
-
 -- LSP
 ---@type table<string, vim.api.keyset.highlight>
 local lsp = {
@@ -355,7 +326,7 @@ local extras = {
 
 ---@type table<string, vim.api.keyset.highlight>
 local groups =
-    vim.tbl_extend('error', statusline_groups, builtins, treesitter, semantic_tokens, lsp, blink, winbar, extras)
+    vim.tbl_extend('error', statusline_groups, builtins, treesitter, lsp, blink, winbar, extras)
 for group, opts in pairs(groups) do
     vim.api.nvim_set_hl(0, group, opts)
 end
