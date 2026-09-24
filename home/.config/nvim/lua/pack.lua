@@ -7,38 +7,22 @@ local M = {}
 ---@field opts? table|fun():table Options passed to require(module).setup(opts)
 ---@field on_setup? fun() Runs after opts setup with no args
 ---@field setup? false Set to false to skip require/setup (for deps or vimscript plugins)
----@field on_update? string|fun() Command string (runs in plugin dir) or function, fired when the plugin's commit changes (install or update)
+---@field on_update? fun() Runs when the plugin is installed or updated
 ---@field version? string Git ref (branch, tag, or commit) passed to vim.pack.add
 
----@param path string
----@param on_update string|fun()
-local function run_on_update(path, on_update)
-    if type(on_update) == 'string' then
-        vim.system(vim.split(on_update, ' '), { cwd = path })
-    else
-        vim.schedule(on_update)
-    end
-end
-
+---@type table<string, fun()>
 local update_hooks = {}
-local pending_changes = {}
-local function handle_change(data)
-    if data.kind ~= 'install' and data.kind ~= 'update' then return end
-    local name = data.spec.name
-    local hook = update_hooks[name]
-    if not hook then
-        pending_changes[name] = data
-        return
-    end
-    pending_changes[name] = nil
-    vim.opt.runtimepath:append(data.path)
-    run_on_update(data.path, hook)
-end
 
 vim.api.nvim_create_autocmd('PackChanged', {
     group = vim.api.nvim_create_augroup('DotfilesPackHooks', { clear = true }),
     callback = function(ev)
-        handle_change(ev.data)
+        local data = ev.data
+        local hook = update_hooks[data.spec.name]
+        if hook and (data.kind == 'install' or data.kind == 'update') then
+            -- Make the plugin's code available when it isn't loaded yet.
+            vim.opt.runtimepath:append(data.path)
+            vim.schedule(hook)
+        end
     end,
 })
 
@@ -79,9 +63,7 @@ end
 function M.add(plugins)
     for _, p in ipairs(plugins) do
         if p.on_update and not p.dir then
-            local name = p[1]:match('[^/]+$')
-            update_hooks[name] = p.on_update
-            if pending_changes[name] then handle_change(pending_changes[name]) end
+            update_hooks[p[1]:match '[^/]+$'] = p.on_update
         end
     end
     configure(plugins)
