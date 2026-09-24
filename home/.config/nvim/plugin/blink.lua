@@ -2,7 +2,6 @@ local add = require('pack').add
 
 add {
     { 'saghen/blink.lib', setup = false },
-    { 'nvim-mini/mini.snippets', setup = false },
     {
         'saghen/blink.cmp',
         on_update = function()

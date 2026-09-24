@@ -347,9 +347,6 @@ local extras = {
     HighlightUrl = { underline = true, fg = colors.neon_cyan, sp = colors.neon_cyan },
     -- Quickfix Window
     QuickFixLine = { italic = true, bg = colors.transparent_red },
-    -- Yanky
-    YankyPut = { link = 'Visual' },
-    YankyYanked = { link = 'Visual' },
     -- Command line
     MoreMsg = { fg = colors.bright_white, bold = true },
     MsgArea = { fg = colors.cyan },
