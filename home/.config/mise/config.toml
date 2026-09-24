@@ -3,6 +3,7 @@
 biome = "latest"
 bun = "latest"
 go = "latest"
+just = "latest"
 node = "lts"
 "npm:@astrojs/language-server" = "latest"
 "npm:@tailwindcss/language-server" = "latest"
