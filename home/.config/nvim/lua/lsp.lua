@@ -109,9 +109,11 @@ vim.lsp.handlers['client/registerCapability'] = function(err, res, ctx)
         return
     end
 
-    on_attach(client, vim.api.nvim_get_current_buf())
-
-    return register_capability(err, res, ctx)
+    local result = register_capability(err, res, ctx)
+    for bufnr in pairs(client.attached_buffers) do
+        on_attach(client, bufnr)
+    end
+    return result
 end
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -161,22 +163,12 @@ vim.diagnostic.config {
     signs = false,
 }
 
-vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
-    once = true,
-    callback = function()
-        -- Defer to avoid racing with filetype detection on the triggering buffer
-        -- (e.g. ObsidianNew creating a markdown file as the very first BufNewFile)
-        vim.schedule(function()
-            -- Extend neovim's client capabilities with the completion ones.
-            vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities(nil, true) })
-
-            local config_dir = vim.fn.stdpath 'config' .. '/lsp'
-            local server_configs = vim.iter(vim.fn.glob(config_dir .. '/*.lua', false, true))
-                :map(function(file)
-                    return vim.fn.fnamemodify(file, ':t:r')
-                end)
-                :totable()
-            vim.lsp.enable(server_configs)
-        end)
-    end,
-})
+-- Enable every server config in lsp/. blink.cmp adds its completion capabilities
+-- to vim.lsp.config('*') itself.
+local config_dir = vim.fn.stdpath 'config' .. '/lsp'
+local server_configs = vim.iter(vim.fn.glob(config_dir .. '/*.lua', false, true))
+    :map(function(file)
+        return vim.fn.fnamemodify(file, ':t:r')
+    end)
+    :totable()
+vim.lsp.enable(server_configs)
