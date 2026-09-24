@@ -20,6 +20,9 @@ local store = require 'utils.store'
 -- The terminal is only a display. Output and job lifetime belong to the run.
 local current_run
 
+-- Output lines kept per run for quickfix parsing.
+local max_lines = 10000
+
 ---@return string
 local function project_root()
     -- From the compile window, stay in the project that was last compiled.
@@ -43,7 +46,7 @@ local function from_root(root, fn)
     return result
 end
 
-local function publish_diagnostics(run)
+local function set_quickfix(run)
     local lines = vim.tbl_map(function(line)
         -- Strip terminal styling and OSC links before errorformat parsing.
         return line:gsub('\27%][^\7\27]*\7', '')
@@ -64,8 +67,8 @@ local function publish_diagnostics(run)
     end
 end
 
-local function show_diagnostics(run)
-    publish_diagnostics(run)
+local function open_quickfix(run)
+    set_quickfix(run)
     -- Another command may have made a different quickfix list current.
     local target = vim.fn.getqflist({ id = run.qf_id, nr = 0 }).nr
     local current = vim.fn.getqflist({ nr = 0 }).nr
@@ -107,7 +110,7 @@ local function goto_location(run)
     end
 
     -- Keep the quickfix position in sync so :cnext continues from here.
-    publish_diagnostics(run)
+    set_quickfix(run)
     for i, qf in ipairs(vim.fn.getqflist({ id = run.qf_id, items = 0 }).items) do
         if qf.bufnr == item.bufnr and qf.lnum == item.lnum and qf.col == item.col then
             vim.fn.setqflist({}, 'a', { id = run.qf_id, idx = i })
@@ -138,7 +141,7 @@ end
 
 ---@param root string
 ---@param cmd string
-local function run(root, cmd)
+local function start(root, cmd)
     store.update('compile', function(data)
         data[root] = cmd
     end)
@@ -183,6 +186,10 @@ local function run(root, cmd)
             for i = 2, #data do
                 run.lines[#run.lines + 1] = data[i]
             end
+            -- Long-running programs can log forever; keep the tail, like terminal scrollback.
+            if #run.lines > max_lines + 1000 then
+                run.lines = vim.list_slice(run.lines, #run.lines - max_lines + 1)
+            end
         end,
         on_exit = function(_, code)
             run.finished = true
@@ -190,7 +197,7 @@ local function run(root, cmd)
                 return
             end
 
-            publish_diagnostics(run)
+            set_quickfix(run)
             vim.notify(
                 string.format('%s: exited with %d', cmd, code),
                 code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
@@ -206,8 +213,8 @@ local function run(root, cmd)
     end
 
     vim.keymap.set('n', '<CR>', function()
-        show_diagnostics(run)
-    end, { buffer = buf, desc = 'Show compile diagnostics' })
+        open_quickfix(run)
+    end, { buffer = buf, desc = 'Show compile errors in quickfix' })
     vim.keymap.set('n', 'gd', function()
         goto_location(run)
     end, { buffer = buf, desc = 'Go to error location' })
@@ -222,7 +229,7 @@ end
 vim.api.nvim_create_user_command('Compile', function(opts)
     local root = project_root()
     if opts.args ~= '' then
-        run(root, opts.args)
+        start(root, opts.args)
         return
     end
 
@@ -232,7 +239,7 @@ vim.api.nvim_create_user_command('Compile', function(opts)
         completion = 'shellcmd',
     }, function(cmd)
         if cmd and cmd ~= '' then
-            run(root, cmd)
+            start(root, cmd)
         end
     end)
 end, { desc = 'Run a compile command', nargs = '*', complete = 'shellcmd' })
@@ -241,7 +248,7 @@ vim.api.nvim_create_user_command('Recompile', function()
     local root = project_root()
     local cmd = store.read('compile')[root]
     if cmd then
-        run(root, cmd)
+        start(root, cmd)
     else
         vim.cmd.Compile()
     end
