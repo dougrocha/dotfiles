@@ -31,10 +31,27 @@ local function project_root()
     return vim.fs.root(0, '.git') or vim.fn.getcwd()
 end
 
+-- Error paths are relative to the project root, but quickfix resolves them against
+-- the current directory, so parse output from the root.
+---@param root string
+---@param fn fun(): any
+local function from_root(root, fn)
+    local prev = vim.fn.chdir(root)
+    local ok, result = pcall(fn)
+    if prev ~= '' then
+        vim.fn.chdir(prev)
+    end
+    assert(ok, result)
+    return result
+end
+
 ---@param buf integer
-local function jump_to_error(buf)
+---@param root string
+local function jump_to_error(buf, root)
     local line = vim.api.nvim_get_current_line()
-    local item = vim.fn.getqflist({ lines = { line }, efm = efm }).items[1]
+    local item = from_root(root, function()
+        return vim.fn.getqflist({ lines = { line }, efm = efm }).items[1]
+    end)
     if not item or item.valid ~= 1 or item.bufnr == 0 then
         return
     end
@@ -81,7 +98,9 @@ local function run(root, cmd)
             end
 
             local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
-            vim.fn.setqflist({}, ' ', { title = cmd, lines = lines, efm = efm })
+            from_root(root, function()
+                vim.fn.setqflist({}, ' ', { title = cmd, lines = lines, efm = efm })
+            end)
             vim.notify(
                 string.format('%s: exited with %d', cmd, code),
                 code == 0 and vim.log.levels.INFO or vim.log.levels.WARN
@@ -90,7 +109,7 @@ local function run(root, cmd)
     })
 
     vim.keymap.set('n', '<CR>', function()
-        jump_to_error(buf)
+        jump_to_error(buf, root)
     end, { buffer = buf, desc = 'Jump to error' })
     vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, desc = 'Close compile window' })
 
