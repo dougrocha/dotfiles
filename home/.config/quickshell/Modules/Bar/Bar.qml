@@ -114,9 +114,9 @@ Variants {
 
             Rectangle {
                 anchors.left: parent.left
-                anchors.leftMargin: 8
+                anchors.leftMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
-                width: workspaceModule.implicitWidth + 28
+                width: workspaceModule.implicitWidth + 24
                 height: Theme.topBarHeight - 8
                 radius: height / 2
                 color: Theme.colors.surface
@@ -135,7 +135,7 @@ Variants {
                 readonly property int rightPadding: 14
 
                 anchors.right: parent.right
-                anchors.rightMargin: 8
+                anchors.rightMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
                 width: indicatorRow.implicitWidth + leftPadding + rightPadding
                 height: Theme.topBarHeight - 8
@@ -149,7 +149,7 @@ Variants {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.space.lg
 
-                    readonly property int trayGap: 8
+                    readonly property int trayGap: Theme.space.xxl
 
                     TraySection {
                         id: traySection
@@ -174,7 +174,7 @@ Variants {
 
             SettingsPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
                 anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
@@ -184,7 +184,7 @@ Variants {
 
             SoundPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
                 anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
@@ -194,7 +194,7 @@ Variants {
 
             BluetoothPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
                 anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
@@ -204,7 +204,7 @@ Variants {
 
             NotificationPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - 8
+                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
                 anchor.rect.y: topBar.height + Theme.space.xs
             }
         }

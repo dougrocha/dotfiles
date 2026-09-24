@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -151,6 +153,8 @@ Item {
     implicitHeight: Theme.topBarHeight
 
     component ItemDelegate: TrayItem {
+        required property var modelData
+        trayItem: modelData
         menuOpen: trayMenu.visible && root.activeTrayItem === trayItem
         previewOffsetX: root.dragSource ? root.previewOffset(trayItem) : 0
         onMenuRequested: (trayItem, anchorItem) => root.toggleMenu(trayItem, anchorItem)

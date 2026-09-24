@@ -31,7 +31,7 @@ Rectangle {
         text: root.glyph
         color: root.active ? root.activeColor : hover.hovered ? root.hoverColor : root.restColor
         font.pixelSize: root.glyphSize
-        font.family: Theme.font.icon
+        font.family: root.active ? Theme.font.iconFill : Theme.font.icon
 
         Behavior on color {
             ColorAnimation {

@@ -14,8 +14,8 @@ IconButton {
             return PhosphorIcons.speakerLow;
         return PhosphorIcons.speakerHigh;
     }
-    active: AudioService.muted
-    activeColor: Theme.danger
-    tooltipText: AudioService.muted ? "Volume · Muted" : "Volume · " + Math.round(AudioService.volume * 100) + "%"
+    active: AudioService.muted || Visibilities.soundPanel
+    activeColor: AudioService.muted ? Theme.danger : Theme.text.primary
+    tooltipText: AudioService.muted ? "Volume: Muted" : "Volume: " + Math.round(AudioService.volume * 100) + "%"
     onTapped: Visibilities.toggleSoundPanel()
 }

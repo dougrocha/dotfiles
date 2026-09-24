@@ -22,7 +22,7 @@ Item {
         spacing: 0
 
         Row {
-            spacing: Theme.space.xs
+            spacing: 0
             Layout.alignment: Qt.AlignVCenter
 
             Repeater {
@@ -38,9 +38,11 @@ Item {
                     readonly property int resizeDuration: 120
                     readonly property int stateDuration: 100
 
+                    readonly property int dotSize: 10
+
                     visible: width > 0
-                    width: belongsToMonitor ? 10 : 0
-                    height: 10
+                    width: belongsToMonitor ? dotSize + Theme.space.xs : 0
+                    height: Theme.topBarHeight - 8
 
                     Behavior on width {
                         NumberAnimation {
@@ -51,12 +53,14 @@ Item {
 
                     Rectangle {
                         id: dot
-                        anchors.fill: parent
+                        anchors.centerIn: parent
+                        width: Math.min(parent.dotSize, parent.width)
+                        height: parent.dotSize
                         radius: Theme.radius.xs
                         color: isActive ? Theme.accent : Theme.withAlpha(Theme.accent, hasWindows ? 0.15 : 0.0)
                         border.color: isActive ? Theme.withAlpha(Theme.accent, 0) : Theme.accent
                         border.width: 1.5
-                        opacity: isActive || hasWindows ? 1.0 : 0.35
+                        opacity: isActive || hasWindows ? 1.0 : 0.5
 
                         Behavior on color {
                             ColorAnimation {
@@ -93,8 +97,8 @@ Item {
             clip: true
             implicitHeight: 16
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: root.onNamedWorkspace ? namedBadge.implicitWidth + 5 : 0
-            Layout.leftMargin: root.onNamedWorkspace ? 5 : 0
+            Layout.preferredWidth: root.onNamedWorkspace ? namedBadge.implicitWidth + 3 : 0
+            Layout.leftMargin: root.onNamedWorkspace ? 3 : 0
 
             Behavior on Layout.preferredWidth {
                 NumberAnimation {
@@ -127,6 +131,7 @@ Item {
                     font.family: Theme.font.ui
                     font.pixelSize: Theme.type.label.size
                     font.weight: Theme.type.label.weight
+                    font.letterSpacing: Theme.type.label.tracking
                 }
             }
         }

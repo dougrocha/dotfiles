@@ -37,6 +37,17 @@ Singleton {
         return paletteOverrides[name] ?? fallback;
     }
 
+    // Generated palettes can land danger on the accent hue; rotate it away so the two never read as one color.
+    function separateHue(c, from, minDegrees) {
+        if (c.hslHue < 0 || from.hslHue < 0)
+            return c;
+        const delta = ((c.hslHue - from.hslHue) * 360 + 540) % 360 - 180;
+        if (Math.abs(delta) >= minDegrees)
+            return c;
+        const hue = (from.hslHue * 360 + (delta < 0 ? -minDegrees : minDegrees) + 360) % 360;
+        return Qt.hsla(hue / 360, c.hslSaturation, c.hslLightness, c.a);
+    }
+
     FileView {
         id: paletteFile
         path: Quickshell.shellDir + "/palette.json"
@@ -57,7 +68,7 @@ Singleton {
         readonly property color muted: root.paletteColor("muted", "#6b7075")
         readonly property color accent: root.paletteColor("accent", "#9bd4a2")
         readonly property color accentText: root.paletteColor("accentText", "#0c1f12")
-        readonly property color danger: root.paletteColor("danger", "#ee9089")
+        readonly property color danger: root.separateHue(root.paletteColor("danger", "#ee9089"), accent, 30)
     }
 
     function withAlpha(c, a) {

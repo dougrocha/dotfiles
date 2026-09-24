@@ -8,5 +8,6 @@ IconButton {
     glyph: PhosphorIcons.gear
     active: Visibilities.settingsPanel
     activeColor: Theme.text.primary
+    tooltipText: "Settings"
     onTapped: Visibilities.toggleSettings()
 }
