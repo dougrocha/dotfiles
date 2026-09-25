@@ -15,5 +15,4 @@ home/.config/tmux/plugins
 default/sddm/autologin.conf.deployed
 
 # Local Claude Code config / skills
-home/.config/quickshell/.claude/
 CLAUDE.local.md
