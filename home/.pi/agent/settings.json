@@ -4,6 +4,7 @@
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "medium",
+  "externalEditor": "nvim",
   "tuiMode": "fullscreen",
   "packages": [
     "npm:pi-web-access"
