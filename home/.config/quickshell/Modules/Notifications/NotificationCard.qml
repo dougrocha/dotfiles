@@ -5,8 +5,6 @@ import QtQuick.Layouts
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Notifications
-import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -15,12 +13,6 @@ Item {
     id: card
 
     required property var modelData
-
-    property bool showTimestamp: false
-
-    property bool interactive: true
-
-    property bool nested: false
 
     readonly property bool isCritical: modelData?.urgency === NotificationUrgency.Critical
 
@@ -78,10 +70,10 @@ Item {
     component ActionButton: Rectangle {
         required property var modelData
 
-        Layout.preferredHeight: 26
-        Layout.preferredWidth: actionLabel.implicitWidth + 24
-        radius: Theme.radius.sm
-        color: actionHover.hovered ? Theme.fill.strong : Theme.fill.press
+        Layout.fillWidth: true
+        Layout.preferredHeight: 28
+        radius: Theme.radius.md
+        color: actionHover.hovered ? Theme.fill.strong : Theme.fill.hover
 
         Behavior on color {
             ColorAnimation {
@@ -90,20 +82,17 @@ Item {
         }
 
         Text {
-            id: actionLabel
-            anchors.centerIn: parent
-            anchors.margins: 4
+            anchors.fill: parent
+            anchors.leftMargin: Theme.space.md
+            anchors.rightMargin: Theme.space.md
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
             text: modelData.text
-            color: actionHover.hovered ? Theme.text.primary : Theme.text.secondary
+            color: Theme.text.primary
             elide: Text.ElideRight
             font.family: Theme.font.ui
             font.pixelSize: Theme.type.label.size
             font.weight: Theme.type.label.weight
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
         }
 
         HoverHandler {
@@ -123,32 +112,19 @@ Item {
         width: card.width
         height: cardContent.implicitHeight + Theme.space.lg * 2
 
-        radius: card.nested ? Theme.radius.lg : Theme.radius.xl
-        border.width: card.nested ? 0 : 1
-        color: {
-            if (card.isCritical)
-                return Theme.withAlpha(Theme.danger, 0.18);
-            if (!card.nested)
-                return Theme.colors.surface;
-            return cardHover.hovered ? Theme.fill.press : Theme.fill.hover;
-        }
-        border.color: card.isCritical ? Theme.danger : Theme.stroke.hairline
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
-            }
-        }
+        radius: Theme.radius.xl
+        border.width: 1
+        color: card.isCritical ? Qt.tint(Theme.colors.surface, Theme.withAlpha(Theme.danger, 0.12)) : Theme.colors.surface
+        border.color: card.isCritical ? Theme.withAlpha(Theme.danger, 0.6) : Theme.stroke.hairline
 
         HoverHandler {
             id: cardHover
         }
 
         TapHandler {
-            enabled: card.interactive
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onTapped: function (eventPoint, button) {
-                if (card.actionHovered || card.menuHovered || closeHoverInline.hovered)
+                if (card.actionHovered || card.menuHovered)
                     return;
                 if (card.menuExpanded) {
                     card.menuExpanded = false;
@@ -168,181 +144,104 @@ Item {
             id: cardContent
             anchors.fill: parent
             anchors.margins: Theme.space.lg
-            spacing: Theme.space.xxs
+            spacing: Theme.space.md
 
-            RowLayout {
-                id: headerRow
+            ColumnLayout {
+                id: textColumn
                 Layout.fillWidth: true
-                spacing: Theme.space.sm
+                spacing: Theme.space.xxs
 
-                Item {
-                    Layout.preferredWidth: 16
-                    Layout.preferredHeight: 16
-                    Layout.alignment: Qt.AlignVCenter
-                    visible: appIconImage.status === Image.Ready
-
-                    IconImage {
-                        id: appIconImage
-                        anchors.centerIn: parent
-                        source: Quickshell.iconPath(card.modelData?.appIcon ?? "", true)
-                        implicitSize: 16
-                    }
-                }
-
-                Text {
-                    Layout.fillWidth: true
-                    text: card.modelData?.appName ?? ""
-                    color: Theme.text.secondary
-                    font.family: Theme.font.ui
-                    font.pixelSize: Theme.type.label.size
-                    font.weight: Theme.type.label.weight
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    visible: card.showTimestamp
-                    text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
-                    color: Theme.text.secondary
-                    font.family: Theme.font.ui
-                    font.pixelSize: Theme.type.label.size
-                    font.weight: Theme.type.label.weight
-                }
-
-                Text {
-                    visible: card.interactive && card.menuActions().length > 0
-                    activeFocusOnTab: visible
-                    text: PhosphorIcons.caretDown
-                    font.family: Theme.font.icon
-                    font.pixelSize: Theme.icon.xs
-                    color: menuHover.hovered ? Theme.text.primary : Theme.text.secondary
-                    rotation: card.menuExpanded ? 180 : 0
-
-                    Behavior on rotation {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
-
-                    HoverHandler {
-                        id: menuHover
-                        cursorShape: Qt.PointingHandCursor
-                        onHoveredChanged: card.menuHovered = hovered
-                    }
-
-                    TapHandler {
-                        onTapped: card.menuExpanded = !card.menuExpanded
-                    }
-
-                    Keys.onPressed: function (event) {
-                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                            card.menuExpanded = !card.menuExpanded;
-                            event.accepted = true;
-                        }
-                    }
-                }
-
-                Text {
-                    visible: card.interactive && card.nested
-                    opacity: cardHover.hovered || closeHoverInline.hovered ? 1 : 0
-                    enabled: opacity > 0
-                    text: PhosphorIcons.x
-                    font.family: Theme.font.icon
-                    font.pixelSize: Theme.icon.xs
-                    color: closeHoverInline.hovered ? Theme.text.primary : Theme.text.secondary
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
-
-                    HoverHandler {
-                        id: closeHoverInline
-                        cursorShape: Qt.PointingHandCursor
-                    }
-
-                    TapHandler {
-                        onTapped: NotificationService.removeNotification(card.modelData.id)
-                    }
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredHeight: card.menuExpanded && card.menuActions().length > 0 ? popover.height + 6 : 0
-
-                Behavior on Layout.preferredHeight {
-                    NumberAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Theme.space.md
-
-                ColumnLayout {
+                RowLayout {
+                    id: headerRow
                     Layout.fillWidth: true
                     spacing: Theme.space.sm
 
                     Text {
                         Layout.fillWidth: true
-                        text: card.modelData?.summary ?? ""
-                        visible: text !== ""
+                        text: card.modelData?.summary || card.modelData?.appName || ""
                         color: Theme.text.primary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.title.size
-                        font.weight: Theme.type.title.weight
+                        font.weight: Font.DemiBold
                         elide: Text.ElideRight
                     }
 
                     Text {
-                        Layout.fillWidth: true
-                        text: card.styledBody(card.modelData?.body ?? "")
-                        visible: text !== ""
-                        color: Theme.text.secondary
+                        text: [card.modelData?.summary ? card.modelData?.appName : "", card.relativeTime(card.modelData?.timestamp ?? Date.now())].filter(Boolean).join(" · ")
+                        color: Theme.text.tertiary
                         font.family: Theme.font.ui
-                        font.pixelSize: Theme.type.body.size
-                        font.weight: Theme.type.body.weight
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 2
-                        elide: Text.ElideRight
-                        onLinkActivated: link => card.openBodyLink(link)
+                        font.pixelSize: Theme.type.caption.size
+                    }
+
+                    Text {
+                        visible: card.menuActions().length > 0
+                        activeFocusOnTab: visible
+                        text: PhosphorIcons.caretDown
+                        font.family: Theme.font.icon
+                        font.pixelSize: Theme.icon.xs
+                        color: menuHover.hovered ? Theme.text.primary : Theme.text.secondary
+                        rotation: card.menuExpanded ? 180 : 0
+
+                        Behavior on rotation {
+                            NumberAnimation {
+                                duration: Theme.motion.fast
+                            }
+                        }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.motion.fast
+                            }
+                        }
+
+                        HoverHandler {
+                            id: menuHover
+                            cursorShape: Qt.PointingHandCursor
+                            onHoveredChanged: card.menuHovered = hovered
+                        }
+
+                        TapHandler {
+                            onTapped: card.menuExpanded = !card.menuExpanded
+                        }
+
+                        Keys.onPressed: function (event) {
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                                card.menuExpanded = !card.menuExpanded;
+                                event.accepted = true;
+                            }
+                        }
                     }
                 }
 
-                ClippingRectangle {
-                    Layout.preferredWidth: 48
-                    Layout.preferredHeight: 48
-                    Layout.alignment: Qt.AlignTop
-                    radius: Theme.radius.md
-                    color: "transparent"
-                    visible: notifImage.status === Image.Ready
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: card.menuExpanded && card.menuActions().length > 0 ? popover.height + 6 : 0
 
-                    Image {
-                        id: notifImage
-                        anchors.fill: parent
-                        source: card.modelData?.image ?? ""
-                        fillMode: Image.PreserveAspectCrop
+                    Behavior on Layout.preferredHeight {
+                        NumberAnimation {
+                            duration: Theme.motion.fast
+                        }
                     }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: card.styledBody(card.modelData?.body ?? "")
+                    visible: text !== ""
+                    color: Theme.text.secondary
+                    font.family: Theme.font.ui
+                    font.pixelSize: Theme.type.body.size
+                    font.weight: Theme.type.body.weight
+                    wrapMode: Text.WordWrap
+                    maximumLineCount: 3
+                    elide: Text.ElideRight
+                    onLinkActivated: link => card.openBodyLink(link)
                 }
             }
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: Theme.space.md
-                visible: card.interactive && card.buttonActions().length > 0
+                spacing: Theme.space.sm
+                visible: card.buttonActions().length > 0
 
                 Repeater {
                     model: card.buttonActions()
@@ -359,7 +258,7 @@ Item {
             z: 10
 
             x: Math.max(0, surface.width - width - 12)
-            y: cardContent.y + headerRow.y + headerRow.height + cardContent.spacing
+            y: cardContent.y + textColumn.y + headerRow.y + headerRow.height + textColumn.spacing
             width: popoverColumn.implicitWidth + 8
             height: popoverColumn.implicitHeight + 8
 
@@ -436,11 +335,10 @@ Item {
     }
 
     CloseBadge {
-        id: closeBadge
+        readonly property real cornerInset: surface.radius * (1 - Math.SQRT1_2)
 
-        x: -width / 2
-        y: -height / 2
-        visible: card.interactive && !card.nested
+        x: Math.round(cornerInset - width / 2)
+        y: Math.round(cornerInset - height / 2)
         revealed: cardHover.hovered
         onTapped: NotificationService.removeNotification(card.modelData.id)
     }

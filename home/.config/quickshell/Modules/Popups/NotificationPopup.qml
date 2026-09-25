@@ -11,13 +11,7 @@ Popup {
     shown: Visibilities.notificationCenter
     onDismissed: Visibilities.notificationCenter = false
 
-    onShownChanged: {
-        if (!shown)
-            center.menuOpen = false;
-    }
-
     NotificationCenter {
-        id: center
         width: parent.width
         maxHeight: panel.implicitHeight - panel.cardPadding * 2
     }

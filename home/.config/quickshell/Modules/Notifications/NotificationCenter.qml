@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -11,105 +10,43 @@ Item {
 
     readonly property bool hasHistory: NotificationService.history.length > 0
 
-    readonly property int badgeOverhang: Theme.space.sm
-
-    property bool menuOpen: false
-
-    onHasHistoryChanged: {
-        if (!hasHistory)
-            menuOpen = false;
-    }
+    readonly property int bleed: Theme.space.sm
 
     implicitHeight: stack.implicitHeight
-
-    HoverHandler {
-        id: panelHover
-    }
-
-    Item {
-        anchors.fill: parent
-        visible: root.menuOpen
-        z: 9
-
-        TapHandler {
-            onTapped: root.menuOpen = false
-        }
-    }
 
     Column {
         id: stack
         width: parent.width
-        spacing: 0
+        spacing: Theme.space.lg
 
         Item {
-            id: overflowSlot
+            id: header
             width: parent.width
             height: 22
-            z: 10
 
-            IconActionButton {
-                id: overflowButton
-                anchors.right: parent.right
+            Text {
+                anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                size: 22
-                circular: true
-                glyph: PhosphorIcons.dotsThree
-                visible: root.hasHistory
-                opacity: panelHover.hovered || root.menuOpen ? 1 : 0
-                enabled: opacity > 0
-                onTapped: root.menuOpen = !root.menuOpen
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
+                text: "Notifications"
+                color: Theme.text.primary
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.title.size
+                font.weight: Theme.type.title.weight
             }
 
-            Rectangle {
-                id: overflowMenu
-
+            Text {
                 anchors.right: parent.right
-                anchors.top: overflowButton.bottom
-                anchors.topMargin: Theme.space.xs
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.hasHistory
+                text: "Clear all"
+                color: clearAllHover.hovered ? Theme.text.primary : Theme.text.secondary
+                font.family: Theme.font.ui
+                font.pixelSize: Theme.type.label.size
+                font.weight: Theme.type.label.weight
 
-                visible: root.menuOpen && root.hasHistory
-                opacity: visible ? 1 : 0
-                width: clearAllLabel.implicitWidth + Theme.space.lg * 2
-                height: 32
-
-                radius: Theme.radius.md
-                color: Theme.colors.raised
-                border.width: 1
-                border.color: Theme.stroke.hairline
-
-                layer.enabled: true
-                layer.effect: MultiEffect {
-                    shadowEnabled: true
-                    shadowColor: Qt.rgba(0, 0, 0, 0.45)
-                    shadowBlur: 0.6
-                    shadowVerticalOffset: 2
-                }
-
-                Behavior on opacity {
-                    NumberAnimation {
+                Behavior on color {
+                    ColorAnimation {
                         duration: Theme.motion.fast
-                    }
-                }
-
-                Text {
-                    id: clearAllLabel
-
-                    anchors.centerIn: parent
-                    text: "Clear all"
-                    color: clearAllHover.hovered ? Theme.danger : Theme.text.primary
-                    font.family: Theme.font.ui
-                    font.pixelSize: Theme.type.body.size
-
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.motion.fast
-                        }
                     }
                 }
 
@@ -119,10 +56,7 @@ Item {
                 }
 
                 TapHandler {
-                    onTapped: {
-                        NotificationService.clearHistory();
-                        root.menuOpen = false;
-                    }
+                    onTapped: NotificationService.clearHistory()
                 }
             }
         }
@@ -135,7 +69,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 text: "No notifications"
-                color: Theme.text.secondary
+                color: Theme.text.tertiary
                 font.family: Theme.font.ui
                 font.pixelSize: Theme.type.body.size
             }
@@ -143,10 +77,10 @@ Item {
 
         Flickable {
             id: historyScroll
-            x: -root.badgeOverhang
-            width: parent.width + root.badgeOverhang * 2
+            x: -root.bleed
+            width: parent.width + root.bleed * 2
             visible: root.hasHistory
-            height: root.maxHeight > 0 ? Math.min(history.implicitHeight, root.maxHeight - overflowSlot.height - stack.spacing) : history.implicitHeight
+            height: root.maxHeight > 0 ? Math.min(history.implicitHeight, root.maxHeight - header.height - stack.spacing) : history.implicitHeight
             contentHeight: history.implicitHeight
             clip: true
             boundsBehavior: Flickable.StopAtBounds
@@ -154,9 +88,9 @@ Item {
 
             NotificationHistory {
                 id: history
-                x: root.badgeOverhang
-                width: historyScroll.width - root.badgeOverhang * 2
-                badgeOverhang: root.badgeOverhang
+                x: root.bleed
+                width: historyScroll.width - root.bleed * 2
+                bleed: root.bleed
             }
         }
     }
