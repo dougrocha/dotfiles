@@ -38,6 +38,8 @@ Singleton {
     }
 
     function separateHue(c, from, minDegrees) {
+        c = Qt.color(c);
+        from = Qt.color(from);
         if (c.hslHue < 0 || from.hslHue < 0)
             return c;
         const delta = ((c.hslHue - from.hslHue) * 360 + 540) % 360 - 180;
