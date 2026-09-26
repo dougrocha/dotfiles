@@ -75,7 +75,7 @@ build_stb() {
 build_stb
 
 build_and_install ols https://github.com/DanielGavin/ols.git master \
-    "./build.sh" ols
+    "./build.sh && ./odinfmt.sh" ols odinfmt
 
 build_and_install odin-tags https://github.com/GoNZooo/odin-tags.git main \
     "odin build tags -o:speed -out:bin/odin-tags" bin/odin-tags
