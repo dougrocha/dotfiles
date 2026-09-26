@@ -1031,7 +1031,7 @@ Item {
                             text: "Other Location…"
                             color: Theme.accent
                             font.pixelSize: Theme.type.body.size
-                            font.weight: Font.Medium
+                            font.weight: Theme.type.title.weight
                             font.family: Theme.font.ui
                         }
 
@@ -1617,7 +1617,7 @@ Item {
                             text: "Capture"
                             color: Theme.accentText
                             font.pixelSize: Theme.type.body.size
-                            font.weight: Font.Medium
+                            font.weight: Theme.type.title.weight
                             font.family: Theme.font.ui
                         }
 
@@ -1666,13 +1666,12 @@ Item {
                         text: manager.countdown + "s"
                         color: Theme.text.primary
                         font.pixelSize: Theme.type.title.size
-                        font.weight: Font.Medium
+                        font.weight: Theme.type.title.weight
                         font.family: Theme.font.ui
                         Layout.rightMargin: 6
                     }
                 }
             }
-
         }
     }
 }

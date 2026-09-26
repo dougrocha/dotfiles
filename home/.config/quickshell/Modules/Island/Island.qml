@@ -287,7 +287,7 @@ Variants {
                                     color: Theme.text.primary
                                     font.pixelSize: Theme.type.body.size
                                     font.family: Theme.font.ui
-                                    font.weight: Font.Medium
+                                    font.weight: Theme.type.title.weight
 
                                     readonly property real overflow: Math.max(0, implicitWidth - musicTextClip.width)
 
@@ -301,7 +301,7 @@ Variants {
                                         running: musicText.scrolling
                                         loops: Animation.Infinite
                                         PauseAnimation {
-                                            duration: 2000
+                                            duration: Theme.motion.marqueePause
                                         }
                                         NumberAnimation {
                                             from: 0
@@ -310,7 +310,7 @@ Variants {
                                             easing.type: Theme.motion.easeSmooth
                                         }
                                         PauseAnimation {
-                                            duration: 2000
+                                            duration: Theme.motion.marqueePause
                                         }
                                         NumberAnimation {
                                             from: -musicText.overflow
@@ -325,7 +325,6 @@ Variants {
                                     cursorShape: Qt.PointingHandCursor
                                 }
                             }
-
                         }
 
                         Row {
@@ -379,7 +378,6 @@ Variants {
                                 font.pixelSize: Theme.type.body.size
                                 font.family: Theme.font.ui
                             }
-
                         }
 
                         Row {
@@ -455,11 +453,11 @@ Variants {
                                     loops: Animation.Infinite
                                     NumberAnimation {
                                         to: 0.3
-                                        duration: 800
+                                        duration: Theme.motion.pulse
                                     }
                                     NumberAnimation {
                                         to: 1
-                                        duration: 800
+                                        duration: Theme.motion.pulse
                                     }
                                 }
 
@@ -476,7 +474,7 @@ Variants {
                                 color: Theme.danger
                                 font.pixelSize: Theme.type.body.size
                                 font.family: Theme.font.ui
-                                font.weight: Font.Medium
+                                font.weight: Theme.type.title.weight
 
                                 TapHandler {
                                     onTapped: pill.recDetails = !pill.recDetails
@@ -545,7 +543,7 @@ Variants {
                                 color: stopHover.hovered ? Theme.dangerText : Theme.danger
                                 font.pixelSize: Theme.type.body.size
                                 font.family: Theme.font.ui
-                                font.weight: Font.Medium
+                                font.weight: Theme.type.title.weight
                             }
 
                             HoverHandler {
@@ -617,7 +615,7 @@ Variants {
                             color: Theme.text.primary
                             font.pixelSize: Theme.type.body.size
                             font.family: Theme.font.ui
-                            font.weight: Font.Medium
+                            font.weight: Theme.type.title.weight
                             elide: Text.ElideRight
                             maximumLineCount: 1
                         }
@@ -721,7 +719,7 @@ Variants {
                                         color: tabChip.active ? Theme.text.primary : Theme.text.secondary
                                         font.family: Theme.font.ui
                                         font.pixelSize: Theme.type.caption.size
-                                        font.weight: Font.Medium
+                                        font.weight: Theme.type.label.weight
 
                                         Behavior on color {
                                             ColorAnimation {
@@ -806,7 +804,7 @@ Variants {
                                             id: panelArt
                                             anchors.fill: parent
                                             tag: IslandService.track
-                            source: tag?.artUrl ?? ""
+                                            source: tag?.artUrl ?? ""
                                         }
                                     }
 
@@ -831,7 +829,7 @@ Variants {
                                             color: Theme.text.primary
                                             font.pixelSize: Theme.type.display.size
                                             font.family: Theme.font.ui
-                                            font.weight: Font.Medium
+                                            font.weight: Theme.type.display.weight
                                             elide: Text.ElideRight
                                             maximumLineCount: 1
                                         }
@@ -1074,11 +1072,11 @@ Variants {
                         loops: Animation.Infinite
                         NumberAnimation {
                             to: 0.3
-                            duration: 800
+                            duration: Theme.motion.pulse
                         }
                         NumberAnimation {
                             to: 1
-                            duration: 800
+                            duration: Theme.motion.pulse
                         }
                     }
                 }

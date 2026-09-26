@@ -23,7 +23,9 @@ Singleton {
     }
 
     function next() {
-        MprisService.musicPlayer?.next();
+        const player = MprisService.musicPlayer;
+        if (player?.canGoNext)
+            player.next();
     }
 
     function previous() {
@@ -32,7 +34,7 @@ Singleton {
             return;
         if (player.position > 3)
             root.seek(0);
-        else
+        else if (player.canGoPrevious)
             player.previous();
     }
 
@@ -53,7 +55,7 @@ Singleton {
         if (!player)
             return;
         if (player.lengthSupported && player.length > 0 && seconds >= player.length - 1) {
-            player.next();
+            root.next();
             return;
         }
         player.position = Math.max(0, seconds);

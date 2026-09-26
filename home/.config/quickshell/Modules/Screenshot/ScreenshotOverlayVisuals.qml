@@ -64,7 +64,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             visible: !regionVisuals.hasIntersection
-            color: "#66000000"
+            color: Theme.withAlpha(Theme.shadow, 0.4)
         }
         Rectangle {
             x: 0
@@ -72,7 +72,7 @@ Item {
             width: regionVisuals.width
             height: regionVisuals.intersectionTop
             visible: regionVisuals.hasIntersection
-            color: "#66000000"
+            color: Theme.withAlpha(Theme.shadow, 0.4)
         }
         Rectangle {
             x: 0
@@ -80,7 +80,7 @@ Item {
             width: regionVisuals.intersectionLeft
             height: regionVisuals.intersectionBottom - y
             visible: regionVisuals.hasIntersection
-            color: "#66000000"
+            color: Theme.withAlpha(Theme.shadow, 0.4)
         }
         Rectangle {
             x: regionVisuals.intersectionRight
@@ -88,7 +88,7 @@ Item {
             width: regionVisuals.width - x
             height: regionVisuals.intersectionBottom - y
             visible: regionVisuals.hasIntersection
-            color: "#66000000"
+            color: Theme.withAlpha(Theme.shadow, 0.4)
         }
         Rectangle {
             x: 0
@@ -96,7 +96,7 @@ Item {
             width: regionVisuals.width
             height: regionVisuals.height - y
             visible: regionVisuals.hasIntersection
-            color: "#66000000"
+            color: Theme.withAlpha(Theme.shadow, 0.4)
         }
 
         Rectangle {
