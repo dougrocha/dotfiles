@@ -164,7 +164,9 @@ Variants {
 
                     SettingsButton {}
 
-                    NotificationBellButton {}
+                    DoNotDisturbIndicator {}
+
+                    ClockButton {}
                 }
             }
         }
