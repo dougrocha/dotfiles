@@ -2,6 +2,8 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
+import qs.Constants
 
 Singleton {
     id: root
@@ -32,6 +34,48 @@ Singleton {
     Timer {
         id: osdTimer
         interval: 1500
+    }
+
+    property var alerts: []
+    readonly property var currentAlert: alerts[0] ?? null
+    readonly property bool transientAlertActive: alerts.some(a => a.until > 0)
+
+    function pushAlert(id: string, icon: string, text: string, seconds: real): void {
+        const alert = {
+            id: id,
+            glyph: PhosphorIcons[icon] ?? icon,
+            text: text,
+            until: seconds > 0 ? Date.now() + seconds * 1000 : 0
+        };
+        alerts = [alert, ...alerts.filter(a => a.id !== id)];
+    }
+
+    function clearAlert(id: string): void {
+        alerts = alerts.filter(a => a.id !== id);
+    }
+
+    Timer {
+        interval: 250
+        repeat: true
+        running: root.transientAlertActive
+        onTriggered: {
+            const now = Date.now();
+            const kept = root.alerts.filter(a => a.until === 0 || a.until > now);
+            if (kept.length !== root.alerts.length)
+                root.alerts = kept;
+        }
+    }
+
+    IpcHandler {
+        target: "island"
+
+        function push(id: string, icon: string, text: string, seconds: real): void {
+            root.pushAlert(id, icon, text, seconds);
+        }
+
+        function clear(id: string): void {
+            root.clearAlert(id);
+        }
     }
 
     Connections {
@@ -136,6 +180,11 @@ Singleton {
             list.push({
                 id: "osd",
                 priority: 100
+            });
+        if (currentAlert)
+            list.push({
+                id: "alert",
+                priority: currentAlert.until > 0 ? 95 : 60
             });
         if (recording)
             list.push({

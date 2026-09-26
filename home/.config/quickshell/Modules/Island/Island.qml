@@ -50,7 +50,7 @@ Variants {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "qs.island"
 
-        readonly property bool revealed: Visibilities.barRevealed || IslandService.osdActive || IslandService.songNotif
+        readonly property bool revealed: Visibilities.barRevealed || IslandService.osdActive || IslandService.songNotif || IslandService.transientAlertActive
 
         mask: Region {
             x: pill.x
@@ -145,6 +145,10 @@ Variants {
                 }
                 TapHandler {
                     onTapped: {
+                        if (!pill.full && pill.activity === "alert") {
+                            IslandService.clearAlert(IslandService.currentAlert.id);
+                            return;
+                        }
                         if (pill.notif)
                             IslandService.dismissSongNotif();
                         Visibilities.openMusicPanel();
@@ -248,7 +252,7 @@ Variants {
                         id: activitySlot
                         visible: pill.activity !== "idle"
                         anchors.verticalCenter: parent.verticalCenter
-                        width: pill.activity === "music" ? musicGroup.implicitWidth : pill.activity === "osd" ? osdGroup.implicitWidth : pill.activity === "recording" ? recordingGroup.implicitWidth : 0
+                        width: pill.activity === "music" ? musicGroup.implicitWidth : pill.activity === "osd" ? osdGroup.implicitWidth : pill.activity === "recording" ? recordingGroup.implicitWidth : pill.activity === "alert" ? alertGroup.implicitWidth : 0
                         height: parent.height
 
                         Row {
@@ -366,6 +370,34 @@ Variants {
                                 font.family: Theme.font.ui
                             }
 
+                        }
+
+                        Row {
+                            id: alertGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.space.sm
+                            opacity: pill.activity === "alert" ? 1 : 0
+                            visible: opacity > 0
+
+                            ContentFade on opacity {}
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: IslandService.currentAlert?.glyph ?? ""
+                                color: Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
+                            }
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.min(implicitWidth, 320)
+                                text: IslandService.currentAlert?.text ?? ""
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
+                                elide: Text.ElideRight
+                            }
                         }
 
                         Row {
@@ -962,6 +994,15 @@ Variants {
                     font.pixelSize: Theme.icon.xs
                 }
 
+                Text {
+                    anchors.centerIn: parent
+                    visible: bubble.shownKind === "alert"
+                    text: IslandService.currentAlert?.glyph ?? ""
+                    color: Theme.accent
+                    font.family: Theme.font.icon
+                    font.pixelSize: Theme.icon.xs
+                }
+
                 Rectangle {
                     anchors.centerIn: parent
                     visible: bubble.shownKind === "recording"
@@ -991,6 +1032,8 @@ Variants {
                     onTapped: {
                         if (bubble.shownKind === "recording")
                             pill.recDetails = !pill.recDetails;
+                        else if (bubble.shownKind === "alert")
+                            IslandService.clearAlert(IslandService.currentAlert?.id ?? "");
                         else
                             Visibilities.openMusicPanel();
                     }
