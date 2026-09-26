@@ -91,8 +91,8 @@ Singleton {
 
     function styledBody(text) {
         const anchors = [];
-        const linked = text.replace(/<a\s[^>]*>.*?<\/a>/gi, anchor => {
-            anchors.push(anchor);
+        const linked = text.replace(/<a\s[^>]*>.*?<\/a>|<[^>]+>/gi, tag => {
+            anchors.push(tag);
             return "\u0000" + (anchors.length - 1) + "\u0000";
         }).replace(/\bhttps?:\/\/[^\s<>"']*[^\s<>"'.,;:!?)\]]/gi, url => `<a href="${url}">${root.shortUrl(url)}</a>`).replace(/\u0000(\d+)\u0000/g, (_, index) => anchors[index]);
         return linked.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
