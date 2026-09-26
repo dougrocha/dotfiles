@@ -19,7 +19,7 @@ QtObject {
     ]
 
     function identity() {
-        return `${root.trayItem.id || ""} ${root.trayItem.title || ""}`.toLowerCase();
+        return `${root.trayItem?.id || ""} ${root.trayItem?.title || ""}`.toLowerCase();
     }
 
     function matches(override) {
@@ -69,6 +69,6 @@ QtObject {
     }
 
     property QsMenuOpener menuOpener: QsMenuOpener {
-        menu: root.trayItem.hasMenu ? root.trayItem.menu : null
+        menu: root.trayItem?.hasMenu ? root.trayItem.menu : null
     }
 }

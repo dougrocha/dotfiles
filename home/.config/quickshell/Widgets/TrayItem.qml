@@ -36,8 +36,8 @@ Rectangle {
     activeFocusOnTab: true
     radius: height / 2
     color: menuOpen || activeFocus ? Theme.fill.press : hoverHandler.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-    border.width: trayItem.status === Status.NeedsAttention || activeFocus ? 1 : 0
-    border.color: trayItem.status === Status.NeedsAttention ? Theme.accent : Theme.stroke.strong
+    border.width: trayItem?.status === Status.NeedsAttention || activeFocus ? 1 : 0
+    border.color: trayItem?.status === Status.NeedsAttention ? Theme.accent : Theme.stroke.strong
     transform: Translate {
         x: root.previewOffsetX
     }
@@ -59,7 +59,7 @@ Rectangle {
         anchors.centerIn: parent
         width: 16
         height: 16
-        source: root.trayItem.icon
+        source: root.trayItem?.icon ?? ""
         visible: status === Image.Ready && !root.dragging
         mipmap: true
     }
