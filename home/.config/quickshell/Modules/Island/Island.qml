@@ -57,6 +57,13 @@ Variants {
             y: slide.y + pill.y
             width: overlay.revealed ? pill.width : 0
             height: overlay.revealed ? pill.height : 0
+
+            Region {
+                x: bubble.x
+                y: slide.y + bubble.y
+                width: bubble.visible ? bubble.width : 0
+                height: bubble.visible ? bubble.height : 0
+            }
         }
 
         HyprlandFocusGrab {
@@ -197,10 +204,11 @@ Variants {
                     spacing: Theme.space.md
                     opacity: (pill.full || pill.notif) ? 0 : 1
                     visible: opacity > 0
-                    scale: 0.96 + 0.04 * opacity
-                    transformOrigin: Item.Top
-
-                    ContentFade on opacity {}
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.motion.fast
+                        }
+                    }
 
                     ClockWidget {
                         anchors.verticalCenter: parent.verticalCenter
@@ -237,55 +245,180 @@ Variants {
                     }
 
                     Item {
-                        id: musicTextClip
-                        visible: pill.activity === "music" || (pill.activity === "recording" && IslandService.musicAvailable)
+                        id: activitySlot
+                        visible: pill.activity !== "idle"
                         anchors.verticalCenter: parent.verticalCenter
-                        width: Math.min(musicText.implicitWidth, 360)
-                        height: musicText.implicitHeight
-                        clip: true
+                        width: pill.activity === "music" ? musicGroup.implicitWidth : pill.activity === "osd" ? osdGroup.implicitWidth : pill.activity === "recording" ? recordingGroup.implicitWidth : 0
+                        height: parent.height
 
-                        Text {
-                            id: musicText
-                            text: MprisService.nowPlaying(IslandService.trackTitle, IslandService.trackArtist)
-                            color: Theme.text.primary
-                            font.pixelSize: Theme.type.body.size
-                            font.family: Theme.font.ui
-                            font.weight: Font.Medium
+                        Row {
+                            id: musicGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.space.md
+                            opacity: pill.activity === "music" ? 1 : 0
+                            visible: opacity > 0
 
-                            readonly property real overflow: Math.max(0, implicitWidth - musicTextClip.width)
+                            ContentFade on opacity {}
 
-                            readonly property bool scrolling: musicText.overflow > 0 && musicTextClip.visible && overlay.revealed
+                            Item {
+                                id: musicTextClip
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.min(musicText.implicitWidth, 360)
+                                height: musicText.implicitHeight
+                                clip: true
 
-                            onTextChanged: x = 0
-                            onScrollingChanged: if (!musicText.scrolling)
-                                x = 0
+                                Text {
+                                    id: musicText
+                                    text: MprisService.nowPlaying(IslandService.trackTitle, IslandService.trackArtist)
+                                    color: Theme.text.primary
+                                    font.pixelSize: Theme.type.body.size
+                                    font.family: Theme.font.ui
+                                    font.weight: Font.Medium
 
-                            SequentialAnimation on x {
-                                running: musicText.scrolling
-                                loops: Animation.Infinite
-                                PauseAnimation {
-                                    duration: 2000
+                                    readonly property real overflow: Math.max(0, implicitWidth - musicTextClip.width)
+
+                                    readonly property bool scrolling: musicText.overflow > 0 && musicTextClip.visible && overlay.revealed
+
+                                    onTextChanged: x = 0
+                                    onScrollingChanged: if (!musicText.scrolling)
+                                        x = 0
+
+                                    SequentialAnimation on x {
+                                        running: musicText.scrolling
+                                        loops: Animation.Infinite
+                                        PauseAnimation {
+                                            duration: 2000
+                                        }
+                                        NumberAnimation {
+                                            from: 0
+                                            to: -musicText.overflow
+                                            duration: musicText.overflow * 40
+                                            easing.type: Theme.motion.easeSmooth
+                                        }
+                                        PauseAnimation {
+                                            duration: 2000
+                                        }
+                                        NumberAnimation {
+                                            from: -musicText.overflow
+                                            to: 0
+                                            duration: musicText.overflow * 40
+                                            easing.type: Theme.motion.easeSmooth
+                                        }
+                                    }
                                 }
-                                NumberAnimation {
-                                    from: 0
-                                    to: -musicText.overflow
-                                    duration: musicText.overflow * 40
-                                    easing.type: Theme.motion.easeSmooth
-                                }
-                                PauseAnimation {
-                                    duration: 2000
-                                }
-                                NumberAnimation {
-                                    from: -musicText.overflow
-                                    to: 0
-                                    duration: musicText.overflow * 40
-                                    easing.type: Theme.motion.easeSmooth
+
+                                HoverHandler {
+                                    cursorShape: Qt.PointingHandCursor
                                 }
                             }
+
                         }
 
-                        HoverHandler {
-                            cursorShape: Qt.PointingHandCursor
+                        Row {
+                            id: osdGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.space.md
+                            opacity: pill.activity === "osd" ? 1 : 0
+                            visible: opacity > 0
+
+                            ContentFade on opacity {}
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: {
+                                    if (IslandService.osdMode === "mic")
+                                        return IslandService.osdMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone;
+                                    if (IslandService.osdMuted)
+                                        return PhosphorIcons.speakerSlash;
+                                    if (IslandService.osdLevel === 0)
+                                        return PhosphorIcons.speakerNone;
+                                    return IslandService.osdLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
+                                }
+                                color: IslandService.osdMuted ? Theme.text.secondary : Theme.accent
+                                font.pixelSize: Theme.icon.md
+                                font.family: Theme.font.icon
+                            }
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 120
+                                height: 4
+                                radius: Theme.radius.xxs
+                                color: Theme.stroke.strong
+
+                                Rectangle {
+                                    width: Math.min(IslandService.osdLevel, 1) * parent.width
+                                    height: parent.height
+                                    radius: Theme.radius.xxs
+                                    color: IslandService.osdMuted ? Theme.text.tertiary : Theme.accent
+                                    Behavior on width {
+                                        NumberAnimation {
+                                            duration: Theme.motion.instant
+                                            easing.type: Theme.motion.easeStandard
+                                        }
+                                    }
+                                }
+                            }
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: IslandService.osdLabel !== "" ? IslandService.osdLabel : Math.round(IslandService.osdLevel * 100) + "%"
+                                color: Theme.text.primary
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
+                            }
+
+                        }
+
+                        Row {
+                            id: recordingGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.space.md
+                            opacity: pill.activity === "recording" ? 1 : 0
+                            visible: opacity > 0
+
+                            ContentFade on opacity {}
+
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 8
+                                height: 8
+                                radius: Theme.radius.xs
+                                color: Theme.danger
+
+                                SequentialAnimation on opacity {
+                                    running: pill.activity === "recording"
+                                    loops: Animation.Infinite
+                                    NumberAnimation {
+                                        to: 0.3
+                                        duration: 800
+                                    }
+                                    NumberAnimation {
+                                        to: 1
+                                        duration: 800
+                                    }
+                                }
+
+                                TapHandler {
+                                    onTapped: pill.recDetails = !pill.recDetails
+                                }
+                                HoverHandler {
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: StreamingService.isRecordingScreen ? "Recording" : "Screen shared"
+                                color: Theme.danger
+                                font.pixelSize: Theme.type.body.size
+                                font.family: Theme.font.ui
+                                font.weight: Font.Medium
+
+                                TapHandler {
+                                    onTapped: pill.recDetails = !pill.recDetails
+                                }
+                                HoverHandler {
+                                    cursorShape: Qt.PointingHandCursor
+                                }
+                            }
                         }
                     }
 
@@ -296,97 +429,6 @@ Variants {
                         height: 8
                         radius: Theme.radius.xs
                         color: Theme.caution
-                    }
-
-                    Text {
-                        visible: pill.activity === "osd"
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: {
-                            if (IslandService.osdMode === "mic")
-                                return IslandService.osdMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone;
-                            if (IslandService.osdMuted)
-                                return PhosphorIcons.speakerSlash;
-                            if (IslandService.osdLevel === 0)
-                                return PhosphorIcons.speakerNone;
-                            return IslandService.osdLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
-                        }
-                        color: IslandService.osdMuted ? Theme.text.secondary : Theme.accent
-                        font.pixelSize: Theme.icon.md
-                        font.family: Theme.font.icon
-                    }
-                    Rectangle {
-                        visible: pill.activity === "osd"
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 120
-                        height: 4
-                        radius: Theme.radius.xxs
-                        color: Theme.stroke.strong
-
-                        Rectangle {
-                            width: Math.min(IslandService.osdLevel, 1) * parent.width
-                            height: parent.height
-                            radius: Theme.radius.xxs
-                            color: IslandService.osdMuted ? Theme.text.tertiary : Theme.accent
-                            Behavior on width {
-                                NumberAnimation {
-                                    duration: Theme.motion.instant
-                                    easing.type: Theme.motion.easeStandard
-                                }
-                            }
-                        }
-                    }
-                    Text {
-                        visible: pill.activity === "osd"
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: IslandService.osdLabel !== "" ? IslandService.osdLabel : Math.round(IslandService.osdLevel * 100) + "%"
-                        color: Theme.text.primary
-                        font.pixelSize: Theme.type.body.size
-                        font.family: Theme.font.ui
-                    }
-
-                    Rectangle {
-                        visible: pill.activity === "recording"
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 8
-                        height: 8
-                        radius: Theme.radius.xs
-                        color: Theme.danger
-
-                        SequentialAnimation on opacity {
-                            running: pill.activity === "recording"
-                            loops: Animation.Infinite
-                            NumberAnimation {
-                                to: 0.3
-                                duration: 800
-                            }
-                            NumberAnimation {
-                                to: 1
-                                duration: 800
-                            }
-                        }
-
-                        TapHandler {
-                            onTapped: pill.recDetails = !pill.recDetails
-                        }
-                        HoverHandler {
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                    }
-                    Text {
-                        visible: pill.activity === "recording" && !IslandService.musicAvailable
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: StreamingService.isRecordingScreen ? "Recording" : "Screen shared"
-                        color: Theme.danger
-                        font.pixelSize: Theme.type.body.size
-                        font.family: Theme.font.ui
-                        font.weight: Font.Medium
-
-                        TapHandler {
-                            onTapped: pill.recDetails = !pill.recDetails
-                        }
-                        HoverHandler {
-                            cursorShape: Qt.PointingHandCursor
-                        }
                     }
                 }
 
@@ -864,6 +906,93 @@ Variants {
                                 onToggled: SunsetService.toggle()
                             }
                         }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: bubble
+
+                readonly property string kind: IslandService.secondaryActivity
+                readonly property bool shown: kind !== "" && overlay.revealed && !pill.full && !pill.notif && !pill.recDetails && pill.activity !== "osd"
+                property string shownKind: kind
+
+                onKindChanged: if (kind !== "")
+                    shownKind = kind
+
+                x: pill.x + pill.width + Theme.space.sm
+                y: pill.y
+                width: pill.compactHeight
+                height: pill.compactHeight
+                radius: height / 2
+                color: Theme.colors.surface
+                opacity: shown ? 1 : 0
+                scale: shown ? 1 : 0.6
+                visible: opacity > 0
+
+                ContentFade on opacity {}
+
+                Behavior on scale {
+                    SpringAnimation {
+                        spring: Theme.motion.springStiffness
+                        damping: Theme.motion.springDamping
+                        epsilon: 0.005
+                    }
+                }
+
+                ClippingRectangle {
+                    anchors.fill: parent
+                    anchors.margins: Theme.space.xs
+                    radius: height / 2
+                    color: "transparent"
+                    visible: bubble.shownKind === "music" && IslandService.trackArtUrl !== ""
+
+                    CrossfadeImage {
+                        anchors.fill: parent
+                        source: IslandService.trackArtUrl || ""
+                    }
+                }
+
+                Text {
+                    anchors.centerIn: parent
+                    visible: bubble.shownKind === "music" && IslandService.trackArtUrl === ""
+                    text: PhosphorIcons.musicNoteSimple
+                    color: Theme.text.secondary
+                    font.family: Theme.font.icon
+                    font.pixelSize: Theme.icon.xs
+                }
+
+                Rectangle {
+                    anchors.centerIn: parent
+                    visible: bubble.shownKind === "recording"
+                    width: 8
+                    height: 8
+                    radius: Theme.radius.xs
+                    color: Theme.danger
+
+                    SequentialAnimation on opacity {
+                        running: bubble.visible && bubble.shownKind === "recording"
+                        loops: Animation.Infinite
+                        NumberAnimation {
+                            to: 0.3
+                            duration: 800
+                        }
+                        NumberAnimation {
+                            to: 1
+                            duration: 800
+                        }
+                    }
+                }
+
+                HoverHandler {
+                    cursorShape: Qt.PointingHandCursor
+                }
+                TapHandler {
+                    onTapped: {
+                        if (bubble.shownKind === "recording")
+                            pill.recDetails = !pill.recDetails;
+                        else
+                            Visibilities.openMusicPanel();
                     }
                 }
             }

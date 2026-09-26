@@ -130,5 +130,26 @@ Singleton {
 
     readonly property bool recording: StreamingService.isRecordingScreen || StreamingService.isScreenshare
 
-    readonly property string activity: osdActive ? "osd" : recording ? "recording" : musicAvailable ? "music" : "idle"
+    readonly property var activities: {
+        const list = [];
+        if (osdActive)
+            list.push({
+                id: "osd",
+                priority: 100
+            });
+        if (recording)
+            list.push({
+                id: "recording",
+                priority: 90
+            });
+        if (musicAvailable)
+            list.push({
+                id: "music",
+                priority: 50
+            });
+        return list.sort((a, b) => b.priority - a.priority);
+    }
+
+    readonly property string activity: activities[0]?.id ?? "idle"
+    readonly property string secondaryActivity: activities.find(a => a.id !== "osd" && a.id !== activity)?.id ?? ""
 }
