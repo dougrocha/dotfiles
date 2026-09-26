@@ -408,15 +408,9 @@ Item {
                 }
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: 1
-                Layout.bottomMargin: Theme.space.sm
-                color: Theme.stroke.hairline
-            }
-
             RowLayout {
                 Layout.fillWidth: true
+                Layout.topMargin: Theme.space.xs
                 spacing: Theme.space.md
 
                 Text {
