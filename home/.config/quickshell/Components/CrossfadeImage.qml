@@ -7,6 +7,8 @@ Item {
     property string source: ""
     property int fillMode: Image.PreserveAspectCrop
     property int duration: Theme.motion.normal
+    property var tag: null
+    property var shownTag: null
 
     property bool firstOnTop: true
     property int generation: 0
@@ -18,7 +20,16 @@ Item {
     readonly property bool ready: front.url !== "" && front.status === Image.Ready
 
     onSourceChanged: request()
-    Component.onCompleted: request()
+    onTagChanged: Qt.callLater(syncTag)
+    Component.onCompleted: {
+        request();
+        syncTag();
+    }
+
+    function syncTag() {
+        if (source === front.url)
+            shownTag = tag;
+    }
 
     function request() {
         generation++;
@@ -56,6 +67,7 @@ Item {
         fade.restart();
         if (!root.visible)
             finishFade();
+        syncTag();
     }
 
     function finishFade() {

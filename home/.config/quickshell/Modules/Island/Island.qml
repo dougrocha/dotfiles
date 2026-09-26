@@ -591,7 +591,8 @@ Variants {
                         CrossfadeImage {
                             id: notifArt
                             anchors.fill: parent
-                            source: IslandService.trackArtUrl || ""
+                            tag: IslandService.track
+                            source: tag?.artUrl ?? ""
                         }
                     }
 
@@ -607,7 +608,7 @@ Variants {
                         TrackSwap {
                             id: notifSwap
                             target: notifText
-                            source: IslandService.track
+                            source: notifArt.shownTag ?? IslandService.track
                         }
 
                         Text {
@@ -804,7 +805,8 @@ Variants {
                                         CrossfadeImage {
                                             id: panelArt
                                             anchors.fill: parent
-                                            source: IslandService.trackArtUrl || ""
+                                            tag: IslandService.track
+                            source: tag?.artUrl ?? ""
                                         }
                                     }
 
@@ -820,7 +822,7 @@ Variants {
                                         TrackSwap {
                                             id: panelSwap
                                             target: panelText
-                                            source: IslandService.track
+                                            source: panelArt.shownTag ?? IslandService.track
                                         }
 
                                         Text {
