@@ -14,8 +14,8 @@ function __island_command_done --on-event fish_postexec
     test $seconds -ge 60; and set took (math --scale=0 $seconds / 60)m (math $seconds % 60)s
 
     if test $code -eq 0
-        command qs ipc call island push command checkCircle "$name finished · $took" 4 >/dev/null 2>&1
+        command qs ipc call island push command checkCircle "$name finished in $took" 4 >/dev/null 2>&1
     else
-        command qs ipc call island push command warningCircle "$name failed · $took" 6 >/dev/null 2>&1
+        command qs ipc call island push command warningCircle "$name failed after $took" 6 >/dev/null 2>&1
     end
 end
