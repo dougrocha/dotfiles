@@ -8,68 +8,104 @@ Item {
     property int fillMode: Image.PreserveAspectCrop
     property int duration: Theme.motion.normal
 
-    property bool secondOnTop: false
-    readonly property Image shown: secondOnTop ? layer2 : layer1
-    readonly property Image pending: secondOnTop ? layer1 : layer2
+    property bool firstOnTop: true
+    property int generation: 0
+    property Image outgoing: null
 
-    readonly property bool ready: (layer1.status === Image.Ready && layer1.opacity > 0) || (layer2.status === Image.Ready && layer2.opacity > 0)
+    readonly property Image front: firstOnTop ? layer1 : layer2
+    readonly property Image back: firstOnTop ? layer2 : layer1
 
-    onSourceChanged: {
-        if (source === "") {
-            fade.stop();
-            layer1.source = "";
-            layer2.source = "";
-            layer1.opacity = 0;
-            layer2.opacity = 0;
+    readonly property bool ready: front.url !== "" && front.status === Image.Ready
+
+    onSourceChanged: request()
+    Component.onCompleted: request()
+
+    function request() {
+        generation++;
+        finishFade();
+        if (source === front.url && front.status !== Image.Error) {
+            back.url = "";
+            back.generation = -1;
             return;
         }
-        if (String(root.shown.source) === source)
-            return;
-        if (fade.running)
-            fade.complete();
-        root.pending.source = source;
-        if (root.pending.status === Image.Ready)
-            root.promote();
+        const candidate = back;
+        candidate.opacity = 0;
+        candidate.generation = generation;
+        candidate.url = source;
+        settle(candidate);
     }
 
-    function promote() {
-        fade.stop();
-        const incoming = root.pending;
-        incoming.opacity = 0;
-        incoming.z = 1;
-        root.shown.z = 0;
-        root.secondOnTop = !root.secondOnTop;
-        fade.target = incoming;
+    function settle(candidate) {
+        if (candidate.generation !== generation || candidate !== back)
+            return;
+        if (candidate.url !== "" && candidate.status !== Image.Ready && candidate.status !== Image.Error)
+            return;
+        candidate.generation = -1;
+        promote(candidate);
+    }
+
+    function promote(candidate) {
+        const previous = front;
+        const hasImage = candidate.url !== "" && candidate.status === Image.Ready;
+        candidate.z = 1;
+        previous.z = 0;
+        firstOnTop = candidate === layer1;
+        outgoing = previous;
+        fade.target = hasImage ? candidate : previous;
+        fade.to = hasImage ? 1 : 0;
         fade.restart();
+        if (!root.visible)
+            finishFade();
+    }
+
+    function finishFade() {
+        if (fade.running)
+            fade.complete();
+        releaseOutgoing();
+    }
+
+    function releaseOutgoing() {
+        if (!outgoing)
+            return;
+        outgoing.url = "";
+        outgoing.opacity = 0;
+        outgoing = null;
     }
 
     Image {
         id: layer1
+
+        property string url: ""
+        property int generation: -1
+
         anchors.fill: parent
+        source: url
         fillMode: root.fillMode
         asynchronous: true
         opacity: 0
-        onStatusChanged: if (status === Image.Ready && root.pending === layer1 && String(source) === root.source)
-            root.promote()
+        onStatusChanged: root.settle(layer1)
     }
 
     Image {
         id: layer2
+
+        property string url: ""
+        property int generation: -1
+
         anchors.fill: parent
+        source: url
         fillMode: root.fillMode
         asynchronous: true
         opacity: 0
-        onStatusChanged: if (status === Image.Ready && root.pending === layer2 && String(source) === root.source)
-            root.promote()
+        onStatusChanged: root.settle(layer2)
     }
 
     NumberAnimation {
         id: fade
 
         property: "opacity"
-        to: 1
         duration: root.duration
-        easing.type: Theme.motion.easeSmooth
-        onFinished: root.pending.opacity = 0
+        easing.type: Theme.motion.easeStandard
+        onFinished: root.releaseOutgoing()
     }
 }

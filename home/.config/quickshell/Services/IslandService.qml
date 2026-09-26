@@ -112,11 +112,108 @@ Singleton {
     }
 
     readonly property var mprisPlayer: MprisService.musicPlayer
-    readonly property bool musicAvailable: (mprisPlayer?.trackTitle || "") !== ""
-    readonly property string trackTitle: mprisPlayer?.trackTitle || ""
-    readonly property string trackArtist: mprisPlayer?.trackArtist || ""
-    readonly property string albumName: mprisPlayer?.trackAlbum || ""
-    readonly property string trackArtUrl: mprisPlayer?.trackArtUrl || ""
+
+    readonly property var liveTrack: {
+        const player = mprisPlayer;
+        const title = player?.trackTitle || "";
+        const artist = player?.trackArtist || "";
+        const trackId = String(player?.metadata?.["mpris:trackid"] ?? "");
+        return {
+            key: title === "" ? "" : [player.dbusName || "", trackId, title, artist].join("|"),
+            title: title,
+            artist: artist,
+            album: player?.trackAlbum || "",
+            artUrl: player?.trackArtUrl || ""
+        };
+    }
+
+    property var track: ({
+            key: "",
+            title: "",
+            artist: "",
+            album: "",
+            artUrl: ""
+        })
+    property var pendingTrack: null
+    property real lastCommitTime: 0
+
+    readonly property bool musicAvailable: track.title !== ""
+    readonly property string trackTitle: track.title
+    readonly property string trackArtist: track.artist
+    readonly property string albumName: track.album
+    readonly property string trackArtUrl: track.artUrl
+
+    onLiveTrackChanged: Qt.callLater(stageTrack)
+
+    function sameTrack(a, b) {
+        return a.key === b.key && a.title === b.title && a.artist === b.artist && a.album === b.album && a.artUrl === b.artUrl;
+    }
+
+    function stageTrack() {
+        const next = liveTrack;
+        if (next.title === "") {
+            pendingTrack = null;
+            artTimeout.stop();
+            commitTrack(next);
+            return;
+        }
+        if (sameTrack(next, track)) {
+            pendingTrack = null;
+            return;
+        }
+        pendingTrack = next;
+        artPreloader.url = next.artUrl;
+        artTimeout.restart();
+        tryCommitTrack();
+    }
+
+    function tryCommitTrack() {
+        const next = pendingTrack;
+        if (!next)
+            return;
+        const artSettled = next.artUrl === "" || artPreloader.status === Image.Ready || artPreloader.status === Image.Error;
+        if (!artSettled && artTimeout.running)
+            return;
+        const wait = lastCommitTime + Theme.motion.slow - Date.now();
+        if (wait > 0) {
+            commitDelay.interval = wait;
+            commitDelay.restart();
+            return;
+        }
+        pendingTrack = null;
+        artTimeout.stop();
+        commitTrack(next);
+    }
+
+    function commitTrack(next) {
+        if (sameTrack(next, track))
+            return;
+        track = next;
+        lastCommitTime = Date.now();
+        announceTrack();
+    }
+
+    Image {
+        id: artPreloader
+
+        property string url: ""
+
+        source: url
+        asynchronous: true
+        visible: false
+        onStatusChanged: root.tryCommitTrack()
+    }
+
+    Timer {
+        id: artTimeout
+        interval: 1200
+        onTriggered: root.tryCommitTrack()
+    }
+
+    Timer {
+        id: commitDelay
+        onTriggered: root.tryCommitTrack()
+    }
     readonly property bool isPlaying: mprisPlayer?.isPlaying ?? false
     readonly property bool canSeek: mprisPlayer?.canSeek ?? false
     readonly property real position: mprisPlayer?.position ?? 0
@@ -149,7 +246,10 @@ Singleton {
     onScratchpadOpenChanged: if (scratchpadOpen)
         root.dismissSongNotif()
 
-    Component.onCompleted: Hyprland.refreshMonitors()
+    Component.onCompleted: {
+        Hyprland.refreshMonitors();
+        stageTrack();
+    }
 
     Connections {
         target: Hyprland
@@ -164,14 +264,9 @@ Singleton {
         interval: 5000
     }
 
-    onTrackTitleChanged: root._checkSongChange()
-    onTrackArtistChanged: root._checkSongChange()
-
-    function _checkSongChange() {
-        if (!root.trackTitle)
-            return;
-        const key = root.trackTitle + root.trackArtist;
-        if (key === root.lastTrackKey)
+    function announceTrack() {
+        const key = root.track.key;
+        if (key === "" || key === root.lastTrackKey)
             return;
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;

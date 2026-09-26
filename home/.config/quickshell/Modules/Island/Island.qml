@@ -185,6 +185,7 @@ Variants {
                         id: backgroundArt
                         anchors.fill: parent
                         source: IslandService.trackArtUrl || ""
+                        duration: Theme.motion.slow
                         layer.enabled: true
                         layer.effect: MultiEffect {
                             blurEnabled: true
@@ -196,7 +197,14 @@ Variants {
                     Rectangle {
                         anchors.fill: parent
                         color: Theme.withAlpha(Theme.shadow, 0.6)
-                        visible: backgroundArt.ready
+                        opacity: backgroundArt.ready ? 1 : 0
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.motion.slow
+                                easing.type: Theme.motion.easeSmooth
+                            }
+                        }
                     }
                 }
 
@@ -569,29 +577,40 @@ Variants {
                         radius: Theme.radius.md
                         color: Theme.colors.raised
 
-                        CrossfadeImage {
-                            anchors.fill: parent
-                            source: IslandService.trackArtUrl || ""
-                        }
-
                         Text {
                             anchors.centerIn: parent
                             text: PhosphorIcons.musicNoteSimple
                             font.family: Theme.font.icon
                             font.pixelSize: Theme.icon.lg
                             color: Theme.text.secondary
-                            visible: IslandService.trackArtUrl === ""
+                            opacity: notifArt.ready ? 0 : 1
+                        }
+
+                        CrossfadeImage {
+                            id: notifArt
+                            anchors.fill: parent
+                            source: IslandService.trackArtUrl || ""
                         }
                     }
 
                     Column {
+                        id: notifText
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width - 44 - 12 - 28 - 12
                         spacing: Theme.space.xxs
+                        transform: Translate {
+                            y: notifSwap.offset
+                        }
+
+                        TrackSwap {
+                            id: notifSwap
+                            target: notifText
+                            source: IslandService.track
+                        }
 
                         Text {
                             width: parent.width
-                            text: IslandService.trackTitle || ""
+                            text: notifSwap.shown.title ?? ""
                             color: Theme.text.primary
                             font.pixelSize: Theme.type.body.size
                             font.family: Theme.font.ui
@@ -602,8 +621,8 @@ Variants {
 
                         Text {
                             width: parent.width
-                            visible: (IslandService.trackArtist || "") !== ""
-                            text: IslandService.trackArtist || ""
+                            visible: text !== ""
+                            text: notifSwap.shown.artist ?? ""
                             color: Theme.text.secondary
                             font.pixelSize: Theme.type.caption.size
                             font.family: Theme.font.ui
@@ -771,29 +790,40 @@ Variants {
                                         radius: Theme.radius.md
                                         color: Theme.colors.raised
 
-                                        CrossfadeImage {
-                                            anchors.fill: parent
-                                            source: IslandService.trackArtUrl || ""
-                                        }
-
                                         Text {
                                             anchors.centerIn: parent
                                             text: PhosphorIcons.musicNoteSimple
                                             font.family: Theme.font.icon
                                             font.pixelSize: Theme.icon.xxl
                                             color: Theme.text.secondary
-                                            visible: IslandService.trackArtUrl === ""
+                                            opacity: panelArt.ready ? 0 : 1
+                                        }
+
+                                        CrossfadeImage {
+                                            id: panelArt
+                                            anchors.fill: parent
+                                            source: IslandService.trackArtUrl || ""
                                         }
                                     }
 
                                     Column {
+                                        id: panelText
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width - musicColumn.artSize - Theme.space.lg
                                         spacing: Theme.space.xs
+                                        transform: Translate {
+                                            y: panelSwap.offset
+                                        }
+
+                                        TrackSwap {
+                                            id: panelSwap
+                                            target: panelText
+                                            source: IslandService.track
+                                        }
 
                                         Text {
                                             width: parent.width
-                                            text: IslandService.trackTitle
+                                            text: panelSwap.shown.title ?? ""
                                             color: Theme.text.primary
                                             font.pixelSize: Theme.type.display.size
                                             font.family: Theme.font.ui
@@ -804,8 +834,8 @@ Variants {
 
                                         Text {
                                             width: parent.width
-                                            visible: (IslandService.trackArtist || "") !== ""
-                                            text: IslandService.trackArtist || ""
+                                            visible: text !== ""
+                                            text: panelSwap.shown.artist ?? ""
                                             color: Theme.text.secondary
                                             font.pixelSize: Theme.type.body.size
                                             font.family: Theme.font.ui
@@ -815,8 +845,8 @@ Variants {
 
                                         Text {
                                             width: parent.width
-                                            visible: IslandService.albumName !== ""
-                                            text: IslandService.albumName
+                                            visible: text !== ""
+                                            text: panelSwap.shown.album ?? ""
                                             color: Theme.text.tertiary
                                             font.pixelSize: Theme.type.caption.size
                                             font.family: Theme.font.ui
