@@ -13,7 +13,7 @@ Column {
 
     property int bleed: Theme.space.sm
 
-    readonly property int groupGap: Theme.space.lg
+    readonly property int groupGap: Theme.space.xl
 
     property var expandedApps: ({})
 
@@ -215,17 +215,6 @@ Column {
             readonly property bool expanded: root.expandedApps[modelData.app] === true && count > 1
 
             width: root.width
-
-            Item {
-                width: parent.width
-                height: root.groupGap
-                visible: group.index > 0
-            }
-
-            Divider {
-                visible: group.index > 0
-                bleed: root.bleed
-            }
 
             Item {
                 width: parent.width
