@@ -125,8 +125,10 @@ Variants {
                 onTabChanged: if (tab === 1)
                     calendarView.reset()
                 onFullChanged: {
-                    if (full)
+                    if (full) {
                         recDetails = false;
+                        SunsetService.refresh();
+                    }
                     if (full && tab === 1)
                         calendarView.reset();
                 }
