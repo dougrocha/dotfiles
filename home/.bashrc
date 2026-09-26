@@ -17,6 +17,4 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 . "$HOME/.cargo/env"
 
-export PATH="$PATH:$HOME/.turso"
-
 eval "$(mise activate bash)"
