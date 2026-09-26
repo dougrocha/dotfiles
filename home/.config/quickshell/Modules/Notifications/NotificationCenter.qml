@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Components
 import qs.Constants
+import qs.Modules.Popups
 import qs.Services
 
 Item {
@@ -14,10 +15,27 @@ Item {
 
     implicitHeight: stack.implicitHeight
 
+    Connections {
+        target: Visibilities
+        function onNotificationCenterChanged() {
+            if (Visibilities.notificationCenter)
+                calendar.reset();
+        }
+    }
+
     Column {
         id: stack
         width: parent.width
         spacing: Theme.space.lg
+
+        CalendarView {
+            id: calendar
+            width: parent.width
+        }
+
+        Divider {
+            bleed: root.bleed
+        }
 
         Item {
             id: header
@@ -80,7 +98,7 @@ Item {
             x: -root.bleed
             width: parent.width + root.bleed * 2
             visible: root.hasHistory
-            height: root.maxHeight > 0 ? Math.min(history.implicitHeight, root.maxHeight - header.height - stack.spacing) : history.implicitHeight
+            height: root.maxHeight > 0 ? Math.min(history.implicitHeight, root.maxHeight - calendar.height - header.height - Theme.space.lg * 4 - 1) : history.implicitHeight
             contentHeight: history.implicitHeight
             clip: true
             boundsBehavior: Flickable.StopAtBounds

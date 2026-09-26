@@ -102,34 +102,15 @@ Variants {
                     }
                 }
 
-                readonly property int tab: Visibilities.islandTab
-
-                property real tabProgress: tab
-
-                Behavior on tabProgress {
-                    NumberAnimation {
-                        duration: Theme.motion.normal
-                        easing.type: Theme.motion.easeSmooth
-                    }
-                }
-
                 onActivityChanged: recDetails = false
 
-                onTabChanged: if (tab === 1)
-                    calendarView.reset()
-                onFullChanged: {
-                    if (full) {
-                        recDetails = false;
-                        SunsetService.refresh();
-                    }
-                    if (full && tab === 1)
-                        calendarView.reset();
-                }
+                onFullChanged: if (full)
+                    recDetails = false
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 4
 
-                width: full ? (tab === 0 ? 560 : 420) : notif ? 380 : compactRow.implicitWidth + 28
+                width: full ? musicColumn.width + inset * 2 : notif ? 380 : compactRow.implicitWidth + 28
                 height: targetHeight
                 radius: Math.min(height / 2, cornerRadius)
                 color: pill.full ? Theme.colors.overlay : Theme.colors.surface
@@ -169,7 +150,7 @@ Variants {
                     anchors.fill: parent
                     radius: pill.radius
                     color: "transparent"
-                    opacity: pill.notif ? 1 : pill.full ? Math.max(0, 1 - pill.tabProgress * 2) : 0
+                    opacity: pill.notif || pill.full ? 1 : 0
                     Behavior on opacity {
                         NumberAnimation {
                             duration: Theme.motion.fast
@@ -616,340 +597,206 @@ Variants {
                     ContentFade on opacity {}
 
                     Item {
-                        width: tabBar.implicitWidth
-                        height: tabBar.implicitHeight
+                        width: musicColumn.width
+                        height: IslandService.musicAvailable ? musicColumn.height : musicEmpty.height
 
-                        Rectangle {
-                            id: tabHighlight
-
-                            readonly property Item chip: tabRepeater.count > pill.tab ? tabRepeater.itemAt(pill.tab) : null
-
-                            x: chip ? chip.x : 0
-                            width: chip ? chip.width : 0
-                            height: tabBar.implicitHeight
-                            radius: Theme.radius.md
-                            color: Theme.fill.selected
-
-                            Behavior on x {
-                                NumberAnimation {
-                                    duration: Theme.motion.normal
-                                    easing.type: Theme.motion.easeStandard
-                                }
-                            }
-                            Behavior on width {
-                                NumberAnimation {
-                                    duration: Theme.motion.normal
-                                    easing.type: Theme.motion.easeStandard
-                                }
-                            }
-                        }
-
-                        Row {
-                            id: tabBar
-                            spacing: Theme.space.sm
-
-                            Repeater {
-                                id: tabRepeater
-                                model: ["Now Playing", "Calendar"]
-
-                                delegate: Rectangle {
-                                    id: tabChip
-
-                                    required property string modelData
-                                    required property int index
-
-                                    readonly property bool active: pill.tab === tabChip.index
-
-                                    width: tabLabel.implicitWidth + 24
-                                    height: 28
-                                    radius: Theme.radius.md
-                                    color: tabChip.active ? Theme.withAlpha(Theme.fill.hover, 0) : tabHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Theme.motion.fast
-                                        }
-                                    }
-
-                                    Text {
-                                        id: tabLabel
-                                        anchors.centerIn: parent
-                                        text: tabChip.modelData
-                                        color: tabChip.active ? Theme.text.primary : Theme.text.secondary
-                                        font.family: Theme.font.ui
-                                        font.pixelSize: Theme.type.caption.size
-                                        font.weight: Theme.type.label.weight
-
-                                        Behavior on color {
-                                            ColorAnimation {
-                                                duration: Theme.motion.normal
-                                            }
-                                        }
-                                    }
-
-                                    HoverHandler {
-                                        id: tabHover
-                                        cursorShape: Qt.PointingHandCursor
-                                    }
-                                    TapHandler {
-                                        onTapped: Visibilities.islandTab = tabChip.index
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    Row {
-                        id: tabContent
-                        spacing: Theme.space.lg
-
-                        Item {
-                            id: tabSlot
-
-                            width: pill.tab === 1 ? calendarView.width : musicColumn.width
-                            height: pill.tab === 1 ? calendarView.height : (IslandService.musicAvailable ? musicColumn.height : musicEmpty.height)
-
-                            Behavior on width {
-                                NumberAnimation {
-                                    duration: Theme.motion.normal
-                                    easing.type: Theme.motion.easeStandard
-                                }
-                            }
-                            Behavior on height {
-                                NumberAnimation {
-                                    duration: Theme.motion.normal
-                                    easing.type: Theme.motion.easeStandard
-                                }
-                            }
-
-                            CalendarView {
-                                id: calendarView
-                                x: 16 * (1 - pill.tabProgress)
-                                opacity: Math.max(0, pill.tabProgress * 2 - 1)
-                                visible: opacity > 0
-                            }
-
-                            Column {
-                                id: musicColumn
-
-                                readonly property int artSize: 96
-
-                                width: 460
-                                x: -16 * pill.tabProgress
-                                opacity: IslandService.musicAvailable ? Math.max(0, 1 - pill.tabProgress * 2) : 0
-                                visible: opacity > 0
-                                spacing: Theme.space.lg
-
-                                Row {
-                                    width: parent.width
-                                    spacing: Theme.space.lg
-
-                                    ClippingRectangle {
-                                        width: musicColumn.artSize
-                                        height: musicColumn.artSize
-                                        radius: Theme.radius.md
-                                        color: Theme.colors.raised
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: PhosphorIcons.musicNoteSimple
-                                            font.family: Theme.font.icon
-                                            font.pixelSize: Theme.icon.xxl
-                                            color: Theme.text.secondary
-                                            opacity: panelArt.ready ? 0 : 1
-                                        }
-
-                                        CrossfadeImage {
-                                            id: panelArt
-                                            anchors.fill: parent
-                                            tag: IslandService.track
-                                            source: tag?.artUrl ?? ""
-                                        }
-                                    }
-
-                                    Column {
-                                        id: panelText
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width - musicColumn.artSize - Theme.space.lg
-                                        spacing: Theme.space.xs
-                                        transform: Translate {
-                                            y: panelSwap.offset
-                                        }
-
-                                        TrackSwap {
-                                            id: panelSwap
-                                            target: panelText
-                                            source: panelArt.shownTag ?? IslandService.track
-                                        }
-
-                                        Text {
-                                            width: parent.width
-                                            text: panelSwap.shown.title ?? ""
-                                            color: Theme.text.primary
-                                            font.pixelSize: Theme.type.display.size
-                                            font.family: Theme.font.ui
-                                            font.weight: Theme.type.display.weight
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 1
-                                        }
-
-                                        Text {
-                                            width: parent.width
-                                            visible: text !== ""
-                                            text: panelSwap.shown.artist ?? ""
-                                            color: Theme.text.secondary
-                                            font.pixelSize: Theme.type.body.size
-                                            font.family: Theme.font.ui
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 1
-                                        }
-
-                                        Text {
-                                            width: parent.width
-                                            visible: text !== ""
-                                            text: panelSwap.shown.album ?? ""
-                                            color: Theme.text.tertiary
-                                            font.pixelSize: Theme.type.caption.size
-                                            font.family: Theme.font.ui
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 1
-                                        }
-                                    }
-                                }
-
-                                Column {
-                                    width: parent.width
-                                    spacing: Theme.space.xxs
-
-                                    Timer {
-                                        id: seekDebounce
-                                        interval: 300
-                                    }
-
-                                    StyledSlider {
-                                        id: seekSlider
-
-                                        width: parent.width
-                                        from: 0
-                                        to: IslandService.duration > 0 ? IslandService.duration : 1
-                                        boundValue: IslandService.position
-                                        enabled: IslandService.canSeek
-
-                                        holding: seekDebounce.running
-                                        trackColor: Theme.stroke.strong
-                                        handleSize: 10
-                                        onPressedChanged: {
-                                            if (!pressed) {
-                                                MediaControlService.seek(value);
-                                                seekDebounce.start();
-                                            }
-                                        }
-                                    }
-
-                                    Item {
-                                        width: parent.width
-                                        height: elapsedLabel.implicitHeight
-
-                                        Text {
-                                            id: elapsedLabel
-                                            anchors.left: parent.left
-                                            text: overlay.formatTime(seekSlider.value)
-                                            color: Theme.text.secondary
-                                            font.pixelSize: Theme.type.caption.size
-                                            font.family: Theme.font.ui
-                                        }
-                                        Text {
-                                            anchors.right: parent.right
-                                            text: overlay.formatTime(IslandService.duration)
-                                            color: Theme.text.secondary
-                                            font.pixelSize: Theme.type.caption.size
-                                            font.family: Theme.font.ui
-                                        }
-                                    }
-                                }
-
-                                Row {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: Theme.space.lg
-
-                                    MediaControlButton {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        icon: PhosphorIcons.skipBack
-                                        onTapped: MediaControlService.previous()
-                                    }
-
-                                    MediaControlButton {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        icon: IslandService.isPlaying ? PhosphorIcons.pause : PhosphorIcons.play
-                                        iconSize: 22
-                                        filled: true
-                                        onTapped: MediaControlService.playpause()
-                                    }
-
-                                    MediaControlButton {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        icon: PhosphorIcons.skipForward
-                                        onTapped: MediaControlService.next()
-                                    }
-                                }
-                            }
-
-                            Item {
-                                id: musicEmpty
-                                width: musicColumn.width
-                                height: musicColumn.implicitHeight
-                                x: -16 * pill.tabProgress
-                                opacity: IslandService.musicAvailable ? 0 : Math.max(0, 1 - pill.tabProgress * 2)
-                                visible: opacity > 0
-
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Theme.space.md
-
-                                    Text {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: PhosphorIcons.musicNoteSimple
-                                        color: Theme.text.secondary
-                                        font.pixelSize: Theme.icon.xxl
-                                        font.family: Theme.font.icon
-                                    }
-
-                                    Text {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        text: "Nothing playing"
-                                        color: Theme.text.secondary
-                                        font.pixelSize: Theme.type.body.size
-                                        font.family: Theme.font.ui
-                                    }
-                                }
+                        Behavior on height {
+                            NumberAnimation {
+                                duration: Theme.motion.normal
+                                easing.type: Theme.motion.easeStandard
                             }
                         }
 
                         Column {
-                            id: quickControls
-                            width: 56
-                            spacing: Theme.space.md
+                            id: musicColumn
 
-                            ToggleRow {
-                                style: "compact"
-                                danger: true
-                                glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
-                                active: AudioService.sourceMuted
-                                onToggled: AudioService.toggleSourceMute()
+                            readonly property int artSize: 96
+
+                            width: 460
+                            opacity: IslandService.musicAvailable ? 1 : 0
+                            visible: opacity > 0
+                            spacing: Theme.space.lg
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.space.lg
+
+                                ClippingRectangle {
+                                    width: musicColumn.artSize
+                                    height: musicColumn.artSize
+                                    radius: Theme.radius.md
+                                    color: Theme.colors.raised
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: PhosphorIcons.musicNoteSimple
+                                        font.family: Theme.font.icon
+                                        font.pixelSize: Theme.icon.xxl
+                                        color: Theme.text.secondary
+                                        opacity: panelArt.ready ? 0 : 1
+                                    }
+
+                                    CrossfadeImage {
+                                        id: panelArt
+                                        anchors.fill: parent
+                                        tag: IslandService.track
+                                        source: tag?.artUrl ?? ""
+                                    }
+                                }
+
+                                Column {
+                                    id: panelText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - musicColumn.artSize - Theme.space.lg
+                                    spacing: Theme.space.xs
+                                    transform: Translate {
+                                        y: panelSwap.offset
+                                    }
+
+                                    TrackSwap {
+                                        id: panelSwap
+                                        target: panelText
+                                        source: panelArt.shownTag ?? IslandService.track
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        text: panelSwap.shown.title ?? ""
+                                        color: Theme.text.primary
+                                        font.pixelSize: Theme.type.display.size
+                                        font.family: Theme.font.ui
+                                        font.weight: Theme.type.display.weight
+                                        elide: Text.ElideRight
+                                        maximumLineCount: 1
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        visible: text !== ""
+                                        text: panelSwap.shown.artist ?? ""
+                                        color: Theme.text.secondary
+                                        font.pixelSize: Theme.type.body.size
+                                        font.family: Theme.font.ui
+                                        elide: Text.ElideRight
+                                        maximumLineCount: 1
+                                    }
+
+                                    Text {
+                                        width: parent.width
+                                        visible: text !== ""
+                                        text: panelSwap.shown.album ?? ""
+                                        color: Theme.text.tertiary
+                                        font.pixelSize: Theme.type.caption.size
+                                        font.family: Theme.font.ui
+                                        elide: Text.ElideRight
+                                        maximumLineCount: 1
+                                    }
+                                }
                             }
 
-                            ToggleRow {
-                                style: "compact"
-                                label: "DND"
-                                active: SettingsService.doNotDisturb
-                                onToggled: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
+                            Column {
+                                width: parent.width
+                                spacing: Theme.space.xxs
+
+                                Timer {
+                                    id: seekDebounce
+                                    interval: 300
+                                }
+
+                                StyledSlider {
+                                    id: seekSlider
+
+                                    width: parent.width
+                                    from: 0
+                                    to: IslandService.duration > 0 ? IslandService.duration : 1
+                                    boundValue: IslandService.position
+                                    enabled: IslandService.canSeek
+
+                                    holding: seekDebounce.running
+                                    trackColor: Theme.stroke.strong
+                                    handleSize: 10
+                                    onPressedChanged: {
+                                        if (!pressed) {
+                                            MediaControlService.seek(value);
+                                            seekDebounce.start();
+                                        }
+                                    }
+                                }
+
+                                Item {
+                                    width: parent.width
+                                    height: elapsedLabel.implicitHeight
+
+                                    Text {
+                                        id: elapsedLabel
+                                        anchors.left: parent.left
+                                        text: overlay.formatTime(seekSlider.value)
+                                        color: Theme.text.secondary
+                                        font.pixelSize: Theme.type.caption.size
+                                        font.family: Theme.font.ui
+                                    }
+                                    Text {
+                                        anchors.right: parent.right
+                                        text: overlay.formatTime(IslandService.duration)
+                                        color: Theme.text.secondary
+                                        font.pixelSize: Theme.type.caption.size
+                                        font.family: Theme.font.ui
+                                    }
+                                }
                             }
 
-                            ToggleRow {
-                                style: "compact"
-                                glyph: SunsetService.active ? PhosphorIcons.moon : PhosphorIcons.sun
-                                active: SunsetService.active
-                                onToggled: SunsetService.toggle()
+                            Row {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: Theme.space.lg
+
+                                MediaControlButton {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    icon: PhosphorIcons.skipBack
+                                    onTapped: MediaControlService.previous()
+                                }
+
+                                MediaControlButton {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    icon: IslandService.isPlaying ? PhosphorIcons.pause : PhosphorIcons.play
+                                    iconSize: 22
+                                    filled: true
+                                    onTapped: MediaControlService.playpause()
+                                }
+
+                                MediaControlButton {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    icon: PhosphorIcons.skipForward
+                                    onTapped: MediaControlService.next()
+                                }
+                            }
+                        }
+
+                        Item {
+                            id: musicEmpty
+                            width: musicColumn.width
+                            height: musicColumn.implicitHeight
+                            opacity: IslandService.musicAvailable ? 0 : 1
+                            visible: opacity > 0
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: Theme.space.md
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: PhosphorIcons.musicNoteSimple
+                                    color: Theme.text.secondary
+                                    font.pixelSize: Theme.icon.xxl
+                                    font.family: Theme.font.icon
+                                }
+
+                                Text {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    text: "Nothing playing"
+                                    color: Theme.text.secondary
+                                    font.pixelSize: Theme.type.body.size
+                                    font.family: Theme.font.ui
+                                }
                             }
                         }
                     }
