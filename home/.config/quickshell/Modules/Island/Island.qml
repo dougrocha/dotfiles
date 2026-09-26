@@ -11,7 +11,6 @@ import qs.Components
 import qs.Constants
 import qs.Modules.Popups
 import qs.Services
-import qs.Widgets
 
 Variants {
     id: root
@@ -22,13 +21,6 @@ Variants {
 
         required property var modelData
         screen: modelData
-
-        readonly property var clockFormats: ["h:mmAP", "ddd h:mmAP", "MMM d  h:mmAP"]
-
-        function cycleClockFormat() {
-            const next = (clockFormats.indexOf(SettingsService.clockFormat) + 1) % clockFormats.length;
-            SettingsService.clockFormat = clockFormats[next];
-        }
 
         function formatTime(seconds) {
             if (!seconds || seconds < 0)
@@ -50,7 +42,8 @@ Variants {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "qs.island"
 
-        readonly property bool revealed: Visibilities.barRevealed || IslandService.osdActive || IslandService.songNotif || IslandService.transientAlertActive
+        readonly property bool hasContent: Visibilities.musicPanel || IslandService.songNotif || IslandService.activity !== "idle" || AudioService.micInUse
+        readonly property bool revealed: (Visibilities.barRevealed && hasContent) || IslandService.osdActive || IslandService.songNotif || IslandService.transientAlertActive
 
         mask: Region {
             x: pill.x
@@ -222,40 +215,6 @@ Variants {
                         NumberAnimation {
                             duration: Theme.motion.fast
                         }
-                    }
-
-                    ClockWidget {
-                        anchors.verticalCenter: parent.verticalCenter
-                        format: SettingsService.clockFormat
-                        color: clockHover.hovered ? Theme.text.primary : Theme.text.secondary
-                        font.pixelSize: Theme.type.mono.size
-                        font.family: Theme.font.mono
-                        font.weight: Theme.type.mono.weight
-                        font.letterSpacing: Theme.type.mono.tracking
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.motion.fast
-                            }
-                        }
-
-                        HoverHandler {
-                            id: clockHover
-                            cursorShape: Qt.PointingHandCursor
-                        }
-
-                        TapHandler {
-                            acceptedButtons: Qt.RightButton
-                            onTapped: overlay.cycleClockFormat()
-                        }
-                    }
-
-                    Rectangle {
-                        visible: pill.activity !== "idle" || AudioService.micInUse
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 1
-                        height: 14
-                        color: Theme.stroke.hairline
                     }
 
                     Item {
