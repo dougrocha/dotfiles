@@ -271,7 +271,7 @@ Singleton {
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;
 
-        if (!known || Visibilities.musicPanel || root.scratchpadOpen || MprisService.musicPlayerIsBrowser)
+        if (!known || Visibilities.musicPanel || root.scratchpadOpen)
             return;
         songNotifTimer.restart();
     }

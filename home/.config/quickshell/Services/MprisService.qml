@@ -19,16 +19,14 @@ Singleton {
     }
 
     readonly property list<MprisPlayer> availablePlayers: Mpris.players.values.filter(p => !isBrowser(p.identity) && !isProxy(p))
-    readonly property list<MprisPlayer> browserPlayers: Mpris.players.values.filter(p => isBrowser(p.identity) && !isProxy(p))
 
-    readonly property MprisPlayer playingPlayer: availablePlayers.find(p => p.isPlaying && hasTrack(p)) ?? browserPlayers.find(p => p.isPlaying && hasTrack(p)) ?? null
+    readonly property MprisPlayer playingPlayer: availablePlayers.find(p => p.isPlaying && hasTrack(p)) ?? null
 
     property MprisPlayer lastPlayer: null
     onPlayingPlayerChanged: if (playingPlayer)
         lastPlayer = playingPlayer
 
     readonly property MprisPlayer musicPlayer: playingPlayer ?? (hasTrack(lastPlayer) ? lastPlayer : null) ?? availablePlayers.find(p => hasTrack(p)) ?? null
-    readonly property bool musicPlayerIsBrowser: isBrowser(musicPlayer?.identity)
 
     function playerForBinary(binary) {
         if (!binary)
