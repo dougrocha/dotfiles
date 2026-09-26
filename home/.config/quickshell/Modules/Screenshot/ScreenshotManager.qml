@@ -942,7 +942,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 28
                         radius: Theme.radius.sm
-                        color: defaultSaveArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: defaultSaveArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -966,12 +966,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: defaultSaveArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.selectSaveDirectory(manager.defaultSaveDirectory)
+                        }
+                        TapHandler {
+                            onTapped: manager.selectSaveDirectory(manager.defaultSaveDirectory)
                         }
                     }
 
@@ -983,7 +983,7 @@ Item {
                             Layout.fillWidth: true
                             implicitHeight: 28
                             radius: Theme.radius.sm
-                            color: recentSaveArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                            color: recentSaveArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                             RowLayout {
                                 anchors.fill: parent
@@ -1008,12 +1008,12 @@ Item {
                                 }
                             }
 
-                            MouseArea {
+                            HoverHandler {
                                 id: recentSaveArea
-                                anchors.fill: parent
-                                hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: manager.selectSaveDirectory(modelData)
+                            }
+                            TapHandler {
+                                onTapped: manager.selectSaveDirectory(modelData)
                             }
                         }
                     }
@@ -1022,7 +1022,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 28
                         radius: Theme.radius.sm
-                        color: otherLocationArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: otherLocationArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Text {
                             anchors.left: parent.left
@@ -1035,12 +1035,12 @@ Item {
                             font.family: Theme.font.ui
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: otherLocationArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.optionsOpen = false;
                                 manager.overlayVisible = false;
                                 saveLocationProcess.running = true;
@@ -1095,7 +1095,7 @@ Item {
                                 Layout.fillWidth: true
                                 implicitHeight: 26
                                 radius: Theme.radius.sm
-                                color: manager.timerDelay === modelData.delay ? Theme.fill.selected : (timerOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
+                                color: manager.timerDelay === modelData.delay ? Theme.fill.selected : (timerOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
 
                                 Text {
                                     anchors.centerIn: parent
@@ -1105,12 +1105,12 @@ Item {
                                     font.family: Theme.font.ui
                                 }
 
-                                MouseArea {
+                                HoverHandler {
                                     id: timerOptArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: manager.setTimerDelay(modelData.delay)
+                                }
+                                TapHandler {
+                                    onTapped: manager.setTimerDelay(modelData.delay)
                                 }
                             }
                         }
@@ -1138,7 +1138,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 30
                         radius: Theme.radius.sm
-                        color: notificationOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: notificationOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1162,12 +1162,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: notificationOptArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.showNotification = !manager.showNotification;
                                 if (SettingsService.loaded)
                                     SettingsService.screenshotShowNotification = manager.showNotification;
@@ -1179,7 +1179,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 30
                         radius: Theme.radius.sm
-                        color: rememberSelectionArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: rememberSelectionArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1203,12 +1203,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: rememberSelectionArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.rememberLastSelection = !manager.rememberLastSelection;
                                 if (SettingsService.loaded) {
                                     SettingsService.screenshotRememberLastSelection = manager.rememberLastSelection;
@@ -1223,7 +1223,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 30
                         radius: Theme.radius.sm
-                        color: systemAudioOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: systemAudioOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
                         Behavior on color {
                             ColorAnimation {
                                 duration: Theme.motion.fast
@@ -1252,12 +1252,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: systemAudioOptArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.systemAudioEnabled = !manager.systemAudioEnabled;
                                 if (SettingsService.loaded)
                                     SettingsService.screenshotSystemAudioEnabled = manager.systemAudioEnabled;
@@ -1269,7 +1269,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 30
                         radius: Theme.radius.sm
-                        color: micOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: micOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
                         Behavior on color {
                             ColorAnimation {
                                 duration: Theme.motion.fast
@@ -1298,12 +1298,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: micOptArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.micEnabled = !manager.micEnabled;
                                 if (SettingsService.loaded)
                                     SettingsService.screenshotMicEnabled = manager.micEnabled;
@@ -1333,7 +1333,7 @@ Item {
                         Layout.fillWidth: true
                         implicitHeight: 30
                         radius: Theme.radius.sm
-                        color: cursorOptArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: cursorOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         RowLayout {
                             anchors.fill: parent
@@ -1357,12 +1357,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: cursorOptArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
+                        }
+                        TapHandler {
+                            onTapped: {
                                 manager.showCursor = !manager.showCursor;
                                 if (SettingsService.loaded)
                                     SettingsService.screenshotShowCursor = manager.showCursor;
@@ -1434,12 +1434,12 @@ Item {
                             font.family: Theme.font.iconFill
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: closeArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.dismiss()
+                        }
+                        TapHandler {
+                            onTapped: manager.dismiss()
                         }
                     }
 
@@ -1464,7 +1464,7 @@ Item {
                             implicitWidth: 36
                             implicitHeight: 36
                             radius: Theme.radius.md
-                            color: manager.selectedMode === modelData.mode || modeArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                            color: manager.selectedMode === modelData.mode || modeArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                             Behavior on color {
                                 ColorAnimation {
@@ -1485,12 +1485,12 @@ Item {
                                 }
                             }
 
-                            MouseArea {
+                            HoverHandler {
                                 id: modeArea
-                                anchors.fill: parent
-                                hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: manager.setSelectedMode(modelData.mode)
+                            }
+                            TapHandler {
+                                onTapped: manager.setSelectedMode(modelData.mode)
                             }
                         }
                     }
@@ -1508,7 +1508,7 @@ Item {
                         implicitWidth: 36
                         implicitHeight: 36
                         radius: Theme.radius.md
-                        color: manager.selectedMode === "video" || videoArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: manager.selectedMode === "video" || videoArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {
                             ColorAnimation {
@@ -1529,12 +1529,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: videoArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.setSelectedMode("video")
+                        }
+                        TapHandler {
+                            onTapped: manager.setSelectedMode("video")
                         }
                     }
 
@@ -1551,7 +1551,7 @@ Item {
                         implicitWidth: optionsLabel.implicitWidth + 16
                         implicitHeight: 36
                         radius: Theme.radius.md
-                        color: manager.optionsOpen ? Theme.fill.hover : (optionsBtn.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
+                        color: manager.optionsOpen ? Theme.fill.hover : (optionsBtn.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
 
                         Behavior on color {
                             ColorAnimation {
@@ -1587,12 +1587,12 @@ Item {
                             }
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: optionsBtn
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.optionsOpen = !manager.optionsOpen
+                        }
+                        TapHandler {
+                            onTapped: manager.optionsOpen = !manager.optionsOpen
                         }
                     }
 
@@ -1602,7 +1602,7 @@ Item {
                         radius: Theme.radius.md
                         readonly property bool canCapture: manager.selectedMode === "region" ? manager.hasSelection : manager.selectedMode === "windows" ? manager.selectedWindow != null : true
                         opacity: canCapture ? 1.0 : 0.45
-                        color: captureBtn.containsMouse && captureBtn.enabled ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
+                        color: captureBtn.hovered && captureBtn.enabled ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
                         Layout.leftMargin: 3
 
                         Behavior on color {
@@ -1621,13 +1621,14 @@ Item {
                             font.family: Theme.font.ui
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: captureBtn
-                            anchors.fill: parent
-                            hoverEnabled: true
                             enabled: parent.canCapture && !manager.countdownActive
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.capture()
+                        }
+                        TapHandler {
+                            enabled: parent.canCapture && !manager.countdownActive
+                            onTapped: manager.capture()
                         }
                     }
                 }
@@ -1642,7 +1643,7 @@ Item {
                         implicitWidth: cancelCountdownLabel.implicitWidth + 16
                         implicitHeight: 32
                         radius: Theme.radius.sm
-                        color: cancelCountdownArea.containsMouse ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                        color: cancelCountdownArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Text {
                             id: cancelCountdownLabel
@@ -1653,12 +1654,12 @@ Item {
                             font.family: Theme.font.ui
                         }
 
-                        MouseArea {
+                        HoverHandler {
                             id: cancelCountdownArea
-                            anchors.fill: parent
-                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: manager.dismiss()
+                        }
+                        TapHandler {
+                            onTapped: manager.dismiss()
                         }
                     }
 

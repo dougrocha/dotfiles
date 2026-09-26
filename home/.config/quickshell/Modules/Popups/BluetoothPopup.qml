@@ -19,7 +19,7 @@ Popup {
 
         readonly property string action: BluetoothService.pendingAction(row.address)
 
-        readonly property bool hovered: rowMouse.containsMouse
+        readonly property bool hovered: rowMouse.hovered
         readonly property string statusText: {
             if (action === "forgetting")
                 return "Forgetting";
@@ -54,12 +54,12 @@ Popup {
             }
         }
 
-        MouseArea {
+        HoverHandler {
             id: rowMouse
-            anchors.fill: parent
-            hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
-            onClicked: BluetoothService.activate(entry.row)
+        }
+        TapHandler {
+            onTapped: BluetoothService.activate(entry.row)
         }
 
         Text {
@@ -92,7 +92,7 @@ Popup {
                 color: entry.row.connected ? Theme.text.primary : Theme.text.secondary
                 font.pixelSize: Theme.type.body.size
                 font.family: Theme.font.ui
-                font.weight: entry.row.connected ? Font.Medium : Font.Normal
+                font.weight: entry.row.connected ? Theme.type.title.weight : Theme.type.body.weight
                 elide: Text.ElideRight
             }
 
@@ -171,14 +171,9 @@ Popup {
             spacing: Theme.space.sm
             visible: BluetoothService.pairedRows.length > 0
 
-            Divider {
-                visible: BluetoothService.connectedRows.length > 0
-            }
-
             Item {
                 width: parent.width
                 height: 4
-                visible: BluetoothService.connectedRows.length === 0
             }
 
             SectionLabel {
