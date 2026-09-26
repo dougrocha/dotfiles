@@ -147,7 +147,7 @@ Rectangle {
         text: root.glyph !== "" ? root.glyph : root.label
         font.family: root.glyph !== "" ? Theme.font.icon : Theme.font.ui
         font.pixelSize: root.glyph !== "" ? 18 : Theme.type.caption.size
-        font.weight: root.glyph !== "" ? Font.Normal : Font.Medium
+        font.weight: root.glyph !== "" ? Theme.type.body.weight : Theme.type.title.weight
         color: root.active ? (root.danger ? Theme.danger : Theme.accentText) : Theme.text.primary
 
         Behavior on color {

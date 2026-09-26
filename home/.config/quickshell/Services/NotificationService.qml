@@ -81,8 +81,21 @@ Singleton {
         return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
     }
 
+    function shortUrl(url: string): string {
+        const match = url.match(/^[a-z]+:\/\/(?:www\.)?([^\/?#]+)([^?#]*)/i);
+        if (!match)
+            return url;
+        const path = match[2].replace(/\/$/, "");
+        return match[1] + (path.length > 24 ? path.slice(0, 23) + "…" : path);
+    }
+
     function styledBody(text) {
-        return text.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
+        const anchors = [];
+        const linked = text.replace(/<a\s[^>]*>.*?<\/a>/gi, anchor => {
+            anchors.push(anchor);
+            return "\u0000" + (anchors.length - 1) + "\u0000";
+        }).replace(/\bhttps?:\/\/[^\s<>"']*[^\s<>"'.,;:!?)\]]/gi, url => `<a href="${url}">${root.shortUrl(url)}</a>`).replace(/\u0000(\d+)\u0000/g, (_, index) => anchors[index]);
+        return linked.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
     }
 
     function openBodyLink(link) {

@@ -320,11 +320,13 @@ Item {
                         color: Theme.text.secondary
                         visible: !root.responseVisible
 
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -6
+                        HoverHandler {
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: root.revealPassword = !root.revealPassword
+                            margin: 6
+                        }
+                        TapHandler {
+                            margin: 6
+                            onTapped: root.revealPassword = !root.revealPassword
                         }
                     }
                 }
@@ -365,7 +367,7 @@ Item {
         implicitHeight: 30
         radius: Theme.radius.md
         opacity: enabled ? 1 : 0.5
-        color: primary ? (btnArea.pressed ? Qt.darker(Theme.accent, 1.15) : (btnArea.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)) : (btnArea.pressed ? Theme.colors.overlay : (btnArea.containsMouse ? Theme.colors.raised : Theme.colors.bg))
+        color: primary ? (btnAreaTap.pressed ? Qt.darker(Theme.accent, 1.15) : (btnArea.hovered ? Qt.lighter(Theme.accent, 1.1) : Theme.accent)) : (btnAreaTap.pressed ? Theme.colors.overlay : (btnArea.hovered ? Theme.colors.raised : Theme.colors.bg))
         border.width: primary ? 0 : 1
         border.color: Theme.stroke.hairline
 
@@ -382,16 +384,18 @@ Item {
             color: btn.primary ? Theme.accentText : Theme.text.primary
             font.family: Theme.font.ui
             font.pixelSize: Theme.type.body.size
-            font.weight: btn.primary ? Font.Medium : Font.Normal
+            font.weight: btn.primary ? Theme.type.title.weight : Theme.type.body.weight
         }
 
-        MouseArea {
+        HoverHandler {
             id: btnArea
-            anchors.fill: parent
-            hoverEnabled: true
             enabled: btn.enabled
             cursorShape: Qt.PointingHandCursor
-            onClicked: btn.clicked()
+        }
+        TapHandler {
+            id: btnAreaTap
+            enabled: btn.enabled
+            onTapped: btn.clicked()
         }
     }
 }
