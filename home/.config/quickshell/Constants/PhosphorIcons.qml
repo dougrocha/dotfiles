@@ -81,6 +81,8 @@ Singleton {
     readonly property string eyeSlash: String.fromCodePoint(0xE224)
     readonly property string signOut: String.fromCodePoint(0xE42A)
     readonly property string terminal: String.fromCodePoint(0xEAE8)
+    readonly property string ghost: String.fromCodePoint(0xE62A)
+    readonly property string sparkle: String.fromCodePoint(0xE6A2)
     readonly property string cpu: String.fromCodePoint(0xE610)
     readonly property string hardDrive: String.fromCodePoint(0xE29E)
     readonly property string cloudArrowUp: String.fromCodePoint(0xE1AE)

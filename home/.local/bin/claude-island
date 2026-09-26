@@ -8,8 +8,8 @@ project=$(basename "$(jq -r '.cwd // empty' <<<"$input")")
 id="claude-$session"
 
 case "$event" in
-Stop) qs ipc call island push "$id" checkCircle "Claude finished in $project" 4 ;;
-Notification) qs ipc call island push "$id" bell "Claude needs you in $project" 8 ;;
+Stop) qs ipc call island push "$id" sparkle "Claude finished in $project" 4 ;;
+Notification) qs ipc call island push "$id" sparkle "Claude needs you in $project" 8 ;;
 UserPromptSubmit) qs ipc call island clear "$id" ;;
 esac >/dev/null 2>&1
 
