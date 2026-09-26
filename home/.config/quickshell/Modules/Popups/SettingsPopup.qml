@@ -28,7 +28,7 @@ Popup {
         width: parent.width
         height: 32
 
-        readonly property color batteryColor: pct <= 10 && !charging ? Theme.danger : Theme.accent
+        readonly property color batteryColor: charging ? Theme.text.secondary : pct <= 10 ? Theme.danger : pct <= 20 ? Theme.caution : Theme.text.secondary
 
         Text {
             id: deviceIcon

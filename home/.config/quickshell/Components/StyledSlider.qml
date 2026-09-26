@@ -10,7 +10,7 @@ Slider {
     property bool holding: false
 
     property color trackColor: Theme.stroke.strong
-    property color accentColor: Theme.accent
+    property color accentColor: Theme.text.primary
     property color handleColor: Theme.text.primary
     property int handleSize: 12
 
