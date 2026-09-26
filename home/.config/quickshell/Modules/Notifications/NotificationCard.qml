@@ -157,7 +157,16 @@ Item {
                     }
 
                     Text {
-                        text: [card.modelData?.summary ? NotificationService.appDisplayName(card.modelData?.appName) : "", card.relativeTime(card.modelData?.timestamp ?? Date.now())].filter(Boolean).join(" · ")
+                        visible: !!card.modelData?.summary
+                        text: NotificationService.appDisplayName(card.modelData?.appName)
+                        color: Theme.text.tertiary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.caption.size
+                    }
+
+                    Text {
+                        Layout.leftMargin: Theme.space.xs
+                        text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
