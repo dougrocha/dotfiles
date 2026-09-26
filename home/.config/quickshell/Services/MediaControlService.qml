@@ -49,7 +49,13 @@ Singleton {
     }
 
     function seek(seconds) {
-        if (MprisService.musicPlayer)
-            MprisService.musicPlayer.position = seconds;
+        const player = MprisService.musicPlayer;
+        if (!player)
+            return;
+        if (player.lengthSupported && player.length > 0 && seconds >= player.length - 1) {
+            player.next();
+            return;
+        }
+        player.position = Math.max(0, seconds);
     }
 }
