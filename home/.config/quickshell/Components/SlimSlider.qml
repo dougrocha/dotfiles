@@ -9,7 +9,7 @@ Item {
     property string labelText: ""
     property string sublabelText: ""
     property real sliderValue: 0
-    property real sliderMax: 1.5
+    property real sliderMax: 1
     property bool muted: false
     property string muteIcon: ""
     property string mutedIcon: ""
@@ -30,7 +30,7 @@ Item {
 
         Item {
             width: parent.width
-            height: slimRoot.sublabelText !== "" ? 36 : 32
+            height: Math.max(32, labelCol.implicitHeight)
 
             IconImage {
                 anchors.left: parent.left
@@ -40,34 +40,33 @@ Item {
                 visible: slimRoot.iconSource !== ""
             }
 
-            Text {
-                id: mainLabel
+            Column {
+                id: labelCol
                 anchors.left: parent.left
                 anchors.leftMargin: slimRoot.labelIndent
                 anchors.right: muteBtn.left
                 anchors.rightMargin: 8
-                anchors.top: slimRoot.sublabelText !== "" ? parent.top : undefined
-                anchors.verticalCenter: slimRoot.sublabelText !== "" ? undefined : parent.verticalCenter
-                text: slimRoot.labelText
-                color: Theme.text.primary
-                font.pixelSize: Theme.type.body.size
-                font.family: Theme.font.ui
-                elide: Text.ElideRight
-            }
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: 1
 
-            Text {
-                anchors.left: parent.left
-                anchors.leftMargin: slimRoot.labelIndent
-                anchors.right: muteBtn.left
-                anchors.rightMargin: 8
-                anchors.top: mainLabel.bottom
-                anchors.topMargin: 1
-                visible: slimRoot.sublabelText !== ""
-                text: slimRoot.sublabelText
-                color: Theme.text.tertiary
-                font.pixelSize: Theme.type.caption.size
-                font.family: Theme.font.ui
-                elide: Text.ElideRight
+                Text {
+                    width: parent.width
+                    text: slimRoot.labelText
+                    color: Theme.text.primary
+                    font.pixelSize: Theme.type.body.size
+                    font.family: Theme.font.ui
+                    elide: Text.ElideRight
+                }
+
+                Text {
+                    width: parent.width
+                    visible: slimRoot.sublabelText !== ""
+                    text: slimRoot.sublabelText
+                    color: Theme.text.tertiary
+                    font.pixelSize: Theme.type.caption.size
+                    font.family: Theme.font.ui
+                    elide: Text.ElideRight
+                }
             }
 
             Rectangle {
@@ -123,11 +122,6 @@ Item {
             to: slimRoot.sliderMax
             boundValue: slimRoot.sliderValue
             onMoved: slimRoot.moved(value)
-
-            TapHandler {
-                enabled: slimRoot.sliderMax > 1
-                onDoubleTapped: slimRoot.moved(1)
-            }
         }
     }
 }

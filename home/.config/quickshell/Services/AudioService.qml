@@ -296,6 +296,14 @@ Singleton {
             setStreamMuted(stream, muted);
     }
 
+    // Entries load asynchronously; drop cached misses once they arrive
+    Connections {
+        target: DesktopEntries.applications
+        function onValuesChanged() {
+            root.appLookups = ({});
+        }
+    }
+
     PwObjectTracker {
         objects: [...root.sinks, ...root.sources, ...root.streams, ...root.captures]
     }
