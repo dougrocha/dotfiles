@@ -7,6 +7,7 @@ Singleton {
     id: root
 
     property bool musicPanel: false
+    property int islandTab: 0
     property bool settingsPanel: false
     property bool soundPanel: false
     property bool bluetoothPanel: false
@@ -75,6 +76,10 @@ Singleton {
         }
         function toggle(): void {
             root.toggleMusicPanel();
+        }
+        function calendar(): void {
+            root.islandTab = 1;
+            root.openMusicPanel();
         }
     }
 
