@@ -45,16 +45,6 @@ Item {
     property bool menuHovered: false
     property bool menuExpanded: false
 
-    function styledBody(text) {
-        return text.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
-    }
-
-    function openBodyLink(link) {
-        const scheme = String(link).split(":", 1)[0].toLowerCase();
-        if (scheme === "http" || scheme === "https" || scheme === "mailto")
-            Qt.openUrlExternally(link);
-    }
-
     function isSettingsAction(a) {
         return /^\s*settings\s*$/i.test(a.text);
     }
@@ -158,7 +148,7 @@ Item {
 
                     Text {
                         Layout.fillWidth: true
-                        text: card.modelData?.summary || card.modelData?.appName || ""
+                        text: card.modelData?.summary || NotificationService.appDisplayName(card.modelData?.appName)
                         color: Theme.text.primary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.title.size
@@ -167,7 +157,7 @@ Item {
                     }
 
                     Text {
-                        text: [card.modelData?.summary ? card.modelData?.appName : "", card.relativeTime(card.modelData?.timestamp ?? Date.now())].filter(Boolean).join(" · ")
+                        text: [card.modelData?.summary ? NotificationService.appDisplayName(card.modelData?.appName) : "", card.relativeTime(card.modelData?.timestamp ?? Date.now())].filter(Boolean).join(" · ")
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
@@ -225,7 +215,7 @@ Item {
 
                 Text {
                     Layout.fillWidth: true
-                    text: card.styledBody(card.modelData?.body ?? "")
+                    text: NotificationService.styledBody(card.modelData?.body ?? "")
                     visible: text !== ""
                     color: Theme.text.secondary
                     font.family: Theme.font.ui
@@ -234,7 +224,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 3
                     elide: Text.ElideRight
-                    onLinkActivated: link => card.openBodyLink(link)
+                    onLinkActivated: link => NotificationService.openBodyLink(link)
                 }
             }
 

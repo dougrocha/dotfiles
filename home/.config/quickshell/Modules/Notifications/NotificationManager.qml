@@ -170,6 +170,7 @@ Variants {
                         y: delegateWrapper.badgeInset
                         width: delegateWrapper.width - delegateWrapper.badgeInset
                         modelData: delegateWrapper.modelData
+                        enabled: !delegateWrapper.leaving
                     }
                 }
             }

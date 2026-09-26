@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
+import qs.Constants
 
 Singleton {
     id: root
@@ -64,13 +65,38 @@ Singleton {
             actions: (n.actions ?? []).map(a => ({
                         identifier: a.identifier,
                         text: a.text,
-                        invoke: () => a.invoke()
+                        invoke: () => root.invokeAction(n.id, a)
                     })),
             timestamp: metadata.timestamp,
             duration: metadata.duration,
             isPopup: metadata.isPopup,
             ref: n
         };
+    }
+
+    // Senders report raw ids like "vesktop"; show the desktop entry name instead
+    function appDisplayName(appName) {
+        if (!appName)
+            return "Unknown";
+        const entry = DesktopEntries.heuristicLookup(appName);
+        return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
+    }
+
+    function styledBody(text) {
+        return text.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
+    }
+
+    function openBodyLink(link) {
+        const scheme = String(link).split(":", 1)[0].toLowerCase();
+        if (scheme === "http" || scheme === "https" || scheme === "mailto")
+            Qt.openUrlExternally(link);
+    }
+
+    // A closed notification destroys its actions while its card is still animating out
+    function invokeAction(notificationId, action) {
+        const notif = root.notifications.find(n => n.id === notificationId);
+        if (notif?.ref)
+            action.invoke();
     }
 
     function watchForUpdates(notification, id) {
@@ -184,7 +210,7 @@ Singleton {
     }
 
     function clearAppHistory(appName) {
-        root.history = root.history.filter(n => (n.appName || "Unknown") !== appName);
+        root.history = root.history.filter(n => root.appDisplayName(n.appName) !== appName);
         saveHistory();
     }
 

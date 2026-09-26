@@ -38,7 +38,7 @@ Column {
     readonly property var groups: {
         const map = new Map();
         for (const n of NotificationService.history) {
-            const key = n.appName || "Unknown";
+            const key = NotificationService.appDisplayName(n.appName);
             if (!map.has(key))
                 map.set(key, {
                     id: key,
@@ -186,7 +186,7 @@ Column {
             Text {
                 Layout.fillWidth: true
                 visible: row.modelData.summary !== "" && text !== ""
-                text: row.modelData.body
+                text: NotificationService.styledBody(row.modelData.body)
                 textFormat: Text.StyledText
                 color: Theme.text.secondary
                 font.family: Theme.font.ui
@@ -194,6 +194,7 @@ Column {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
+                onLinkActivated: link => NotificationService.openBodyLink(link)
             }
         }
     }
