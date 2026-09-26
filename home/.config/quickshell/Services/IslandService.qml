@@ -119,7 +119,7 @@ Singleton {
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;
 
-        if (!known || Visibilities.musicPanel || root.scratchpadOpen)
+        if (!known || Visibilities.musicPanel || root.scratchpadOpen || MprisService.musicPlayerIsBrowser)
             return;
         songNotifTimer.restart();
     }

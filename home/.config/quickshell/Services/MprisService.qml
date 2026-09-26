@@ -14,14 +14,23 @@ Singleton {
         return (player.dbusName || "").endsWith(".playerctld");
     }
 
-    readonly property list<MprisPlayer> availablePlayers: Mpris.players.values.filter(p => !isBrowser(p.identity) && !isProxy(p))
-
-    readonly property MprisPlayer musicPlayer: {
-        const playing = availablePlayers.find(p => p.isPlaying && (p.trackTitle || "") !== "");
-        if (playing)
-            return playing;
-        return availablePlayers.find(p => (p.trackTitle || "") !== "") ?? null;
+    function hasTrack(player) {
+        return (player?.trackTitle || "") !== "";
     }
+
+    readonly property list<MprisPlayer> availablePlayers: Mpris.players.values.filter(p => !isBrowser(p.identity) && !isProxy(p))
+    readonly property list<MprisPlayer> browserPlayers: Mpris.players.values.filter(p => isBrowser(p.identity) && !isProxy(p))
+
+    // Music apps win over browsers, so a background video never hides Cider
+    readonly property MprisPlayer playingPlayer: availablePlayers.find(p => p.isPlaying && hasTrack(p)) ?? browserPlayers.find(p => p.isPlaying && hasTrack(p)) ?? null
+
+    // Keep the last player that played so pausing it doesn't swap the island to another app
+    property MprisPlayer lastPlayer: null
+    onPlayingPlayerChanged: if (playingPlayer)
+        lastPlayer = playingPlayer
+
+    readonly property MprisPlayer musicPlayer: playingPlayer ?? (hasTrack(lastPlayer) ? lastPlayer : null) ?? availablePlayers.find(p => hasTrack(p)) ?? null
+    readonly property bool musicPlayerIsBrowser: isBrowser(musicPlayer?.identity)
 
     function playerForBinary(binary) {
         if (!binary)
