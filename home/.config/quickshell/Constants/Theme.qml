@@ -165,6 +165,10 @@ Singleton {
         readonly property int easeExit: Easing.InCubic
         readonly property int easeSmooth: Easing.InOutQuad
         readonly property int easeSoft: Easing.OutQuad
+        readonly property int enterDelay: 70
+        readonly property real springStiffness: 4.5
+        readonly property real springDamping: 0.36
+        readonly property real springEpsilon: 0.25
     }
 
     readonly property QtObject type: QtObject {

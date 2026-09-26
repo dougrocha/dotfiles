@@ -72,9 +72,10 @@ Variants {
             y: overlay.revealed ? 0 : -(pill.y + pill.height)
 
             Behavior on y {
-                NumberAnimation {
-                    duration: Theme.motion.normal
-                    easing.type: Theme.motion.easeStandard
+                SpringAnimation {
+                    spring: Theme.motion.springStiffness
+                    damping: Theme.motion.springDamping
+                    epsilon: Theme.motion.springEpsilon
                 }
             }
 
@@ -90,6 +91,16 @@ Variants {
                 readonly property int inset: 16
 
                 readonly property int targetHeight: full ? fullContent.implicitHeight + inset * 2 : notif ? notifContent.implicitHeight + inset * 2 : recDetails ? compactHeight + recArea.implicitHeight + 12 : compactHeight
+
+                property real cornerRadius: full ? Theme.radius.xxl : notif ? Theme.radius.xl : recDetails ? Theme.radius.lg : compactHeight / 2
+
+                Behavior on cornerRadius {
+                    SpringAnimation {
+                        spring: Theme.motion.springStiffness
+                        damping: Theme.motion.springDamping
+                        epsilon: Theme.motion.springEpsilon
+                    }
+                }
 
                 property int tab: 0
 
@@ -118,7 +129,7 @@ Variants {
 
                 width: full ? (tab === 0 ? 560 : 420) : notif ? 380 : compactRow.implicitWidth + 28
                 height: targetHeight
-                radius: full ? Theme.radius.xxl : notif ? Theme.radius.xl : recDetails ? Theme.radius.lg : compactHeight / 2
+                radius: Math.min(height / 2, cornerRadius)
                 color: pill.full ? Theme.colors.overlay : Theme.colors.surface
                 clip: true
 
@@ -134,21 +145,17 @@ Variants {
                 }
 
                 Behavior on width {
-                    NumberAnimation {
-                        duration: Theme.motion.normal
-                        easing.type: Theme.motion.easeStandard
+                    SpringAnimation {
+                        spring: Theme.motion.springStiffness
+                        damping: Theme.motion.springDamping
+                        epsilon: Theme.motion.springEpsilon
                     }
                 }
                 Behavior on height {
-                    NumberAnimation {
-                        duration: Theme.motion.normal
-                        easing.type: Theme.motion.easeStandard
-                    }
-                }
-                Behavior on radius {
-                    NumberAnimation {
-                        duration: Theme.motion.fast
-                        easing.type: Theme.motion.easeStandard
+                    SpringAnimation {
+                        spring: Theme.motion.springStiffness
+                        damping: Theme.motion.springDamping
+                        epsilon: Theme.motion.springEpsilon
                     }
                 }
 
@@ -190,11 +197,10 @@ Variants {
                     spacing: Theme.space.md
                     opacity: (pill.full || pill.notif) ? 0 : 1
                     visible: opacity > 0
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
+                    scale: 0.96 + 0.04 * opacity
+                    transformOrigin: Item.Top
+
+                    ContentFade on opacity {}
 
                     ClockWidget {
                         anchors.verticalCenter: parent.verticalCenter
@@ -392,12 +398,10 @@ Variants {
                     spacing: Theme.space.sm
                     opacity: pill.recDetails ? 1 : 0
                     visible: opacity > 0
+                    scale: 0.96 + 0.04 * opacity
+                    transformOrigin: Item.Top
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
+                    ContentFade on opacity {}
 
                     Column {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -456,12 +460,10 @@ Variants {
                     spacing: Theme.space.lg
                     opacity: pill.notif ? 1 : 0
                     visible: opacity > 0
+                    scale: 0.96 + 0.04 * opacity
+                    transformOrigin: Item.Top
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
+                    ContentFade on opacity {}
 
                     ClippingRectangle {
                         width: 44
@@ -531,12 +533,10 @@ Variants {
                     spacing: Theme.space.lg
                     opacity: pill.full ? 1 : 0
                     visible: opacity > 0
+                    scale: 0.96 + 0.04 * opacity
+                    transformOrigin: Item.Top
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
+                    ContentFade on opacity {}
 
                     Item {
                         width: tabBar.implicitWidth
