@@ -40,14 +40,23 @@ Singleton {
     readonly property var currentAlert: alerts[0] ?? null
     readonly property bool transientAlertActive: alerts.some(a => a.until > 0)
 
-    function pushAlert(id: string, icon: string, text: string, seconds: real): void {
+    function setAlert(id, icon, text, seconds, progress) {
         const alert = {
             id: id,
             glyph: PhosphorIcons[icon] ?? icon,
             text: text,
-            until: seconds > 0 ? Date.now() + seconds * 1000 : 0
+            until: seconds > 0 ? Date.now() + seconds * 1000 : 0,
+            progress: progress
         };
         alerts = [alert, ...alerts.filter(a => a.id !== id)];
+    }
+
+    function pushAlert(id: string, icon: string, text: string, seconds: real): void {
+        setAlert(id, icon, text, seconds, -1);
+    }
+
+    function pushProgress(id: string, icon: string, text: string, progress: real): void {
+        setAlert(id, icon, text, 0, Math.max(0, Math.min(1, progress)));
     }
 
     function clearAlert(id: string): void {
@@ -71,6 +80,10 @@ Singleton {
 
         function push(id: string, icon: string, text: string, seconds: real): void {
             root.pushAlert(id, icon, text, seconds);
+        }
+
+        function progress(id: string, icon: string, text: string, value: real): void {
+            root.pushProgress(id, icon, text, value);
         }
 
         function clear(id: string): void {

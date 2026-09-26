@@ -32,6 +32,7 @@ Singleton {
         bodyImagesSupported: true
         bodyMarkupSupported: true
         imageSupported: true
+        extraHints: ["value"]
 
         onNotification: notification => handleNotification(notification)
     }
@@ -121,6 +122,47 @@ Singleton {
         root.notifications = root.notifications.map((n, i) => i === index ? data : n);
     }
 
+    property var progressWatchers: ({})
+
+    function progressOf(notification) {
+        const value = notification.hints?.value;
+        return typeof value === "number" ? Math.max(0, Math.min(100, value)) / 100 : -1;
+    }
+
+    function trackProgress(notification) {
+        const id = notification.id;
+        const alertId = "notification-" + id;
+        root.progressWatchers[id]?.();
+
+        const signals = [notification.hintsChanged, notification.summaryChanged];
+
+        function update() {
+            const progress = root.progressOf(notification);
+            const label = notification.summary || root.appDisplayName(notification.appName);
+            if (progress >= 1)
+                IslandService.pushAlert(alertId, "checkCircle", label, 2);
+            else if (progress >= 0)
+                IslandService.setAlert(alertId, "", label, notification.expireTimeout > 0 ? notification.expireTimeout / 1000 : 0, progress);
+        }
+
+        function unwatch() {
+            signals.forEach(signal => signal.disconnect(update));
+            notification.closed.disconnect(close);
+            delete root.progressWatchers[id];
+        }
+
+        function close() {
+            unwatch();
+            if (IslandService.alerts.some(a => a.id === alertId && a.progress >= 0))
+                IslandService.clearAlert(alertId);
+        }
+
+        signals.forEach(signal => signal.connect(update));
+        notification.closed.connect(close);
+        root.progressWatchers[id] = unwatch;
+        update();
+    }
+
     function handleNotification(notification) {
         if (!notification.summary && !notification.body)
             return;
@@ -134,6 +176,12 @@ Singleton {
             existing.ref.closed.disconnect(existing.closeHandler);
         if (existing && existing.unwatch)
             existing.unwatch();
+
+        if (progressOf(notification) >= 0) {
+            root.notifications = root.notifications.filter(notif => notif.id !== id);
+            trackProgress(notification);
+            return;
+        }
 
         const metadata = {
             timestamp: Date.now(),

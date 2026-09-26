@@ -383,6 +383,7 @@ Variants {
 
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
+                                visible: text !== ""
                                 text: IslandService.currentAlert?.glyph ?? ""
                                 color: Theme.accent
                                 font.pixelSize: Theme.icon.md
@@ -397,6 +398,29 @@ Variants {
                                 font.pixelSize: Theme.type.body.size
                                 font.family: Theme.font.ui
                                 elide: Text.ElideRight
+                            }
+
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                visible: (IslandService.currentAlert?.progress ?? -1) >= 0
+                                width: 80
+                                height: 4
+                                radius: Theme.radius.xxs
+                                color: Theme.stroke.strong
+
+                                Rectangle {
+                                    width: Math.max(0, IslandService.currentAlert?.progress ?? 0) * parent.width
+                                    height: parent.height
+                                    radius: Theme.radius.xxs
+                                    color: Theme.accent
+
+                                    Behavior on width {
+                                        NumberAnimation {
+                                            duration: Theme.motion.normal
+                                            easing.type: Theme.motion.easeStandard
+                                        }
+                                    }
+                                }
                             }
                         }
 
