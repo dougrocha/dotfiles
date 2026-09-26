@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Show Claude Code hook events as alerts in the Quickshell island
+input=$(cat)
+event=$(jq -r '.hook_event_name // empty' <<<"$input")
+session=$(jq -r '.session_id // "session"' <<<"$input" | cut -c1-8)
+project=$(basename "$(jq -r '.cwd // empty' <<<"$input")")
+id="claude-$session"
+
+case "$event" in
+Stop) qs ipc call island push "$id" checkCircle "Claude finished · $project" 4 ;;
+Notification) qs ipc call island push "$id" bell "Claude needs you · $project" 8 ;;
+UserPromptSubmit) qs ipc call island clear "$id" ;;
+esac >/dev/null 2>&1
+
+exit 0
