@@ -19,7 +19,7 @@ QtObject {
     ]
 
     function identity() {
-        return `${root.trayItem.id || ""} ${root.trayItem.title || ""}`.toLowerCase();
+        return `${root.trayItem?.id || ""} ${root.trayItem?.title || ""}`.toLowerCase();
     }
 
     function matches(override) {
@@ -36,6 +36,9 @@ QtObject {
     }
 
     function displayTitle() {
+        if (!root.trayItem)
+            return "";
+
         for (const override of root.titleOverrides) {
             if (root.matches(override))
                 return override.title;
@@ -69,6 +72,6 @@ QtObject {
     }
 
     property QsMenuOpener menuOpener: QsMenuOpener {
-        menu: root.trayItem.hasMenu ? root.trayItem.menu : null
+        menu: root.trayItem?.hasMenu ? root.trayItem.menu : null
     }
 }
