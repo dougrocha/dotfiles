@@ -16,6 +16,8 @@ Singleton {
         toggleProcess.running = true;
     }
 
+    Component.onCompleted: refresh()
+
     Process {
         id: statusProcess
 
