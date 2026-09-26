@@ -49,6 +49,15 @@ Singleton {
         return Qt.hsla(hue / 360, c.hslSaturation, c.hslLightness, c.a);
     }
 
+    function tame(c, keep) {
+        c = Qt.color(c);
+        if (c.hslHue < 0)
+            return c;
+        return Qt.hsla(c.hslHue, c.hslSaturation * keep, c.hslLightness, c.a);
+    }
+
+    readonly property real neutralKeep: 0.25
+
     FileView {
         id: paletteFile
         path: Quickshell.shellDir + "/palette.json"
@@ -60,16 +69,17 @@ Singleton {
     }
 
     readonly property QtObject palette: QtObject {
-        readonly property color bg: root.paletteColor("bg", "#16181a")
-        readonly property color surface: root.paletteColor("surface", "#1e2124")
-        readonly property color raised: root.paletteColor("raised", "#282c30")
-        readonly property color overlay: root.paletteColor("overlay", "#31363b")
-        readonly property color text: root.paletteColor("text", "#e6e8ea")
-        readonly property color subtext: root.paletteColor("subtext", "#9aa0a6")
-        readonly property color muted: root.paletteColor("muted", "#6b7075")
+        readonly property color bg: root.tame(root.paletteColor("bg", "#16181a"), root.neutralKeep)
+        readonly property color surface: root.tame(root.paletteColor("surface", "#1e2124"), root.neutralKeep)
+        readonly property color raised: root.tame(root.paletteColor("raised", "#282c30"), root.neutralKeep)
+        readonly property color overlay: root.tame(root.paletteColor("overlay", "#31363b"), root.neutralKeep)
+        readonly property color text: root.tame(root.paletteColor("text", "#e6e8ea"), root.neutralKeep)
+        readonly property color subtext: root.tame(root.paletteColor("subtext", "#9aa0a6"), root.neutralKeep)
+        readonly property color muted: root.tame(root.paletteColor("muted", "#6b7075"), root.neutralKeep)
         readonly property color accent: root.paletteColor("accent", "#9bd4a2")
-        readonly property color accentText: root.paletteColor("accentText", "#0c1f12")
-        readonly property color danger: root.separateHue(root.paletteColor("danger", "#ee9089"), accent, 30)
+        readonly property color accentText: root.readableOn(accent, root.paletteColor("accentText", "#0c1f12"))
+        readonly property color danger: root.separateHue("#ff5f57", accent, 15)
+        readonly property color caution: root.separateHue("#ffcc40", accent, 25)
     }
 
     function withAlpha(c, a) {
@@ -86,6 +96,9 @@ Singleton {
         const hi = Math.max(_lum(a), _lum(b));
         const lo = Math.min(_lum(a), _lum(b));
         return (hi + 0.05) / (lo + 0.05);
+    }
+    function readableOn(bg, preferred) {
+        return _contrast(bg, Qt.color(preferred)) >= 4.5 ? Qt.color(preferred) : foregroundFor(bg);
     }
     readonly property bool lightMode: _lum(root.palette.bg) > _lum(root.palette.text)
     function foregroundFor(bg) {
@@ -109,14 +122,14 @@ Singleton {
     readonly property color accentText: root.palette.accentText
     readonly property color danger: root.palette.danger
     readonly property color dangerText: root.foregroundFor(root.danger)
-    readonly property color caution: "#e7b15e"
+    readonly property color caution: root.palette.caution
     readonly property color shadow: "#000000"
 
     readonly property QtObject fill: QtObject {
         readonly property color hover: root.withAlpha(root.text.primary, 0.06)
         readonly property color press: root.withAlpha(root.text.primary, 0.10)
         readonly property color strong: root.withAlpha(root.text.primary, 0.16)
-        readonly property color selected: root.withAlpha(root.accent, 0.16)
+        readonly property color selected: root.withAlpha(root.text.primary, 0.10)
         readonly property color selectedSolid: root.accent
     }
 

@@ -347,7 +347,7 @@ Variants {
                                         return PhosphorIcons.speakerNone;
                                     return IslandService.osdLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
                                 }
-                                color: IslandService.osdMuted ? Theme.text.secondary : Theme.accent
+                                color: IslandService.osdMuted ? Theme.text.secondary : Theme.text.primary
                                 font.pixelSize: Theme.icon.md
                                 font.family: Theme.font.icon
                             }
@@ -362,7 +362,7 @@ Variants {
                                     width: Math.min(IslandService.osdLevel, 1) * parent.width
                                     height: parent.height
                                     radius: Theme.radius.xxs
-                                    color: IslandService.osdMuted ? Theme.text.tertiary : Theme.accent
+                                    color: IslandService.osdMuted ? Theme.text.tertiary : Theme.text.primary
                                     Behavior on width {
                                         NumberAnimation {
                                             duration: Theme.motion.instant
@@ -420,7 +420,7 @@ Variants {
                                     width: Math.max(0, IslandService.currentAlert?.progress ?? 0) * parent.width
                                     height: parent.height
                                     radius: Theme.radius.xxs
-                                    color: Theme.accent
+                                    color: Theme.text.primary
 
                                     Behavior on width {
                                         NumberAnimation {
@@ -878,7 +878,6 @@ Variants {
 
                                         holding: seekDebounce.running
                                         trackColor: Theme.stroke.strong
-                                        accentColor: Theme.accent
                                         handleSize: 10
                                         onPressedChanged: {
                                             if (!pressed) {
