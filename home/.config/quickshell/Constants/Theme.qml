@@ -161,6 +161,8 @@ Singleton {
         readonly property int fast: 140
         readonly property int normal: 200
         readonly property int slow: 320
+        readonly property int pulse: 800
+        readonly property int marqueePause: 2000
         readonly property int easeStandard: Easing.OutCubic
         readonly property int easeExit: Easing.InCubic
         readonly property int easeSmooth: Easing.InOutQuad

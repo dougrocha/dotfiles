@@ -216,9 +216,22 @@ Singleton {
     }
     readonly property bool isPlaying: mprisPlayer?.isPlaying ?? false
     readonly property bool canSeek: mprisPlayer?.canSeek ?? false
-    readonly property real position: mprisPlayer?.position ?? 0
+    readonly property bool trackPending: liveTrack.key !== track.key
+    readonly property real livePosition: mprisPlayer?.position ?? 0
+    readonly property real liveDuration: (mprisPlayer && mprisPlayer.lengthSupported) ? mprisPlayer.length : 0
+    property real heldPosition: 0
+    property real heldDuration: 0
+    readonly property real position: trackPending ? heldPosition : livePosition
+    readonly property real duration: trackPending ? heldDuration : liveDuration
 
-    readonly property real duration: (mprisPlayer && mprisPlayer.lengthSupported) ? mprisPlayer.length : 0
+    onLivePositionChanged: if (!trackPending)
+        heldPosition = livePosition
+    onLiveDurationChanged: if (!trackPending)
+        heldDuration = liveDuration
+    onTrackPendingChanged: if (!trackPending) {
+        heldPosition = livePosition;
+        heldDuration = liveDuration;
+    }
 
     Timer {
         interval: 250

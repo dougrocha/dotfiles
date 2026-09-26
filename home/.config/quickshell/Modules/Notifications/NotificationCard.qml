@@ -152,7 +152,7 @@ Item {
                         color: Theme.text.primary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.title.size
-                        font.weight: Font.DemiBold
+                        font.weight: Theme.type.title.weight
                         elide: Text.ElideRight
                     }
 

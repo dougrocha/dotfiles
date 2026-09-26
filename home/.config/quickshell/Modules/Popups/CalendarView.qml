@@ -199,7 +199,7 @@ Item {
                     color: Theme.text.primary
                     font.family: Theme.font.ui
                     font.pixelSize: Theme.type.display.size
-                    font.weight: Font.Medium
+                    font.weight: Theme.type.display.weight
                     font.letterSpacing: 2
                 }
                 Text {
@@ -272,7 +272,7 @@ Item {
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
                         font.letterSpacing: 1
-                        font.weight: Font.Medium
+                        font.weight: Theme.type.label.weight
 
                         Behavior on color {
                             ColorAnimation {
@@ -307,7 +307,7 @@ Item {
                                 color: Theme.text.tertiary
                                 font.family: Theme.font.ui
                                 font.pixelSize: Theme.type.caption.size
-                                font.weight: Font.Normal
+                                font.weight: Theme.type.caption.weight
                             }
                         }
                     }
@@ -351,7 +351,7 @@ Item {
                                 font.family: Theme.font.ui
                                 font.pixelSize: Theme.type.caption.size
                                 font.letterSpacing: 1
-                                font.weight: Font.Medium
+                                font.weight: Theme.type.label.weight
                             }
                         }
                     }
@@ -490,7 +490,7 @@ Item {
                 font.family: Theme.font.ui
                 font.pixelSize: Theme.type.body.size
                 font.letterSpacing: 1
-                font.weight: Font.Medium
+                font.weight: Theme.type.title.weight
             }
         }
     }

@@ -107,21 +107,21 @@ Item {
             target: root
             property: "shakeOffset"
             to: -8
-            duration: 35
+            duration: Theme.motion.fast * 0.25
             easing.type: Theme.motion.easeSoft
         }
         NumberAnimation {
             target: root
             property: "shakeOffset"
             to: 8
-            duration: 50
+            duration: Theme.motion.fast * 0.35
             easing.type: Theme.motion.easeSmooth
         }
         NumberAnimation {
             target: root
             property: "shakeOffset"
             to: 0
-            duration: 55
+            duration: Theme.motion.fast * 0.4
             easing.type: Theme.motion.easeSoft
         }
     }
@@ -256,7 +256,7 @@ Item {
                         color: Theme.text.primary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.body.size
-                        font.weight: Font.Medium
+                        font.weight: Theme.type.title.weight
                         elide: Text.ElideRight
                     }
                 }
