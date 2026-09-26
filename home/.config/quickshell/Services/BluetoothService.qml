@@ -86,21 +86,6 @@ Singleton {
         return PhosphorIcons.bluetooth;
     }
 
-    property var announcedAddresses: null
-
-    onConnectedDevicesChanged: {
-        const addresses = connectedDevices.map(d => d.address);
-        if (announcedAddresses !== null) {
-            for (const device of connectedDevices) {
-                if (!announcedAddresses.includes(device.address) && hasHumanName(device)) {
-                    const battery = device.batteryAvailable ? " · " + Math.round(device.battery * 100) + "%" : "";
-                    IslandService.pushAlert("bluetooth-" + device.address, deviceIcon(device.icon), deviceLabel(device) + battery, 3);
-                }
-            }
-        }
-        announcedAddresses = addresses;
-    }
-
     function togglePower() {
         if (adapter)
             adapter.enabled = !adapter.enabled;
