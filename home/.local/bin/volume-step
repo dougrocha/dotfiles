@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Step the default sink volume by 2%, snapping to an even percentage
+direction=$1
+current=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf "%d", $2 * 100 + 0.5}')
+
+case $direction in
+  up) target=$(( current / 2 * 2 + 2 )) ;;
+  down) target=$(( (current + 1) / 2 * 2 - 2 )) ;;
+  *) echo "usage: volume-step up|down" >&2; exit 1 ;;
+esac
+
+(( target > 100 )) && target=100
+(( target < 0 )) && target=0
+
+wpctl set-volume @DEFAULT_AUDIO_SINK@ "$target%"
