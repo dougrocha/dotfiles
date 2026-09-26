@@ -120,7 +120,6 @@ Popup {
                     required property var modelData
 
                     width: parent.width
-                    iconSource: modelData.icon
                     labelText: modelData.name
                     sublabelText: MprisService.nowPlayingFor(modelData.name)
                     sliderValue: AudioService.getGroupVolume(modelData)

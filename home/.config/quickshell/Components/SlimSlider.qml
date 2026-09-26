@@ -1,11 +1,9 @@
 import QtQuick
-import Quickshell.Widgets
 import qs.Constants
 
 Item {
     id: slimRoot
 
-    property string iconSource: ""
     property string labelText: ""
     property string sublabelText: ""
     property real sliderValue: 0
@@ -15,8 +13,6 @@ Item {
     property string mutedIcon: ""
 
     property int trackBleed: 0
-
-    readonly property int labelIndent: iconSource !== "" ? 26 : 0
 
     signal moved(real value)
     signal muteToggled
@@ -32,18 +28,9 @@ Item {
             width: parent.width
             height: Math.max(32, labelCol.implicitHeight)
 
-            IconImage {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                implicitSize: 16
-                source: slimRoot.iconSource
-                visible: slimRoot.iconSource !== ""
-            }
-
             Column {
                 id: labelCol
                 anchors.left: parent.left
-                anchors.leftMargin: slimRoot.labelIndent
                 anchors.right: muteBtn.left
                 anchors.rightMargin: 8
                 anchors.verticalCenter: parent.verticalCenter

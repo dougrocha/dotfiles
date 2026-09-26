@@ -21,10 +21,8 @@ Singleton {
     readonly property list<MprisPlayer> availablePlayers: Mpris.players.values.filter(p => !isBrowser(p.identity) && !isProxy(p))
     readonly property list<MprisPlayer> browserPlayers: Mpris.players.values.filter(p => isBrowser(p.identity) && !isProxy(p))
 
-    // Music apps win over browsers, so a background video never hides Cider
     readonly property MprisPlayer playingPlayer: availablePlayers.find(p => p.isPlaying && hasTrack(p)) ?? browserPlayers.find(p => p.isPlaying && hasTrack(p)) ?? null
 
-    // Keep the last player that played so pausing it doesn't swap the island to another app
     property MprisPlayer lastPlayer: null
     onPlayingPlayerChanged: if (playingPlayer)
         lastPlayer = playingPlayer

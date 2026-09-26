@@ -16,7 +16,6 @@ Singleton {
             else if (node.audio)
                 acc.sources.push(node);
         } else if (node.isSink && node.audio) {
-
             acc.streams.push(node);
         } else if (node.audio) {
             acc.captures.push(node);
@@ -233,8 +232,7 @@ Singleton {
         if (appLookups[appId] === undefined) {
             const entry = DesktopEntries.byId(appId.toLowerCase());
             appLookups[appId] = {
-                name: entry ? entry.name : appId.charAt(0).toUpperCase() + appId.slice(1),
-                icon: entry ? Quickshell.iconPath(entry.icon, true) : ""
+                name: entry ? entry.name : appId.charAt(0).toUpperCase() + appId.slice(1)
             };
         }
         return appLookups[appId];
@@ -251,13 +249,6 @@ Singleton {
         return stream.applicationName || stream.description || stream.name || "Unknown Application";
     }
 
-    function getStreamIcon(stream) {
-        const appId = getStreamAppId(stream);
-        if (appId === "")
-            return "";
-        return lookupFor(appId).icon;
-    }
-
     readonly property var streamGroups: {
         const groups = [];
         const seen = {};
@@ -268,7 +259,6 @@ Singleton {
                 groups.push({
                     key: key,
                     name: getStreamName(stream),
-                    icon: getStreamIcon(stream),
                     streams: [stream]
                 });
             } else {
@@ -296,7 +286,6 @@ Singleton {
             setStreamMuted(stream, muted);
     }
 
-    // Entries load asynchronously; drop cached misses once they arrive
     Connections {
         target: DesktopEntries.applications
         function onValuesChanged() {

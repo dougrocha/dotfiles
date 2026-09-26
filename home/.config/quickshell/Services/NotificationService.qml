@@ -37,7 +37,6 @@ Singleton {
     }
 
     function calculateDuration(n) {
-
         if (n.expireTimeout === 0) {
             return -1;
         }
@@ -74,7 +73,6 @@ Singleton {
         };
     }
 
-    // Senders report raw ids like "vesktop"; show the desktop entry name instead
     function appDisplayName(appName) {
         if (!appName)
             return "Unknown";
@@ -92,7 +90,6 @@ Singleton {
             Qt.openUrlExternally(link);
     }
 
-    // A closed notification destroys its actions while its card is still animating out
     function invokeAction(notificationId, action) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (notif?.ref)
@@ -167,7 +164,6 @@ Singleton {
     function removeNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
         if (notif) {
-
             if (notif.ref)
                 notif.ref.dismiss();
             else
