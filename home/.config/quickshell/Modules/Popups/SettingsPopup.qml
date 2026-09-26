@@ -13,8 +13,10 @@ Popup {
     onDismissed: Visibilities.settingsPanel = false
 
     onVisibleChanged: {
-        if (visible)
+        if (visible) {
             IdleService.refresh();
+            SunsetService.refresh();
+        }
     }
 
     component DeviceBatteryRow: Item {
@@ -168,6 +170,36 @@ Popup {
             label: "Idle lock"
             active: IdleService.active
             onToggled: IdleService.toggle(true)
+        }
+
+        ToggleRow {
+            width: parent.width
+            style: "switch"
+            bleed: panel.rowBleed
+            glyph: PhosphorIcons.bellSlash
+            label: "Do not disturb"
+            active: SettingsService.doNotDisturb
+            onToggled: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
+        }
+
+        ToggleRow {
+            width: parent.width
+            style: "switch"
+            bleed: panel.rowBleed
+            glyph: PhosphorIcons.moon
+            label: "Night light"
+            active: SunsetService.active
+            onToggled: SunsetService.toggle()
+        }
+
+        ToggleRow {
+            width: parent.width
+            style: "switch"
+            bleed: panel.rowBleed
+            glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
+            label: "Microphone"
+            active: !AudioService.sourceMuted
+            onToggled: AudioService.toggleSourceMute()
         }
 
         Column {

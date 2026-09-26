@@ -7,7 +7,7 @@ import qs.Services
 Item {
     id: root
 
-    implicitWidth: dayCellWidth * 7
+    implicitWidth: 280
     implicitHeight: col.implicitHeight
 
     property int monthOffset: 0
@@ -18,7 +18,7 @@ Item {
     readonly property int weekStart: SettingsService.weekStart
     readonly property int rowCount: cells.length / 7
 
-    readonly property int dayCellWidth: 40
+    readonly property int dayCellWidth: width > 0 ? Math.floor(width / 7) : 40
     readonly property int dayCellHeight: 34
     readonly property int dayPillWidth: 32
     readonly property int dayPillHeight: 28
