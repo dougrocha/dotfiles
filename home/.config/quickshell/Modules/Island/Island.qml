@@ -109,7 +109,7 @@ Variants {
                     }
                 }
 
-                property int tab: 0
+                readonly property int tab: Visibilities.islandTab
 
                 property real tabProgress: tab
 
@@ -733,7 +733,7 @@ Variants {
                                         cursorShape: Qt.PointingHandCursor
                                     }
                                     TapHandler {
-                                        onTapped: pill.tab = tabChip.index
+                                        onTapped: Visibilities.islandTab = tabChip.index
                                     }
                                 }
                             }
