@@ -14,7 +14,7 @@ export SECOND_BRAIN="$HOME/second-brain"
 
 export PATH="$HOME/.local/bin:$PATH"
 
-export PATH="$HOME/.cargo/bin:$PATH"
-. "$HOME/.cargo/env"
+# Adds ~/.cargo/bin to PATH.
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
-eval "$(mise activate bash)"
+command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
