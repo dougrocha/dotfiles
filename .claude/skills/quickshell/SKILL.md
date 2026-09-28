@@ -1,12 +1,14 @@
 ---
 name: quickshell
-description: Structure, code rules, and design rules for this quickshell config. Use this skill before you add, change, or review a QML file here. Use it when you design or restyle a surface (bar, popup, notification, panel) or when a surface looks wrong. Use quickshell-dev to apply and examine the change.
+description: Structure, code rules, and design rules for the quickshell config in home/.config/quickshell. Use this skill before you add, change, or review a QML file there. Use it when you design or restyle a surface (bar, popup, notification, panel) or when a surface looks wrong. Use quickshell-dev to apply and examine the change.
 ---
 
 # Quickshell config
 
 This config is a Wayland shell for Hyprland. It uses QML and Quickshell.
 The design target is a quiet macOS look.
+
+The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell` links to it. All paths and commands in this skill are relative to that directory, the config root.
 
 ## 1. Structure
 
@@ -15,8 +17,8 @@ The design target is a quiet macOS look.
 | `shell.qml`                    | The root. It makes one instance of each top-level module.                                                                            | Add a module here only when it has its own window.                                    |
 | `Constants/`                   | `Theme.qml` (all design tokens) and `PhosphorIcons.qml` (icon glyphs).                                                               | Singletons in this directory cannot import each other. Put all tokens in `Theme.qml`. |
 | `Services/`                    | Singletons that hold state and talk to the system (audio, Bluetooth, notifications, settings).                                       | Put state and system logic here. Do not put layout here. Each file starts with `pragma Singleton`, and its root is `Singleton {}`. |
-| `Services/Visibilities.qml`    | One `bool` for each popup, and the `IpcHandler` targets.                                                                             | Open and close popups only through these properties.                                  |
-| `Services/SettingsService.qml` | User settings. It writes them to `$XDG_STATE_HOME/quickshell/settings.json`. If `XDG_STATE_HOME` is not set, it uses `$HOME/.local/state`.                                                         | Add a persistent setting here.                                                        |
+| `Services/Visibilities.qml`    | `current`, the name of the open panel, and one `PanelIpc` target for each panel.                                                     | Open and close panels only with `open`, `close`, `toggle`, and `closeAll`.            |
+| `Services/SettingsService.qml` | User settings. It writes them to `$XDG_STATE_HOME/quickshell/settings.json`. If `XDG_STATE_HOME` is not set, it uses `$HOME/.local/state`.                                                         | Add a persistent setting here. Put a feature's settings in its own `JsonObject` section, and read them as `SettingsService.<section>.<key>`. |
 | `Components/`                  | Shared controls: `Popup`, `PopupCard`, `ListRow`, `ToggleRow`, `SectionLabel`, `Divider`, `IconActionButton`, `CloseBadge`, sliders. | Use a component from here before you make a new one.                                  |
 | `Modules/<Name>/`              | One feature for each directory: `Bar`, `Notifications`, `Popups`, `Island`, `Screenshot`, `Polkit`, `TooltipOverlay`.                | Keep files for one feature in its directory. For a window on each monitor, use `Variants { model: Quickshell.screens }` with a `PanelWindow` delegate. |
 | `Widgets/`                     | Small items that the bar uses: clock, tray.                                                                                          |                                                                                       |
@@ -25,12 +27,16 @@ The design target is a quiet macOS look.
 
 Imports use the `qs.` prefix, for example `import qs.Components` and `import qs.Services`.
 
-A bar panel (settings, sound, Bluetooth, notification center) has four parts:
+A bar panel (settings, sound, Bluetooth, notification center) has four parts. The panel name is also its IPC target, for example `sound-panel`.
 
-1. A `bool` in `Visibilities.qml`, for example `soundPanel`.
-2. An `open` function and a `toggle` function in `Visibilities.qml`. The `open` function calls `closePopups()` first. Thus only one panel is open at a time.
-3. A `Popup` file in `Modules/Popups/`. Bind `shown` to the `bool`. Set the `bool` to `false` in `onDismissed`.
-4. An instance in `Modules/Bar/Bar.qml` in a `LazyLoader` with `active: modelData === Theme.primaryScreen`. Set `anchor.window: topBar`.
+1. A `PanelIpc { target: "<name>" }` line in `Visibilities.qml`. It gives the `open`, `hide`, and `toggle` IPC functions.
+2. A `Popup` file in `Modules/Popups/` with `panelName: "<name>"`. `Popup` sets `shown` and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
+3. An instance in `Modules/Bar/Bar.qml` in a `LazyLoader` with `active: modelData === Theme.primaryScreen`. Set `anchor.window: topBar`. `Popup` sets the position.
+4. A control that calls `Visibilities.toggle("<name>")` and reads `Visibilities.isOpen("<name>")`.
+
+`Visibilities.current` holds one name, so only one panel is open at a time. `Visibilities.close(name)` closes only that panel. Thus a late dismiss from an old panel does not close the new panel.
+
+A service does not own panel visibility. A service can read `Visibilities.isOpen(...)`, for example to hide the OSD while the sound panel is open.
 
 Other popups use different patterns. Tray menus use `TrayMenuPopup.qml`, which is a `PopupWindow` with local state. The music panel is part of `Modules/Island/`.
 
@@ -49,7 +55,7 @@ Apply these rules to new code and to code that you change. Some old files do not
 - Use `?.` and `??` on Quickshell objects that can be `null`, for example `sink?.audio?.volume ?? 0`.
 - In `Connections`, write handlers as functions: `function onNotificationsChanged() { }`.
 - Keep persistent data in files (`SettingsService`, `FileView`). Do not use `PersistentProperties`.
-- Run `./format` from the config root after you change more than one file.
+- Run `./format` from the config root after you change more than one file. It formats every QML file. Restore files that you did not change with `git checkout -- <file>`.
 - Commit messages use this form: `fix(quickshell): <summary>` or `feat(quickshell): <summary>`.
 
 ## 3. Framework patterns

@@ -1,9 +1,11 @@
 ---
 name: quickshell-dev
-description: Procedure to apply, verify, and examine a change to this quickshell config. Use this skill after you edit a QML file here. It tells you how to reload, read the log, show a surface, and get a screenshot. Use the quickshell skill for structure and design rules.
+description: Procedure to apply, verify, and examine a change to the quickshell config in home/.config/quickshell. Use this skill after you edit a QML file there. It tells you how to reload, read the log, show a surface, and get a screenshot. Use the quickshell skill for structure and design rules.
 ---
 
 # Quickshell development procedure
+
+The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell` links to it. All paths and commands in this skill are relative to that directory, the config root.
 
 ## Rules
 
@@ -46,14 +48,14 @@ qs ipc call notification-center toggle
 
 Panel targets: `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, `music-panel`.
 
-- Use `toggle` to open a panel.
-- Use `hide` to close a panel. A second `toggle` can open the panel again if the first call failed.
+- Use `open` to open a panel.
+- Use `hide` to close a panel.
 
-The `top-bar` target does not show or hide the bar. Its `toggle` pins the bar above fullscreen windows.
+The `top-bar` target does not show or hide the bar. Its `pin`, `unpin`, and `toggle` functions pin the bar above fullscreen windows.
 
 Other targets: `music-control`, `screenshot-overlay`, `screenshot-toast`. Read their functions in the source before you call them.
 
-CAUTION: Wait 1 second after a reload before you send an IPC call. Before that, the instance replies `Not ready to accept queries yet` and ignores the call. Then the next `toggle` opens the panel when you expect it to close.
+CAUTION: Wait 1 second after a reload before you send an IPC call. Before that, the instance replies `Not ready to accept queries yet` and ignores the call. Then a later `toggle` opens the panel when you expect it to close. Use `open` and `hide`.
 
 CAUTION: `qs ipc call <target> show` does not call the function. It prints the list of functions and gives no error. Do not use `show` as the name of a new `IpcHandler` function.
 
