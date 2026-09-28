@@ -8,11 +8,8 @@ fish_variables
 fish_history
 fish_read_history
 
-# Tmux plugins
+# Tmux plugins (TPM installs them next to tmux.conf)
 home/.config/tmux/plugins
-
-# User-specific system configs (if using templates)
-default/sddm/autologin.conf.deployed
 
 # Local Claude Code config / skills
 CLAUDE.local.md
