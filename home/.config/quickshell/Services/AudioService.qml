@@ -95,7 +95,7 @@ Singleton {
             return false;
         if (source && node.id === source.id)
             return false;
-        const hidden = node.isSink ? SettingsService.hiddenAudioOutputs : SettingsService.hiddenAudioInputs;
+        const hidden = node.isSink ? SettingsService.audio.outputs.hidden : SettingsService.audio.inputs.hidden;
         return !!hidden && hidden.indexOf(node.name) !== -1;
     }
 

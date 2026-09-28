@@ -29,7 +29,7 @@ Singleton {
         if (!SettingsService.loaded)
             return;
 
-        const saved = cleanIds(SettingsService.trayOrder, {});
+        const saved = cleanIds(SettingsService.tray.order, {});
         const byId = {};
         const anonymous = [];
         for (const item of liveItems) {
@@ -84,7 +84,7 @@ Singleton {
         if (!item)
             return false;
 
-        const saved = cleanIds(SettingsService.trayOrder, {});
+        const saved = cleanIds(SettingsService.tray.order, {});
         const sourceIndex = items.findIndex(candidate => validId(candidate) === itemId);
         if (sourceIndex >= 0 && sourceIndex < index)
             index--;
@@ -97,8 +97,8 @@ Singleton {
         const filtered = saved.filter(id => id !== itemId);
         const reordered = insertAtLiveIndex(filtered, items, itemId, index);
 
-        SettingsService.trayVersion = 1;
-        SettingsService.trayOrder = reordered;
+        SettingsService.tray.version = 1;
+        SettingsService.tray.order = reordered;
         reconcile();
         return true;
     }
@@ -110,7 +110,11 @@ Singleton {
         function onLoadedChanged() {
             root.reconcile();
         }
-        function onTrayOrderChanged() {
+    }
+
+    Connections {
+        target: SettingsService.tray
+        function onOrderChanged() {
             root.reconcile();
         }
     }

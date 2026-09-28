@@ -12,22 +12,9 @@ Singleton {
     property alias doNotDisturb: adapter.doNotDisturb
     property alias weekStart: adapter.weekStart
     property alias clockFormat: adapter.clockFormat
-    property alias trayVersion: traySettings.version
-    property alias trayOrder: traySettings.order
-
-    property alias screenshotCaptureMode: screenshotSettings.captureMode
-    property alias screenshotTimerDelay: screenshotSettings.timerDelay
-    property alias screenshotShowCursor: screenshotSettings.showCursor
-    property alias screenshotShowNotification: screenshotSettings.showNotification
-    property alias screenshotMicEnabled: screenshotSettings.micEnabled
-    property alias screenshotSystemAudioEnabled: screenshotSettings.systemAudioEnabled
-    property alias screenshotRememberLastSelection: screenshotSettings.rememberLastSelection
-    property alias screenshotSaveDirectory: screenshotSettings.saveDirectory
-    property alias screenshotRecentSaveLocations: screenshotSettings.recentSaveLocations
-    property alias screenshotMonitors: screenshotSettings.monitors
-
-    property alias hiddenAudioOutputs: audioOutputSettings.hidden
-    property alias hiddenAudioInputs: audioInputSettings.hidden
+    property alias tray: traySettings
+    property alias screenshot: screenshotSettings
+    property alias audio: audioSettings
 
     property bool loaded: false
 

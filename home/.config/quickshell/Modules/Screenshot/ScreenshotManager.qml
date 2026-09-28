@@ -95,16 +95,16 @@ Item {
 
     function hydrate() {
         const validModes = ["region", "windows", "fullscreen", "video"];
-        selectedMode = validModes.includes(SettingsService.screenshotCaptureMode) ? SettingsService.screenshotCaptureMode : "region";
+        selectedMode = validModes.includes(SettingsService.screenshot.captureMode) ? SettingsService.screenshot.captureMode : "region";
         const validDelays = [0, 3, 5, 10];
-        timerDelay = validDelays.includes(SettingsService.screenshotTimerDelay) ? SettingsService.screenshotTimerDelay : 0;
-        showCursor = !!SettingsService.screenshotShowCursor;
-        showNotification = !!SettingsService.screenshotShowNotification;
-        micEnabled = !!SettingsService.screenshotMicEnabled;
-        systemAudioEnabled = !!SettingsService.screenshotSystemAudioEnabled;
-        rememberLastSelection = !!SettingsService.screenshotRememberLastSelection;
-        saveDirectory = typeof SettingsService.screenshotSaveDirectory === "string" ? SettingsService.screenshotSaveDirectory : "";
-        const saved = SettingsService.screenshotRecentSaveLocations;
+        timerDelay = validDelays.includes(SettingsService.screenshot.timerDelay) ? SettingsService.screenshot.timerDelay : 0;
+        showCursor = !!SettingsService.screenshot.showCursor;
+        showNotification = !!SettingsService.screenshot.showNotification;
+        micEnabled = !!SettingsService.screenshot.micEnabled;
+        systemAudioEnabled = !!SettingsService.screenshot.systemAudioEnabled;
+        rememberLastSelection = !!SettingsService.screenshot.rememberLastSelection;
+        saveDirectory = typeof SettingsService.screenshot.saveDirectory === "string" ? SettingsService.screenshot.saveDirectory : "";
+        const saved = SettingsService.screenshot.recentSaveLocations;
         const sanitized = Array.isArray(saved) ? saved.filter(loc => typeof loc === "string" && loc !== "") : [];
         recentSaveLocations = [...new Set(sanitized)].slice(0, 3);
     }
@@ -112,17 +112,17 @@ Item {
     function setSelectedMode(mode) {
         selectedMode = mode;
         if (SettingsService.loaded)
-            SettingsService.screenshotCaptureMode = mode;
+            SettingsService.screenshot.captureMode = mode;
     }
 
     function setTimerDelay(delay) {
         timerDelay = delay;
         if (SettingsService.loaded)
-            SettingsService.screenshotTimerDelay = delay;
+            SettingsService.screenshot.timerDelay = delay;
     }
 
     function monitorEntry(name) {
-        const entry = SettingsService.screenshotMonitors[name];
+        const entry = SettingsService.screenshot.monitors[name];
         return entry != null && typeof entry === "object" ? entry : null;
     }
 
@@ -183,7 +183,7 @@ Item {
         const monitor = Hyprland.monitors.values.find(m => m.name === controlMonitor);
         if (monitor == null)
             return;
-        const monitors = Object.assign({}, SettingsService.screenshotMonitors);
+        const monitors = Object.assign({}, SettingsService.screenshot.monitors);
         const existing = Object.assign({}, monitors[controlMonitor]);
         if (selectionContainedByMonitor(monitor)) {
             existing.region = {
@@ -196,31 +196,31 @@ Item {
             delete existing.region;
         }
         monitors[controlMonitor] = existing;
-        SettingsService.screenshotMonitors = monitors;
+        SettingsService.screenshot.monitors = monitors;
     }
 
     function persistToolbarPosition() {
         if (!SettingsService.loaded || toolbarHostMonitor === "")
             return;
-        const monitors = Object.assign({}, SettingsService.screenshotMonitors);
+        const monitors = Object.assign({}, SettingsService.screenshot.monitors);
         const existing = Object.assign({}, monitors[toolbarHostMonitor]);
         existing.toolbar = {
             x: toolbarX,
             y: toolbarY
         };
         monitors[toolbarHostMonitor] = existing;
-        SettingsService.screenshotMonitors = monitors;
+        SettingsService.screenshot.monitors = monitors;
     }
 
     function clearAllSavedRegions() {
-        const monitors = SettingsService.screenshotMonitors;
+        const monitors = SettingsService.screenshot.monitors;
         const updated = {};
         for (const name in monitors) {
             const entry = Object.assign({}, monitors[name]);
             delete entry.region;
             updated[name] = entry;
         }
-        SettingsService.screenshotMonitors = updated;
+        SettingsService.screenshot.monitors = updated;
     }
 
     IpcHandler {
@@ -384,8 +384,8 @@ Item {
             recentSaveLocations = [normalized].concat(remaining).slice(0, 3);
         }
         if (SettingsService.loaded) {
-            SettingsService.screenshotSaveDirectory = saveDirectory;
-            SettingsService.screenshotRecentSaveLocations = recentSaveLocations;
+            SettingsService.screenshot.saveDirectory = saveDirectory;
+            SettingsService.screenshot.recentSaveLocations = recentSaveLocations;
         }
     }
 
@@ -1170,7 +1170,7 @@ Item {
                             onTapped: {
                                 manager.showNotification = !manager.showNotification;
                                 if (SettingsService.loaded)
-                                    SettingsService.screenshotShowNotification = manager.showNotification;
+                                    SettingsService.screenshot.showNotification = manager.showNotification;
                             }
                         }
                     }
@@ -1211,7 +1211,7 @@ Item {
                             onTapped: {
                                 manager.rememberLastSelection = !manager.rememberLastSelection;
                                 if (SettingsService.loaded) {
-                                    SettingsService.screenshotRememberLastSelection = manager.rememberLastSelection;
+                                    SettingsService.screenshot.rememberLastSelection = manager.rememberLastSelection;
                                     if (!manager.rememberLastSelection)
                                         manager.clearAllSavedRegions();
                                 }
@@ -1260,7 +1260,7 @@ Item {
                             onTapped: {
                                 manager.systemAudioEnabled = !manager.systemAudioEnabled;
                                 if (SettingsService.loaded)
-                                    SettingsService.screenshotSystemAudioEnabled = manager.systemAudioEnabled;
+                                    SettingsService.screenshot.systemAudioEnabled = manager.systemAudioEnabled;
                             }
                         }
                     }
@@ -1306,7 +1306,7 @@ Item {
                             onTapped: {
                                 manager.micEnabled = !manager.micEnabled;
                                 if (SettingsService.loaded)
-                                    SettingsService.screenshotMicEnabled = manager.micEnabled;
+                                    SettingsService.screenshot.micEnabled = manager.micEnabled;
                             }
                         }
                     }
@@ -1365,7 +1365,7 @@ Item {
                             onTapped: {
                                 manager.showCursor = !manager.showCursor;
                                 if (SettingsService.loaded)
-                                    SettingsService.screenshotShowCursor = manager.showCursor;
+                                    SettingsService.screenshot.showCursor = manager.showCursor;
                             }
                         }
                     }
