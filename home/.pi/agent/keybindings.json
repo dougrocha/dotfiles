@@ -1,0 +1,9 @@
+{
+  "app.editor.external": ["ctrl+g", "alt+e"],
+  "tui.select.up": "up",
+  "tui.select.down": "down",
+  "tui.select.pageUp": "pageUp",
+  "tui.select.pageDown": "pageDown",
+  "tui.select.confirm": "enter",
+  "tui.select.cancel": ["escape", "ctrl+c"]
+}

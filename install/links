@@ -12,6 +12,7 @@
 .gitconfig
 
 .pi/agent/AGENTS.md
+.pi/agent/keybindings.json
 .pi/agent/models.json
 .pi/agent/settings.json
 .pi/agent/extensions
