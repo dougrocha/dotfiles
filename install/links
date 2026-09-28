@@ -23,14 +23,12 @@
 .config/nvim
 .config/starship.toml
 .config/tmux
-.config/wezterm
 
 # config pulls in whichever platform file exists (config-file = ?config-macos).
 # Listed separately so ~/.config/ghostty stays real and only one lands.
 .config/ghostty/config
 
 [darwin]
-.config/aerospace
 .config/ghostty/config-macos
 
 [linux]

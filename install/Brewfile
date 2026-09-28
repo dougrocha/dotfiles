@@ -1,9 +1,6 @@
 # macOS packages. The Arch equivalent is install/packages.arch.
 #
 #   brew bundle --file=install/Brewfile
-#
-# Only taps that something below needs.
-tap "nikitabobko/tap"
 
 # Terminal
 brew "bat"
@@ -87,7 +84,6 @@ brew "pnpm"
 brew "uv"
 
 # Apps
-cask "aerospace"
 cask "claude"
 cask "font-monaspace"
 cask "ghostty"
