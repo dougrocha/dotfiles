@@ -1,7 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Bluetooth
-import Quickshell.Io
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -16,22 +14,8 @@ Popup {
 
         required property var row
 
-        readonly property string action: BluetoothService.pendingAction(row.address)
-
         readonly property bool hovered: rowMouse.hovered
-        readonly property string statusText: {
-            if (action === "forgetting")
-                return "Forgetting";
-            if (action === "disconnecting" || row.state === BluetoothDeviceState.Disconnecting)
-                return "Disconnecting";
-            if (action === "pairing")
-                return "Pairing";
-            if (action === "connecting" || row.state === BluetoothDeviceState.Connecting)
-                return "Connecting";
-            if (row.connected)
-                return BluetoothService.batteryLabel(row.address) || "Connected";
-            return "";
-        }
+        readonly property string statusText: BluetoothService.rowStatus(row)
 
         width: parent.width
         height: 34
@@ -127,9 +111,9 @@ Popup {
             width: parent.width
             style: "switch"
             bleed: panel.rowBleed
-            glyph: BluetoothService.hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (active ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
+            glyph: BluetoothService.glyph
             label: "Bluetooth"
-            active: BluetoothService.bluetoothEnabled
+            active: BluetoothService.powered
             onToggled: BluetoothService.togglePower()
         }
 
@@ -214,9 +198,9 @@ Popup {
             visible: BluetoothService.connectedRows.length === 0 && BluetoothService.pairedRows.length === 0
             width: parent.width
             text: {
-                if (!BluetoothService.adapter)
+                if (!BluetoothService.available)
                     return "No Bluetooth adapter";
-                if (!BluetoothService.bluetoothEnabled)
+                if (!BluetoothService.powered)
                     return "Turn Bluetooth on";
                 return "No paired devices";
             }
@@ -233,13 +217,8 @@ Popup {
             bleed: panel.rowBleed
             onTapped: {
                 panel.close();
-                bluetoothSettingsProc.running = true;
+                Quickshell.execDetached(["launch-or-focus-tui", "bluetui"]);
             }
         }
-    }
-
-    Process {
-        id: bluetoothSettingsProc
-        command: ["launch-or-focus-tui", "bluetui"]
     }
 }

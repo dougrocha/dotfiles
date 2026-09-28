@@ -8,23 +8,13 @@ Singleton {
     id: root
 
     readonly property var adapter: Bluetooth.defaultAdapter
-    readonly property bool adapterPowered: adapter?.state === BluetoothAdapterState.Enabled || adapter?.state === BluetoothAdapterState.Enabling
+    readonly property bool available: adapter !== null
+    readonly property bool powered: adapter?.state === BluetoothAdapterState.Enabled || adapter?.state === BluetoothAdapterState.Enabling
     readonly property list<BluetoothDevice> devices: adapter?.devices.values ?? []
     readonly property list<BluetoothDevice> connectedDevices: devices.filter(d => d.connected)
-    readonly property list<BluetoothDevice> pairedDevices: devices.filter(d => d.paired)
-
-    readonly property bool bluetoothEnabled: adapterPowered
     readonly property bool hasConnectedDevices: connectedDevices.length > 0
-    readonly property int connectedDeviceCount: connectedDevices.length
-    readonly property string statusText: {
-        if (!adapterPowered)
-            return "Bluetooth Off";
-        if (connectedDevices.length === 0)
-            return "No Devices Connected";
-        if (connectedDevices.length === 1)
-            return "1 Device Connected";
-        return connectedDevices.length + " Devices Connected";
-    }
+
+    readonly property string glyph: hasConnectedDevices ? PhosphorIcons.bluetoothConnected : (powered ? PhosphorIcons.bluetooth : PhosphorIcons.bluetoothSlash)
 
     readonly property var namedDevices: devices.filter(d => hasHumanName(d))
     readonly property var connectedRows: sortedRows(namedDevices.filter(d => d.connected))
@@ -67,6 +57,21 @@ Singleton {
         return Math.round(device.battery * 100) + "%";
     }
 
+    function rowStatus(row: var): string {
+        const action = pendingAction(row.address);
+        if (action === "forgetting")
+            return "Forgetting";
+        if (action === "disconnecting" || row.state === BluetoothDeviceState.Disconnecting)
+            return "Disconnecting";
+        if (action === "pairing")
+            return "Pairing";
+        if (action === "connecting" || row.state === BluetoothDeviceState.Connecting)
+            return "Connecting";
+        if (row.connected)
+            return batteryLabel(row.address) || "Connected";
+        return "";
+    }
+
     function sortedRows(list) {
         return list.map(d => deviceRow(d)).sort((a, b) => a.label.localeCompare(b.label));
     }
@@ -86,27 +91,9 @@ Singleton {
         return PhosphorIcons.bluetooth;
     }
 
-    function togglePower() {
+    function togglePower(): void {
         if (adapter)
             adapter.enabled = !adapter.enabled;
-    }
-
-    function enableBluetooth() {
-        if (adapter && !adapter.enabled)
-            adapter.enabled = true;
-    }
-
-    function disableBluetooth() {
-        if (adapter && adapter.enabled)
-            adapter.enabled = false;
-    }
-
-    function isDeviceConnected(address) {
-        return connectedDevices.some(d => d.address === address);
-    }
-
-    function isDevicePaired(address) {
-        return pairedDevices.some(d => d.address === address);
     }
 
     function connectDevice(address) {
@@ -146,7 +133,7 @@ Singleton {
         pendingTimeout.restart();
     }
 
-    function activate(row) {
+    function activate(row: var): void {
         if (row.connected) {
             setPending(row.address, "disconnecting");
             disconnectDevice(row.address);
@@ -161,7 +148,7 @@ Singleton {
         pairDevice(row.address);
     }
 
-    function forget(row) {
+    function forget(row: var): void {
         setPending(row.address, "forgetting");
         removeDevice(row.address);
     }
@@ -183,7 +170,6 @@ Singleton {
                 if (!device.paired) {
                     next[address] = action;
                 } else if (device.connected) {
-
                     changed = true;
                 } else {
                     device.trusted = true;
