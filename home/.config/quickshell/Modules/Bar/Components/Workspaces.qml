@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -10,130 +12,156 @@ Item {
 
     required property var monitor
 
-    implicitWidth: mainLayout.implicitWidth
+    readonly property var activeWorkspace: monitor?.activeWorkspace
+    readonly property string openSpecialName: monitor?.lastIpcObject?.specialWorkspace?.name ?? ""
+
+    readonly property list<int> workspaceIds: {
+        const ids = [1, 2, 3, 4, 5];
+        for (const workspace of Hyprland.workspaces.values) {
+            if (workspace.id > 0 && workspace.id <= 10 && !ids.includes(workspace.id))
+                ids.push(workspace.id);
+        }
+        return ids.sort((a, b) => a - b);
+    }
+
+    readonly property list<var> extraWorkspaces: Hyprland.workspaces.values.filter(workspace => isExtra(workspace) && (isCurrentExtra(workspace) || (!isSpecial(workspace) && isOccupied(workspace)))).sort((a, b) => labelFor(a).localeCompare(labelFor(b)))
+
+    function isExtra(workspace) {
+        return workspace.id < 0 || !/^\d+$/.test(workspace.name);
+    }
+
+    function isSpecial(workspace) {
+        return workspace.name.startsWith("special:");
+    }
+
+    function isOccupied(workspace) {
+        return (workspace?.toplevels?.values?.length ?? 0) > 0;
+    }
+
+    function isCurrentExtra(workspace) {
+        return isSpecial(workspace) ? workspace.name === openSpecialName : activeWorkspace?.id === workspace.id;
+    }
+
+    function labelFor(workspace) {
+        return workspace.name.replace(/^(special|name):/, "");
+    }
+
+    function openExtra(workspace) {
+        Visibilities.closeAll();
+        const name = JSON.stringify(labelFor(workspace));
+        if (isSpecial(workspace))
+            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${name})`);
+        else
+            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify("name:" + labelFor(workspace))} })`);
+    }
+
+    function workspaceFor(id) {
+        return Hyprland.workspaces.values.find(workspace => workspace.id === id) ?? null;
+    }
+
+    function focusWorkspace(id) {
+        Visibilities.closeAll();
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${id} })`);
+    }
+
+    implicitWidth: row.implicitWidth
     implicitHeight: Theme.topBarHeight
 
-    readonly property var activeWorkspace: monitor?.activeWorkspace
-    readonly property bool onNamedWorkspace: !!activeWorkspace && !/^\d+$/.test(activeWorkspace.name) && !activeWorkspace.name.startsWith("special:")
+    component WorkspaceNumber: Item {
+        id: cell
 
-    RowLayout {
-        id: mainLayout
-        anchors.centerIn: parent
-        spacing: 0
+        required property int modelData
 
-        Row {
-            spacing: 0
-            Layout.alignment: Qt.AlignVCenter
+        readonly property var workspace: root.workspaceFor(modelData)
+        readonly property bool current: root.activeWorkspace?.id === modelData
+        readonly property bool occupied: root.isOccupied(workspace)
 
-            Repeater {
-                model: Hyprland.workspaces
+        implicitWidth: 22
+        implicitHeight: Theme.topBarHeight
 
-                delegate: Item {
-                    required property var modelData
+        Text {
+            anchors.centerIn: parent
+            text: cell.current ? PhosphorIcons.circle : cell.modelData === 10 ? "0" : String(cell.modelData)
+            color: cell.current || hover.hovered ? Theme.text.primary : cell.occupied ? Theme.text.secondary : Theme.text.tertiary
+            font.family: cell.current ? Theme.font.iconFill : Theme.font.mono
+            font.pixelSize: cell.current ? Theme.icon.xxs : Theme.type.mono.size
+            font.weight: Theme.type.mono.weight
 
-                    readonly property bool belongsToMonitor: modelData.id >= 0 && /^\d+$/.test(modelData.name) && modelData.monitor === root.monitor
-                    readonly property bool isActive: modelData.active
-                    readonly property bool hasWindows: (modelData.lastIpcObject?.windows ?? 0) > 0
-
-                    readonly property int resizeDuration: 120
-                    readonly property int stateDuration: 100
-
-                    readonly property int dotSize: 10
-
-                    visible: width > 0
-                    width: belongsToMonitor ? dotSize + Theme.space.xs : 0
-                    height: Theme.topBarHeight - 8
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: resizeDuration
-                            easing.type: Theme.motion.easeStandard
-                        }
-                    }
-
-                    Rectangle {
-                        id: dot
-                        anchors.centerIn: parent
-                        width: Math.min(parent.dotSize, parent.width)
-                        height: parent.dotSize
-                        radius: Theme.radius.xs
-                        color: isActive ? Theme.accent : Theme.withAlpha(Theme.accent, hasWindows ? 0.15 : 0.0)
-                        border.color: isActive ? Theme.withAlpha(Theme.accent, 0) : Theme.accent
-                        border.width: 1.5
-                        opacity: isActive || hasWindows ? 1.0 : 0.5
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: dot.parent.stateDuration
-                            }
-                        }
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: dot.parent.stateDuration
-                                easing.type: Theme.motion.easeStandard
-                            }
-                        }
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: dot.parent.stateDuration
-                            }
-                        }
-                    }
-
-                    HoverHandler {
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                    TapHandler {
-                        onTapped: {
-                            Visibilities.closeAll();
-                            modelData.activate();
-                        }
-                    }
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
                 }
             }
         }
 
-        Item {
-            clip: true
-            implicitHeight: 16
-            Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: root.onNamedWorkspace ? namedBadge.implicitWidth + 3 : 0
-            Layout.leftMargin: root.onNamedWorkspace ? 3 : 0
+        HoverHandler {
+            id: hover
+            cursorShape: Qt.PointingHandCursor
+        }
 
-            Behavior on Layout.preferredWidth {
-                NumberAnimation {
+        TapHandler {
+            onTapped: root.focusWorkspace(cell.modelData)
+        }
+    }
+
+    component WorkspaceLabel: Item {
+        id: label
+
+        required property var modelData
+        required property int index
+
+        readonly property bool current: root.isCurrentExtra(modelData)
+
+        implicitWidth: labelText.implicitWidth + Theme.space.sm * 2
+        implicitHeight: Theme.topBarHeight
+        Layout.leftMargin: index === 0 ? Theme.space.xs : 0
+
+        Text {
+            id: labelText
+            anchors.centerIn: parent
+            text: root.labelFor(label.modelData)
+            color: label.current || labelHover.hovered ? Theme.text.primary : Theme.text.secondary
+            font.family: Theme.font.mono
+            font.pixelSize: Theme.type.mono.size
+            font.weight: Theme.type.mono.weight
+
+            Behavior on color {
+                ColorAnimation {
                     duration: Theme.motion.fast
-                    easing.type: Theme.motion.easeStandard
                 }
             }
-            Behavior on Layout.leftMargin {
-                NumberAnimation {
-                    duration: Theme.motion.fast
-                    easing.type: Theme.motion.easeStandard
-                }
+        }
+
+        HoverHandler {
+            id: labelHover
+            cursorShape: Qt.PointingHandCursor
+        }
+
+        TapHandler {
+            onTapped: root.openExtra(label.modelData)
+        }
+    }
+
+    RowLayout {
+        id: row
+        anchors.centerIn: parent
+        spacing: 0
+
+        Repeater {
+            model: ScriptModel {
+                values: root.workspaceIds
             }
 
-            Rectangle {
-                id: namedBadge
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                implicitWidth: namedLabel.implicitWidth + 16
-                height: 16
-                radius: Theme.radius.md
-                color: Theme.fill.selected
+            delegate: WorkspaceNumber {}
+        }
 
-                Text {
-                    id: namedLabel
-                    anchors.centerIn: parent
-                    renderType: Text.NativeRendering
-                    text: root.activeWorkspace?.name ?? ""
-                    color: Theme.accent
-                    font.family: Theme.font.ui
-                    font.pixelSize: Theme.type.label.size
-                    font.weight: Theme.type.label.weight
-                    font.letterSpacing: Theme.type.label.tracking
-                }
+        Repeater {
+            model: ScriptModel {
+                values: root.extraWorkspaces
+                objectProp: "name"
             }
+
+            delegate: WorkspaceLabel {}
         }
     }
 }

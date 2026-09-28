@@ -116,15 +116,25 @@ Variants {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
-                width: workspaceModule.implicitWidth + 24
+                width: workspaceModule.implicitWidth + Theme.space.md
                 height: Theme.topBarHeight - 8
                 radius: height / 2
                 color: Theme.colors.surface
+                clip: true
+
+                Behavior on width {
+                    NumberAnimation {
+                        duration: Theme.motion.normal
+                        easing.type: Theme.motion.easeStandard
+                    }
+                }
 
                 Workspaces {
                     id: workspaceModule
                     monitor: topBar.monitor
-                    anchors.centerIn: parent
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.space.md / 2
+                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
 

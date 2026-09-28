@@ -10,6 +10,7 @@ Singleton {
     readonly property string monitor: String.fromCodePoint(0xE32E)
     readonly property string videoCamera: String.fromCodePoint(0xE4DA)
     readonly property string gear: String.fromCodePoint(0xE270)
+    readonly property string circle: String.fromCodePoint(0xE18A)
     readonly property string xCircle: String.fromCodePoint(0xE4F8)
     readonly property string x: String.fromCodePoint(0xE4F6)
     readonly property string check: String.fromCodePoint(0xE182)
