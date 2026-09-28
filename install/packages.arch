@@ -19,6 +19,8 @@ hyprland
 hypridle
 hyprlock
 hyprshot
+grim
+slurp
 hyprpaper
 hyprpicker
 hyprpolkitagent
@@ -73,6 +75,7 @@ github-cli
 glow
 gum
 imagemagick
+jq
 lazygit
 matugen
 ripgrep
