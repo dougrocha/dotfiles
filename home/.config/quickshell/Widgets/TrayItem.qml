@@ -24,9 +24,9 @@ Rectangle {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
             root.menuRequested(root.trayItem, root);
         } else if (trayOverrides.triggerPrimaryAction()) {
-            Visibilities.closePopups();
+            Visibilities.closeAll();
         } else {
-            Visibilities.closePopups();
+            Visibilities.closeAll();
             root.trayItem.activate();
         }
     }
@@ -114,7 +114,7 @@ Rectangle {
         enabled: !root.dragging
         acceptedButtons: Qt.MiddleButton
         onTapped: {
-            Visibilities.closePopups();
+            Visibilities.closeAll();
             root.trayItem.secondaryActivate();
         }
     }

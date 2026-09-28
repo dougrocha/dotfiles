@@ -11,7 +11,7 @@ IconButton {
     activeColor: Theme.danger
     tooltipText: "CPU: " + CpuService.usage + "%"
     onTapped: {
-        Visibilities.closePopups();
+        Visibilities.closeAll();
         proc.running = true;
     }
 

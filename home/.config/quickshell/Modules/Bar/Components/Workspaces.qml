@@ -85,7 +85,7 @@ Item {
                     }
                     TapHandler {
                         onTapped: {
-                            Visibilities.closePopups();
+                            Visibilities.closeAll();
                             modelData.activate();
                         }
                     }

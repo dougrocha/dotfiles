@@ -8,8 +8,7 @@ import qs.Services
 Popup {
     id: panel
 
-    shown: Visibilities.soundPanel
-    onDismissed: Visibilities.soundPanel = false
+    panelName: "sound-panel"
 
     Column {
         width: parent.width
@@ -139,7 +138,7 @@ Popup {
             label: "Wiremix"
             bleed: panel.rowBleed
             onTapped: {
-                Visibilities.soundPanel = false;
+                panel.close();
                 soundSettingsProc.running = true;
             }
         }

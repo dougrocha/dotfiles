@@ -1,4 +1,6 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
+
 import QtQml
 import Quickshell
 import Quickshell.Io
@@ -6,140 +8,84 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    property bool musicPanel: false
-    property bool settingsPanel: false
-    property bool soundPanel: false
-    property bool bluetoothPanel: false
-    property bool notificationCenter: false
+    property string current: ""
+    readonly property bool anyOpen: current !== ""
 
     property bool barPinned: false
 
     property bool barRevealed: true
 
     signal closeTrayMenus
+    signal opened(string name)
 
-    function closePopups() {
-        musicPanel = false;
-        settingsPanel = false;
-        soundPanel = false;
-        bluetoothPanel = false;
-        notificationCenter = false;
+    function isOpen(name: string): bool {
+        return current === name;
+    }
+
+    function open(name: string): void {
+        if (current === name)
+            return;
+        closeTrayMenus();
+        current = name;
+        opened(name);
+    }
+
+    function close(name: string): void {
+        if (current === name)
+            current = "";
+    }
+
+    function toggle(name: string): void {
+        current === name ? close(name) : open(name);
+    }
+
+    function closeAll(): void {
+        current = "";
         closeTrayMenus();
     }
-    function openSettings() {
-        closePopups();
-        settingsPanel = true;
-    }
-    function toggleSettings() {
-        settingsPanel ? (settingsPanel = false) : openSettings();
-    }
-    function openSoundPanel() {
-        closePopups();
-        soundPanel = true;
-    }
-    function toggleSoundPanel() {
-        soundPanel ? (soundPanel = false) : openSoundPanel();
-    }
-    function openBluetoothPanel() {
-        closePopups();
-        bluetoothPanel = true;
-    }
-    function toggleBluetoothPanel() {
-        bluetoothPanel ? (bluetoothPanel = false) : openBluetoothPanel();
-    }
-    function openNotificationCenter() {
-        closePopups();
-        notificationCenter = true;
-    }
-    function toggleNotificationCenter() {
-        notificationCenter ? (notificationCenter = false) : openNotificationCenter();
+
+    component PanelIpc: IpcHandler {
+        function open(): void {
+            root.open(target);
+        }
+        function hide(): void {
+            root.close(target);
+        }
+        function toggle(): void {
+            root.toggle(target);
+        }
     }
 
-    function openMusicPanel() {
-        if (musicPanel)
-            return;
-        closePopups();
-        musicPanel = true;
-    }
-    function toggleMusicPanel() {
-        musicPanel ? (musicPanel = false) : openMusicPanel();
-    }
-
-    IpcHandler {
+    PanelIpc {
         target: "music-panel"
-        function show(): void {
-            root.openMusicPanel();
-        }
-        function hide(): void {
-            root.musicPanel = false;
-        }
-        function toggle(): void {
-            root.toggleMusicPanel();
-        }
     }
 
-    IpcHandler {
+    PanelIpc {
         target: "settings-panel"
-        function show(): void {
-            root.openSettings();
-        }
-        function hide(): void {
-            root.settingsPanel = false;
-        }
-        function toggle(): void {
-            root.toggleSettings();
-        }
     }
 
-    IpcHandler {
+    PanelIpc {
         target: "sound-panel"
-        function show(): void {
-            root.openSoundPanel();
-        }
-        function hide(): void {
-            root.soundPanel = false;
-        }
-        function toggle(): void {
-            root.toggleSoundPanel();
-        }
     }
 
-    IpcHandler {
+    PanelIpc {
         target: "bluetooth-panel"
-        function show(): void {
-            root.openBluetoothPanel();
-        }
-        function hide(): void {
-            root.bluetoothPanel = false;
-        }
-        function toggle(): void {
-            root.toggleBluetoothPanel();
-        }
+    }
+
+    PanelIpc {
+        target: "notification-center"
     }
 
     IpcHandler {
         target: "top-bar"
-        function show(): void {
+        function pin(): void {
             root.barPinned = true;
         }
-        function hide(): void {
+        function unpin(): void {
             root.barPinned = false;
         }
         function toggle(): void {
             root.barPinned = !root.barPinned;
-        }
-    }
-
-    IpcHandler {
-        target: "notification-center"
-        function show(): void {
-            root.openNotificationCenter();
-        }
-        function hide(): void {
-            root.notificationCenter = false;
-        }
-        function toggle(): void {
-            root.toggleNotificationCenter();
         }
     }
 }

@@ -9,8 +9,7 @@ import qs.Services
 Popup {
     id: panel
 
-    shown: Visibilities.bluetoothPanel
-    onDismissed: Visibilities.bluetoothPanel = false
+    panelName: "bluetooth-panel"
 
     component DeviceEntry: Rectangle {
         id: entry
@@ -233,7 +232,7 @@ Popup {
             label: "Bluetui"
             bleed: panel.rowBleed
             onTapped: {
-                Visibilities.bluetoothPanel = false;
+                panel.close();
                 bluetoothSettingsProc.running = true;
             }
         }

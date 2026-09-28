@@ -9,14 +9,11 @@ import qs.Services
 Popup {
     id: panel
 
-    shown: Visibilities.settingsPanel
-    onDismissed: Visibilities.settingsPanel = false
+    panelName: "settings-panel"
 
-    onVisibleChanged: {
-        if (visible) {
-            IdleService.refresh();
-            SunsetService.refresh();
-        }
+    onOpened: {
+        IdleService.refresh();
+        SunsetService.refresh();
     }
 
     component DeviceBatteryRow: Item {
@@ -266,7 +263,7 @@ Popup {
                 label: "Lock"
                 onTapped: {
                     lockProcess.running = true;
-                    Visibilities.settingsPanel = false;
+                    panel.close();
                 }
             }
 

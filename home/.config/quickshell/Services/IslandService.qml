@@ -94,11 +94,11 @@ Singleton {
     Connections {
         target: AudioService.sink?.audio ?? null
         function onVolumeChanged() {
-            if (root.changed("volume", AudioService.volume) && !Visibilities.soundPanel)
+            if (root.changed("volume", AudioService.volume) && !Visibilities.isOpen("sound-panel"))
                 root.flashOsd("volume", AudioService.volume, AudioService.muted);
         }
         function onMutedChanged() {
-            if (root.changed("muted", AudioService.muted) && !Visibilities.soundPanel)
+            if (root.changed("muted", AudioService.muted) && !Visibilities.isOpen("sound-panel"))
                 root.flashOsd("volume", AudioService.volume, AudioService.muted);
         }
     }
@@ -106,7 +106,7 @@ Singleton {
     Connections {
         target: AudioService.source?.audio ?? null
         function onMutedChanged() {
-            if (root.changed("sourceMuted", AudioService.sourceMuted) && !Visibilities.soundPanel)
+            if (root.changed("sourceMuted", AudioService.sourceMuted) && !Visibilities.isOpen("sound-panel"))
                 root.flashOsd("mic", AudioService.sourceVolume, AudioService.sourceMuted, "Live");
         }
     }
@@ -237,7 +237,7 @@ Singleton {
         interval: 250
         repeat: true
         triggeredOnStart: true
-        running: Visibilities.musicPanel && root.isPlaying && root.mprisPlayer !== null
+        running: Visibilities.isOpen("music-panel") && root.isPlaying && root.mprisPlayer !== null
         onTriggered: root.mprisPlayer?.positionChanged()
     }
 
@@ -284,7 +284,7 @@ Singleton {
         const known = root.lastTrackKey !== "";
         root.lastTrackKey = key;
 
-        if (!known || Visibilities.musicPanel || root.scratchpadOpen)
+        if (!known || Visibilities.isOpen("music-panel") || root.scratchpadOpen)
             return;
         songNotifTimer.restart();
     }

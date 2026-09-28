@@ -27,7 +27,7 @@ Variants {
         readonly property var activeToplevel: Hyprland.activeToplevel
         readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
         readonly property bool fullscreenOnScreen: fullscreenMode === hyprlandFullscreenModeExclusive
-        readonly property bool popupOpen: Visibilities.musicPanel || Visibilities.settingsPanel || Visibilities.soundPanel || Visibilities.bluetoothPanel || Visibilities.notificationCenter
+        readonly property bool popupOpen: Visibilities.anyOpen
         readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || popupOpen || Visibilities.barPinned
         property bool revealed: true
 
@@ -176,8 +176,6 @@ Variants {
 
             SettingsPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
-                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -186,8 +184,6 @@ Variants {
 
             SoundPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
-                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -196,8 +192,6 @@ Variants {
 
             BluetoothPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
-                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
 
@@ -206,8 +200,6 @@ Variants {
 
             NotificationPopup {
                 anchor.window: topBar
-                anchor.rect.x: topBar.width - implicitWidth - Theme.space.md
-                anchor.rect.y: topBar.height + Theme.space.xs
             }
         }
     }

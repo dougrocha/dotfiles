@@ -17,8 +17,8 @@ Item {
 
     Connections {
         target: Visibilities
-        function onNotificationCenterChanged() {
-            if (Visibilities.notificationCenter)
+        function onOpened(name) {
+            if (name === "notification-center")
                 calendar.reset();
         }
     }

@@ -8,8 +8,7 @@ Popup {
 
     cardWidth: 356
 
-    shown: Visibilities.notificationCenter
-    onDismissed: Visibilities.notificationCenter = false
+    panelName: "notification-center"
 
     NotificationCenter {
         width: parent.width

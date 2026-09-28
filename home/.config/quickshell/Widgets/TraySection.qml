@@ -29,7 +29,7 @@ Item {
     }
     function toggleMenu(trayItem, anchorItem) {
         const shouldClose = trayMenu.visible && activeTrayItem === trayItem;
-        Visibilities.closePopups();
+        Visibilities.closeAll();
         if (shouldClose)
             return;
         activeTrayItem = trayItem;

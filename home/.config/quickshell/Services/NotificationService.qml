@@ -211,7 +211,7 @@ Singleton {
         notification.closed.connect(closeHandler);
         data.closeHandler = closeHandler;
 
-        if ((Visibilities.notificationCenter || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
+        if ((Visibilities.isOpen("notification-center") || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
             addToHistory(data);
             notification.expire();
             return;

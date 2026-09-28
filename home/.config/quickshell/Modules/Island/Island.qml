@@ -42,7 +42,7 @@ Variants {
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "qs.island"
 
-        readonly property bool hasContent: Visibilities.musicPanel || IslandService.songNotif || IslandService.activity !== "idle" || AudioService.micInUse
+        readonly property bool hasContent: Visibilities.isOpen("music-panel") || IslandService.songNotif || IslandService.activity !== "idle" || AudioService.micInUse
         readonly property bool revealed: (Visibilities.barRevealed && hasContent) || IslandService.osdActive || IslandService.songNotif || IslandService.transientAlertActive
 
         mask: Region {
@@ -61,8 +61,8 @@ Variants {
 
         HyprlandFocusGrab {
             windows: [overlay]
-            active: overlay.visible && Visibilities.musicPanel
-            onCleared: Visibilities.musicPanel = false
+            active: overlay.visible && Visibilities.isOpen("music-panel")
+            onCleared: Visibilities.close("music-panel")
         }
 
         Item {
@@ -83,7 +83,7 @@ Variants {
                 id: pill
 
                 readonly property string activity: IslandService.activity
-                readonly property bool full: Visibilities.musicPanel
+                readonly property bool full: Visibilities.isOpen("music-panel")
                 readonly property bool notif: !full && IslandService.songNotif && !IslandService.osdActive
                 property bool recDetails: false
                 readonly property int compactHeight: Theme.topBarHeight - 8
@@ -127,7 +127,7 @@ Variants {
                         }
                         if (pill.notif)
                             IslandService.dismissSongNotif();
-                        Visibilities.openMusicPanel();
+                        Visibilities.open("music-panel");
                     }
                 }
 
@@ -896,7 +896,7 @@ Variants {
                         else if (bubble.shownKind === "alert")
                             IslandService.clearAlert(IslandService.currentAlert?.id ?? "");
                         else
-                            Visibilities.openMusicPanel();
+                            Visibilities.open("music-panel");
                     }
                 }
             }
