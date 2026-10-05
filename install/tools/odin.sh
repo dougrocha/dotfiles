@@ -14,6 +14,11 @@ cd "$ODIN_DIR"
 
 odin_commit=$(git rev-parse HEAD)
 
+# Odin supports LLVM 17-22; Arch's unversioned llvm is newer, so use llvm22.
+if [[ -z "${LLVM_CONFIG:-}" && -x /usr/lib/llvm22/bin/llvm-config ]]; then
+    export LLVM_CONFIG=/usr/lib/llvm22/bin/llvm-config
+fi
+
 if needs_build odin "$odin_commit" "$ODIN_DIR/odin"; then
     make release-native
     mark_built odin "$odin_commit"

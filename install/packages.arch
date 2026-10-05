@@ -57,6 +57,8 @@ nautilus-python
 base-devel
 cmake
 llvm
+# Odin needs LLVM 17-22. Unversioned llvm is 23.
+llvm22
 ninja
 
 # Terminal Stuff
