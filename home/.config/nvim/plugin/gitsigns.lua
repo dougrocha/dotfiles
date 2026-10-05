@@ -13,7 +13,7 @@ add {
                 change = { text = vertical_bar },
                 delete = { text = vertical_bar },
                 topdelete = { text = vertical_bar },
-                changedetele = { text = vertical_bar },
+                changedelete = { text = vertical_bar },
             },
             signs_staged = {
                 add = { text = dashed_bar },
@@ -21,7 +21,7 @@ add {
                 change = { text = dashed_bar },
                 delete = { text = dashed_bar },
                 topdelete = { text = dashed_bar },
-                changedetele = { text = dashed_bar },
+                changedelete = { text = dashed_bar },
             },
             current_line_blame = true,
             gh = true,
@@ -43,8 +43,8 @@ add {
                 local function nmap(lhs, rhs, desc)
                     vim.keymap.set('n', lhs, rhs, { desc = desc, buffer = bufnr })
                 end
-                nmap('[g', gs.prev_hunk, 'Previous hunk')
-                nmap(']g', gs.next_hunk, 'Next hunk')
+                nmap('[g', function() gs.nav_hunk 'prev' end, 'Previous hunk')
+                nmap(']g', function() gs.nav_hunk 'next' end, 'Next hunk')
                 nmap('<leader>gR', gs.reset_buffer, 'Reset buffer')
                 nmap('<leader>gb', gs.blame_line, 'Blame line')
                 nmap('<leader>gp', gs.preview_hunk, 'Preview hunk')

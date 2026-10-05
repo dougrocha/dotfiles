@@ -5,7 +5,7 @@ map({ 'n', 'x' }, 'j', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'j']], { expr = 
 map({ 'n', 'x' }, 'k', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'k']], { expr = true })
 
 -- paste text without copying what under it
-map('x', 'p', [["_dp]], { desc = 'Paste over selection without yanking' })
+map('x', 'p', 'P', { desc = 'Paste over selection without yanking' })
 
 -- Replicate <Esc>
 map('i', '<C-c>', '<Esc>')
@@ -26,8 +26,8 @@ map('n', 'n', 'nzzzv', { desc = 'Move to next search match', silent = true, nore
 map('n', 'N', 'Nzzzv', { desc = 'Move to previous search match', silent = true, noremap = true })
 
 -- Better indenting
-map('v', '<', '<gv')
-map('v', '>', '>gv')
+map('x', '<', '<gv')
+map('x', '>', '>gv')
 
 -- Package manager.
 map('n', '<leader>pu', '<cmd>packupdate<cr>', { desc = 'Update packages' })

@@ -14,6 +14,10 @@ add {
                     args = { '-stdin' },
                     stdin = true,
                 },
+                prettier = {
+                    -- Require prettier file to format
+                    require_cwd = true,
+                },
             },
             formatters_by_ft = {
                 c = { lsp_format = 'prefer' },
@@ -50,11 +54,6 @@ add {
 
                 return {}
             end,
-
-            prettier = {
-                -- Require prettier file to format
-                require_cwd = true,
-            },
         },
         on_setup = function()
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
