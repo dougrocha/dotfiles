@@ -28,22 +28,14 @@ add {
             local treesitter = require 'nvim-treesitter'
             treesitter.install(langs)
 
-            local parser_to_filetype = {
-                tsx = 'typescriptreact',
-            }
-
-            local patterns = {}
-            for _, lang in ipairs(langs) do
-                table.insert(patterns, parser_to_filetype[lang] or lang)
-            end
-
             local group = vim.api.nvim_create_augroup('dougrocha/treesitter', { clear = true })
             vim.api.nvim_create_autocmd('FileType', {
                 group = group,
-                pattern = patterns,
                 callback = function(args)
-                    -- Enable highlighting for the buffer
-                    vim.treesitter.start(args.buf)
+                    -- Enable highlighting for any filetype with an installed parser
+                    if not pcall(vim.treesitter.start, args.buf) then
+                        return
+                    end
 
                     -- Enable indentation for the buffer
                     vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
