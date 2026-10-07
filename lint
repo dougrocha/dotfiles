@@ -1,0 +1,23 @@
+#!/bin/bash
+# Run shellcheck on every tracked shell script. Extra args go to shellcheck.
+
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+if ! command -v shellcheck >/dev/null 2>&1; then
+    echo "lint: needs shellcheck -- run mise install" >&2
+    exit 1
+fi
+
+shebang='^#!(/usr/bin/env )?/?(usr/)?(bin/)?(ba)?sh$'
+scripts=()
+while IFS= read -r -d '' file; do
+    [[ -f $file ]] || continue
+    IFS= read -r first <"$file" || true
+    [[ $first =~ $shebang ]] && scripts+=("$file")
+done < <(git ls-files -z)
+
+exec shellcheck --external-sources "$@" "${scripts[@]}"
+
+# vim: ft=sh
