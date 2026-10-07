@@ -20,6 +20,7 @@
 .pi/agent/prompts
 
 .config/fish
+.config/git/allowed_signers
 .config/lazygit
 .config/mise
 .config/nvim
