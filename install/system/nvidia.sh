@@ -10,7 +10,7 @@ if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 EOF
-    sudo pacman -Sy
+    sudo pacman -Syu --noconfirm
 fi
 
 paru -S --noconfirm --needed \

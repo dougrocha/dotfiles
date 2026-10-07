@@ -36,7 +36,7 @@ if is_linux; then
     "$DOTFILES_DIR/install/tools/rust.sh"
     "$DOTFILES_DIR/install/tools/paru.sh"
     mapfile -t packages < <(read_package_list "$DOTFILES_DIR/install/packages.arch")
-    paru -S --noconfirm --needed "${packages[@]}"
+    paru -Syu --noconfirm --needed "${packages[@]}"
 else
     source "$DOTFILES_DIR/install/tools/brew.sh"
     brew bundle --file="$DOTFILES_DIR/install/Brewfile"
