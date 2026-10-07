@@ -1,16 +1,15 @@
-export NVD_BACKEND=direct
-
-export LIBVA_DRIVER_NAME=nvidia
-export __GLX_VENDOR_LIBRARY_NAME=nvidia
+# NVIDIA-only; these break VA-API on Intel/AMD.
+if [[ -e /proc/driver/nvidia ]]; then
+  export NVD_BACKEND=direct
+  export LIBVA_DRIVER_NAME=nvidia
+  export __GLX_VENDOR_LIBRARY_NAME=nvidia
+fi
 
 # Set defaults
 source ~/.config/uwsm/default
 source ~/.config/user-dirs.dirs
 
-export PATH="$PATH:$HOME/.local/bin"
-
-if command -v mise &> /dev/null && [[ "$SHELL" == "/bin/bash" ]]; then
-  eval "$(mise activate bash)"
-fi
+# Shims, not activate: this file is sourced non-interactively by uwsm.
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
 # vim: ft=sh
