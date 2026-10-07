@@ -49,13 +49,11 @@ step "Toolchains"
 step "Dotfiles"
 "$DOTFILES_DIR/link" --prune --force
 
-# mise install needs the linked config.toml.
 step "Tools"
 "$DOTFILES_DIR/install/tools/neovim.sh"
 "$DOTFILES_DIR/install/tools/tmux.sh"
 "$DOTFILES_DIR/install/tools/opencode.sh"
 "$DOTFILES_DIR/install/tools/mise.sh"
-mise install
 
 if is_linux; then
     step "System"

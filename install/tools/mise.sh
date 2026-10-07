@@ -13,4 +13,6 @@ fi
 
 mise --version
 
+mise install
+
 # vim: ft=sh
