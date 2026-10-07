@@ -50,32 +50,34 @@ step "Dotfiles"
 "$DOTFILES_DIR/link" --prune --force
 
 step "Tools"
-"$DOTFILES_DIR/install/tools/neovim.sh"
-"$DOTFILES_DIR/install/tools/tmux.sh"
-"$DOTFILES_DIR/install/tools/opencode.sh"
-"$DOTFILES_DIR/install/tools/mise.sh"
+try "$DOTFILES_DIR/install/tools/neovim.sh"
+try "$DOTFILES_DIR/install/tools/tmux.sh"
+try "$DOTFILES_DIR/install/tools/opencode.sh"
+try "$DOTFILES_DIR/install/tools/mise.sh"
 
 if is_linux; then
     step "System"
-    "$DOTFILES_DIR/install/system/sddm.sh"
-    "$DOTFILES_DIR/install/system/snapper.sh"
+    try "$DOTFILES_DIR/install/system/sddm.sh"
+    try "$DOTFILES_DIR/install/system/snapper.sh"
     if [[ $PLATFORM_GPU == nvidia ]]; then
-        "$DOTFILES_DIR/install/system/nvidia.sh"
+        try "$DOTFILES_DIR/install/system/nvidia.sh"
     fi
 
     step "Desktop"
-    "$DOTFILES_DIR/install/post/fonts"
-    "$DOTFILES_DIR/install/post/desktop-prefs"
-    "$DOTFILES_DIR/install/post/nautilus-python"
-    "$DOTFILES_DIR/install/post/setup-applications"
-    "$DOTFILES_DIR/install/post/defaults"
-    "$DOTFILES_DIR/install/post/fast-shutdown"
+    try "$DOTFILES_DIR/install/post/fonts"
+    try "$DOTFILES_DIR/install/post/desktop-prefs"
+    try "$DOTFILES_DIR/install/post/nautilus-python"
+    try "$DOTFILES_DIR/install/post/setup-applications"
+    try "$DOTFILES_DIR/install/post/defaults"
+    try "$DOTFILES_DIR/install/post/fast-shutdown"
 
     step "Services"
     for service in hyprpaper hyprpolkitagent hypridle hyprsunset; do
-        systemctl --user enable --now "$service.service"
+        try systemctl --user enable --now "$service.service"
     done
 fi
+
+report_failures || exit 1
 
 step "Done"
 if is_linux; then

@@ -40,6 +40,20 @@ step() { printf '\n\033[1;34m==>\033[0m \033[1m%s\033[0m\n' "$*"; }
 info() { printf '    %s\n' "$*"; }
 warn() { printf '\033[1;33m  ! %s\033[0m\n' "$*" >&2; }
 
+FAILED=()
+try() {
+    if ! "$@"; then
+        warn "${*##*/} failed"
+        FAILED+=("${*##*/}")
+    fi
+}
+
+report_failures() {
+    ((${#FAILED[@]} == 0)) && return 0
+    warn "failed: $(printf '%s, ' "${FAILED[@]}" | sed 's/, $//')"
+    return 1
+}
+
 # Hold the sudo timestamp open so later steps never prompt.
 keep_sudo_alive() {
     sudo -v || return 1

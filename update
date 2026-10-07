@@ -68,19 +68,12 @@ for name in "${wanted[@]}"; do
     fi
 done
 
-failed=()
 for name in "${wanted[@]}"; do
     step "$name"
-    if ! "$TOOLS/$name.sh"; then
-        warn "$name failed"
-        failed+=("$name")
-    fi
+    try "$TOOLS/$name.sh"
 done
 
-if ((${#failed[@]})); then
-    warn "failed: ${failed[*]}"
-    exit 1
-fi
+report_failures || exit 1
 
 step "Done"
 
