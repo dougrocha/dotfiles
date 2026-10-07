@@ -32,5 +32,7 @@ fi
 if command -v cargo >/dev/null 2>&1; then
     cargo install tree-sitter-cli
 else
-    echo "  ! cargo not found, skipping tree-sitter-cli" >&2
+    warn "cargo not found, skipping tree-sitter-cli"
 fi
+
+# vim: ft=sh

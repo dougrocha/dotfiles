@@ -37,3 +37,5 @@ fi
 makepkg -si --noconfirm
 
 echo "Paru installation complete!"
+
+# vim: ft=sh
