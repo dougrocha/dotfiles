@@ -1,5 +1,10 @@
 function sync-obsidian
-    # Obsidian to iCloud Sync Script
+    # Obsidian to iCloud Sync Script (macOS only)
+    if test (uname) != "Darwin"
+        echo "sync-obsidian: iCloud sync only works on macOS" >&2
+        return 1
+    end
+
     # Set your paths here
     set SOURCE_DIR "$SECOND_BRAIN/"
     set DEST_DIR "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/second-brain/"
@@ -26,11 +31,12 @@ function sync-obsidian
         --exclude='.DS_Store' \
         --exclude='.git/' \
         "$SOURCE_DIR" "$DEST_DIR"
+    set -l rc $status
 
-    if test $status -eq 0
+    if test $rc -eq 0
         echo "$GREEN✅ Sync completed successfully!$NORMAL"
     else
-        echo "$RED❌ Sync failed with error code $status$NORMAL"
+        echo "$RED❌ Sync failed with error code $rc$NORMAL"
         return 1
     end
 end
