@@ -5,6 +5,16 @@ function sync-obsidian
         return 1
     end
 
+    if test -z "$SECOND_BRAIN"
+        echo "sync-obsidian: SECOND_BRAIN is not set" >&2
+        return 1
+    end
+
+    if not test -d "$SECOND_BRAIN"
+        echo "sync-obsidian: SECOND_BRAIN is not a directory: $SECOND_BRAIN" >&2
+        return 1
+    end
+
     # Set your paths here
     set SOURCE_DIR "$SECOND_BRAIN/"
     set DEST_DIR "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/second-brain/"
