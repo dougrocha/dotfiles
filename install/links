@@ -8,6 +8,7 @@
 #   link -P    deploy + prune   link -h   options
 
 [all]
+.bash_profile
 .bashrc
 .gitconfig
 
