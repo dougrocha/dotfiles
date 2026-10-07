@@ -7,7 +7,7 @@ pkill -SIGUSR1 -f gpu-screen-recorder
 sleep 0.5
 
 REPLAY_DIR="${HOME}/Videos/Replays"
-mkdir -p $REPLAY_DIR
+mkdir -p "$REPLAY_DIR"
 
 if [[ -d "$REPLAY_DIR" ]]; then
     LATEST_REPLAY=$(find "$REPLAY_DIR" -type f -name "*.mp4" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)

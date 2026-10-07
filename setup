@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DOTFILES_DIR
 source "$DOTFILES_DIR/install/lib.sh"
 
 ansi_art='

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck source=/dev/null
 [[ -f ~/.config/user-dirs.dirs ]] && source ~/.config/user-dirs.dirs
 OUTPUT_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures/}"
 
@@ -16,7 +17,7 @@ FREEZE=false
 GEOMETRY=""
 OUTPUT_DIR_OVERRIDE=""
 SHOW_NOTIFICATION=true
-SLURP_THEME="-b #00000055 -c #9acbfaFF -B #00000055"
+SLURP_THEME=(-b '#00000055' -c '#9acbfaFF' -B '#00000055')
 ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -32,6 +33,7 @@ done
 set -- "${ARGS[@]}"
 MODE=${1:-}
 
+# shellcheck disable=SC2016 # jq variables, not shell ones
 JQ_MONITOR_GEO='
   def format_geo:
     .x as $x | .y as $y |
@@ -46,13 +48,14 @@ JQ_MONITOR_GEO='
 '
 
 get_visible_clients() {
-  local monitors_json=$(hyprctl monitors -j)
-  local visible_workspaces=$(echo "$monitors_json" | jq -r '
+  local monitors_json visible_workspaces clients_json fullscreen_workspaces
+  monitors_json=$(hyprctl monitors -j)
+  visible_workspaces=$(echo "$monitors_json" | jq -r '
     [.[] | .activeWorkspace.id, (if .specialWorkspace.id != 0 then .specialWorkspace.id else empty end)] |
     unique | join(",")
   ')
-  local clients_json=$(hyprctl clients -j)
-  local fullscreen_workspaces=$(echo "$clients_json" | jq -r '[.[] | select(.fullscreen != 0) | .workspace.id] | unique | join(",")')
+  clients_json=$(hyprctl clients -j)
+  fullscreen_workspaces=$(echo "$clients_json" | jq -r '[.[] | select(.fullscreen != 0) | .workspace.id] | unique | join(",")')
   echo "$clients_json" | jq -r --arg ws "$visible_workspaces" --arg fs_ws "$fullscreen_workspaces" '
     ($ws | split(",") | map(tonumber)) as $visible |
     ($fs_ws | if . == "" then [] else split(",") | map(tonumber) end) as $fullscreen_ws |
@@ -64,7 +67,8 @@ get_visible_clients() {
 }
 
 get_rectangles() {
-  local monitors_json=$(hyprctl monitors -j)
+  local monitors_json
+  monitors_json=$(hyprctl monitors -j)
   echo "$monitors_json" | jq -r "${JQ_MONITOR_GEO} .[] | format_geo"
   get_visible_clients
 }
@@ -106,14 +110,14 @@ grab() {
       if [[ -n $GEOMETRY ]]; then
         selection="$GEOMETRY"
       else
-        selection=$(slurp $SLURP_THEME 2>/dev/null)
+        selection=$(slurp "${SLURP_THEME[@]}" 2>/dev/null)
       fi
       ;;
     windows)
       if [[ -n $GEOMETRY ]]; then
         selection="$GEOMETRY"
       else
-        selection=$(get_visible_clients | slurp -r $SLURP_THEME 2>/dev/null)
+        selection=$(get_visible_clients | slurp -r "${SLURP_THEME[@]}" 2>/dev/null)
       fi
       if [[ -n $selection && $DELAY -gt 0 ]]; then
         WIN_ADDR=$(hyprctl clients -j | jq -r --arg geo "$selection" \
@@ -125,10 +129,10 @@ grab() {
       ;;
     smart|*)
       RECTS=$(get_rectangles)
-      selection=$(echo "$RECTS" | slurp $SLURP_THEME 2>/dev/null)
+      selection=$(echo "$RECTS" | slurp "${SLURP_THEME[@]}" 2>/dev/null)
 
       if [[ $selection =~ ^([0-9]+),([0-9]+)[[:space:]]([0-9]+)x([0-9]+)$ ]]; then
-        if ((${BASH_REMATCH[3]} * ${BASH_REMATCH[4]} < 20)); then
+        if ((BASH_REMATCH[3] * BASH_REMATCH[4] < 20)); then
           click_x="${BASH_REMATCH[1]}"
           click_y="${BASH_REMATCH[2]}"
           while IFS= read -r rect; do
@@ -145,7 +149,7 @@ grab() {
       ;;
   esac
 
-  [[ -n $FREEZE_PID ]] && kill $FREEZE_PID 2>/dev/null
+  [[ -n $FREEZE_PID ]] && kill "$FREEZE_PID" 2>/dev/null
   [[ $DELAY -gt 0 ]] && sleep "$DELAY"
   if [[ $mode == fullscreen ]]; then
     local target monitor geometry suffix="" paths_json

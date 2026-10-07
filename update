@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DOTFILES_DIR
 source "$DOTFILES_DIR/install/lib.sh"
 
 TOOLS="$DOTFILES_DIR/install/tools"
@@ -53,7 +54,7 @@ while (($#)); do
 done
 
 if (($# == 0)); then
-    wanted=($(targets))
+    mapfile -t wanted < <(targets)
 else
     wanted=("$@")
 fi

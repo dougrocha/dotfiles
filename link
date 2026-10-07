@@ -3,7 +3,8 @@
 
 set -euo pipefail
 
-export DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export DOTFILES_DIR
 
 if ! command -v odin >/dev/null 2>&1; then
     echo "link: needs the odin compiler -- run ./install/tools/odin.sh" >&2

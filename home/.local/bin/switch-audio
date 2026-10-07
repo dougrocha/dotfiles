@@ -8,7 +8,7 @@ readarray -t SINKS < <(echo "$WPCTL_OUTPUT" | sed -n '/Sinks:/,/Sources:/p' | gr
 
 for sink in "${SINKS[@]}"; do
     [[ -z "$sink" ]] && continue
-    [[ "$sink" =~ ^\* ]] && sink=$(echo "$sink" | sed 's/^\*[[:space:]]*//')
+    sink=${sink#\*}
 
     SINK_ID=$(echo "$sink" | cut -d'.' -f1 | xargs)
     wpctl inspect "$SINK_ID" 2>/dev/null | grep -q 'media.class = "Audio/Sink/Internal"' && continue
@@ -30,7 +30,7 @@ while IFS= read -r line; do
         FILTER_ID="${BASH_REMATCH[1]}"
         FILTER_NAME="${BASH_REMATCH[2]}"
         
-        [[ " ${SINK_IDS[@]} " =~ " ${FILTER_ID} " ]] && continue
+        [[ " ${SINK_IDS[*]} " == *" ${FILTER_ID} "* ]] && continue
 
         INSPECT=$(wpctl inspect "${FILTER_ID}" 2>/dev/null)
         echo "$INSPECT" | grep -q 'media.class = "Audio/Sink/Internal"' && continue
@@ -55,7 +55,11 @@ SELECTED=$(printf '%s\n' "${OPTIONS[@]}" | gum choose --header "Select audio out
 
 for i in "${!OPTIONS[@]}"; do
     if [[ "${OPTIONS[$i]}" == "$SELECTED" ]]; then
-        wpctl set-default "${SINK_IDS[$i]}" && echo "✓ Default audio device set to: ${SINK_NAMES[$i]}" || { echo "Failed to set default audio device!"; exit 1; }
+        if ! wpctl set-default "${SINK_IDS[$i]}"; then
+            echo "Failed to set default audio device!"
+            exit 1
+        fi
+        echo "✓ Default audio device set to: ${SINK_NAMES[$i]}"
         exit 0
     fi
 done
