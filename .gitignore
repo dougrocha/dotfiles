@@ -13,3 +13,6 @@ home/.config/tmux/plugins
 
 # Local Claude Code config / skills
 CLAUDE.local.md
+
+# mise per-install lock files (mise.lock itself is tracked)
+home/.config/mise/locks/
