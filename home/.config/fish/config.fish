@@ -14,7 +14,7 @@ set -gx EDITOR nvim
 set -gx GIT_EDITOR nvim
 set -gx VISUAL nvim
 set -gx MANPAGER "nvim +Man!"
-set -gx PAGER bat
+set -gx PAGER "bat --style=plain"
 
 set -gx SECOND_BRAIN "$HOME/second-brain"
 
