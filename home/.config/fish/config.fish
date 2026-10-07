@@ -2,21 +2,12 @@ if test -f "$HOME/.config/env"
     source "$HOME/.config/env"
 end
 
-set -gx XDG_CACHE_HOME "$HOME/.cache"
-set -gx XDG_CONFIG_HOME "$HOME/.config"
-set -gx XDG_DATA_HOME "$HOME/.local/share"
-set -gx XDG_STATE_HOME "$HOME/.local/state"
+if test -f "$HOME/.config/shell/env"
+    source "$HOME/.config/shell/env"
+end
 
 fish_add_path -P "$HOME/.local/bin"
 fish_add_path -P "$HOME/.opencode/bin"
-
-set -gx EDITOR nvim
-set -gx GIT_EDITOR nvim
-set -gx VISUAL nvim
-set -gx MANPAGER "nvim +Man!"
-set -gx PAGER "bat --style=plain"
-
-set -gx SECOND_BRAIN "$HOME/second-brain"
 
 if status is-interactive
     set -g fish_greeting

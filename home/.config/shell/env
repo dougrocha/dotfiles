@@ -1,0 +1,19 @@
+# Environment shared by bash, fish and the uwsm (Hyprland) session.
+# fish sources this as well, so keep to plain `export NAME="value"` lines:
+# no conditionals or $(...). PATH stays per-shell because fish dedupes it
+# with fish_add_path and each shell adds different entries.
+
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+export EDITOR="nvim"
+export GIT_EDITOR="nvim"
+export VISUAL="nvim"
+export MANPAGER="nvim +Man!"
+export PAGER="bat --style=plain"
+
+export SECOND_BRAIN="$HOME/second-brain"
+
+# vim: ft=sh

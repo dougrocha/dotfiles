@@ -6,6 +6,7 @@ if [[ -e /proc/driver/nvidia ]]; then
 fi
 
 # Set defaults
+source ~/.config/shell/env
 source ~/.config/uwsm/default
 source ~/.config/user-dirs.dirs
 
