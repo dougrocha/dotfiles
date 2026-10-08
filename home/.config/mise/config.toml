@@ -15,6 +15,7 @@ shellcheck = "latest"
 stylua = "latest"
 taplo = "latest"
 usage = "latest"
+herdr = "latest"
 
 [settings]
 auto_update = true
