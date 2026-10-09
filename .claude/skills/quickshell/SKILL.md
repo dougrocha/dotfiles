@@ -161,6 +161,10 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 - Value fills (slider, OSD level, progress) and the Island springs are not size changes. Keep their own animations.
 - A surface that scales in grows from `Theme.motion.scaleFrom` (0.95) to 1, together with its opacity. Never scale from 0 or from another literal. qslint checks it.
 
+### 5.6 More design decisions
+
+For a decision that this file does not make, read `references/design-guidelines.md`. It maps each surface to Apple's Human Interface Guidelines (panels, menus, toasts, Island, polkit, controls) and gives the rules for UI text.
+
 ## 6. Checklist
 
 Before you finish, make sure that:
