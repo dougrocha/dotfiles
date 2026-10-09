@@ -1,6 +1,10 @@
 #!/bin/bash
-# Format all QML files in the QuickShell project
+# Format QML files in the QuickShell project: the given files, or all of them
 
 QMLFORMAT="/usr/lib/qt6/bin/qmlformat"
 
-find . -name "*.qml" -type f -exec "$QMLFORMAT" -i {} +
+if (($#)); then
+  "$QMLFORMAT" -i "$@"
+else
+  find . -name "*.qml" -type f -exec "$QMLFORMAT" -i {} +
+fi
