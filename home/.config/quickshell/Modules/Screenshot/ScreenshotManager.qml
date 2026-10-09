@@ -469,40 +469,7 @@ Item {
     }
 
     Variants {
-        model: manager.overlayVisible ? Quickshell.screens.filter(screen => screen.name !== manager.toolbarHostMonitor) : []
-
-        delegate: PanelWindow {
-            id: visualWindow
-            required property var modelData
-            screen: modelData
-
-            readonly property var monitor: Hyprland.monitorFor(modelData)
-
-            color: "transparent"
-            mask: Region {}
-
-            WlrLayershell.layer: WlrLayer.Overlay
-            WlrLayershell.namespace: "qs.screenshot_overlay_visuals"
-            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-            WlrLayershell.exclusionMode: ExclusionMode.Ignore
-
-            anchors.top: true
-            anchors.bottom: true
-            anchors.left: true
-            anchors.right: true
-
-            ScreenshotOverlayVisuals {
-                anchors.fill: parent
-                manager: manager
-                monitorName: visualWindow.modelData.name
-                monitorX: visualWindow.monitor?.x ?? 0
-                monitorY: visualWindow.monitor?.y ?? 0
-            }
-        }
-    }
-
-    Variants {
-        model: manager.overlayVisible && Theme.primaryScreen != null ? [Theme.primaryScreen] : []
+        model: manager.overlayVisible ? Quickshell.screens : []
 
         delegate: PanelWindow {
             id: overlayWindow
@@ -510,12 +477,9 @@ Item {
             screen: modelData
 
             readonly property var monitor: Hyprland.monitorFor(modelData)
-            readonly property real monitorX: manager.desktopGeometry.left
-            readonly property real monitorY: manager.desktopGeometry.top
-            readonly property real toolbarHostX: monitor != null ? monitor.x - monitorX : 0
-            readonly property real toolbarHostY: monitor != null ? monitor.y - monitorY : 0
-            readonly property real toolbarHostWidth: monitor != null ? monitor.width : width
-            readonly property real toolbarHostHeight: monitor != null ? monitor.height : height
+            readonly property real monitorX: monitor?.x ?? 0
+            readonly property real monitorY: monitor?.y ?? 0
+            readonly property bool hostsToolbar: modelData.name === manager.toolbarHostMonitor
             property real dragStartX: 0
             property real dragStartY: 0
             property real pointerX: 0
@@ -741,25 +705,16 @@ Item {
 
             visible: manager.overlayVisible
             color: "transparent"
-            implicitWidth: manager.desktopGeometry.width
-            implicitHeight: manager.desktopGeometry.height
-
-            mask: Region {
-                x: 0
-                y: 0
-                width: overlayWindow.width
-                height: overlayWindow.height
-            }
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs.screenshot_overlay"
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.margins.left: monitor != null ? manager.desktopGeometry.left - monitor.x : 0
-            WlrLayershell.margins.top: monitor != null ? manager.desktopGeometry.top - monitor.y : 0
 
             anchors.top: true
+            anchors.bottom: true
             anchors.left: true
+            anchors.right: true
 
             onVisibleChanged: {
                 if (visible) {
@@ -900,14 +855,11 @@ Item {
             }
 
             ScreenshotOverlayVisuals {
-                x: overlayWindow.toolbarHostX
-                y: overlayWindow.toolbarHostY
-                width: overlayWindow.toolbarHostWidth
-                height: overlayWindow.toolbarHostHeight
+                anchors.fill: parent
                 manager: manager
                 monitorName: overlayWindow.modelData.name
-                monitorX: overlayWindow.monitor?.x ?? 0
-                monitorY: overlayWindow.monitor?.y ?? 0
+                monitorX: overlayWindow.monitorX
+                monitorY: overlayWindow.monitorY
             }
 
             Item {
@@ -926,7 +878,7 @@ Item {
 
             Rectangle {
                 id: optionsPanel
-                visible: manager.overlayVisible && !manager.quickMode
+                visible: manager.overlayVisible && !manager.quickMode && overlayWindow.hostsToolbar
                 enabled: manager.optionsOpen
 
                 x: Math.max(8, Math.min(parent.width - width - 8, toolbar.x + (toolbar.width - width) / 2))
@@ -1419,12 +1371,12 @@ Item {
 
             Rectangle {
                 id: toolbar
-                visible: manager.overlayVisible && !manager.quickMode
+                visible: manager.overlayVisible && !manager.quickMode && overlayWindow.hostsToolbar
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52
-                x: overlayWindow.toolbarHostX + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostWidth - width, manager.toolbarX)) : (overlayWindow.toolbarHostWidth - width) / 2)
-                y: overlayWindow.toolbarHostY + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.toolbarHostHeight - height, manager.toolbarY)) : overlayWindow.toolbarHostHeight - height - 52)
+                x: (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.width - width, manager.toolbarX)) : (overlayWindow.width - width) / 2)
+                y: (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.height - height, manager.toolbarY)) : overlayWindow.height - height - 52)
                 radius: Theme.radius.lg
                 color: Theme.colors.surface
                 border.width: 1
@@ -1444,14 +1396,14 @@ Item {
                     anchors.fill: parent
                     cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                     drag.target: toolbar
-                    drag.minimumX: overlayWindow.toolbarHostX
-                    drag.maximumX: overlayWindow.toolbarHostX + overlayWindow.toolbarHostWidth - toolbar.width
-                    drag.minimumY: overlayWindow.toolbarHostY
-                    drag.maximumY: overlayWindow.toolbarHostY + overlayWindow.toolbarHostHeight - toolbar.height
+                    drag.minimumX: 0
+                    drag.maximumX: overlayWindow.width - toolbar.width
+                    drag.minimumY: 0
+                    drag.maximumY: overlayWindow.height - toolbar.height
                     onReleased: {
                         manager.toolbarMonitor = manager.toolbarHostMonitor;
-                        manager.toolbarX = toolbar.x - overlayWindow.toolbarHostX;
-                        manager.toolbarY = toolbar.y - overlayWindow.toolbarHostY;
+                        manager.toolbarX = toolbar.x;
+                        manager.toolbarY = toolbar.y;
                         manager.persistToolbarPosition();
                     }
                 }
