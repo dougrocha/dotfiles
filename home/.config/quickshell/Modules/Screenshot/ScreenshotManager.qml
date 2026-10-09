@@ -13,6 +13,8 @@ Item {
     id: manager
 
     property bool overlayVisible: false
+    property bool quickMode: false
+    readonly property string visualMode: quickMode ? (hasSelection ? "region" : "windows") : selectedMode
     property string controlMonitor: ""
     readonly property string toolbarHostMonitor: Theme.primaryScreen?.name ?? ""
     property string toolbarMonitor: ""
@@ -246,6 +248,18 @@ Item {
             }
             manager.overlayVisible = !manager.overlayVisible;
         }
+        function toggleQuick(): void {
+            if (manager.overlayVisible) {
+                manager.dismiss();
+                return;
+            }
+            manager.resetSelection();
+            Hyprland.refreshToplevels();
+            Hyprland.refreshMonitors();
+            manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+            manager.quickMode = true;
+            manager.overlayVisible = true;
+        }
     }
 
     IpcHandler {
@@ -300,6 +314,8 @@ Item {
         if (!overlayVisible && pendingMode !== "") {
             executeAction();
         }
+        if (!overlayVisible)
+            quickMode = false;
     }
 
     function capture() {
@@ -308,7 +324,7 @@ Item {
         if ((selectedMode === "region" && !hasSelection) || (selectedMode === "windows" && selectedWindow == null))
             return;
         pendingMode = selectedMode;
-        pendingGeometry = selectedMode === "region" ? selectionGeometry() : selectedMode === "windows" ? windowGeometry(selectedWindow) : "";
+        pendingGeometry = selectedMode === "region" ? selectionGeometry() : selectedMode === "windows" ? rectGeometry(selectedWindow) : "";
         optionsOpen = false;
         if (timerDelay > 0) {
             countdown = timerDelay;
@@ -362,8 +378,17 @@ Item {
         return Math.round(selectionX) + "," + Math.round(selectionY) + " " + Math.round(selectionWidth) + "x" + Math.round(selectionHeight);
     }
 
-    function windowGeometry(window) {
-        return Math.round(window.x) + "," + Math.round(window.y) + " " + Math.round(window.width) + "x" + Math.round(window.height);
+    function rectGeometry(rect) {
+        return Math.round(rect.x) + "," + Math.round(rect.y) + " " + Math.round(rect.width) + "x" + Math.round(rect.height);
+    }
+
+    function captureQuick(px, py) {
+        const target = hasSelection ? null : windowAt(px, py) ?? Hyprland.monitors.values.find(m => px >= m.x && px < m.x + m.width && py >= m.y && py < m.y + m.height);
+        if (!hasSelection && target == null)
+            return;
+        pendingMode = "region";
+        pendingGeometry = hasSelection ? selectionGeometry() : rectGeometry(target);
+        overlayVisible = false;
     }
 
     function selectSaveDirectory(path) {
@@ -773,7 +798,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: manager.optionsOpen || (manager.selectedMode !== "region" && manager.selectedMode !== "windows")
+                enabled: !manager.quickMode && (manager.optionsOpen || (manager.selectedMode !== "region" && manager.selectedMode !== "windows"))
                 onClicked: {
                     if (manager.optionsOpen)
                         manager.optionsOpen = false;
@@ -785,7 +810,7 @@ Item {
             MouseArea {
                 id: windowSelectionArea
                 anchors.fill: parent
-                enabled: manager.selectedMode === "windows" && !manager.optionsOpen && !manager.countdownActive
+                enabled: manager.selectedMode === "windows" && !manager.quickMode && !manager.optionsOpen && !manager.countdownActive
                 hoverEnabled: true
                 cursorShape: manager.hoveredWindow != null ? Qt.PointingHandCursor : Qt.ArrowCursor
                 onPositionChanged: mouse => {
@@ -805,7 +830,7 @@ Item {
             MouseArea {
                 id: selectionArea
                 anchors.fill: parent
-                enabled: manager.selectedMode === "region" && !manager.optionsOpen && !manager.countdownActive
+                enabled: (manager.quickMode || manager.selectedMode === "region") && !manager.optionsOpen && !manager.countdownActive
                 hoverEnabled: true
                 cursorShape: manager.pointerCursorShape
                 onEntered: manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.monitorX + mouseX, overlayWindow.monitorY + mouseY)
@@ -835,11 +860,18 @@ Item {
                     const globalY = overlayWindow.monitorY + mouse.y;
                     if (!pressed) {
                         manager.pointerCursorShape = overlayWindow.cursorAt(globalX, globalY);
+                        if (manager.quickMode)
+                            manager.hoveredWindow = manager.windowAt(globalX, globalY);
                         return;
                     }
                     overlayWindow.updateInteraction(globalX, globalY);
                 }
                 onReleased: {
+                    if (manager.quickMode) {
+                        overlayWindow.interaction = "idle";
+                        manager.captureQuick(overlayWindow.pointerX, overlayWindow.pointerY);
+                        return;
+                    }
                     if (overlayWindow.interaction === "create" && !overlayWindow.interactionMoved) {
                         manager.selectionX = overlayWindow.initialX;
                         manager.selectionY = overlayWindow.initialY;
@@ -883,18 +915,18 @@ Item {
                 focus: overlayWindow.visible
                 Keys.onEscapePressed: manager.dismiss()
                 Keys.onReturnPressed: {
-                    if (!manager.countdownActive)
+                    if (!manager.countdownActive && !manager.quickMode)
                         manager.capture();
                 }
                 Keys.onEnterPressed: {
-                    if (!manager.countdownActive)
+                    if (!manager.countdownActive && !manager.quickMode)
                         manager.capture();
                 }
             }
 
             Rectangle {
                 id: optionsPanel
-                visible: manager.overlayVisible
+                visible: manager.overlayVisible && !manager.quickMode
                 enabled: manager.optionsOpen
 
                 x: Math.max(8, Math.min(parent.width - width - 8, toolbar.x + (toolbar.width - width) / 2))
@@ -1387,7 +1419,7 @@ Item {
 
             Rectangle {
                 id: toolbar
-                visible: manager.overlayVisible
+                visible: manager.overlayVisible && !manager.quickMode
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52

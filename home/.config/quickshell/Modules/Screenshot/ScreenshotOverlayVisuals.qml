@@ -34,7 +34,7 @@ Item {
 
     Rectangle {
         readonly property var targetWindow: root.manager.hoveredWindow ?? root.manager.selectedWindow
-        visible: root.manager.selectedMode === "windows" && targetWindow != null
+        visible: root.manager.visualMode === "windows" && targetWindow != null
         x: targetWindow != null ? targetWindow.x - root.monitorX : 0
         y: targetWindow != null ? targetWindow.y - root.monitorY : 0
         width: targetWindow != null ? targetWindow.width : 0
@@ -48,7 +48,7 @@ Item {
     Item {
         id: regionVisuals
         anchors.fill: parent
-        visible: root.manager.selectedMode === "region"
+        visible: root.manager.visualMode === "region"
         clip: true
 
         readonly property real sx: root.manager.selectionX - root.monitorX
