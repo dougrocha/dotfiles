@@ -1,5 +1,8 @@
 hl.layer_rule({ match = { namespace = "qs.notification_overlay" }, no_anim = true })
 
+-- grim runs as soon as the picker closes, so a fade-out would land in the capture
+hl.layer_rule({ match = { namespace = "^(qs\\.screenshot_overlay.*|selection)$" }, no_anim = true })
+
 -- Suppress maximize requests from all apps
 hl.window_rule({
     name = "suppress-maximize-events",
