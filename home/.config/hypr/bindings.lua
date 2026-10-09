@@ -17,6 +17,7 @@ bind({ "W" }, hl.dsp.window.close())
 bind({ "E" }, hl.dsp.exec_cmd("uwsm-app -- nautilus --new-window"))
 bind({ "SPACE" }, hl.dsp.exec_cmd("launch-walker"))
 bind({ "B" }, hl.dsp.exec_cmd("uwsm-app -- $(xdg-settings get default-web-browser)"))
+bind({ "I" }, hl.dsp.exec_cmd("uwsm-app -- ghostty --class=org.arsene.kura-pick -e kura pick"))
 
 bind({ "S" }, hl.dsp.workspace.toggle_special("scratchpad"))
 bind({ "SHIFT", "S" }, hl.dsp.window.move({ workspace = "special:scratchpad" }))

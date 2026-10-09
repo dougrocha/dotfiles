@@ -57,6 +57,14 @@ hl.window_rule({
     tag = "+floating-window",
 })
 
+hl.window_rule({
+    name = "kura-pick",
+    match = { class = "^org\\.arsene\\.kura-pick$" },
+    float = true,
+    center = true,
+    size = "875 600",
+})
+
 -- Floating window tag for file dialogs
 hl.window_rule({
     match = {
