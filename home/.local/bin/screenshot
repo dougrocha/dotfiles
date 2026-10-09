@@ -9,21 +9,14 @@ if [[ ! -d $OUTPUT_DIR ]]; then
   exit 1
 fi
 
-pkill slurp && exit 0
-
-DELAY=0
 CURSOR=false
-FREEZE=false
 GEOMETRY=""
 OUTPUT_DIR_OVERRIDE=""
 SHOW_NOTIFICATION=true
-SLURP_THEME=(-b '#00000055' -c '#9acbfaFF' -B '#00000055')
 ARGS=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --delay) DELAY="$2"; shift 2 ;;
         --cursor) CURSOR=true; shift ;;
-        --freeze) FREEZE=true; shift ;;
         --geometry) GEOMETRY="$2"; shift 2 ;;
         --output-dir) OUTPUT_DIR_OVERRIDE="$2"; shift 2 ;;
         --no-notification) SHOW_NOTIFICATION=false; shift ;;
@@ -47,38 +40,11 @@ JQ_MONITOR_GEO='
     end;
 '
 
-get_visible_clients() {
-  local monitors_json visible_workspaces clients_json fullscreen_workspaces
-  monitors_json=$(hyprctl monitors -j)
-  visible_workspaces=$(echo "$monitors_json" | jq -r '
-    [.[] | if .specialWorkspace.id != 0 then .specialWorkspace.id else .activeWorkspace.id end] |
-    unique | join(",")
-  ')
-  clients_json=$(hyprctl clients -j)
-  fullscreen_workspaces=$(echo "$clients_json" | jq -r '[.[] | select(.fullscreen != 0) | .workspace.id] | unique | join(",")')
-  echo "$clients_json" | jq -r --arg ws "$visible_workspaces" --arg fs_ws "$fullscreen_workspaces" '
-    ($ws | split(",") | map(tonumber)) as $visible |
-    ($fs_ws | if . == "" then [] else split(",") | map(tonumber) end) as $fullscreen_ws |
-    .[] |
-    select([.workspace.id] | inside($visible)) |
-    .workspace.id as $wid |
-    select(if ($fullscreen_ws | contains([$wid])) then .fullscreen != 0 else true end) |
-    "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"'
-}
-
-get_rectangles() {
-  local monitors_json
-  monitors_json=$(hyprctl monitors -j)
-  echo "$monitors_json" | jq -r "${JQ_MONITOR_GEO} .[] | format_geo"
-  get_visible_clients
-}
-
 save() {
   local selection="$1"
   local suffix="$2"
   local notify="${3:-true}"
   LAST_SAVED_PATH=""
-  [[ -z $selection ]] && return 0
 
   FILENAME="Screenshot-$(date +'%Y-%m-%d-at-%I.%M.%S%p')${suffix:+-$suffix}.png"
   SAVE_DIR="${OUTPUT_DIR_OVERRIDE:-$OUTPUT_DIR/Screenshots}"
@@ -95,86 +61,35 @@ save() {
   fi
 }
 
-grab() {
-  local mode="$1"
-  local selection
-
-  if [[ $FREEZE == true ]]; then
-    hyprpicker -r -z >/dev/null 2>&1 &
-    FREEZE_PID=$!
-    sleep .1
-  fi
-
-  case "$mode" in
-    region)
-      if [[ -n $GEOMETRY ]]; then
-        selection="$GEOMETRY"
-      else
-        selection=$(slurp "${SLURP_THEME[@]}" 2>/dev/null)
-      fi
-      ;;
-    windows)
-      if [[ -n $GEOMETRY ]]; then
-        selection="$GEOMETRY"
-      else
-        selection=$(get_visible_clients | slurp -r "${SLURP_THEME[@]}" 2>/dev/null)
-      fi
-      if [[ -n $selection && $DELAY -gt 0 ]]; then
-        WIN_ADDR=$(hyprctl clients -j | jq -r --arg geo "$selection" \
-          '.[] | select("\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])" == $geo) | .address' | head -1)
-      fi
-      ;;
-    fullscreen)
-      mapfile -t fullscreen_targets < <(hyprctl monitors -j | jq -r "${JQ_MONITOR_GEO} .[] | [.name, format_geo] | @tsv")
-      ;;
-    smart|*)
-      RECTS=$(get_rectangles)
-      selection=$(echo "$RECTS" | slurp "${SLURP_THEME[@]}" 2>/dev/null)
-
-      if [[ $selection =~ ^([0-9]+),([0-9]+)[[:space:]]([0-9]+)x([0-9]+)$ ]]; then
-        if ((BASH_REMATCH[3] * BASH_REMATCH[4] < 20)); then
-          click_x="${BASH_REMATCH[1]}"
-          click_y="${BASH_REMATCH[2]}"
-          while IFS= read -r rect; do
-            if [[ $rect =~ ^([0-9]+),([0-9]+)[[:space:]]([0-9]+)x([0-9]+) ]]; then
-              rx="${BASH_REMATCH[1]}" ry="${BASH_REMATCH[2]}" rw="${BASH_REMATCH[3]}" rh="${BASH_REMATCH[4]}"
-              if ((click_x >= rx && click_x < rx + rw && click_y >= ry && click_y < ry + rh)); then
-                selection="${rx},${ry} ${rw}x${rh}"
-                break
-              fi
-            fi
-          done <<<"$RECTS"
-        fi
-      fi
-      ;;
-  esac
-
-  [[ -n $FREEZE_PID ]] && kill "$FREEZE_PID" 2>/dev/null
-  [[ $DELAY -gt 0 ]] && sleep "$DELAY"
-  if [[ $mode == fullscreen ]]; then
-    local target monitor geometry suffix="" paths_json
-    local -a fullscreen_paths=()
-    for target in "${fullscreen_targets[@]}"; do
-      monitor=${target%%$'\t'*}
-      geometry=${target#*$'\t'}
-      [[ ${#fullscreen_targets[@]} -gt 1 ]] && suffix=${monitor//[^[:alnum:]_.-]/_}
-      save "$geometry" "$suffix" false
-      [[ -n $LAST_SAVED_PATH ]] && fullscreen_paths+=("$LAST_SAVED_PATH")
-    done
-    if [[ $SHOW_NOTIFICATION == true && ${#fullscreen_paths[@]} -gt 0 ]]; then
-      paths_json=$(printf '%s\n' "${fullscreen_paths[@]}" | jq -Rrsc 'split("\n")[:-1] | map(@uri) | join("|")')
-      quickshell ipc call -- screenshot-toast notifyBatch "$paths_json"
-    fi
-    return
-  fi
-  if [[ -n ${WIN_ADDR:-} ]]; then
-    selection=$(hyprctl clients -j | jq -r --arg addr "$WIN_ADDR" \
-      '.[] | select(.address == $addr) | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"')
-  fi
-  save "$selection"
+wait_for_overlay_gone() {
+  local _
+  for _ in {1..50}; do
+    hyprctl layers -j | jq -e '[.. | .namespace? | strings | select(startswith("qs.screenshot_overlay"))] | length == 0' >/dev/null && return
+    sleep 0.02
+  done
 }
 
-grab "$MODE" &
-wait
+wait_for_overlay_gone
+if [[ -n $GEOMETRY ]]; then
+  save "$GEOMETRY"
+elif [[ $MODE == fullscreen ]]; then
+  mapfile -t fullscreen_targets < <(hyprctl monitors -j | jq -r "${JQ_MONITOR_GEO} .[] | [.name, format_geo] | @tsv")
+  fullscreen_paths=()
+  suffix=""
+  for target in "${fullscreen_targets[@]}"; do
+    monitor=${target%%$'\t'*}
+    geometry=${target#*$'\t'}
+    [[ ${#fullscreen_targets[@]} -gt 1 ]] && suffix=${monitor//[^[:alnum:]_.-]/_}
+    save "$geometry" "$suffix" false
+    [[ -n $LAST_SAVED_PATH ]] && fullscreen_paths+=("$LAST_SAVED_PATH")
+  done
+  if [[ $SHOW_NOTIFICATION == true && ${#fullscreen_paths[@]} -gt 0 ]]; then
+    paths_json=$(printf '%s\n' "${fullscreen_paths[@]}" | jq -Rrsc 'split("\n")[:-1] | map(@uri) | join("|")')
+    quickshell ipc call -- screenshot-toast notifyBatch "$paths_json"
+  fi
+else
+  echo "usage: screenshot [--cursor] [--no-notification] [--output-dir DIR] (--geometry 'X,Y WxH' | fullscreen)" >&2
+  exit 2
+fi
 
 # vim: ft=sh
