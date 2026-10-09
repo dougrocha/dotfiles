@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -894,17 +895,19 @@ Item {
                 border.color: Theme.stroke.hairline
 
                 opacity: manager.optionsOpen ? 1.0 : 0.0
-                scale: manager.optionsOpen ? 1.0 : 0.95
+                scale: manager.optionsOpen ? 1 : Theme.motion.scaleFrom
                 transformOrigin: Item.Bottom
 
                 Behavior on opacity {
                     NumberAnimation {
                         duration: Theme.motion.fast
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
                 Behavior on scale {
                     NumberAnimation {
                         duration: Theme.motion.fast
+                        easing.type: Theme.motion.easeStandard
                     }
                 }
 
@@ -1384,12 +1387,7 @@ Item {
                 border.width: 1
                 border.color: Theme.stroke.hairline
 
-                Behavior on implicitWidth {
-                    NumberAnimation {
-                        duration: Theme.motion.slow
-                        easing.type: Theme.motion.easeStandard
-                    }
-                }
+                SizeMotion on implicitWidth {}
 
                 layer.enabled: true
                 layer.effect: null

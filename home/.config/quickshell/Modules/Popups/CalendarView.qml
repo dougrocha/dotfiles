@@ -1,6 +1,9 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -312,6 +315,8 @@ Item {
                 Layout.preferredHeight: monthGrid.height
                 clip: true
 
+                SizeMotion on Layout.preferredHeight {}
+
                 Grid {
                     id: monthGrid
                     columns: 7
@@ -395,50 +400,59 @@ Item {
             }
         }
 
-        ColumnLayout {
+        Item {
             Layout.fillWidth: true
-            opacity: root.selectedDay > 0 ? 1 : 0
-            visible: opacity > 0
-            spacing: Theme.space.xs
+            Layout.topMargin: -col.spacing
+            Layout.preferredHeight: root.selectedDay > 0 ? details.implicitHeight + col.spacing : 0
+            clip: true
 
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: Theme.motion.normal
-                    easing.type: Theme.motion.easeStandard
+            SizeMotion on Layout.preferredHeight {}
+
+            ColumnLayout {
+                id: details
+                y: col.spacing
+                width: parent.width
+                opacity: root.selectedDay > 0 ? 1 : 0
+                spacing: Theme.space.xs
+
+                ContentFade on opacity {}
+
+                transform: Translate {
+                    y: (1 - details.opacity) * -Theme.motion.nudge
                 }
-            }
 
-            RowLayout {
-                Layout.fillWidth: true
-                Layout.topMargin: Theme.space.xs
-                spacing: Theme.space.md
+                RowLayout {
+                    Layout.fillWidth: true
+                    Layout.topMargin: Theme.space.xs
+                    spacing: Theme.space.md
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: root.selectedDayDetail
+                        color: Theme.text.primary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
+                        font.weight: Theme.type.title.weight
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        text: root.selectedDayRelative
+                        color: Theme.text.tertiary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.caption.size
+                    }
+                }
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.selectedDayDetail
-                    color: Theme.text.primary
-                    font.family: Theme.font.ui
-                    font.pixelSize: Theme.type.body.size
-                    font.weight: Theme.type.title.weight
-                    elide: Text.ElideRight
-                }
-
-                Text {
-                    text: root.selectedDayRelative
-                    color: Theme.text.tertiary
+                    visible: root.selectedDayHoliday.length > 0
+                    text: root.selectedDayHoliday
+                    color: Theme.accent
                     font.family: Theme.font.ui
                     font.pixelSize: Theme.type.caption.size
+                    font.weight: Theme.type.label.weight
                 }
-            }
-
-            Text {
-                Layout.fillWidth: true
-                visible: root.selectedDayHoliday.length > 0
-                text: root.selectedDayHoliday
-                color: Theme.accent
-                font.family: Theme.font.ui
-                font.pixelSize: Theme.type.caption.size
-                font.weight: Theme.type.label.weight
             }
         }
     }

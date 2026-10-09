@@ -1,8 +1,11 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Components
 import qs.Constants
 import qs.Modules.Bar.Components
 import qs.Modules.Popups
@@ -122,12 +125,7 @@ Variants {
                 color: Theme.colors.surface
                 clip: true
 
-                Behavior on width {
-                    NumberAnimation {
-                        duration: Theme.motion.normal
-                        easing.type: Theme.motion.easeStandard
-                    }
-                }
+                SizeMotion on width {}
 
                 Workspaces {
                     id: workspaceModule

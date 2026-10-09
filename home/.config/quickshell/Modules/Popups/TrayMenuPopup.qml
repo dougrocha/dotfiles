@@ -65,7 +65,7 @@ PopupWindow {
         border.width: 1
 
         transformOrigin: Item.Top
-        scale: root.visible ? 1.0 : 0.92
+        scale: root.visible ? 1 : Theme.motion.scaleFrom
         opacity: root.visible ? 1.0 : 0.0
         clip: true
 
@@ -90,12 +90,7 @@ PopupWindow {
                 easing.type: Theme.motion.easeStandard
             }
         }
-        Behavior on height {
-            NumberAnimation {
-                duration: Theme.motion.normal
-                easing.type: Theme.motion.easeStandard
-            }
-        }
+        SizeMotion on height {}
 
         Flickable {
             id: menuFlickable

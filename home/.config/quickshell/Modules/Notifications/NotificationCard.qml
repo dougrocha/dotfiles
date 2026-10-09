@@ -215,11 +215,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: card.menuExpanded && card.menuActions().length > 0 ? popover.height + 6 : 0
 
-                    Behavior on Layout.preferredHeight {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                        }
-                    }
+                    SizeMotion on Layout.preferredHeight {}
                 }
 
                 Text {

@@ -74,7 +74,7 @@ Variants {
             border.color: Theme.stroke.strong
 
             opacity: toastWindow.shown ? 1 : 0
-            scale: toastWindow.shown ? 1 : 0.92
+            scale: toastWindow.shown ? 1 : Theme.motion.scaleFrom
 
             Behavior on opacity {
                 NumberAnimation {

@@ -80,10 +80,21 @@ Column {
         id: row
 
         required property var modelData
+        required property int index
 
         readonly property bool isCritical: modelData.urgency === NotificationUrgency.Critical
 
+        property bool revealed: false
+
         height: rowContent.implicitHeight + Theme.space.sm * 2
+        opacity: (index === 0 || revealed) ? 1 : 0
+        transform: Translate {
+            y: (1 - row.opacity) * -Theme.motion.nudge
+        }
+
+        ContentFade on opacity {}
+
+        Component.onCompleted: revealed = true
 
         Rectangle {
             anchors.fill: parent
@@ -264,12 +275,7 @@ Column {
                 height: rows.implicitHeight
                 clip: true
 
-                Behavior on height {
-                    NumberAnimation {
-                        duration: Theme.motion.fast
-                        easing.type: Theme.motion.easeStandard
-                    }
-                }
+                SizeMotion on height {}
 
                 Column {
                     id: rows

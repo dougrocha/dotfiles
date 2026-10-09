@@ -27,12 +27,7 @@ Rectangle {
         y: (1 - card.reveal) * -6
     }
 
-    Behavior on height {
-        NumberAnimation {
-            duration: Theme.motion.normal
-            easing.type: Theme.motion.easeStandard
-        }
-    }
+    SizeMotion on height {}
 
     focus: shown
     Keys.onPressed: function (event) {

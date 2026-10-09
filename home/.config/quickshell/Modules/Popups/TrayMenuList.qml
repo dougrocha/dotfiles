@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import qs.Components
 import qs.Constants
 
 Item {
@@ -69,17 +70,20 @@ Item {
                         }
 
                         Loader {
+                            id: submenuLoader
+
                             active: entryColumn.submenuLoaded && entryColumn.modelData !== null
                             width: parent.width
                             clip: true
                             height: entryColumn.expanded && item ? item.implicitHeight : 0
+                            opacity: entryColumn.expanded ? 1 : 0
                             sourceComponent: menuBranchComponent
 
-                            Behavior on height {
-                                NumberAnimation {
-                                    duration: Theme.motion.fast
-                                    easing.type: Theme.motion.easeStandard
-                                }
+                            SizeMotion on height {}
+                            ContentFade on opacity {}
+
+                            transform: Translate {
+                                y: (1 - submenuLoader.opacity) * -Theme.motion.nudge
                             }
 
                             onLoaded: {

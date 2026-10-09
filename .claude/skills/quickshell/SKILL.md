@@ -156,6 +156,10 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 - Use `Behavior` with `Theme.motion.fast` for hover and color changes.
 - Use `Theme.motion.normal` with `easeStandard` to open, and `Theme.motion.fast` with `easeExit` to close.
 - Use motion to show a change of state only.
+- To animate the size of a container, use `SizeMotion on height {}` (or `width`, `implicitWidth`, `Layout.preferredHeight`). It grows with `motion.normal` and shrinks with `motion.fast`. Do not write a `NumberAnimation` for size. Do not animate the size of a window. Make the window large enough for the largest state, and set `mask` to the animated item.
+- Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference: a short move and a fade, not a large slide.
+- Value fills (slider, OSD level, progress) and the Island springs are not size changes. Keep their own animations.
+- A surface that scales in grows from `Theme.motion.scaleFrom` (0.95) to 1, together with its opacity. Never scale from 0 or from another literal.
 
 ## 6. Checklist
 

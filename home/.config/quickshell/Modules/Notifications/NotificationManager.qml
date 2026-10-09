@@ -1,8 +1,11 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -109,20 +112,16 @@ Variants {
                     required property var modelData
 
                     property bool leaving: false
+                    property bool entered: false
 
                     readonly property int badgeInset: Theme.space.lg
 
                     width: cardColumn.width
-                    height: leaving ? 0 : card.height + badgeInset
+                    height: leaving || !entered ? 0 : card.height + badgeInset
                     clip: true
                     opacity: leaving ? 0 : 1
 
-                    Behavior on height {
-                        NumberAnimation {
-                            duration: Theme.motion.fast
-                            easing.type: Theme.motion.easeExit
-                        }
-                    }
+                    SizeMotion on height {}
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -131,7 +130,10 @@ Variants {
                         }
                     }
 
-                    Component.onCompleted: appearAnim.start()
+                    Component.onCompleted: {
+                        entered = true;
+                        appearAnim.start();
+                    }
 
                     NumberAnimation {
                         id: appearAnim
@@ -139,7 +141,7 @@ Variants {
                         property: "opacity"
                         from: 0
                         to: 1
-                        duration: Theme.motion.slow
+                        duration: Theme.motion.normal
                         easing.type: Theme.motion.easeStandard
                     }
 

@@ -444,7 +444,7 @@ Variants {
                     spacing: Theme.space.sm
                     opacity: pill.recDetails ? 1 : 0
                     visible: opacity > 0
-                    scale: 0.96 + 0.04 * opacity
+                    scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * opacity
                     transformOrigin: Item.Top
 
                     ContentFade on opacity {}
@@ -506,7 +506,7 @@ Variants {
                     spacing: Theme.space.lg
                     opacity: pill.notif ? 1 : 0
                     visible: opacity > 0
-                    scale: 0.96 + 0.04 * opacity
+                    scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * opacity
                     transformOrigin: Item.Top
 
                     ContentFade on opacity {}
@@ -591,7 +591,7 @@ Variants {
                     spacing: Theme.space.lg
                     opacity: pill.full ? 1 : 0
                     visible: opacity > 0
-                    scale: 0.96 + 0.04 * opacity
+                    scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * opacity
                     transformOrigin: Item.Top
 
                     ContentFade on opacity {}
@@ -600,12 +600,7 @@ Variants {
                         width: musicColumn.width
                         height: IslandService.musicAvailable ? musicColumn.height : musicEmpty.height
 
-                        Behavior on height {
-                            NumberAnimation {
-                                duration: Theme.motion.normal
-                                easing.type: Theme.motion.easeStandard
-                            }
-                        }
+                        SizeMotion on height {}
 
                         Column {
                             id: musicColumn
@@ -820,7 +815,7 @@ Variants {
                 radius: height / 2
                 color: Theme.colors.surface
                 opacity: shown ? 1 : 0
-                scale: shown ? 1 : 0.6
+                scale: shown ? 1 : Theme.motion.scaleFrom
                 visible: opacity > 0
 
                 ContentFade on opacity {}
