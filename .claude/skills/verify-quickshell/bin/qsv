@@ -26,7 +26,7 @@ run_dir() {
 
 cmd_help() {
   cat <<'EOF'
-qsv start <name>             new evidence dir under ~/.cache/verify-quickshell, prints its path
+qsv start <name>             clean up the previous run, then make a new evidence dir and print its path
 qsv doctor                   read-only health check of quickshell, Hyprland and input tools
 qsv log                      log lines since the last quickshell reload, noise removed
 qsv key <k1+k2+...>          press a chord through ydotool, e.g. super+ctrl+s, esc, enter
@@ -46,6 +46,7 @@ EOF
 }
 
 cmd_start() {
+  [[ -f $RUN_FILE && ( -f "$(cat "$RUN_FILE")/.captures" || -f "$(cat "$RUN_FILE")/.notifications" ) ]] && cmd_cleanup
   local dir
   dir="$EVIDENCE_ROOT/${1:?name}-$(date +%Y%m%d-%H%M%S)"
   mkdir -p "$dir" && echo "$dir" >"$RUN_FILE" && echo "$dir"

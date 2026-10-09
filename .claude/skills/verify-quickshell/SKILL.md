@@ -82,7 +82,7 @@ Write each result line with the expected value next to it, for example `quick dr
 
 ## 5. Cleanup
 
-Run `qsv cleanup` at the end of a run and after every failed attempt. It does four things:
+Run `qsv cleanup` at the end of a run and after every failed attempt. `qsv start` also runs it on the previous run before it starts a new one, so a forgotten cleanup does not leave files behind. It does four things:
 
 - Runs `qsv reset`.
 - Closes every notification that `qsv notify` sent, over D-Bus. Critical test toasts never time out, so this removes them without a click.
