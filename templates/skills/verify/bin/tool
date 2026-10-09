@@ -1,0 +1,56 @@
+#!/bin/bash
+# Drive and observe <app> with real input. Rename this file to the tool name. Run `<tool> help`.
+set -uo pipefail
+
+TOOL=$(basename "$0")
+EVIDENCE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/verify-<app>"
+RUN_FILE="$EVIDENCE_ROOT/.current-run"
+
+die() { echo "$TOOL: $*" >&2; exit 1; }
+
+run_dir() {
+  [[ -f $RUN_FILE ]] || die "no run started; run: $TOOL start <name>"
+  cat "$RUN_FILE"
+}
+
+cmd_help() {
+  cat <<EOF
+$TOOL start <name>     new evidence dir under $EVIDENCE_ROOT, prints its path
+$TOOL doctor           read-only health check; exit 0 when the app is worth driving
+$TOOL reset            return the app to the baseline state
+$TOOL cleanup          reset, then stop what this run started; evidence stays
+EOF
+}
+
+cmd_start() {
+  local dir
+  dir="$EVIDENCE_ROOT/${1:?name}-$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$dir" && echo "$dir" >"$RUN_FILE" && echo "$dir"
+}
+
+# shellcheck disable=SC2016 # each check string is evaluated later on purpose
+cmd_doctor() {
+  local ok=true
+  check() { if eval "$2" >/dev/null 2>&1; then echo "ok    $1"; else echo "FAIL  $1  ($3)"; ok=false; fi; }
+  check "<app> runs" 'false' "<how to start it>"
+  check "<tools> installed" 'command -v jq' "<install command>"
+  echo "info  <values that change, such as ports or monitors>"
+  $ok
+}
+
+cmd_reset() {
+  :
+}
+
+cmd_cleanup() {
+  cmd_reset
+  echo "evidence kept in $(run_dir)"
+}
+
+sub=${1:-help}
+shift || true
+case "$sub" in
+  help | -h | --help) cmd_help ;;
+  start | doctor | reset | cleanup) "cmd_$sub" "$@" ;;
+  *) die "unknown command: $sub (run $TOOL help)" ;;
+esac

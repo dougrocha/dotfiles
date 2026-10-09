@@ -1,0 +1,73 @@
+#!/bin/bash
+# Check agent skills against the size, structure, and link rules in README.md.
+# Usage: check-skills [skill-dir-or-root ...]   (default: .claude/skills)
+set -uo pipefail
+
+MAX_SKILL=200
+MAX_REF=100
+fails=0
+
+fail() { echo "FAIL  $1: $2"; fails=$((fails + 1)); }
+
+has_toc() { head -n 30 "$1" | grep -qiE '^#+ *(contents|table of contents)\b'; }
+
+check_links() {
+  local md=$1 dir target
+  dir=$(dirname "$md")
+  awk '/^ *```/{f=!f;next} !f' "$md" | grep -oE '\]\([^)#]+' | sed 's/^](//' | while IFS= read -r target; do
+    [[ $target =~ ^[a-z]+: ]] && continue
+    [[ -e $dir/$target ]] || echo "FAIL  $md: broken link $target"
+  done
+}
+
+check_skill() {
+  local skill=$1 file name desc lines rel mentioned
+  file=$skill/SKILL.md
+
+  name=$(sed -n '2,10{s/^name: *//p}' "$file" | head -1)
+  desc=$(sed -n '2,10{s/^description: *//p}' "$file" | head -1)
+  [[ $(head -1 "$file") == "---" ]] || fail "$file" "no YAML frontmatter"
+  [[ $name == "$(basename "$skill")" ]] || fail "$file" "name '$name' does not match directory"
+  grep -qiE '\b(use|when)\b' <<<"$desc" || fail "$file" "description does not say when to use the skill"
+
+  lines=$(wc -l <"$file")
+  ((lines <= MAX_SKILL)) || fail "$file" "$lines lines, limit $MAX_SKILL; move detail to references/"
+
+  while IFS= read -r md; do
+    lines=$(wc -l <"$md")
+    ((lines <= MAX_REF)) || has_toc "$md" || fail "$md" "$lines lines and no table of contents"
+  done < <(find "$skill" -name '*.md' -not -path "$file")
+
+  while IFS= read -r ref; do
+    rel=${ref#"$skill"/}
+    mentioned=false
+    grep -rqF --include='*.md' -e "$rel" -e "$(dirname "$rel")/" -e "($(basename "$ref"))" "$skill" && mentioned=true
+    $mentioned || fail "$ref" "not referred to from any doc in the skill"
+  done < <(find "$skill/references" -type f 2>/dev/null)
+
+  if [[ -f $skill/features/README.md ]]; then
+    while IFS= read -r feat; do
+      grep -qF "$(basename "$feat")" "$skill/features/README.md" || fail "$feat" "not listed in features/README.md"
+    done < <(find "$skill/features" -name '*.md' -not -name README.md)
+  fi
+
+  while IFS= read -r script; do
+    head -c2 "$script" | grep -q '#!' || continue
+    [[ -x $script ]] || fail "$script" "helper is not executable"
+  done < <(find "$skill/bin" "$skill/scripts" -type f 2>/dev/null)
+
+  local broken
+  broken=$(find "$skill" -name '*.md' | while IFS= read -r md; do check_links "$md"; done)
+  [[ -z $broken ]] || { echo "$broken"; fails=$((fails + $(wc -l <<<"$broken"))); }
+}
+
+roots=("$@")
+((${#roots[@]})) || roots=(.claude/skills)
+count=0
+while IFS= read -r skill_md; do
+  check_skill "$(dirname "$skill_md")"
+  count=$((count + 1))
+done < <(find -L "${roots[@]}" -name SKILL.md -not -path '*/node_modules/*' -not -path '*/.venv/*' | sort)
+
+echo "checked $count skills, $fails problems"
+((fails == 0))
