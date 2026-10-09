@@ -9,7 +9,7 @@ Every monitor has a bar whose right-hand group holds CPU, Bluetooth, volume, set
 - `panel-sound` opens sound from the speaker.
 - `panel-bluetooth` opens Bluetooth from its icon.
 - `panel-single` keeps only one card open. Opening another replaces it.
-- `panel-close` closes a card on the same control again or on a click outside the card.
+- `panel-close` closes a card on the same control again, on a click outside the card, or on Escape.
 - `panel-other-monitor` opens the card on DP-1 from a control on DP-2's bar.
 - `panel-music` expands the island into the music panel.
 
@@ -17,7 +17,7 @@ Every monitor has a bar whose right-hand group holds CPU, Bluetooth, volume, set
 
 - Click the control in any bar's right-hand group.
 - Click the island at the top center of DP-1 while media plays.
-- Run `qs ipc call <target> open|hide|toggle`. This is for setup only. Targets are `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, and `music-panel`.
+- Run `qs ipc call <target> open|hide|toggle`. This is for setup only. Targets are `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, and `music-panel`. `qs ipc call panels closeAll` closes whichever is open.
 
 ## Driving it with qsv
 
@@ -30,12 +30,13 @@ Preconditions:
 - **Replace.** Run `qsv click 2407 17`. The shot shows only the Bluetooth card.
 - **Same control closes.** Run `qsv click 2407 17` again. The shot shows no card. A `Bluetooth: On` tooltip can remain.
 - **Outside click closes.** Run `qsv click 2459 17`, then `qsv click 1200 800`. The settings card is gone.
+- **Escape.** Run `qsv click 2433 17`. `hyprctl submap` prints `qs-panel`. Run `qsv key esc`. The shot shows no card and `hyprctl submap` prints `default`.
 - **Other monitor.** Run `qsv click 5067 17`. The calendar card shows on DP-1 in `"2150,40 400x620"`, and DP-2 shows no card.
 - **Music.** Requires an active media player. Click the island at `1280,17`. The music panel expands. A click outside closes it.
 
 ## Gotchas
 
-- Escape does not close a card opened by a click. This was observed on 2026-10-09 with the sound card and is a product gap. Use the same control, an outside click, or `qsv reset`.
+- Escape works through the Hyprland submap `qs-panel`, which quickshell enters while a card is open. If `hyprctl submap` still prints `qs-panel` with no card open, the reset failed. Press Escape once to leave it.
 - The island and the music panel are hidden while no player is active. Report `panel-music` as unreachable with that prerequisite. Do not start playback on the user's machine to test it.
 - The pointer stays on the control, so a shot can include its tooltip, for example `Settings`. Do not read the tooltip as a card.
 - Cards are popups, not layer surfaces, so `qsv layers` does not list them. The music panel is part of the `qs.island` layer. Prove cards with a shot. Brightness averages do not tell a card from the window behind it.
