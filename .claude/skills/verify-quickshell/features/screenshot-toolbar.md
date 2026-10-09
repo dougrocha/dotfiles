@@ -11,7 +11,7 @@ The screenshot toolbar opens an overlay on every monitor and a toolbar on the pr
 - `toolbar-timer` counts down for 3, 5, or 10 seconds, with a Cancel button, before it captures.
 - `toolbar-options` sets the save folder, timer, Show Notification, Remember Last Selection, System Audio, Microphone, and Show Cursor.
 - `toolbar-video` starts `toggle-recording` with `--system-audio` and `--mic` when those options are on.
-- `toolbar-cancel` closes on Escape, the close button, or the countdown's Cancel, and saves nothing.
+- `toolbar-cancel` closes on Escape, the close button, the countdown's Cancel, or the bind again, and saves nothing.
 
 ## How to get to it (user POV)
 
@@ -28,7 +28,7 @@ Preconditions:
 
 - **Open.** Focus DP-1, then run `qsv key super+ctrl+shift+s`, wait 0.8s, and `qsv shot open "0,0 5120x1440"`. The toolbar shows on DP-1. In region mode, a pixel outside the selection is darker than the same pixel with no overlay on both monitors, for example `srgb(15,21,27)` became `srgb(9,13,16)`.
 - **Region with Enter.** With Remember Last Selection on and a saved region for DP-1, run `qsv mark` and `qsv key enter`. The toolbar shows `Cancel` and the seconds left. After `timerDelay` plus 1.2s, `qsv captured toolbar-region` prints one file of the saved region's size.
-- **Cancel the countdown.** Reopen, press Enter, then within the countdown run `qsv click 1105 1234`. No overlay layer stays, and after the countdown would have ended `qsv captured` prints `none`.
+- **Cancel the countdown.** Reopen, press Enter, then within the countdown run `qsv click 1105 1234`. No overlay layer stays, and after the countdown would have ended `qsv captured` prints `none`. Repeat with `qsv key super+ctrl+shift+s` in place of the click. The result is the same.
 - **Window mode.** Reopen and run `qsv click 1150 1230`. `captureMode` reads `windows`. Point at a window with `qsv at 2000 300`. A DP-2 pixel equals its no-overlay color, so there is no dim. Run `qsv mark` and `qsv click 2000 300`, wait the timer, then `qsv captured toolbar-window`. The size equals that window's `size` from `hyprctl clients -j`.
 - **Options.** Reopen, run `qsv click 1302 1232`, and take a shot of `"900,700 700x620"`. The menu shows Save to, Timer, Options, and Capture sections. `qsv click 1230 1022` flips `showNotification` in the settings file. Click it again to restore.
 - **Restore the mode.** Reopen, run `qsv click 1113 1230` and `qsv key esc`. `captureMode` reads `region`.
@@ -38,6 +38,6 @@ Preconditions:
 
 - Enter does nothing when Remember Last Selection is off or the focused monitor has no saved region. The monitor is the one focused when the overlay opened.
 - Clicking a mode button or an option writes the settings file at once. Restore every value you change.
-- Pressing the bind during a countdown captures at once instead of cancelling. This was observed on 2026-10-09 and is a product bug, not a harness problem. Use Cancel or Escape to stop a countdown.
+- Pressing the bind during a countdown cancels it, like Cancel and Escape. Before 2026-10-09 it captured at once.
 - Wait for the whole countdown before you check for a file.
 - Do not verify video mode unless the task is about recording. If you do, stop the recording afterwards.

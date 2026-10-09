@@ -85,7 +85,7 @@ Write each result line with the expected value next to it, for example `quick dr
 Run `qsv cleanup` at the end of a run and after every failed attempt. It does four things:
 
 - Runs `qsv reset`.
-- Closes every notification that `qsv notify` sent, over D-Bus. A user cannot close a critical toast by clicking it, so this is the only clean way to remove one.
+- Closes every notification that `qsv notify` sent, over D-Bus. Critical test toasts never time out, so this removes them without a click.
 - Deletes the test files this run created in `~/Pictures/Screenshots`. It deletes only files that `qsv captured` recorded.
 - Keeps the evidence directory under `~/.cache/verify-quickshell/`. The proof stays there.
 

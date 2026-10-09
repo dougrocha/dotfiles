@@ -37,7 +37,8 @@ Preconditions:
 
 ## Gotchas
 
-- A critical card does not close on a left click, a right click, or its X badge. This was observed on 2026-10-09 and is a product gap, while normal cards close on a click. Send critical tests through `qsv notify` so `qsv cleanup` can close them over D-Bus.
+- Click a card with `qsv click <x> <y>`, which moves and clicks at once. On 2026-10-09 a click that came after the pointer rested on the stack for 0.3s or more did not register on any card, normal or critical. A fresh `qsv click` on the same spot then worked. Do not report a card as unclosable before you retry with `qsv click`.
+- Send critical tests through `qsv notify` so `qsv cleanup` can close them over D-Bus.
 - `notify-send -A` waits for a click and prints no ID while it waits, so `qsv notify` cannot record it. Run it in the background as shown and let it time out.
 - Without `-t 0`, a sender timeout can close a critical card.
 - Test titles stay in the history file. Clear them from the center's `Clear all` only if the user agrees, because that clears their real history too.
