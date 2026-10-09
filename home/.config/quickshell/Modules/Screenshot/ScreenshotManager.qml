@@ -236,17 +236,19 @@ Item {
             manager.overlayVisible = true;
         }
         function hide(): void {
-            manager.overlayVisible = false;
+            manager.dismiss();
         }
         function toggle(): void {
-            if (!manager.overlayVisible) {
-                manager.resetSelection();
-                Hyprland.refreshToplevels();
-                Hyprland.refreshMonitors();
-                manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
-                manager.restoreOverlayState();
+            if (manager.overlayVisible) {
+                manager.dismiss();
+                return;
             }
-            manager.overlayVisible = !manager.overlayVisible;
+            manager.resetSelection();
+            Hyprland.refreshToplevels();
+            Hyprland.refreshMonitors();
+            manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+            manager.restoreOverlayState();
+            manager.overlayVisible = true;
         }
         function toggleQuick(): void {
             if (manager.overlayVisible) {
