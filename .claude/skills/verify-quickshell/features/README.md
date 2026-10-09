@@ -41,7 +41,7 @@ Each feature file starts with an H1 title and one paragraph about the user-visib
 ## Features
 
 - [Quick screenshot](./screenshot-quick.md) covers `Super+Ctrl+S`: region drag, window click, special workspace priority, both monitors, and Escape.
-- [Screenshot toolbar](./screenshot-toolbar.md) covers `Super+Ctrl+Shift+S`: region, window, and fullscreen modes, the timer, and Escape.
-- [Fullscreen screenshot](./screenshot-fullscreen.md) covers `Super+Shift+P`: one file per monitor.
-- [Bar panels](./bar-panels.md) covers the notification center, settings, sound, and Bluetooth panels.
-- [Notification toasts](./notifications.md) covers toasts, critical toasts, and history.
+- [Screenshot toolbar](./screenshot-toolbar.md) covers `Super+Ctrl+Shift+S`: region, window, and fullscreen modes, the options menu, the countdown and its Cancel button, and Escape.
+- [Fullscreen screenshot](./screenshot-fullscreen.md) covers `Super+Shift+P`: one file per monitor, the batch toast, and the clipboard.
+- [Bar panels](./bar-panels.md) covers the notification center, settings, sound, and Bluetooth cards from either monitor's bar, and the music panel from the island.
+- [Notification toasts](./notifications.md) covers normal, critical, and action toasts, closing them, history, and held critical toasts.

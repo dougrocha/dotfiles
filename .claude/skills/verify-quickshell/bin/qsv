@@ -38,9 +38,10 @@ qsv layers [prefix]          mapped layer namespaces, optionally filtered by pre
 qsv pixel <png> <x> <y>      color of one pixel
 qsv edge-count <png> <color> pixels within 6% of color on the outer 2px frame
 qsv mark                     remember the newest file in ~/Pictures/Screenshots
-qsv captured <name>          copy captures newer than the mark into the run dir, print size
-qsv reset                    hide overlay and panels, release held keys and buttons
-qsv cleanup                  reset, then delete the captures this run copied as evidence
+qsv captured <name>          copy captures newer than the mark into the run dir, print size and source name
+qsv notify <notify-send args> send a test notification and record its id for cleanup
+qsv reset                    hide every IPC target with hide(), release held keys and buttons
+qsv cleanup                  reset, close recorded notifications, delete this run's captures
 EOF
 }
 
@@ -67,7 +68,7 @@ cmd_doctor() {
 
 cmd_log() {
   qs log 2>&1 | tac | awk '{print} /Reloading configuration/{exit}' | tac |
-    grep -v -E 'Reloading configuration|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError'
+    grep -v -E 'Reloading configuration|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError' || true
 }
 
 cmd_key() {
@@ -134,16 +135,23 @@ cmd_captured() {
     while [[ -e $dir/${1:?name}-$i.png ]]; do i=$((i + 1)); done
     cp "$f" "$dir/$1-$i.png"
     echo "$f" >>"$dir/.captures"
-    echo "$dir/$1-$i.png $(magick "$f" -format '%wx%h' info:)"
+    echo "$dir/$1-$i.png $(magick "$f" -format '%wx%h' info:) from $(basename "$f")"
   done < <(find "$CAPTURE_DIR" -maxdepth 1 -name '*.png' -newer "$dir/.mark" | sort)
   [[ $n -gt 0 ]] || { echo "none"; return 1; }
   cmd_mark
 }
 
+cmd_notify() {
+  local id
+  id=$(notify-send -p "$@") || die "notify-send failed"
+  echo "$id" >>"$(run_dir)/.notifications"
+  echo "$id"
+}
+
 cmd_reset() {
-  qs ipc call screenshot-overlay hide >/dev/null 2>&1
-  for panel in notification-center settings-panel sound-panel bluetooth-panel music-panel; do
-    qs ipc call "$panel" hide >/dev/null 2>&1
+  local target
+  for target in $(qs ipc show | awk '/^target/ { t = $2 } /function hide\(\)/ { print t }'); do
+    qs ipc call "$target" hide >/dev/null 2>&1
   done
   yd key 125:0 29:0 42:0 56:0
   yd click 0x80
@@ -154,6 +162,15 @@ cmd_cleanup() {
   cmd_reset
   local dir
   dir=$(run_dir)
+  if [[ -f $dir/.notifications ]]; then
+    local id
+    while read -r id; do
+      gdbus call --session --dest org.freedesktop.Notifications --object-path /org/freedesktop/Notifications \
+        --method org.freedesktop.Notifications.CloseNotification "$id" >/dev/null 2>&1
+    done <"$dir/.notifications"
+    echo "closed $(wc -l <"$dir/.notifications") test notifications"
+    rm -f "$dir/.notifications"
+  fi
   if [[ -f $dir/.captures ]]; then
     sort -u "$dir/.captures" | xargs -r rm -f
     echo "deleted $(sort -u "$dir/.captures" | wc -l) test captures from $CAPTURE_DIR, evidence kept in $dir"
@@ -165,7 +182,7 @@ sub=${1:-help}
 shift || true
 case "$sub" in
   help | -h | --help) cmd_help ;;
-  start | doctor | log | key | at | click | drag | shot | layers | pixel | mark | captured | reset | cleanup) "cmd_$sub" "$@" ;;
+  start | doctor | log | key | at | click | drag | shot | layers | pixel | mark | captured | notify | reset | cleanup) "cmd_$sub" "$@" ;;
   edge-count) cmd_edge_count "$@" ;;
   *) die "unknown command: $sub (run qsv help)" ;;
 esac

@@ -1,6 +1,6 @@
 # Quick screenshot
 
-Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+Shift+4. The window under the pointer gets a rounded outline. A drag captures a region on release. A click captures the window under the pointer, or the whole monitor when no window is there. The file goes to `~/Pictures/Screenshots` and the clipboard, and a toast shows.
+Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+Shift+4. The window under the pointer gets a rounded outline. A drag captures a region on release. A click captures the window under the pointer, or the whole monitor when no window is there. The file goes to `~/Pictures/Screenshots` and the clipboard. A toast shows at the bottom right of DP-1 when Show Notification is on in the toolbar's options.
 
 ## Sub-features
 
@@ -12,6 +12,7 @@ Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+S
 - `quick-multimonitor` takes clicks and drags on DP-2 and drags across monitors.
 - `quick-clean` saves files with no overlay border or dim in them.
 - `quick-cancel` closes on Escape or on the bind again, and saves nothing.
+- `quick-no-enter` ignores Enter, because quick mode has no selection to confirm.
 
 ## How to get to it (user POV)
 
@@ -32,6 +33,7 @@ Preconditions:
 - **Special workspace.** Focus DP-1 and open a special workspace with `hyprctl dispatch 'hl.dsp.workspace.toggle_special("discord")'`. Reopen and click a point where a workspace window sits under it (`qsv click 100 500`). The saved size is the special workspace window's size, `2536x1380` on 2026-10-08. Close the special workspace afterwards.
 - **Second monitor.** Run `qsv click 3000 500`, then `qsv drag 3000 300 3500 700`, then `qsv drag 2300 300 2900 600`, reopening between them. You get a DP-2 window, a `500x400` file, and a `600x300` file.
 - **Clean capture.** Read the accent with `A=$(jq -r .accent ~/.config/quickshell/palette.json)`. Count it on a drag file with `qsv edge-count <file> "$A"`. Grab the same area clean with `qsv shot clean "<x>,<y> <w>x<h>"` and count it too. The counts match, `0` and `0` for a drag over a terminal on 2026-10-08. The old border bug gave 813.
+- **Enter does nothing.** Reopen, run `qsv mark` and `qsv key enter`. Both `qs.screenshot_overlay` layers stay mapped and `qsv captured` prints `none`.
 - **Cancel.** Reopen and run `qsv key esc`. `qsv layers qs.screenshot_overlay` prints nothing and `qsv captured` prints `none`.
 
 ## Gotchas
@@ -39,4 +41,4 @@ Preconditions:
 - The bind toggles. If a case fails with the overlay still open, the next `qsv key super+ctrl+s` closes it. Run `qsv reset` before each case.
 - `qsv drag` lands about 1px off at times, so a drag may save `499x400`. Treat ±1px as a pass.
 - Clicking in a window gap captures the whole monitor.
-- Each capture overwrites the clipboard and shows a toast.
+- Each capture overwrites the clipboard. It shows a toast only when Show Notification is on. The toast lives at the bottom right of DP-1, so grab `"2150,1250 410x190"` to see it.
