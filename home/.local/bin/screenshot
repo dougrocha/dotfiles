@@ -51,7 +51,7 @@ get_visible_clients() {
   local monitors_json visible_workspaces clients_json fullscreen_workspaces
   monitors_json=$(hyprctl monitors -j)
   visible_workspaces=$(echo "$monitors_json" | jq -r '
-    [.[] | .activeWorkspace.id, (if .specialWorkspace.id != 0 then .specialWorkspace.id else empty end)] |
+    [.[] | if .specialWorkspace.id != 0 then .specialWorkspace.id else .activeWorkspace.id end] |
     unique | join(",")
   ')
   clients_json=$(hyprctl clients -j)
