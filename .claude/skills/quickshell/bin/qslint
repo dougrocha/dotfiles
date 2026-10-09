@@ -1,0 +1,57 @@
+#!/bin/bash
+# Check QML files against the quickshell code and design rules that grep can prove.
+# Usage: qslint [--all | file.qml ...]   (default: QML files changed since HEAD)
+set -uo pipefail
+
+ROOT=$(git rev-parse --show-toplevel)/home/.config/quickshell
+cd "$ROOT" || exit 1
+report() { echo "$1:$2: $3"; }
+
+if [[ ${1:-} == --all ]]; then
+  mapfile -t files < <(find . -name '*.qml' -printf '%P\n' | sort)
+elif (($#)); then
+  files=("${@#home/.config/quickshell/}")
+else
+  mapfile -t files < <({ git diff --name-only --relative HEAD -- '*.qml'; git ls-files --others --exclude-standard -- '*.qml'; } | sort -u)
+fi
+
+for f in "${files[@]}"; do
+  [[ -f $f ]] || continue
+
+  [[ $f == Constants/* ]] || grep -nE '"#[0-9a-fA-F]{3,8}"' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "hex color; use a Theme token or Theme.withAlpha"
+  done
+
+  grep -nE '^\s*//|[;{}),]\s*//' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "comment; QML in this config has no comments"
+  done
+
+  [[ $f == Widgets/Tray* ]] || grep -n 'IconImage' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "app icon; show the app name as text instead"
+  done
+
+  grep -n 'PersistentProperties' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "PersistentProperties; keep persistent data in SettingsService or FileView"
+  done
+
+  if grep -q 'delegate:' "$f" && ! grep -q 'pragma ComponentBehavior: Bound' "$f"; then
+    report "$f" 1 "has a delegate but no 'pragma ComponentBehavior: Bound'"
+  fi
+
+  grep -n 'MouseArea' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "MouseArea; use TapHandler or HoverHandler unless a handler cannot do it (wheel)"
+  done
+
+  awk -v f="$f" '
+    /^import / {
+      rank = $2 ~ /^Qt/ ? 0 : $2 ~ /^Quickshell/ ? 1 : $2 ~ /^qs\./ ? 2 : -1
+      if (rank >= 0 && rank < last) print f ":" NR ": import order is Qt, then Quickshell, then qs.*"
+      if (rank >= 0) last = rank
+    }
+    /IpcHandler *\{|PanelIpc *\{/ { ipc = depth + 1 }
+    ipc && depth >= ipc && /function [A-Za-z_]+\([^)]*\) *\{/ && !/\) *: *[A-Za-z]+ *\{/ {
+      print f ":" NR ": IpcHandler function has no types"
+    }
+    { depth += gsub(/\{/, "{") - gsub(/\}/, "}"); if (ipc && depth < ipc) ipc = 0 }
+  ' "$f"
+done | tee /dev/stderr | { n=$(wc -l); echo "qslint: ${#files[@]} files, $n problems" >&2; ((n == 0)); }

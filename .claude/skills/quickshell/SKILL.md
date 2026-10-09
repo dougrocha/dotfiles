@@ -44,6 +44,8 @@ Other popups use different patterns. Tray menus use `TrayMenuPopup.qml`, which i
 
 Apply these rules to new code and to code that you change. Some old files do not obey them yet. Do not change old files only to obey a rule.
 
+`.claude/skills/quickshell/bin/qslint` (from the repo root) checks the rules that a script can prove: hex colors, comments, app icons, `PersistentProperties`, delegates without `Bound`, `MouseArea`, import order, and untyped `IpcHandler` functions. With no arguments it checks the QML files that changed since `HEAD`. `qslint --all` checks every file. A `MouseArea` result is correct when a handler cannot do the task.
+
 - Write no comments in QML. The code has no comments now. Use clear names.
 - Use `pragma ComponentBehavior: Bound` in files with delegates. Declare model data as `required property`.
 - Use `ScriptModel` for a `Repeater` on a JavaScript array. Set `objectProp` to a property that is unique and stable for each item, for example `"id"` or `"address"`.
@@ -55,7 +57,7 @@ Apply these rules to new code and to code that you change. Some old files do not
 - Use `?.` and `??` on Quickshell objects that can be `null`, for example `sink?.audio?.volume ?? 0`.
 - In `Connections`, write handlers as functions: `function onNotificationsChanged() { }`.
 - Keep persistent data in files (`SettingsService`, `FileView`). Do not use `PersistentProperties`.
-- Run `./format` from the config root after you change more than one file. It formats every QML file. Restore files that you did not change with `git checkout -- <file>`.
+- Run `./format <files>` from the config root with the QML files that you changed. Do not run `./format` with no arguments: it formats every QML file.
 - Commit messages use this form: `fix(quickshell): <summary>` or `feat(quickshell): <summary>`.
 
 ## 3. Framework patterns
@@ -64,7 +66,7 @@ Use these patterns. They are the patterns that this config uses now.
 
 | Task | Pattern | Example |
 |---|---|---|
-| Start a command and forget it | `Quickshell.execDetached(["cmd", "arg"])`. Quickshell does not track or stop the process. | None yet. Older code uses `Process` for this. Change it when you edit that code. |
+| Start a command and forget it | `Quickshell.execDetached(["cmd", "arg"])`. Quickshell does not track or stop the process. | `Modules/Popups/BluetoothPopup.qml`. Older code uses `Process` for this. Change it when you edit that code. |
 | Run a command and use its result or state | `Process` with `command` as a string array. Set `running = true` to start it. | `Services/IdleService.qml` |
 | Read command output line by line | `stdout: SplitParser { onRead: data => { } }` | `Services/IdleService.qml` |
 | Read or write a file | `FileView` with `atomicWrites: true` and `printErrors: false`. Handle `FileViewError.FileNotFound` in `onLoadFailed`. | `Services/NotificationService.qml` |
@@ -78,6 +80,7 @@ Use these patterns. They are the patterns that this config uses now.
 | Problem | Cause and correction |
 |---|---|
 | An inline component cannot see an outer `id` or a `required property`. | Add `pragma ComponentBehavior: Bound`. |
+| A `Constants/` singleton is `undefined` in another `Constants/` file. | `import qs.Constants` and `import "."` do not work in that directory. Put the value in `Theme.qml`. |
 | A hover check never changes. | `HoverHandler` has `hovered`. `containsMouse` is a `MouseArea` property. |
 | `Process` does not start. | `command` is a string. Make it an array, for example `["sh", "-c", "..."]`. |
 | An audio node has no `audio` data. | Add the node to `PwObjectTracker`. |
@@ -158,8 +161,8 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 
 Before you finish, make sure that:
 
+- `qslint` prints no problems, or each problem is a `MouseArea` that a handler cannot replace.
 - The squint test passes.
-- The change has no hex colors, no nested cards, and no app icons.
-- Public functions have types.
-- New input code uses handlers. It uses `MouseArea` only for a task that handlers cannot do.
+- The change has no nested cards.
+- Service functions that other files call have types.
 - You examined these conditions in the real render: empty state, long text, a group with many items, and a critical item.
