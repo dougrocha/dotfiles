@@ -229,6 +229,7 @@ Item {
         function show(): void {
             manager.resetSelection();
             Hyprland.refreshToplevels();
+            Hyprland.refreshMonitors();
             manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
             manager.restoreOverlayState();
             manager.overlayVisible = true;
@@ -240,6 +241,7 @@ Item {
             if (!manager.overlayVisible) {
                 manager.resetSelection();
                 Hyprland.refreshToplevels();
+                Hyprland.refreshMonitors();
                 manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
                 manager.restoreOverlayState();
             }
@@ -396,9 +398,22 @@ Item {
         return parts.length > 0 ? parts[parts.length - 1] : path;
     }
 
-    function isVisibleMappedToplevel(toplevel): bool {
-        const data = toplevel.lastIpcObject;
-        return data != null && data.mapped !== false && !data.hidden && toplevel.workspace != null && toplevel.workspace.active;
+    function visibleWorkspaceIds() {
+        return Hyprland.monitors.values.map(monitor => {
+            const data = monitor.lastIpcObject;
+            const specialId = data?.specialWorkspace?.id ?? 0;
+            return specialId !== 0 ? specialId : data?.activeWorkspace?.id ?? monitor.activeWorkspace?.id;
+        });
+    }
+
+    function visibleToplevels() {
+        const workspaceIds = visibleWorkspaceIds();
+        const mapped = Hyprland.toplevels.values.filter(toplevel => {
+            const data = toplevel.lastIpcObject;
+            return data != null && data.mapped !== false && !data.hidden && workspaceIds.includes(data.workspace?.id);
+        });
+        const fullscreenWorkspaceIds = mapped.filter(toplevel => toplevel.lastIpcObject.fullscreen !== 0).map(toplevel => toplevel.lastIpcObject.workspace.id);
+        return mapped.filter(toplevel => !fullscreenWorkspaceIds.includes(toplevel.lastIpcObject.workspace.id) || toplevel.lastIpcObject.fullscreen !== 0);
     }
 
     function toplevelGeometry(toplevel) {
@@ -413,7 +428,7 @@ Item {
     }
 
     function windowAt(px, py) {
-        const candidates = Hyprland.toplevels.values.filter(isVisibleMappedToplevel).sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999) - (b.lastIpcObject.focusHistoryID ?? 9999));
+        const candidates = visibleToplevels().sort((a, b) => (a.lastIpcObject.focusHistoryID ?? 9999) - (b.lastIpcObject.focusHistoryID ?? 9999));
 
         for (let i = 0; i < candidates.length; ++i) {
             const geometry = toplevelGeometry(candidates[i]);
