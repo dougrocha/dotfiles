@@ -22,7 +22,6 @@ Item {
     property string selectedMode: "region"
     property string pendingMode: ""
     property string pendingGeometry: ""
-    property bool pendingUsesUiCountdown: false
     property int countdown: 0
     property bool countdownActive: false
     property real selectionX: 0
@@ -312,7 +311,6 @@ Item {
         pendingGeometry = selectedMode === "region" ? selectionGeometry() : selectedMode === "windows" ? windowGeometry(selectedWindow) : "";
         optionsOpen = false;
         if (timerDelay > 0) {
-            pendingUsesUiCountdown = true;
             countdown = timerDelay;
             countdownActive = true;
             countdownTimer.restart();
@@ -332,8 +330,6 @@ Item {
             toggleRecordingProcess.running = true;
         } else {
             let args = ["screenshot"];
-            if (timerDelay > 0 && !pendingUsesUiCountdown)
-                args = args.concat(["--delay", timerDelay.toString()]);
             if (showCursor)
                 args.push("--cursor");
             if (!showNotification)
@@ -348,7 +344,6 @@ Item {
         }
         pendingMode = "";
         pendingGeometry = "";
-        pendingUsesUiCountdown = false;
     }
 
     function resetSelection() {
@@ -441,7 +436,6 @@ Item {
     function dismiss() {
         pendingMode = "";
         pendingGeometry = "";
-        pendingUsesUiCountdown = false;
         countdownTimer.stop();
         countdownActive = false;
         countdown = 0;
