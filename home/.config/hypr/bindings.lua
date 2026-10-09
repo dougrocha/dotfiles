@@ -1,8 +1,14 @@
 local mainMod = "SUPER"
 
-local function bind(keys, action, opts)
-    local key_str = mainMod .. " + " .. table.concat(keys, " + ")
+-- Universal, so these keep working inside any submap
+local function global_bind(key_str, action, opts)
+    opts = opts or {}
+    opts.submap_universal = true
     hl.bind(key_str, action, opts)
+end
+
+local function bind(keys, action, opts)
+    global_bind(mainMod .. " + " .. table.concat(keys, " + "), action, opts)
 end
 
 -- Programs
@@ -102,24 +108,24 @@ bind({ "D" }, hl.dsp.workspace.toggle_special("discord"))
 bind({ "SHIFT", "D" }, hl.dsp.window.move({ workspace = "special:discord" }))
 
 -- Volume
-hl.bind(
+global_bind(
     "XF86AudioRaiseVolume",
     hl.dsp.exec_cmd("volume-step up"),
     { locked = true, repeating = true }
 )
-hl.bind(
+global_bind(
     "XF86AudioLowerVolume",
     hl.dsp.exec_cmd("volume-step down"),
     { locked = true, repeating = true }
 )
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
+global_bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+global_bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 
 -- Media
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("quickshell ipc call music-control next"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("quickshell ipc call music-control previous"), { locked = true })
+global_bind("XF86AudioNext", hl.dsp.exec_cmd("quickshell ipc call music-control next"), { locked = true })
+global_bind("XF86AudioPause", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
+global_bind("XF86AudioPlay", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
+global_bind("XF86AudioPrev", hl.dsp.exec_cmd("quickshell ipc call music-control previous"), { locked = true })
 bind({ "XF86AudioPlay" }, hl.dsp.exec_cmd("launch-or-focus-tui switch-audio"))
 
 bind({ "CTRL", "Z" }, function()
