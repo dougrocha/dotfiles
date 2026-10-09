@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 
 Singleton {
@@ -10,6 +11,7 @@ Singleton {
 
     property string current: ""
     readonly property bool anyOpen: current !== ""
+    onAnyOpenChanged: Hyprland.dispatch(anyOpen ? 'hl.dsp.submap("qs-panel")' : 'hl.dsp.submap("reset")')
 
     property bool barPinned: false
 
@@ -74,6 +76,13 @@ Singleton {
 
     PanelIpc {
         target: "notification-center"
+    }
+
+    IpcHandler {
+        target: "panels"
+        function closeAll(): void {
+            root.closeAll();
+        }
     }
 
     IpcHandler {

@@ -136,3 +136,8 @@ end, { description = "Zoom in" })
 bind({ "CTRL", "ALT", "Z" }, function()
     hl.config({ cursor = { zoom_factor = 1 } })
 end, { description = "Reset zoom" })
+
+-- Quickshell enters this while a bar panel is open, so Escape can close it
+hl.define_submap("qs-panel", "reset", function()
+    hl.bind("ESCAPE", hl.dsp.exec_cmd("quickshell ipc call panels closeAll"))
+end)
