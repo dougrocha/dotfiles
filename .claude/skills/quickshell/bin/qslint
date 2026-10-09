@@ -42,7 +42,14 @@ for f in "${files[@]}"; do
     report "$f" "$n" "MouseArea; use TapHandler or HoverHandler unless a handler cannot do it (wheel)"
   done
 
+  grep -nE '^\s*scale:.*[^.0-9]0?\.[0-9]|^\s*scale:.*[^0-9.]0([^.0-9]|$)' "$f" | while IFS=: read -r n _; do
+    report "$f" "$n" "scale start; grow from Theme.motion.scaleFrom (0.95), never from a literal or 0"
+  done
+
   awk -v f="$f" '
+    size &&!/SpringAnimation/ { print f ":" size ": size animation; use SizeMotion on <property> {}" }
+    { size = 0 }
+    /Behavior on (height|implicitHeight|implicitWidth|Layout\.preferred(Height|Width)) *\{/ { size = NR }
     /^import / {
       rank = $2 ~ /^Qt/ ? 0 : $2 ~ /^Quickshell/ ? 1 : $2 ~ /^qs\./ ? 2 : -1
       if (rank >= 0 && rank < last) print f ":" NR ": import order is Qt, then Quickshell, then qs.*"
