@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Constants
@@ -49,18 +48,41 @@ Variants {
         implicitWidth: toastWindow.cardWidth + toastWindow.framePadding * 2 + Theme.space.lg * 2
         implicitHeight: toastWindow.cardHeight + toastWindow.framePadding * 2 + Theme.space.lg * 2
 
-        visible: toastWindow.shown
+        visible: toastWindow.shown || card.Drag.active
 
         mask: Region {
-            item: toastWindow.shown ? card : null
-        }
-
-        Process {
-            id: openProcess
+            item: toastWindow.visible ? card : null
         }
 
         Rectangle {
             id: card
+
+            property var dragPayload: null
+
+            Drag.dragType: Drag.Automatic
+            Drag.supportedActions: Qt.CopyAction
+            Drag.proposedAction: Qt.CopyAction
+            Drag.mimeData: dragPayload ? {
+                "text/uri-list": dragPayload.uris
+            } : ({})
+            Drag.imageSource: dragPayload ? dragPayload.preview : ""
+            Drag.imageSourceSize: Qt.size(toastWindow.cardWidth, toastWindow.cardHeight)
+            Drag.hotSpot: Qt.point(width / 2, height / 2)
+            Drag.onDragFinished: {
+                card.Drag.active = false;
+            }
+            Drag.onActiveChanged: {
+                if (!card.Drag.active && card.dragPayload !== null) {
+                    card.dragPayload = null;
+                    ScreenshotToastService.dragPaused = false;
+                }
+            }
+            Component.onDestruction: {
+                if (card.dragPayload !== null) {
+                    card.Drag.cancel();
+                    ScreenshotToastService.dragPaused = false;
+                }
+            }
 
             anchors.right: parent.right
             anchors.bottom: parent.bottom
@@ -106,7 +128,7 @@ Variants {
                 Image {
                     id: thumbProbe
                     visible: false
-                    source: ScreenshotToastService.path !== "" ? "file://" + ScreenshotToastService.path : ""
+                    source: ScreenshotToastService.path !== "" ? ScreenshotToastService.localFileUrl(ScreenshotToastService.path) : ""
                     asynchronous: true
                     cache: false
                 }
@@ -122,7 +144,7 @@ Variants {
                             required property string modelData
                             width: toastWindow.previewCount > 1 ? toastWindow.groupedPreviewWidth : parent.width
                             height: parent.height
-                            source: "file://" + modelData
+                            source: ScreenshotToastService.localFileUrl(modelData)
                             fillMode: Image.PreserveAspectFit
                             asynchronous: true
                             cache: false
@@ -136,12 +158,29 @@ Variants {
                 }
 
                 TapHandler {
+                    acceptedButtons: Qt.LeftButton
+                    gesturePolicy: TapHandler.DragThreshold
                     onTapped: {
                         if (ScreenshotToastService.paths.length === 0)
                             return;
-                        openProcess.command = ["imv"].concat(ScreenshotToastService.paths);
-                        openProcess.running = true;
+                        Quickshell.execDetached(["imv"].concat(ScreenshotToastService.paths));
                         ScreenshotToastService.dismiss();
+                    }
+                }
+
+                DragHandler {
+                    target: null
+                    acceptedButtons: Qt.LeftButton
+                    onActiveChanged: {
+                        if (!active || card.Drag.active || ScreenshotToastService.paths.length === 0)
+                            return;
+                        const urls = ScreenshotToastService.paths.map(path => ScreenshotToastService.localFileUrl(path));
+                        card.dragPayload = {
+                            uris: urls.join("\r\n") + "\r\n",
+                            preview: urls[0]
+                        };
+                        ScreenshotToastService.dragPaused = true;
+                        card.Drag.active = true;
                     }
                 }
             }
