@@ -60,8 +60,8 @@ Before you start, make sure that Do Not Disturb is off. When it is on, notificat
 Use `qsv notify`. It takes `notify-send` arguments and records each ID, so `qsv cleanup` closes the notifications. Run `qsv start <name>` first.
 
 ```sh
-qsv notify -a Vesktop "Riley" "yo are you on tonight? we're doing raids at 9"
-qsv notify -a Vesktop "Sam" "lunch?"
+qsv notify -a Discord "Riley" "yo are you on tonight? we're doing raids at 9"
+qsv notify -a Discord "Sam" "lunch?"
 qsv notify -a Chromium "GitHub" "Review requested on #412: refactor notification service"
 qsv notify -a Steam "Download complete" "Baldur's Gate 3 is ready to play"
 ```

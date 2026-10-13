@@ -5,6 +5,6 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm-app -- walker --gapplication-service")
     -- Electron only looks for a tray host at startup, so wait for qs's watcher; After= alone races qs's start job
     local wait_tray = "-p 'ExecStartPre=/usr/bin/gdbus wait --session --timeout 30 org.kde.StatusNotifierWatcher'"
-    hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- vesktop")
+    hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- discord")
     hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- cider")
 end)

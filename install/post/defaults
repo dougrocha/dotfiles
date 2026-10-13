@@ -115,7 +115,7 @@ set_default imv-dir.desktop \
     image/jxl
 
 # Application URL scheme handlers
-set_default vesktop.desktop x-scheme-handler/discord
+set_default discord.desktop x-scheme-handler/discord
 set_default cider.desktop \
     x-scheme-handler/cider \
     x-scheme-handler/itms \
