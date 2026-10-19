@@ -8,6 +8,7 @@ end
 
 fish_add_path -P "$HOME/.local/bin"
 fish_add_path -P "$HOME/.opencode/bin"
+fish_add_path -P "$HOME/.grok/bin"
 
 if status is-interactive
     set -g fish_greeting
