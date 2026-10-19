@@ -102,6 +102,8 @@ localsend-bin
 wl-clipboard
 ocrs
 zbar
+voxtype
+wtype
 
 playerctl
 xmlstarlet

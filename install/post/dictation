@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -euo pipefail
+
+command -v voxtype >/dev/null || exit 0
+
+voxtype setup gpu --enable
+voxtype setup --download --no-post-install
+voxtype setup systemd
+systemctl --user enable --now voxtype.service
+
+# vim: ft=sh

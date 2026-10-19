@@ -47,6 +47,7 @@
 .config/quickshell
 .config/user-dirs.dirs
 .config/uwsm
+.config/voxtype
 .config/walker
 
 # All of these drive the Hyprland desktop. ~/.local/bin stays a real directory

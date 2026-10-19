@@ -70,6 +70,7 @@ if is_linux; then
     try "$DOTFILES_DIR/install/post/setup-applications"
     try "$DOTFILES_DIR/install/post/defaults"
     try "$DOTFILES_DIR/install/post/fast-shutdown"
+    try "$DOTFILES_DIR/install/post/dictation"
 
     step "Services"
     for service in hyprpaper hyprpolkitagent hypridle hyprsunset; do
