@@ -3,7 +3,7 @@ hl.window_rule({
     name = "cider",
     match = { class = "cider" },
     workspace = "special:scratchpad silent",
-    -- Cider asks to be activated once it finishes loading
+    -- Cider asks to be activated while it loads
     focus_on_activate = false,
-    tag = "+skip-first-activation",
+    tag = "+quiet-launch",
 })

@@ -9,21 +9,25 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- cider")
 end)
 
-local function allow_activation_after_first(window)
-    local skips_first = false
+-- Windows that ask to be activated while they load, keyed by address once their quiet period starts
+local quiet_launches = {}
+
+local function allow_activation_after_launch(window)
+    local quiet = false
     for _, tag in ipairs(window.tags) do
-        if tag:find("^skip%-first%-activation") then
-            skips_first = true
+        if tag:find("^quiet%-launch") then
+            quiet = true
         end
     end
-    if not skips_first then
+    local address = window.address
+    if not quiet or quiet_launches[address] then
         return
     end
-    local address = window.address
-    -- Hyprland emits window.urgent before it checks focus_on_activate
+    quiet_launches[address] = true
+    -- Discord asks again about a second after its window opens, so ignore activations for a few seconds
     hl.timer(function()
         hl.dispatch(hl.dsp.window.set_prop({ prop = "focus_on_activate", value = "1", window = "address:" .. address }))
-    end, { timeout = 1, type = "oneshot" })
+    end, { timeout = 5000, type = "oneshot" })
 end
 
-hl.on("window.urgent", allow_activation_after_first)
+hl.on("window.urgent", allow_activation_after_launch)
