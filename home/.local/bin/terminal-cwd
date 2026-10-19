@@ -5,8 +5,6 @@ window=$(hyprctl activewindow -j)
 cwd=""
 if [[ $(jq -r '.class // empty' <<<"$window") == com.mitchellh.ghostty ]]; then
   cwd=$(jq -r '.title // empty' <<<"$window")
-  cwd=${cwd##* · }
-  [[ $cwd == "~"* ]] && cwd="$HOME${cwd:1}"
 fi
 
 if [[ -d $cwd ]]; then
