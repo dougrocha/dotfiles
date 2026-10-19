@@ -395,6 +395,8 @@ Item {
     }
 
     function captureQuick(px, py) {
+        if (quickCommand !== "" && !hasSelection)
+            return;
         const target = hasSelection ? null : windowAt(px, py) ?? Hyprland.monitors.values.find(m => px >= m.x && px < m.x + m.width && py >= m.y && py < m.y + m.height);
         if (!hasSelection && target == null)
             return;
@@ -827,7 +829,7 @@ Item {
                     const globalY = overlayWindow.monitorY + mouse.y;
                     if (!pressed) {
                         manager.pointerCursorShape = overlayWindow.cursorAt(globalX, globalY);
-                        if (manager.quickMode)
+                        if (manager.quickMode && manager.quickCommand === "")
                             manager.hoveredWindow = manager.windowAt(globalX, globalY);
                         return;
                     }
