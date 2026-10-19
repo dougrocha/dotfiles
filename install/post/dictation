@@ -7,6 +7,6 @@ command -v voxtype >/dev/null || exit 0
 [[ $(readlink /usr/bin/voxtype) == */voxtype-vulkan ]] || sudo voxtype setup gpu --enable
 voxtype setup --download --no-post-install
 voxtype setup systemd
-systemctl --user enable --now voxtype.service
+systemctl --user enable --now ydotool.service voxtype.service
 
 # vim: ft=sh

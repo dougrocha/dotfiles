@@ -18,6 +18,7 @@ translate = false
 mode = "type"
 fallback_to_clipboard = true
 type_delay_ms = 1
+driver_order = ["ydotool", "wtype", "clipboard"]
 
 [output.notification]
 on_recording_start = false
