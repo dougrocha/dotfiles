@@ -77,6 +77,11 @@ bind({ "CTRL", "Q" }, hl.dsp.exec_cmd("capture-qr"), { description = "QR code in
 bind({ "SHIFT", "R" }, hl.dsp.exec_cmd("save-replay"))
 bind({ "CTRL", "R" }, hl.dsp.exec_cmd("toggle-recording"))
 
+-- Dictation
+global_bind("F9", hl.dsp.exec_cmd("voxtype record start"), { description = "Push-to-talk dictation" })
+global_bind("F9", hl.dsp.exec_cmd("voxtype record stop"), { release = true })
+bind({ "CTRL", "X" }, hl.dsp.exec_cmd("voxtype record toggle"), { description = "Toggle dictation" })
+
 -- Quickshell panels
 bind({ "N" }, hl.dsp.exec_cmd("quickshell ipc call notification-center toggle"))
 bind({ "COMMA" }, hl.dsp.exec_cmd("quickshell ipc call settings-panel toggle"))
