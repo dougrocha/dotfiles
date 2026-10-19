@@ -27,12 +27,7 @@ The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell`
 
 Imports use the `qs.` prefix, for example `import qs.Components` and `import qs.Services`.
 
-A bar panel (settings, sound, Bluetooth, notification center) has four parts. The panel name is also its IPC target, for example `sound-panel`.
-
-1. A `PanelIpc { target: "<name>" }` line in `Visibilities.qml`. It gives the `open`, `hide`, and `toggle` IPC functions.
-2. A `Popup` file in `Modules/Popups/` with `panelName: "<name>"`. `Popup` sets `shown` and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
-3. An instance in `Modules/Bar/Bar.qml` in a `LazyLoader` with `active: modelData === Theme.primaryScreen`. Set `anchor.window: topBar`. `Popup` sets the position.
-4. A control that calls `Visibilities.toggle("<name>")` and reads `Visibilities.isOpen("<name>")`.
+A bar panel (settings, sound, Bluetooth, notification center) has four parts: a `PanelIpc` in `Visibilities.qml`, a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml`, and a bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. The panel name is also its IPC target. `Popup` sets its position and `shown`, and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
 
 `Visibilities.current` holds one name, so only one panel is open at a time. `Visibilities.close(name)` closes only that panel. Thus a late dismiss from an old panel does not close the new panel.
 
@@ -144,12 +139,13 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 
 ### 5.4 Controls and hover
 
-- Show secondary controls on an item (close, clear group) only on hover.
-- Animate their `opacity` with `Theme.motion.fast`. Set `enabled: opacity > 0`.
+`references/qml-patterns.md` has the code for each rule below.
+
+- Show secondary controls on an item (close, clear group) only on hover. Fade them with `Theme.motion.fast`, and set `enabled: opacity > 0`.
 - Keep primary actions and panel actions visible, for example "Clear all" in the notification center header.
-- Align the row text with the content edge. Let the hover fill extend past the edge by `bleed` (see `ListRow` and `HistoryRow` in `NotificationHistory.qml`).
-- If an ancestor has `clip: true`, add `bleed` on the left and on the right. Set `x: -bleed` and `width: parent.width + bleed * 2`. Move the content back with `x: bleed`. If not, the clip cuts the hover fill.
-- Put a badge on a rounded corner at the center of the curve. Move it in by `radius * (1 - Math.SQRT1_2)` from the corner of the bounding box (see `CloseBadge` in `NotificationCard.qml`).
+- Align the row text with the content edge. Let the hover fill extend past the edge with `bleed: panel.rowBleed`.
+- If an ancestor has `clip: true`, set `x: -bleed` and `width: parent.width + bleed * 2`, and move the content back with `x: bleed`. If not, the clip cuts the hover fill.
+- Put a badge on a rounded corner at the center of the curve, as `CloseBadge` in `NotificationCard.qml` does.
 
 ### 5.5 Motion
 
@@ -157,13 +153,16 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 - Use `Theme.motion.normal` with `easeStandard` to open, and `Theme.motion.fast` with `easeExit` to close.
 - Use motion to show a change of state only.
 - To animate the size of a container, use `SizeMotion on height {}` (or `width`, `implicitWidth`, `Layout.preferredHeight`). It grows with `motion.normal` and shrinks with `motion.fast`. Do not write a `NumberAnimation` for size. Do not animate the size of a window. Make the window large enough for the largest state, and set `mask` to the animated item.
-- Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference: a short move and a fade, not a large slide.
+- Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference: a short move and a fade, not a large slide. The code is in `references/qml-patterns.md`.
 - Value fills (slider, OSD level, progress) and the Island springs are not size changes. Keep their own animations.
 - A surface that scales in grows from `Theme.motion.scaleFrom` (0.95) to 1, together with its opacity. Never scale from 0 or from another literal. qslint checks it.
 
 ### 5.6 More design decisions
 
-For a decision that this file does not make, read `references/design-guidelines.md`. It maps each surface to Apple's Human Interface Guidelines (panels, menus, toasts, Island, polkit, controls) and gives the rules for UI text.
+For a decision that this file does not make:
+
+- Read `references/design-surfaces.md` for a surface: panels, menus, toasts, the Island, polkit, controls, and feedback. It maps each one to Apple's Human Interface Guidelines.
+- Read `references/design-style.md` for color, UI text, and restraint.
 
 ## 6. Checklist
 
