@@ -16,6 +16,7 @@ stylua = "latest"
 taplo = "latest"
 usage = "latest"
 herdr = "latest"
+"npm:cf" = "latest"
 
 [settings]
 auto_update = true
