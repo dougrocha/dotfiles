@@ -101,6 +101,7 @@ gpu-screen-recorder
 localsend-bin
 wl-clipboard
 ocrs
+zbar
 
 playerctl
 xmlstarlet

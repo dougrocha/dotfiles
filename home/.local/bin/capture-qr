@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Decode a QR code from a selected screen region and copy it to the clipboard.
+
+cleanup() {
+  [[ -n $PID ]] && kill $PID 2>/dev/null
+}
+trap cleanup EXIT
+
+hyprpicker -r -z >/dev/null 2>&1 &
+PID=$!
+sleep .1
+SELECTION=$(slurp 2>/dev/null)
+
+[[ -z $SELECTION ]] && exit 0
+
+# QR only: dense screen content can false-positive as other barcode types
+RESULT=$(grim -g "$SELECTION" - | zbarimg -q --raw -Sdisable -Sqrcode.enable - 2>/dev/null)
+
+if [[ -z $RESULT ]]; then
+  notify-send -u critical "QR" "No QR code found in selection"
+  exit 1
+fi
+
+# QR codes often carry secrets like otpauth:// URIs, so keep the value out of
+# the notification and mark it sensitive for clipboard history
+printf "%s" "$RESULT" | wl-copy --sensitive
+notify-send "QR" "Copied QR code contents to clipboard"
+
+# vim: ft=sh
