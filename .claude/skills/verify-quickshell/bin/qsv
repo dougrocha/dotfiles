@@ -69,7 +69,7 @@ cmd_doctor() {
 
 cmd_log() {
   qs log 2>&1 | tac | awk '{print} /Reloading configuration/{exit}' | tac |
-    grep -v -E 'Reloading configuration|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError' || true
+    grep -v -E 'Reloading configuration|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError|IslandService.qml\[245:5\]: Unable to assign \[undefined\] to bool' || true
 }
 
 cmd_key() {
