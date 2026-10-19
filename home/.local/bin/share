@@ -1,0 +1,26 @@
+#!/bin/bash
+
+MODE=${1:-$(printf '%s\n' clipboard file folder | walker --dmenu)}
+
+case $MODE in
+clipboard)
+  FILE=$(mktemp --suffix=.txt)
+  wl-paste >"$FILE"
+  FILES=("$FILE")
+  ;;
+file)
+  readarray -t FILES < <(zenity --file-selection --multiple --separator=$'\n' --title="Share Files")
+  ;;
+folder)
+  readarray -t FILES < <(zenity --file-selection --directory --title="Share Folder")
+  ;;
+*)
+  exit 0
+  ;;
+esac
+
+[[ -n ${FILES[0]} ]] || exit 0
+
+systemd-run --user --quiet --collect localsend --headless send "${FILES[@]}"
+
+# vim: ft=sh

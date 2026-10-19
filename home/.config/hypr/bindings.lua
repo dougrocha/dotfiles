@@ -88,6 +88,8 @@ bind({ "C" }, hl.dsp.send_shortcut({ mods = "CTRL", key = "Insert" }))
 bind({ "V" }, hl.dsp.send_shortcut({ mods = "SHIFT", key = "Insert" }))
 bind({ "X" }, hl.dsp.send_shortcut({ mods = "CTRL", key = "X" }))
 bind({ "CTRL", "V" }, hl.dsp.exec_cmd("walker -m clipboard"))
+bind({ "CTRL", "E" }, hl.dsp.exec_cmd("walker -m symbols"), { description = "Emoji picker" })
+bind({ "CTRL", "D" }, hl.dsp.exec_cmd("share"), { description = "Share with LocalSend" })
 
 -- Focus movement
 bind({ "h" }, hl.dsp.focus({ direction = "l" }))
