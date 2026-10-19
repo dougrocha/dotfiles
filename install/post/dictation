@@ -5,6 +5,7 @@ set -euo pipefail
 command -v voxtype >/dev/null || exit 0
 
 [[ $(readlink /usr/bin/voxtype) == */voxtype-vulkan ]] || sudo voxtype setup gpu --enable
+id -nG "$USER" | grep -qw input || sudo usermod -aG input "$USER"
 voxtype setup --download --no-post-install
 voxtype setup systemd
 systemctl --user enable --now ydotool.service voxtype.service
