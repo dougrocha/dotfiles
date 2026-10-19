@@ -1,18 +1,15 @@
 #!/bin/bash
 
-cleanup() {
-  [[ -n $PID ]] && kill $PID 2>/dev/null
-}
-trap cleanup EXIT
+if [[ $1 != --geometry ]]; then
+  exec quickshell ipc call screenshot-overlay toggleQuickWith capture-qr
+fi
 
-hyprpicker -r -z >/dev/null 2>&1 &
-PID=$!
-sleep .1
-SELECTION=$(slurp 2>/dev/null)
+for _ in {1..50}; do
+  hyprctl layers -j | jq -e '[.. | .namespace? | strings | select(startswith("qs.screenshot_overlay"))] | length == 0' >/dev/null && break
+  sleep 0.02
+done
 
-[[ -z $SELECTION ]] && exit 0
-
-RESULT=$(grim -g "$SELECTION" - | zbarimg -q --raw -Sdisable -Sqrcode.enable - 2>/dev/null)
+RESULT=$(grim -g "$2" - | zbarimg -q --raw -Sdisable -Sqrcode.enable - 2>/dev/null)
 
 if [[ -z $RESULT ]]; then
   notify-send -u critical "QR" "No QR code found in selection"

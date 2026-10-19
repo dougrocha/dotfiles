@@ -15,6 +15,7 @@ Item {
 
     property bool overlayVisible: false
     property bool quickMode: false
+    property string quickCommand: ""
     readonly property string visualMode: quickMode ? (hasSelection ? "region" : "windows") : selectedMode
     property string controlMonitor: ""
     readonly property string toolbarHostMonitor: Theme.primaryScreen?.name ?? ""
@@ -252,6 +253,9 @@ Item {
             manager.overlayVisible = true;
         }
         function toggleQuick(): void {
+            toggleQuickWith("");
+        }
+        function toggleQuickWith(command: string): void {
             if (manager.overlayVisible) {
                 manager.dismiss();
                 return;
@@ -260,6 +264,7 @@ Item {
             Hyprland.refreshToplevels();
             Hyprland.refreshMonitors();
             manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+            manager.quickCommand = command;
             manager.quickMode = true;
             manager.overlayVisible = true;
         }
@@ -317,8 +322,10 @@ Item {
         if (!overlayVisible && pendingMode !== "") {
             executeAction();
         }
-        if (!overlayVisible)
+        if (!overlayVisible) {
             quickMode = false;
+            quickCommand = "";
+        }
     }
 
     function capture() {
@@ -339,7 +346,9 @@ Item {
     }
 
     function executeAction() {
-        if (pendingMode === "video") {
+        if (quickCommand !== "") {
+            Quickshell.execDetached([quickCommand, "--geometry", pendingGeometry]);
+        } else if (pendingMode === "video") {
             let args = ["toggle-recording"];
             if (systemAudioEnabled)
                 args.push("--system-audio");
