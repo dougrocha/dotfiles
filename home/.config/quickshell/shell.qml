@@ -1,4 +1,5 @@
 import qs.Modules.Bar
+import qs.Modules.Dictation
 import qs.Modules.Island
 import qs.Modules.Notifications
 import qs.Modules.Polkit
@@ -25,6 +26,8 @@ ShellRoot {
     ScreenshotToast {}
 
     Island {}
+
+    DictationPill {}
 
     PolkitAgent {}
 
