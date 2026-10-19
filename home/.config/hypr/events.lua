@@ -8,3 +8,22 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- discord")
     hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- cider")
 end)
+
+local function allow_activation_after_first(window)
+    local skips_first = false
+    for _, tag in ipairs(window.tags) do
+        if tag:find("^skip%-first%-activation") then
+            skips_first = true
+        end
+    end
+    if not skips_first then
+        return
+    end
+    local address = window.address
+    -- Hyprland emits window.urgent before it checks focus_on_activate
+    hl.timer(function()
+        hl.dispatch(hl.dsp.window.set_prop({ prop = "focus_on_activate", value = "1", window = "address:" .. address }))
+    end, { timeout = 1, type = "oneshot" })
+end
+
+hl.on("window.urgent", allow_activation_after_first)
