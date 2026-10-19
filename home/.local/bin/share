@@ -9,10 +9,10 @@ clipboard)
   FILES=("$FILE")
   ;;
 file)
-  readarray -t FILES < <(zenity --file-selection --multiple --separator=$'\n' --title="Share Files")
+  readarray -t FILES < <(zenity --file-selection --multiple --separator=$'\n' --title="Select Files to Share")
   ;;
 folder)
-  readarray -t FILES < <(zenity --file-selection --directory --title="Share Folder")
+  readarray -t FILES < <(zenity --file-selection --directory --title="Select Folder to Share")
   ;;
 *)
   exit 0
