@@ -19,6 +19,5 @@ TEXT=$(ocrs "$TMPFILE" 2>/dev/null) || exit 1
 [[ -z $TEXT ]] && exit 1
 
 printf "%s" "$TEXT" | wl-copy
-notify-send "OCR" "Copied text from selection to clipboard"
 
 # vim: ft=sh
