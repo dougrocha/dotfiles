@@ -4,9 +4,35 @@ set -e
 
 ICON_DIR="$HOME/.local/share/icons/webapps"
 
+require_plain_name() {
+  if [[ -z $1 || $1 == */* ]]; then
+    echo -e "\e[31mThe name can't be empty or contain a /\e[0m" >&2
+    exit 1
+  fi
+}
+
+exec_arg() {
+  local value=$1
+  value=${value//\\/\\\\}
+  value=${value//\"/\\\"}
+  value=${value//\`/\\\`}
+  value=${value//\$/\\\$}
+  value=${value//%/%%}
+  printf '"%s"' "${value//\\/\\\\}"
+}
+
+window_class() {
+  local address=${1#*://}
+  address=${address%%[?#]*}
+  local host=${address%%/*}
+  local path=${address:${#host}}
+  printf 'chrome-%s_%s-Default' "${host,,}" "${path:-/}" | tr / _
+}
+
 if (( $# < 2 )); then
   echo -e "\e[32mLet's create a web app launcher.\n\e[0m"
   APP_NAME=$(gum input --prompt "Name> " --placeholder "My favorite web app")
+  require_plain_name "$APP_NAME"
   APP_URL=$(gum input --prompt "URL> " --placeholder "https://example.com")
 
   if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
@@ -29,6 +55,7 @@ if (( $# < 2 )); then
 else
   APP_NAME="$1"
   APP_URL="$2"
+  require_plain_name "$APP_NAME"
 
   if [[ ! $APP_URL =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
     APP_URL="https://$APP_URL"
@@ -58,7 +85,7 @@ mkdir -p "$HOME/.local/share/applications"
 # Create desktop file
 DESKTOP_FILE="$HOME/.local/share/applications/$APP_NAME.desktop"
 
-EXEC_CMD="launch-or-focus-webapp \"$APP_NAME\" \"$APP_URL\""
+EXEC_CMD="launch-or-focus-webapp $(exec_arg "$APP_NAME") $(exec_arg "$APP_URL")"
 
 cat >"$DESKTOP_FILE" <<EOF
 [Desktop Entry]
@@ -70,7 +97,7 @@ Exec=$EXEC_CMD
 Icon=$ICON_PATH
 Terminal=false
 StartupNotify=true
-StartupWMClass=$APP_NAME
+StartupWMClass=$(window_class "$APP_URL")
 EOF
 
 chmod +x "$DESKTOP_FILE"

@@ -11,6 +11,6 @@ fi
 APP_NAME="$1"
 APP_URL="$2"
 
-exec launch-or-focus "$APP_NAME" "launch-webapp $APP_URL"
+exec launch-or-focus "$APP_NAME" "launch-webapp $(printf %q "$APP_URL")"
 
 # vim: ft=sh
