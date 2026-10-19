@@ -2,12 +2,7 @@
 
 <One sentence: what this doc covers and when SKILL.md sends the agent here.>
 
-## Contents
-
-- [<Section one>](#<section-one>)
-- [<Section two>](#<section-two>)
-
-Keep this list when the doc is longer than 100 lines. Delete it, and this line, when the doc is shorter.
+Keep this doc at 100 lines or fewer. Split a longer doc into files by topic.
 
 ## <Section one>
 
@@ -15,6 +10,8 @@ Keep this list when the doc is longer than 100 lines. Delete it, and this line, 
 
 ## <Section two>
 
-| <Key> | <Value> |
-|---|---|
-| <...> | <...> |
+<When code says it more exactly than prose, copy a short example from a real file and name the file.>
+
+```<lang>
+<code from a real file>
+```

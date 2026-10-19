@@ -7,7 +7,7 @@ Templates and a checker for agent skills. Copy a template into `<repo>/.claude/s
 | Path | Use it for |
 |---|---|
 | `skill/` | A rules or procedure skill: `SKILL.md` and an optional `references/` directory. |
-| `skill/references/reference.md` | A reference doc. Keep the table of contents when the doc is longer than 100 lines. |
+| `skill/references/reference.md` | A reference doc, 100 lines or fewer. |
 | `principle/` | A short engineering principle that other skills load: the rule, when it applies, and how to check it. |
 | `verify/` | A verification skill that drives the real app: Launch, Doctor, Drive, Evidence, Cleanup. It has a feature map in `features/` and a helper CLI in `bin/`. |
 | `check-skills` | The checker for the rules below. |
@@ -22,7 +22,7 @@ templates/skills/check-skills [skill-dir-or-root ...]   # default: .claude/skill
 
 - `SKILL.md` has frontmatter. `name` is the directory name. `description` says what the skill does and when to use it.
 - `SKILL.md` is 200 lines or fewer. Move detail to `references/<topic>.md` and link it from `SKILL.md` with the condition to read it.
-- A doc other than `SKILL.md` that is longer than 100 lines starts with a `## Contents` list.
+- A doc other than `SKILL.md` is 100 lines or fewer. Split a longer doc into files by topic.
 - Each file in `references/` is linked or named from a doc in the skill.
 - Each file in `features/` is listed in `features/README.md`.
 - A helper script with a shebang is executable.
@@ -38,6 +38,8 @@ Write a script when an instruction is one of these:
 - A check with a yes or no answer, for example "no hex colors" or "one instance runs".
 - A list that the code already knows, for example IPC targets or routes. Read the list at run time.
 - Setup or teardown with more than two steps.
+
+Show a short code example, copied from a real file, when the agent must write a pattern exactly. Name the file that it comes from.
 
 Keep prose for judgment: design rules, the order of steps, and why a trap exists. When a script owns a fact, the skill names the script and does not repeat the fact.
 

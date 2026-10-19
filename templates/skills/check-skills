@@ -9,8 +9,6 @@ fails=0
 
 fail() { echo "FAIL  $1: $2"; fails=$((fails + 1)); }
 
-has_toc() { head -n 30 "$1" | grep -qiE '^#+ *(contents|table of contents)\b'; }
-
 check_links() {
   local md=$1 dir target
   dir=$(dirname "$md")
@@ -35,7 +33,7 @@ check_skill() {
 
   while IFS= read -r md; do
     lines=$(wc -l <"$md")
-    ((lines <= MAX_REF)) || has_toc "$md" || fail "$md" "$lines lines and no table of contents"
+    ((lines <= MAX_REF)) || fail "$md" "$lines lines, limit $MAX_REF; split it into smaller files"
   done < <(find "$skill" -name '*.md' -not -path "$file")
 
   while IFS= read -r ref; do
