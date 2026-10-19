@@ -11,10 +11,21 @@ local function bind(keys, action, opts)
     global_bind(mainMod .. " + " .. table.concat(keys, " + "), action, opts)
 end
 
+-- Every Ghostty window shares one process, which ignores a launch directory, so
+-- from a Ghostty window use its own new_window: it opens in that window's directory
+local function new_terminal()
+    local window = hl.get_active_window()
+    if window and window.class == "com.mitchellh.ghostty" then
+        hl.dispatch(hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "N" }))
+    else
+        hl.exec_cmd("uwsm-app -- xdg-terminal-exec")
+    end
+end
+
 -- Programs
-bind({ "RETURN" }, hl.dsp.exec_cmd("uwsm-app -- xdg-terminal-exec"))
+bind({ "RETURN" }, new_terminal)
 bind({ "W" }, hl.dsp.window.close())
-bind({ "E" }, hl.dsp.exec_cmd("uwsm-app -- nautilus --new-window"))
+bind({ "E" }, hl.dsp.exec_cmd("launch-nautilus-cwd"))
 bind({ "SPACE" }, hl.dsp.exec_cmd("launch-walker"))
 bind({ "B" }, hl.dsp.exec_cmd("uwsm-app -- $(xdg-settings get default-web-browser)"))
 bind({ "I" }, hl.dsp.exec_cmd("uwsm-app -- ghostty --class=org.arsene.kura-pick -e kura pick"))

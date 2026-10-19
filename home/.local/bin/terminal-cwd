@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Print the directory of the focused Ghostty window, or $HOME for any other window.
+# Reads it from the window title, which fish_title ends with the full directory.
+# Usage: terminal-cwd [window-address]
+
+if [[ -n $1 ]]; then
+  window=$(hyprctl clients -j | jq -c --arg address "$1" '.[] | select(.address == $address)')
+else
+  window=$(hyprctl activewindow -j)
+fi
+
+cwd=""
+if [[ $(jq -r '.class // empty' <<<"$window") == com.mitchellh.ghostty ]]; then
+  cwd=$(jq -r '.title // empty' <<<"$window")
+  cwd=${cwd##* · }
+  [[ $cwd == "~"* ]] && cwd="$HOME${cwd:1}"
+fi
+
+if [[ -d $cwd ]]; then
+  echo "$cwd"
+else
+  echo "$HOME"
+fi
+
+# vim: ft=sh
