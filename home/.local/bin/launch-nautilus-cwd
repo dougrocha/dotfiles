@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Open Files in the focused terminal's directory, or in $HOME from any other window.
-
 exec setsid uwsm-app -- nautilus --new-window "$(terminal-cwd)"
 
 # vim: ft=sh
