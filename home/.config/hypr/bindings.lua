@@ -25,10 +25,10 @@ end
 -- Programs
 bind({ "RETURN" }, new_terminal)
 bind({ "W" }, hl.dsp.window.close())
-bind({ "E" }, hl.dsp.exec_cmd("launch-nautilus-cwd"))
+bind({ "E" }, hl.dsp.exec_cmd("uwsm-app -- nautilus --new-window \"$(terminal-cwd)\""))
 bind({ "SPACE" }, hl.dsp.exec_cmd("launch-walker"))
 bind({ "B" }, hl.dsp.exec_cmd("uwsm-app -- $(xdg-settings get default-web-browser)"))
-bind({ "I" }, hl.dsp.exec_cmd("uwsm-app -- ghostty --class=org.arsene.kura-pick -e kura pick"))
+bind({ "I" }, hl.dsp.exec_cmd("launch-tui kura pick"))
 
 bind({ "S" }, hl.dsp.workspace.toggle_special("scratchpad"))
 bind({ "SHIFT", "S" }, hl.dsp.window.move({ workspace = "special:scratchpad" }))
@@ -70,8 +70,8 @@ bind({ "SHIFT", "P" }, hl.dsp.exec_cmd("screenshot fullscreen"))
 bind({ "CTRL", "S" }, hl.dsp.exec_cmd("screenshot-ui toggleQuick"))
 bind({ "CTRL", "SHIFT", "S" }, hl.dsp.exec_cmd("screenshot-ui"))
 bind({ "SHIFT", "C" }, hl.dsp.exec_cmd("hyprpicker -a"), { description = "Color picker" })
-bind({ "CTRL", "O" }, hl.dsp.exec_cmd("ocr"), { description = "OCR selection to clipboard" })
-bind({ "CTRL", "Q" }, hl.dsp.exec_cmd("capture-qr"), { description = "QR code in selection to clipboard" })
+bind({ "CTRL", "O" }, hl.dsp.exec_cmd("screenshot-ui toggleQuickWith ocr"), { description = "OCR selection to clipboard" })
+bind({ "CTRL", "Q" }, hl.dsp.exec_cmd("screenshot-ui toggleQuickWith capture-qr"), { description = "QR code in selection to clipboard" })
 
 -- Screen recording
 bind({ "SHIFT", "R" }, hl.dsp.exec_cmd("save-replay"))

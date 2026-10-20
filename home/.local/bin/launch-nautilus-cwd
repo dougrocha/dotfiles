@@ -1,5 +1,0 @@
-#!/bin/bash
-
-exec setsid uwsm-app -- nautilus --new-window "$(terminal-cwd)"
-
-# vim: ft=sh
