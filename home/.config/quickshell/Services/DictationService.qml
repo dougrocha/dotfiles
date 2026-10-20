@@ -21,13 +21,29 @@ Singleton {
     onRecordingChanged: if (!recording)
         level = 0
 
-    FileView {
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/voxtype/state"
-        watchChanges: true
-        printErrors: false
-        onFileChanged: reload()
-        onLoaded: root.state = text().trim()
-        onLoadFailed: root.state = "idle"
+    Process {
+        id: statusFollow
+
+        running: true
+        command: ["voxtype", "status", "--follow", "--format", "json"]
+        stdout: SplitParser {
+            onRead: data => {
+                try {
+                    root.state = JSON.parse(data).class ?? "idle";
+                } catch (error) {}
+            }
+        }
+        onExited: {
+            root.state = "idle";
+            reconnect.start();
+        }
+    }
+
+    Timer {
+        id: reconnect
+
+        interval: 5000
+        onTriggered: statusFollow.running = true
     }
 
     Process {
