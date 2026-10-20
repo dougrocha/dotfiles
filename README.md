@@ -1,9 +1,9 @@
 # Dotfiles
 
-- **`home/`** - Dotfiles
-- **`default/`** - System-level configurations
-- **`install/`** - Installation scripts
-- **`install/links`** - Stow
+- `home/`: Dotfiles
+- `default/`: System-level configurations
+- `install/`: Installation scripts
+- `install/links`: Stow
 
 ## Setup
 
@@ -23,7 +23,7 @@ cd dotfiles
 ./link --help     # all options
 ```
 
-This is cause stow is too basic, and other tools are too complicated to use and installed.
+This is cause stow is too basic, and other tools are too complicated to use and install.
 
 I don't want to be locked in and Odin is awesome.
 
