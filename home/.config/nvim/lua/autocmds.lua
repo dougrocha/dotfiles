@@ -54,8 +54,7 @@ vim.api.nvim_create_autocmd('FileType', {
     group = augroup 'custom_settings',
     callback = function()
         -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
-        -- If don't do this on `FileType`, this keeps reappearing due to being set in
-        -- filetype plugins.
+        -- Set this on `FileType` because filetype plugins set these options again.
         vim.cmd 'setlocal formatoptions-=c formatoptions-=o'
     end,
     desc = [[Ensure proper 'formatoptions']],

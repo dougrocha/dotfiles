@@ -36,40 +36,21 @@ local function on_attach(client, bufnr)
         vim.diagnostic.open_float { scope = 'line' }
     end, 'View Diagnostic')
 
-    keymap('[d', function()
-        vim.diagnostic.jump {
-            count = -1,
-            on_jump = function()
-                vim.diagnostic.open_float { scope = 'cursor', focus = false }
-            end,
-        }
-    end, 'Previous diagnostic')
-    keymap(']d', function()
-        vim.diagnostic.jump {
-            count = 1,
-            on_jump = function()
-                vim.diagnostic.open_float { scope = 'cursor', focus = false }
-            end,
-        }
-    end, 'Next diagnostic')
-    keymap('[e', function()
-        vim.diagnostic.jump {
-            count = -1,
-            severity = vim.diagnostic.severity.ERROR,
-            on_jump = function()
-                vim.diagnostic.open_float { scope = 'cursor', focus = false }
-            end,
-        }
-    end, 'Previous error')
-    keymap(']e', function()
-        vim.diagnostic.jump {
-            count = 1,
-            severity = vim.diagnostic.severity.ERROR,
-            on_jump = function()
-                vim.diagnostic.open_float { scope = 'cursor', focus = false }
-            end,
-        }
-    end, 'Next error')
+    local function jump(count, severity)
+        return function()
+            vim.diagnostic.jump {
+                count = count,
+                severity = severity,
+                on_jump = function()
+                    vim.diagnostic.open_float { scope = 'cursor', focus = false }
+                end,
+            }
+        end
+    end
+    keymap('[d', jump(-1), 'Previous diagnostic')
+    keymap(']d', jump(1), 'Next diagnostic')
+    keymap('[e', jump(-1, vim.diagnostic.severity.ERROR), 'Previous error')
+    keymap(']e', jump(1, vim.diagnostic.severity.ERROR), 'Next error')
 
     if client:supports_method 'textDocument/documentColor' then
         keymap('grc', function()

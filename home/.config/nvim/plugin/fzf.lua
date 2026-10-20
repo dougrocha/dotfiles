@@ -3,7 +3,6 @@ local add = require('pack').add
 add {
     {
         'ibhagwan/fzf-lua',
-        module_name = 'fzf-lua',
         opts = function()
             local icons = require 'icons'
             local actions = require('fzf-lua').actions

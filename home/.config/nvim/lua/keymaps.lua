@@ -1,10 +1,9 @@
 local map = vim.keymap.set
 
--- Better line movement
+-- Move by display line, and record counted moves in the jumplist
 map({ 'n', 'x' }, 'j', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'j']], { expr = true })
 map({ 'n', 'x' }, 'k', [[(v:count > 1 ? 'm`' . v:count : 'g') . 'k']], { expr = true })
 
--- paste text without copying what under it
 map('x', 'p', 'P', { desc = 'Paste over selection without yanking' })
 
 -- Replicate <Esc>
@@ -25,7 +24,7 @@ map('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up' })
 map('n', 'n', 'nzzzv', { desc = 'Move to next search match', silent = true, noremap = true })
 map('n', 'N', 'Nzzzv', { desc = 'Move to previous search match', silent = true, noremap = true })
 
--- Better indenting
+-- Keep the selection after indenting
 map('x', '<', '<gv')
 map('x', '>', '>gv')
 

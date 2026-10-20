@@ -24,7 +24,6 @@ local no_ts_indent = { shaderslang = true }
 add {
     {
         'nvim-treesitter/nvim-treesitter',
-        module_name = 'nvim-treesitter',
         setup = false,
         on_update = function() vim.cmd 'TSUpdate' end,
         on_setup = function()

@@ -32,7 +32,7 @@ add {
     },
 }
 
--- mini.clue — which-key style hints
+-- mini.clue, which-key style hints
 add {
     {
         'nvim-mini/mini.nvim',
@@ -88,7 +88,7 @@ add {
                     { mode = 'n', keys = '<C-w>' },
                     { mode = 'i', keys = '<C-x>' },
                     { mode = 'n', keys = 'z' },
-                    -- Moving between stuff.
+                    -- Bracket motions.
                     { mode = 'n', keys = '[' },
                     { mode = 'n', keys = ']' },
                 },
@@ -119,7 +119,7 @@ add {
     },
 }
 
--- mini.files — file explorer
+-- mini.files, file explorer
 local map_split = function(buf_id, lhs, direction)
     local rhs = function()
         local cur_target = MiniFiles.get_explorer_state().target_window
@@ -137,7 +137,7 @@ local map_split = function(buf_id, lhs, direction)
         MiniFiles.go_in { close_on_file = true }
     end
 
-    -- Adding `desc` will result into `show_help` entries
+    -- A `desc` adds the mapping to the `show_help` entries
     local desc = 'Split ' .. direction
     vim.keymap.set('n', lhs, rhs, { buffer = buf_id, desc = desc })
 end
@@ -235,7 +235,7 @@ add {
     },
 }
 
--- mini.ai — better text objects
+-- mini.ai, text objects
 add {
     { 'nvim-treesitter/nvim-treesitter-textobjects', setup = false },
 }

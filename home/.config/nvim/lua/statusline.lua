@@ -1,48 +1,47 @@
 local M = {}
 
-function M.mode_component()
-    local mode_to_str = {
-        ['n'] = 'NORMAL',
-        ['no'] = 'OP-PENDING',
-        ['nov'] = 'OP-PENDING',
-        ['noV'] = 'OP-PENDING',
-        ['no\22'] = 'OP-PENDING',
-        ['niI'] = 'NORMAL',
-        ['niR'] = 'NORMAL',
-        ['niV'] = 'NORMAL',
-        ['nt'] = 'NORMAL',
-        ['ntT'] = 'NORMAL',
-        ['v'] = 'VISUAL',
-        ['vs'] = 'VISUAL',
-        ['V'] = 'VISUAL',
-        ['Vs'] = 'VISUAL',
-        ['\22'] = 'VISUAL',
-        ['\22s'] = 'VISUAL',
-        ['s'] = 'SELECT',
-        ['S'] = 'SELECT',
-        ['\19'] = 'SELECT',
-        ['i'] = 'INSERT',
-        ['ic'] = 'INSERT',
-        ['ix'] = 'INSERT',
-        ['R'] = 'REPLACE',
-        ['Rc'] = 'REPLACE',
-        ['Rx'] = 'REPLACE',
-        ['Rv'] = 'VIRT REPLACE',
-        ['Rvc'] = 'VIRT REPLACE',
-        ['Rvx'] = 'VIRT REPLACE',
-        ['c'] = 'COMMAND',
-        ['cv'] = 'VIM EX',
-        ['ce'] = 'EX',
-        ['r'] = 'PROMPT',
-        ['rm'] = 'MORE',
-        ['r?'] = 'CONFIRM',
-        ['!'] = 'SHELL',
-        ['t'] = 'TERMINAL',
-    }
+local mode_to_str = {
+    ['n'] = 'NORMAL',
+    ['no'] = 'OP-PENDING',
+    ['nov'] = 'OP-PENDING',
+    ['noV'] = 'OP-PENDING',
+    ['no\22'] = 'OP-PENDING',
+    ['niI'] = 'NORMAL',
+    ['niR'] = 'NORMAL',
+    ['niV'] = 'NORMAL',
+    ['nt'] = 'NORMAL',
+    ['ntT'] = 'NORMAL',
+    ['v'] = 'VISUAL',
+    ['vs'] = 'VISUAL',
+    ['V'] = 'VISUAL',
+    ['Vs'] = 'VISUAL',
+    ['\22'] = 'VISUAL',
+    ['\22s'] = 'VISUAL',
+    ['s'] = 'SELECT',
+    ['S'] = 'SELECT',
+    ['\19'] = 'SELECT',
+    ['i'] = 'INSERT',
+    ['ic'] = 'INSERT',
+    ['ix'] = 'INSERT',
+    ['R'] = 'REPLACE',
+    ['Rc'] = 'REPLACE',
+    ['Rx'] = 'REPLACE',
+    ['Rv'] = 'VIRT REPLACE',
+    ['Rvc'] = 'VIRT REPLACE',
+    ['Rvx'] = 'VIRT REPLACE',
+    ['c'] = 'COMMAND',
+    ['cv'] = 'VIM EX',
+    ['ce'] = 'EX',
+    ['r'] = 'PROMPT',
+    ['rm'] = 'MORE',
+    ['r?'] = 'CONFIRM',
+    ['!'] = 'SHELL',
+    ['t'] = 'TERMINAL',
+}
 
+function M.mode_component()
     local mode = mode_to_str[vim.api.nvim_get_mode().mode] or 'UNKNOWN'
 
-    -- Set the highlight group.
     local hl = 'Other'
     if mode:find 'NORMAL' then
         hl = 'Normal'
@@ -56,7 +55,6 @@ function M.mode_component()
         hl = 'Command'
     end
 
-    -- Construct the bubble-like component.
     return table.concat {
         string.format('%%#StatuslineModeSeparator%s#', hl),
         string.format('%%#StatuslineMode%s#%s', hl, mode),
