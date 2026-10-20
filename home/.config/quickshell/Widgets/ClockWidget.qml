@@ -1,19 +1,15 @@
 import QtQuick
+import Quickshell
 
 Text {
     id: clockWidget
 
     property string format: "h:mmAP"
-    property int updateInterval: 1000
 
-    property var now: new Date()
+    text: Qt.formatDateTime(clock.date, clockWidget.format)
 
-    text: Qt.formatDateTime(clockWidget.now, clockWidget.format)
-
-    Timer {
-        interval: clockWidget.updateInterval
-        running: true
-        repeat: true
-        onTriggered: clockWidget.now = new Date()
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
     }
 }

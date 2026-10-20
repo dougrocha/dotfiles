@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 
 Singleton {
     id: root
@@ -11,18 +12,27 @@ Singleton {
 
     property var paths: []
     readonly property string path: paths.length > 0 ? paths[0] : ""
-    property double shownAt: 0
+    property double remaining: duration
+    property double resumedAt: 0
     property bool hoverPaused: false
     property bool dragPaused: false
     readonly property bool paused: hoverPaused || dragPaused
-    property double pausedAt: 0
 
     onPausedChanged: {
         if (paused) {
-            pausedAt = Date.now();
+            if (dismissTimer.running) {
+                dismissTimer.stop();
+                root.remaining -= Date.now() - root.resumedAt;
+            }
         } else if (root.paths.length > 0) {
-            root.shownAt += Date.now() - pausedAt;
+            root.startCountdown();
         }
+    }
+
+    function startCountdown() {
+        root.resumedAt = Date.now();
+        dismissTimer.interval = Math.max(0, root.remaining);
+        dismissTimer.restart();
     }
 
     function localFileUrl(filePath: string): string {
@@ -38,22 +48,32 @@ Singleton {
         if (sanitized.length === 0)
             return;
         root.paths = sanitized;
-        root.shownAt = Date.now();
-        root.pausedAt = root.paused ? root.shownAt : 0;
+        root.remaining = root.duration;
+        if (!root.paused)
+            root.startCountdown();
     }
 
     function dismiss(): void {
+        dismissTimer.stop();
         root.paths = [];
         root.hoverPaused = false;
     }
 
     Timer {
-        interval: 100
-        repeat: true
-        running: root.paths.length > 0 && !root.paused
-        onTriggered: {
-            if (Date.now() - root.shownAt > root.duration)
-                root.dismiss();
+        id: dismissTimer
+
+        onTriggered: root.dismiss()
+    }
+
+    IpcHandler {
+        target: "screenshot-toast"
+
+        function notify(path: string): void {
+            root.show(path);
+        }
+
+        function notifyBatch(encodedPaths: string): void {
+            root.showBatch(encodedPaths.split("|").map(path => decodeURIComponent(path)));
         }
     }
 }

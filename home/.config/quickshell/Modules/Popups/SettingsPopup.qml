@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.Components
 import qs.Constants
@@ -80,81 +79,6 @@ Popup {
         }
     }
 
-    component PowerRow: Rectangle {
-        id: powerRow
-
-        property string iconText: ""
-        property string label: ""
-        property bool danger: false
-
-        signal tapped
-
-        readonly property bool highlighted: powerHover.hovered || activeFocus
-
-        activeFocusOnTab: true
-        width: parent.width
-        height: 30
-        radius: Theme.radius.sm
-        color: "transparent"
-
-        Rectangle {
-            z: -1
-            anchors.fill: parent
-            anchors.leftMargin: -panel.rowBleed
-            anchors.rightMargin: -panel.rowBleed
-            radius: parent.radius
-            color: powerRow.highlighted ? (powerRow.danger ? Theme.withAlpha(Theme.danger, 0.10) : Theme.fill.hover) : Theme.withAlpha(Theme.fill.hover, 0)
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
-        }
-
-        Text {
-            id: powerIcon
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            text: powerRow.iconText
-            color: powerRow.highlighted ? (powerRow.danger ? Theme.danger : Theme.accent) : Theme.text.secondary
-            font.pixelSize: Theme.icon.sm
-            font.family: Theme.font.icon
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
-        }
-
-        Text {
-            anchors.left: powerIcon.right
-            anchors.leftMargin: 10
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: powerRow.label
-            color: Theme.text.primary
-            font.pixelSize: Theme.type.body.size
-            font.family: Theme.font.ui
-            elide: Text.ElideRight
-        }
-
-        HoverHandler {
-            id: powerHover
-            cursorShape: Qt.PointingHandCursor
-        }
-        TapHandler {
-            onTapped: powerRow.tapped()
-        }
-        Keys.onPressed: function (event) {
-            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                powerRow.tapped();
-                event.accepted = true;
-            }
-        }
-    }
-
     Column {
         width: parent.width
         spacing: Theme.space.sm
@@ -166,7 +90,7 @@ Popup {
             glyph: PhosphorIcons.lockSimple
             label: "Idle lock"
             active: IdleService.active
-            onToggled: IdleService.toggle(true)
+            onToggled: IdleService.toggle()
         }
 
         ToggleRow {
@@ -258,53 +182,37 @@ Popup {
                 height: Theme.space.sm
             }
 
-            PowerRow {
-                iconText: PhosphorIcons.lockSimple
+            PopupActionButton {
+                glyph: PhosphorIcons.lockSimple
                 label: "Lock"
+                bleed: panel.rowBleed
                 onTapped: {
-                    lockProcess.running = true;
+                    Quickshell.execDetached(["loginctl", "lock-session"]);
                     panel.close();
                 }
             }
 
-            PowerRow {
-                iconText: PhosphorIcons.signOut
+            PopupActionButton {
+                glyph: PhosphorIcons.signOut
                 label: "Log out"
-                onTapped: logoutProcess.running = true
+                bleed: panel.rowBleed
+                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""])
             }
 
-            PowerRow {
-                iconText: PhosphorIcons.arrowCounterClockwise
+            PopupActionButton {
+                glyph: PhosphorIcons.arrowCounterClockwise
                 label: "Restart"
-                onTapped: rebootProcess.running = true
+                bleed: panel.rowBleed
+                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""])
             }
 
-            PowerRow {
-                iconText: PhosphorIcons.power
+            PopupActionButton {
+                glyph: PhosphorIcons.power
                 label: "Shut down"
                 danger: true
-                onTapped: shutdownProcess.running = true
+                bleed: panel.rowBleed
+                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""])
             }
         }
-    }
-
-    Process {
-        id: lockProcess
-        command: ["loginctl", "lock-session"]
-    }
-
-    Process {
-        id: shutdownProcess
-        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""]
-    }
-
-    Process {
-        id: rebootProcess
-        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""]
-    }
-
-    Process {
-        id: logoutProcess
-        command: ["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""]
     }
 }

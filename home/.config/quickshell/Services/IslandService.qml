@@ -140,7 +140,6 @@ Singleton {
     readonly property bool musicAvailable: track.title !== ""
     readonly property string trackTitle: track.title
     readonly property string trackArtist: track.artist
-    readonly property string albumName: track.album
     readonly property string trackArtUrl: track.artUrl
 
     onLiveTrackChanged: Qt.callLater(stageTrack)
@@ -245,13 +244,13 @@ Singleton {
     readonly property bool scratchpadOpen: root.isInWorkspace("special:scratchpad")
     property string lastTrackKey: ""
 
-    function isInWorkspace(nameOrId) {
+    function isInWorkspace(name) {
         return Hyprland.monitors.values.some(monitor => {
             const state = monitor.lastIpcObject;
             return [state?.activeWorkspace, state?.specialWorkspace].some(workspace => {
                 if (!workspace || workspace.id === 0)
                     return false;
-                return typeof nameOrId === "number" ? workspace.id === nameOrId : workspace.name === nameOrId;
+                return workspace.name === name;
             });
         });
     }

@@ -1,7 +1,6 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.Pipewire
 
 Singleton {
@@ -52,17 +51,10 @@ Singleton {
     readonly property list<string> screenAccessApps: screenState.apps
 
     function stopRecording() {
-        toggleRecordingProcess.running = true;
+        Quickshell.execDetached(["toggle-recording"]);
     }
 
     PwObjectTracker {
         objects: Pipewire.nodes.values
-    }
-
-    Process {
-        id: toggleRecordingProcess
-
-        command: ["toggle-recording"]
-        running: false
     }
 }

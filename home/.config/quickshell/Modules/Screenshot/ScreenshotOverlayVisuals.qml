@@ -110,21 +110,14 @@ Item {
         }
 
         Repeater {
-            model: root.manager.hasSelection ? [
-                { x: regionVisuals.sx, y: regionVisuals.sy },
-                { x: regionVisuals.sx + regionVisuals.sw / 2, y: regionVisuals.sy },
-                { x: regionVisuals.sx + regionVisuals.sw, y: regionVisuals.sy },
-                { x: regionVisuals.sx, y: regionVisuals.sy + regionVisuals.sh / 2 },
-                { x: regionVisuals.sx + regionVisuals.sw, y: regionVisuals.sy + regionVisuals.sh / 2 },
-                { x: regionVisuals.sx, y: regionVisuals.sy + regionVisuals.sh },
-                { x: regionVisuals.sx + regionVisuals.sw / 2, y: regionVisuals.sy + regionVisuals.sh },
-                { x: regionVisuals.sx + regionVisuals.sw, y: regionVisuals.sy + regionVisuals.sh }
-            ] : []
+            model: root.manager.hasSelection ? 8 : 0
 
             delegate: Rectangle {
-                required property var modelData
-                x: modelData.x - width / 2
-                y: modelData.y - height / 2
+                required property int index
+                readonly property real fx: [0, 0.5, 1, 0, 1, 0, 0.5, 1][index]
+                readonly property real fy: [0, 0, 0, 0.5, 0.5, 1, 1, 1][index]
+                x: regionVisuals.sx + regionVisuals.sw * fx - width / 2
+                y: regionVisuals.sy + regionVisuals.sh * fy - height / 2
                 width: 8
                 height: 8
                 radius: Theme.radius.xs

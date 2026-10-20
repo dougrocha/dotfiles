@@ -52,30 +52,12 @@ Item {
                 font.weight: Theme.type.title.weight
             }
 
-            Text {
+            TextLink {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 visible: root.hasHistory
                 text: "Clear all"
-                color: clearAllHover.hovered ? Theme.text.primary : Theme.text.secondary
-                font.family: Theme.font.ui
-                font.pixelSize: Theme.type.label.size
-                font.weight: Theme.type.label.weight
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
-
-                HoverHandler {
-                    id: clearAllHover
-                    cursorShape: Qt.PointingHandCursor
-                }
-
-                TapHandler {
-                    onTapped: NotificationService.clearHistory()
-                }
+                onTapped: NotificationService.clearHistory()
             }
         }
 

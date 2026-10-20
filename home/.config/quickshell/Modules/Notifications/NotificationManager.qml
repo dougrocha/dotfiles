@@ -11,7 +11,7 @@ import qs.Services
 
 Variants {
     id: root
-    model: Quickshell.screens
+    model: Theme.primaryScreens
 
     delegate: PanelWindow {
         id: notificationPanel
@@ -33,7 +33,7 @@ Variants {
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: modelData === Theme.primaryScreen && localNotifications.length > 0 && !Visibilities.isOpen("notification-center")
+        visible: localNotifications.length > 0 && !Visibilities.isOpen("notification-center")
 
         anchors {
             top: true

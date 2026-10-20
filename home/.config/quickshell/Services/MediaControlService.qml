@@ -38,14 +38,6 @@ Singleton {
             player.previous();
     }
 
-    function pause() {
-        MprisService.musicPlayer?.pause();
-    }
-
-    function play() {
-        MprisService.musicPlayer?.play();
-    }
-
     function playpause() {
         MprisService.musicPlayer?.togglePlaying();
     }

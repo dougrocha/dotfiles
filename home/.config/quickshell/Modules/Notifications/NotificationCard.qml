@@ -18,18 +18,6 @@ Item {
 
     height: surface.height
 
-    function relativeTime(timestamp) {
-        const mins = Math.floor((Date.now() - timestamp) / 60000);
-        if (mins < 1)
-            return "now";
-        if (mins < 60)
-            return mins + "m";
-        const hours = Math.floor(mins / 60);
-        if (hours < 24)
-            return hours + "h";
-        return Math.floor(hours / 24) + "d";
-    }
-
     function defaultAction() {
         for (let i = 0; i < (card.modelData?.actions?.length ?? 0); i++) {
             const a = card.modelData.actions[i];
@@ -49,13 +37,8 @@ Item {
         return /^\s*settings\s*$/i.test(a.text);
     }
 
-    function menuActions() {
-        return (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && card.isSettingsAction(a));
-    }
-
-    function buttonActions() {
-        return (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "" && !card.isSettingsAction(a));
-    }
+    readonly property var menuActions: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && card.isSettingsAction(a))
+    readonly property var buttonActions: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "" && !card.isSettingsAction(a))
 
     component ActionButton: Rectangle {
         required property var modelData
@@ -166,14 +149,14 @@ Item {
 
                     Text {
                         Layout.leftMargin: Theme.space.xs
-                        text: card.relativeTime(card.modelData?.timestamp ?? Date.now())
+                        text: NotificationService.relativeTime(card.modelData?.timestamp ?? Date.now())
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
                     }
 
                     Text {
-                        visible: card.menuActions().length > 0
+                        visible: card.menuActions.length > 0
                         activeFocusOnTab: visible
                         text: PhosphorIcons.caretDown
                         font.family: Theme.font.icon
@@ -213,7 +196,7 @@ Item {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: card.menuExpanded && card.menuActions().length > 0 ? popover.height + 6 : 0
+                    Layout.preferredHeight: card.menuExpanded && card.menuActions.length > 0 ? popover.height + 6 : 0
 
                     SizeMotion on Layout.preferredHeight {}
                 }
@@ -236,10 +219,10 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: Theme.space.sm
-                visible: card.buttonActions().length > 0
+                visible: card.buttonActions.length > 0
 
                 Repeater {
-                    model: card.buttonActions()
+                    model: card.buttonActions
                     delegate: ActionButton {}
                 }
             }
@@ -248,7 +231,7 @@ Item {
         Rectangle {
             id: popover
 
-            visible: card.menuExpanded && card.menuActions().length > 0
+            visible: card.menuExpanded && card.menuActions.length > 0
             opacity: visible ? 1 : 0
             z: 10
 
@@ -282,7 +265,7 @@ Item {
                 spacing: Theme.space.xxs
 
                 Repeater {
-                    model: card.menuActions()
+                    model: card.menuActions
                     delegate: Rectangle {
                         id: menuItem
                         required property var modelData

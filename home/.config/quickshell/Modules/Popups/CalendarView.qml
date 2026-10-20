@@ -19,7 +19,6 @@ Item {
     property int slideDirection: 0
 
     readonly property int weekStart: SettingsService.weekStart
-    readonly property int rowCount: cells.length / 7
 
     readonly property int dayCellWidth: width > 0 ? Math.floor(width / 7) : 40
     readonly property int dayCellHeight: 34

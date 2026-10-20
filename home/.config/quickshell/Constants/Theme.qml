@@ -100,7 +100,6 @@ Singleton {
     function readableOn(bg, preferred) {
         return _contrast(bg, Qt.color(preferred)) >= 4.5 ? Qt.color(preferred) : foregroundFor(bg);
     }
-    readonly property bool lightMode: _lum(root.palette.bg) > _lum(root.palette.text)
     function foregroundFor(bg) {
         return _contrast(bg, Qt.color("#0c1512")) >= _contrast(bg, Qt.color("#ffffff")) ? Qt.color("#0c1512") : Qt.color("#ffffff");
     }

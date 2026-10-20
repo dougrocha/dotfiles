@@ -16,6 +16,7 @@ Item {
     property bool overlayVisible: false
     property bool quickMode: false
     property string quickCommand: ""
+    readonly property bool regionOnly: quickCommand !== ""
     readonly property string visualMode: quickMode ? (hasSelection ? "region" : "windows") : selectedMode
     property string controlMonitor: ""
     readonly property string toolbarHostMonitor: Theme.primaryScreen?.name ?? ""
@@ -124,6 +125,12 @@ Item {
             SettingsService.screenshot.timerDelay = delay;
     }
 
+    function toggleSetting(name) {
+        manager[name] = !manager[name];
+        if (SettingsService.loaded)
+            SettingsService.screenshot[name] = manager[name];
+    }
+
     function monitorEntry(name) {
         const entry = SettingsService.screenshot.monitors[name];
         return entry != null && typeof entry === "object" ? entry : null;
@@ -230,10 +237,7 @@ Item {
         target: "screenshot-overlay"
 
         function show(): void {
-            manager.resetSelection();
-            Hyprland.refreshToplevels();
-            Hyprland.refreshMonitors();
-            manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+            manager.prepareOverlay();
             manager.restoreOverlayState();
             manager.overlayVisible = true;
         }
@@ -245,12 +249,7 @@ Item {
                 manager.dismiss();
                 return;
             }
-            manager.resetSelection();
-            Hyprland.refreshToplevels();
-            Hyprland.refreshMonitors();
-            manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
-            manager.restoreOverlayState();
-            manager.overlayVisible = true;
+            show();
         }
         function toggleQuick(): void {
             toggleQuickWith("");
@@ -260,34 +259,13 @@ Item {
                 manager.dismiss();
                 return;
             }
-            manager.resetSelection();
-            Hyprland.refreshToplevels();
-            Hyprland.refreshMonitors();
-            manager.controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+            manager.prepareOverlay();
             manager.quickCommand = command;
             manager.quickMode = true;
             manager.overlayVisible = true;
         }
     }
 
-    IpcHandler {
-        target: "screenshot-toast"
-
-        function notify(path: string): void {
-            ScreenshotToastService.show(path);
-        }
-
-        function notifyBatch(encodedPaths: string): void {
-            ScreenshotToastService.showBatch(encodedPaths.split("|").map(path => decodeURIComponent(path)));
-        }
-    }
-
-    Process {
-        id: screenshotProcess
-    }
-    Process {
-        id: toggleRecordingProcess
-    }
     Process {
         id: saveLocationProcess
         command: ["zenity", "--file-selection", "--directory", "--title=Save Screenshot To"]
@@ -316,16 +294,13 @@ Item {
     }
 
     onOverlayVisibleChanged: {
-        if (!overlayVisible) {
-            readoutVisible = false;
-        }
-        if (!overlayVisible && pendingMode !== "") {
+        if (overlayVisible)
+            return;
+        readoutVisible = false;
+        if (pendingMode !== "")
             executeAction();
-        }
-        if (!overlayVisible) {
-            quickMode = false;
-            quickCommand = "";
-        }
+        quickMode = false;
+        quickCommand = "";
     }
 
     function capture() {
@@ -346,7 +321,7 @@ Item {
     }
 
     function executeAction() {
-        if (quickCommand !== "") {
+        if (pendingMode === "command") {
             Quickshell.execDetached([quickCommand, "--geometry", pendingGeometry]);
         } else if (pendingMode === "video") {
             let args = ["toggle-recording"];
@@ -354,8 +329,7 @@ Item {
                 args.push("--system-audio");
             if (micEnabled)
                 args.push("--mic");
-            toggleRecordingProcess.command = args;
-            toggleRecordingProcess.running = true;
+            Quickshell.execDetached(args);
         } else {
             let args = ["screenshot"];
             if (showCursor)
@@ -367,8 +341,7 @@ Item {
             if (pendingGeometry !== "")
                 args = args.concat(["--geometry", pendingGeometry]);
             args.push(pendingMode);
-            screenshotProcess.command = args;
-            screenshotProcess.running = true;
+            Quickshell.execDetached(args);
         }
         pendingMode = "";
         pendingGeometry = "";
@@ -386,8 +359,20 @@ Item {
         readoutMonitor = "";
     }
 
+    function prepareOverlay() {
+        resetSelection();
+        Hyprland.refreshToplevels();
+        Hyprland.refreshMonitors();
+        controlMonitor = Hyprland.focusedMonitor?.name ?? "";
+    }
+
     function selectionGeometry() {
-        return Math.round(selectionX) + "," + Math.round(selectionY) + " " + Math.round(selectionWidth) + "x" + Math.round(selectionHeight);
+        return rectGeometry({
+            x: selectionX,
+            y: selectionY,
+            width: selectionWidth,
+            height: selectionHeight
+        });
     }
 
     function rectGeometry(rect) {
@@ -395,12 +380,12 @@ Item {
     }
 
     function captureQuick(px, py) {
-        if (quickCommand !== "" && !hasSelection)
+        if (regionOnly && !hasSelection)
             return;
         const target = hasSelection ? null : windowAt(px, py) ?? Hyprland.monitors.values.find(m => px >= m.x && px < m.x + m.width && py >= m.y && py < m.y + m.height);
         if (!hasSelection && target == null)
             return;
-        pendingMode = "region";
+        pendingMode = regionOnly ? "command" : "region";
         pendingGeometry = hasSelection ? selectionGeometry() : rectGeometry(target);
         overlayVisible = false;
     }
@@ -829,7 +814,7 @@ Item {
                     const globalY = overlayWindow.monitorY + mouse.y;
                     if (!pressed) {
                         manager.pointerCursorShape = overlayWindow.cursorAt(globalX, globalY);
-                        if (manager.quickMode && manager.quickCommand === "")
+                        if (manager.quickMode && !manager.regionOnly)
                             manager.hoveredWindow = manager.windowAt(globalX, globalY);
                         return;
                     }
@@ -937,93 +922,28 @@ Item {
                     }
                     spacing: 0
 
-                    Text {
+                    ScreenshotOptionHeader {
                         text: "Save to"
-                        color: Theme.text.secondary
-                        font.pixelSize: Theme.type.caption.size
-                        font.family: Theme.font.ui
-                        Layout.topMargin: 7
-                        Layout.leftMargin: 6
-                        Layout.bottomMargin: 3
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
+                    ScreenshotOptionRow {
                         implicitHeight: 28
-                        radius: Theme.radius.sm
-                        color: defaultSaveArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.sm
-                                font.family: Theme.font.icon
-                                opacity: manager.saveDirectory === "" ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Pictures/Screenshots"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: defaultSaveArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: manager.selectSaveDirectory(manager.defaultSaveDirectory)
-                        }
+                        glyphSize: Theme.icon.sm
+                        label: "Pictures/Screenshots"
+                        checked: manager.saveDirectory === ""
+                        onTapped: manager.selectSaveDirectory(manager.defaultSaveDirectory)
                     }
 
                     Repeater {
                         model: manager.recentSaveLocations
 
-                        delegate: Rectangle {
+                        delegate: ScreenshotOptionRow {
                             required property string modelData
-                            Layout.fillWidth: true
                             implicitHeight: 28
-                            radius: Theme.radius.sm
-                            color: recentSaveArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 6
-                                anchors.rightMargin: 6
-
-                                Text {
-                                    Layout.preferredWidth: 16
-                                    text: PhosphorIcons.check
-                                    color: Theme.accent
-                                    font.pixelSize: Theme.icon.sm
-                                    font.family: Theme.font.icon
-                                    opacity: manager.saveDirectory === modelData ? 1 : 0
-                                }
-                                Text {
-                                    Layout.fillWidth: true
-                                    text: manager.locationLabel(modelData)
-                                    color: Theme.text.primary
-                                    font.pixelSize: Theme.type.body.size
-                                    font.family: Theme.font.ui
-                                    elide: Text.ElideMiddle
-                                }
-                            }
-
-                            HoverHandler {
-                                id: recentSaveArea
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                            TapHandler {
-                                onTapped: manager.selectSaveDirectory(modelData)
-                            }
+                            glyphSize: Theme.icon.sm
+                            label: manager.locationLabel(modelData)
+                            checked: manager.saveDirectory === modelData
+                            onTapped: manager.selectSaveDirectory(modelData)
                         }
                     }
 
@@ -1065,14 +985,8 @@ Item {
                         Layout.bottomMargin: 1
                     }
 
-                    Text {
+                    ScreenshotOptionHeader {
                         text: "Timer"
-                        color: Theme.text.secondary
-                        font.pixelSize: Theme.type.caption.size
-                        font.family: Theme.font.ui
-                        Layout.topMargin: 7
-                        Layout.leftMargin: 6
-                        Layout.bottomMargin: 3
                     }
 
                     RowLayout {
@@ -1133,191 +1047,36 @@ Item {
                         Layout.bottomMargin: 1
                     }
 
-                    Text {
+                    ScreenshotOptionHeader {
                         text: "Options"
-                        color: Theme.text.secondary
-                        font.pixelSize: Theme.type.caption.size
-                        font.family: Theme.font.ui
-                        Layout.topMargin: 7
-                        Layout.leftMargin: 6
-                        Layout.bottomMargin: 3
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: notificationOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+                    ScreenshotOptionRow {
+                        label: "Show Notification"
+                        checked: manager.showNotification
+                        onTapped: manager.toggleSetting("showNotification")
+                    }
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.md
-                                font.family: Theme.font.icon
-                                opacity: manager.showNotification ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Show Notification"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: notificationOptArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: {
-                                manager.showNotification = !manager.showNotification;
-                                if (SettingsService.loaded)
-                                    SettingsService.screenshot.showNotification = manager.showNotification;
-                            }
+                    ScreenshotOptionRow {
+                        label: "Remember Last Selection"
+                        checked: manager.rememberLastSelection
+                        onTapped: {
+                            manager.toggleSetting("rememberLastSelection");
+                            if (SettingsService.loaded && !manager.rememberLastSelection)
+                                manager.clearAllSavedRegions();
                         }
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: rememberSelectionArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.md
-                                font.family: Theme.font.icon
-                                opacity: manager.rememberLastSelection ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Remember Last Selection"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: rememberSelectionArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: {
-                                manager.rememberLastSelection = !manager.rememberLastSelection;
-                                if (SettingsService.loaded) {
-                                    SettingsService.screenshot.rememberLastSelection = manager.rememberLastSelection;
-                                    if (!manager.rememberLastSelection)
-                                        manager.clearAllSavedRegions();
-                                }
-                            }
-                        }
+                    ScreenshotOptionRow {
+                        label: "System Audio"
+                        checked: manager.systemAudioEnabled
+                        onTapped: manager.toggleSetting("systemAudioEnabled")
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: systemAudioOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.motion.fast
-                            }
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.md
-                                font.family: Theme.font.icon
-                                opacity: manager.systemAudioEnabled ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "System Audio"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: systemAudioOptArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: {
-                                manager.systemAudioEnabled = !manager.systemAudioEnabled;
-                                if (SettingsService.loaded)
-                                    SettingsService.screenshot.systemAudioEnabled = manager.systemAudioEnabled;
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: micOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.motion.fast
-                            }
-                        }
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.md
-                                font.family: Theme.font.icon
-                                opacity: manager.micEnabled ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Microphone"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: micOptArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: {
-                                manager.micEnabled = !manager.micEnabled;
-                                if (SettingsService.loaded)
-                                    SettingsService.screenshot.micEnabled = manager.micEnabled;
-                            }
-                        }
+                    ScreenshotOptionRow {
+                        label: "Microphone"
+                        checked: manager.micEnabled
+                        onTapped: manager.toggleSetting("micEnabled")
                     }
 
                     Rectangle {
@@ -1328,55 +1087,14 @@ Item {
                         Layout.bottomMargin: 1
                     }
 
-                    Text {
+                    ScreenshotOptionHeader {
                         text: "Capture"
-                        color: Theme.text.secondary
-                        font.pixelSize: Theme.type.caption.size
-                        font.family: Theme.font.ui
-                        Layout.topMargin: 7
-                        Layout.leftMargin: 6
-                        Layout.bottomMargin: 3
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 30
-                        radius: Theme.radius.sm
-                        color: cursorOptArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 6
-                            anchors.rightMargin: 6
-
-                            Text {
-                                Layout.preferredWidth: 16
-                                text: PhosphorIcons.check
-                                color: Theme.accent
-                                font.pixelSize: Theme.icon.md
-                                font.family: Theme.font.icon
-                                opacity: manager.showCursor ? 1 : 0
-                            }
-                            Text {
-                                Layout.fillWidth: true
-                                text: "Show Cursor"
-                                color: Theme.text.primary
-                                font.pixelSize: Theme.type.body.size
-                                font.family: Theme.font.ui
-                            }
-                        }
-
-                        HoverHandler {
-                            id: cursorOptArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: {
-                                manager.showCursor = !manager.showCursor;
-                                if (SettingsService.loaded)
-                                    SettingsService.screenshot.showCursor = manager.showCursor;
-                            }
-                        }
+                    ScreenshotOptionRow {
+                        label: "Show Cursor"
+                        checked: manager.showCursor
+                        onTapped: manager.toggleSetting("showCursor")
                     }
 
                     Item {

@@ -23,18 +23,6 @@ Column {
         expandedApps = next;
     }
 
-    function relativeTime(timestamp) {
-        const mins = Math.floor((Date.now() - timestamp) / 60000);
-        if (mins < 1)
-            return "now";
-        if (mins < 60)
-            return mins + "m";
-        const hours = Math.floor(mins / 60);
-        if (hours < 24)
-            return hours + "h";
-        return Math.floor(hours / 24) + "d";
-    }
-
     readonly property var groups: {
         const map = new Map();
         for (const n of NotificationService.history) {
@@ -48,32 +36,6 @@ Column {
             map.get(key).items.push(n);
         }
         return [...map.values()];
-    }
-
-    component TextLink: Text {
-        id: link
-
-        signal tapped
-
-        color: linkHover.hovered ? Theme.text.primary : Theme.text.secondary
-        font.family: Theme.font.ui
-        font.pixelSize: Theme.type.label.size
-        font.weight: Theme.type.label.weight
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
-            }
-        }
-
-        HoverHandler {
-            id: linkHover
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        TapHandler {
-            onTapped: link.tapped()
-        }
     }
 
     component HistoryRow: Item {
@@ -154,7 +116,7 @@ Column {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         opacity: rowHover.hovered ? 0 : 1
-                        text: root.relativeTime(row.modelData.timestamp ?? Date.now())
+                        text: NotificationService.relativeTime(row.modelData.timestamp ?? Date.now())
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size

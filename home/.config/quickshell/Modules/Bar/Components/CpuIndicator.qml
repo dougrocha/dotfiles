@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -12,11 +11,6 @@ IconButton {
     tooltipText: "CPU: " + CpuService.usage + "%"
     onTapped: {
         Visibilities.closeAll();
-        proc.running = true;
-    }
-
-    Process {
-        id: proc
-        command: ["launch-or-focus-tui", "btop"]
+        Quickshell.execDetached(["launch-or-focus-tui", "btop"]);
     }
 }

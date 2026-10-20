@@ -53,33 +53,11 @@ Singleton {
     readonly property real sourceVolume: source && source.audio ? (source.audio.volume ?? 0) : 0
 
     function setVolume(newVolume) {
-        if (sink?.ready && sink?.audio) {
-            sink.audio.muted = false;
-            sink.audio.volume = Math.max(0, Math.min(1, newVolume));
-        }
-    }
-
-    function incrementVolume(amount) {
-        setVolume(volume + (amount || 0.05));
-    }
-
-    function decrementVolume(amount) {
-        setVolume(volume - (amount || 0.05));
+        setStreamVolume(sink, newVolume, 1);
     }
 
     function setSourceVolumeValue(newVolume) {
-        if (source?.ready && source?.audio) {
-            source.audio.muted = false;
-            source.audio.volume = Math.max(0, Math.min(1, newVolume));
-        }
-    }
-
-    function incrementSourceVolume(amount) {
-        setSourceVolumeValue(sourceVolume + (amount || 0.05));
-    }
-
-    function decrementSourceVolume(amount) {
-        setSourceVolumeValue(sourceVolume - (amount || 0.05));
+        setStreamVolume(source, newVolume, 1);
     }
 
     function toggleSourceMute() {
@@ -107,10 +85,10 @@ Singleton {
         Pipewire.preferredDefaultAudioSource = newSource;
     }
 
-    function setStreamVolume(stream, newVolume) {
+    function setStreamVolume(stream, newVolume, max = 1.5) {
         if (stream?.ready && stream?.audio) {
             stream.audio.muted = false;
-            stream.audio.volume = Math.max(0, Math.min(1.5, newVolume));
+            stream.audio.volume = Math.max(0, Math.min(max, newVolume));
         }
     }
 

@@ -18,6 +18,7 @@ PanelWindow {
     readonly property int bottomMargin: 56
     property string monitorName: ""
     property var levels: Array(barCount).fill(0)
+    property int head: 0
     property real wavePhase: 0
 
     screen: Quickshell.screens.find(s => s.name === window.monitorName) ?? Theme.primaryScreen
@@ -44,6 +45,7 @@ PanelWindow {
             if (DictationService.recording) {
                 window.monitorName = Hyprland.focusedMonitor?.name ?? "";
                 window.levels = Array(window.barCount).fill(0);
+                window.head = 0;
             }
         }
     }
@@ -51,21 +53,21 @@ PanelWindow {
     Timer {
         interval: 40
         repeat: true
-        running: DictationService.recording
-        onTriggered: window.levels = window.levels.slice(1).concat([DictationService.level])
-    }
-
-    Timer {
-        interval: 40
-        repeat: true
-        running: DictationService.transcribing
-        onTriggered: window.wavePhase += 0.35
+        running: DictationService.active
+        onTriggered: {
+            if (DictationService.recording) {
+                window.levels[window.head] = DictationService.level;
+                window.head = (window.head + 1) % window.barCount;
+            } else {
+                window.wavePhase += 0.35;
+            }
+        }
     }
 
     function barLevel(index) {
         if (DictationService.transcribing)
             return 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(wavePhase - index * 0.7));
-        return levels[index] ?? 0;
+        return levels[(head + index) % barCount] ?? 0;
     }
 
     Rectangle {
@@ -79,16 +81,9 @@ PanelWindow {
         border.width: 1
         border.color: Theme.stroke.strong
         opacity: DictationService.active ? 1 : 0
-        scale: DictationService.active ? 1 : Theme.motion.scaleFrom
+        scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * opacity
 
         Behavior on opacity {
-            NumberAnimation {
-                duration: DictationService.active ? Theme.motion.normal : Theme.motion.fast
-                easing.type: DictationService.active ? Theme.motion.easeStandard : Theme.motion.easeExit
-            }
-        }
-
-        Behavior on scale {
             NumberAnimation {
                 duration: DictationService.active ? Theme.motion.normal : Theme.motion.fast
                 easing.type: DictationService.active ? Theme.motion.easeStandard : Theme.motion.easeExit

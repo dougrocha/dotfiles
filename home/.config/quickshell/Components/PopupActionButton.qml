@@ -7,6 +7,7 @@ Rectangle {
     property string label: ""
     property string glyph: PhosphorIcons.terminal
     property int bleed: 0
+    property bool danger: false
 
     signal tapped
 
@@ -24,7 +25,7 @@ Rectangle {
         anchors.leftMargin: -root.bleed
         anchors.rightMargin: -root.bleed
         radius: parent.radius
-        color: root.highlighted ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        color: root.highlighted ? (root.danger ? Theme.withAlpha(Theme.danger, 0.10) : Theme.fill.hover) : Theme.withAlpha(Theme.fill.hover, 0)
 
         Behavior on color {
             ColorAnimation {
@@ -38,7 +39,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         text: root.glyph
-        color: root.highlighted ? Theme.accent : Theme.text.secondary
+        color: root.highlighted ? (root.danger ? Theme.danger : Theme.accent) : Theme.text.secondary
         font.pixelSize: Theme.icon.sm
         font.family: Theme.font.icon
 

@@ -81,6 +81,18 @@ Singleton {
         return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
     }
 
+    function relativeTime(timestamp: real): string {
+        const mins = Math.floor((Date.now() - timestamp) / 60000);
+        if (mins < 1)
+            return "now";
+        if (mins < 60)
+            return mins + "m";
+        const hours = Math.floor(mins / 60);
+        if (hours < 24)
+            return hours + "h";
+        return Math.floor(hours / 24) + "d";
+    }
+
     function shortUrl(url: string): string {
         const match = url.match(/^[a-z]+:\/\/(?:www\.)?([^\/?#]+)([^?#]*)/i);
         if (!match)
@@ -386,7 +398,7 @@ Singleton {
     Timer {
         interval: 100
         repeat: true
-        running: notifications.length > 0
+        running: !root.hoverPaused && notifications.some(n => n.duration !== -1)
         onTriggered: {
             const now = Date.now();
 

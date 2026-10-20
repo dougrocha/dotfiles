@@ -71,13 +71,7 @@ Variants {
             height: parent.height
             y: overlay.revealed ? 0 : -(pill.y + pill.height)
 
-            Behavior on y {
-                SpringAnimation {
-                    spring: Theme.motion.springStiffness
-                    damping: Theme.motion.springDamping
-                    epsilon: Theme.motion.springEpsilon
-                }
-            }
+            SpringMotion on y {}
 
             Rectangle {
                 id: pill
@@ -94,13 +88,7 @@ Variants {
 
                 property real cornerRadius: full ? Theme.radius.xxl : notif ? Theme.radius.xl : recDetails ? Theme.radius.lg : compactHeight / 2
 
-                Behavior on cornerRadius {
-                    SpringAnimation {
-                        spring: Theme.motion.springStiffness
-                        damping: Theme.motion.springDamping
-                        epsilon: Theme.motion.springEpsilon
-                    }
-                }
+                SpringMotion on cornerRadius {}
 
                 onActivityChanged: recDetails = false
 
@@ -131,20 +119,8 @@ Variants {
                     }
                 }
 
-                Behavior on width {
-                    SpringAnimation {
-                        spring: Theme.motion.springStiffness
-                        damping: Theme.motion.springDamping
-                        epsilon: Theme.motion.springEpsilon
-                    }
-                }
-                Behavior on height {
-                    SpringAnimation {
-                        spring: Theme.motion.springStiffness
-                        damping: Theme.motion.springDamping
-                        epsilon: Theme.motion.springEpsilon
-                    }
-                }
+                SpringMotion on width {}
+                SpringMotion on height {}
 
                 ClippingRectangle {
                     anchors.fill: parent
@@ -820,12 +796,8 @@ Variants {
 
                 ContentFade on opacity {}
 
-                Behavior on scale {
-                    SpringAnimation {
-                        spring: Theme.motion.springStiffness
-                        damping: Theme.motion.springDamping
-                        epsilon: 0.005
-                    }
+                SpringMotion on scale {
+                    epsilon: 0.005
                 }
 
                 ClippingRectangle {

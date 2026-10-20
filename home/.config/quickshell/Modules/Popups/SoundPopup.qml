@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -139,13 +138,8 @@ Popup {
             bleed: panel.rowBleed
             onTapped: {
                 panel.close();
-                soundSettingsProc.running = true;
+                Quickshell.execDetached(["launch-or-focus-tui", "wiremix"]);
             }
         }
-    }
-
-    Process {
-        id: soundSettingsProc
-        command: ["launch-or-focus-tui", "wiremix"]
     }
 }

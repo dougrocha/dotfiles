@@ -12,8 +12,7 @@ Singleton {
         statusProcess.running = true;
     }
 
-    function toggle(silent) {
-        toggleProcess.command = silent ? ["toggle-idle", "--silent"] : ["toggle-idle"];
+    function toggle(): void {
         toggleProcess.running = true;
     }
 
@@ -31,7 +30,7 @@ Singleton {
     Process {
         id: toggleProcess
 
-        command: ["toggle-idle"]
+        command: ["toggle-idle", "--silent"]
         onExited: (exitCode, exitStatus) => {
             statusProcess.running = true;
         }
