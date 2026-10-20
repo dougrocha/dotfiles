@@ -6,8 +6,8 @@ import { join } from "node:path";
 /**
  * Recreates the per-project Bash/WebFetch allowlist habit from Claude Code's
  * `.claude/settings.local.json` (permissions.allow). Pi has no built-in
- * per-tool permission system by design (see docs/security.md - "No
- * permission popups": build your own confirmation flow). This extension
+ * per-tool permission system by design (see docs/security.md, "No
+ * permission popups", which says to build your own confirmation flow). This extension
  * restores that workflow: commands matching a project-local allowlist run
  * silently; everything else prompts once per distinct command.
  *
@@ -71,7 +71,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
     if (!isToolCallEventType("bash", event)) return;
     if (!ctx.isProjectTrusted()) return; // don't gate untrusted-project runs differently than pi already does
-    if (patterns.length === 0) return; // no allowlist configured -> don't change behavior
+    if (patterns.length === 0) return; // no allowlist configured, so don't change behavior
 
     const command = event.input.command;
     if (patterns.some((re) => re.test(command))) return; // allowlisted, run silently

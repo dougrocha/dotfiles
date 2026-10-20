@@ -1,4 +1,4 @@
-# Global Pi Agent Instructions
+# Global Pi agent instructions
 
 ## Style
 
@@ -16,7 +16,7 @@
 - Prefer clear names and straightforward control flow.
 - Avoid adding dependencies unless there is a strong reason.
 
-## Shell / System Work
+## Shell and system work
 
 - Do not run destructive commands unless explicitly asked.
 - Explain risky or system-level changes before making them. This includes package managers, services, and user configuration.

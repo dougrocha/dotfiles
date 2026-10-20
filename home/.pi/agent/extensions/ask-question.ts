@@ -39,7 +39,7 @@ interface AskQuestionDetails {
   questions: Question[];
   // Keyed by question text, like Claude Code's `answers`.
   answers: Record<string, string>;
-  // Question text -> note the user attached to that question.
+  // Notes the user attached, keyed by question text.
   notes: Record<string, string>;
   cancelled: boolean;
 }

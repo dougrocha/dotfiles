@@ -1,11 +1,11 @@
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
 
 /**
  * Recreates the trust-boundary policy from Claude Code's Auto Mode config
  * (~/.claude/settings.json -> autoMode.environment) as a Pi extension, since
  * Pi has no built-in per-tool permission system ("no permission popups" by
- * design) - see docs/security.md. This confirms before destructive git/shell
+ * design), see docs/security.md. This confirms before destructive git/shell
  * operations instead of silently blocking them.
  *
  * Edit PROTECTED_BRANCHES / SENSITIVE_PATTERN / SENSITIVE_FILES below to match
@@ -36,30 +36,22 @@ function isDangerousBash(command: string): string | null {
   return null;
 }
 
+async function confirmOrBlock(ctx: ExtensionContext, reason: string, message: string) {
+  const block = { block: true, reason: `Blocked by guardrail: ${reason}` };
+  if (!ctx.hasUI) return block;
+  return (await ctx.ui.confirm("Guardrail", message)) ? undefined : block;
+}
+
 export default function (pi: ExtensionAPI) {
   pi.on("tool_call", async (event, ctx) => {
     if (isToolCallEventType("bash", event)) {
       const reason = isDangerousBash(event.input.command);
-      if (reason) {
-        if (!ctx.hasUI) return { block: true, reason: `Blocked by guardrail: ${reason}` };
-        const ok = await ctx.ui.confirm(
-          "Guardrail",
-          `This command looks like: ${reason}.\n\n${event.input.command}\n\nRun it anyway?`,
-        );
-        if (!ok) return { block: true, reason: `Blocked by guardrail: ${reason}` };
-      }
+      if (reason) return confirmOrBlock(ctx, reason, `This command looks like: ${reason}.\n\n${event.input.command}\n\nRun it anyway?`);
     }
 
     if (isToolCallEventType("write", event) || isToolCallEventType("edit", event)) {
       const path = (event.input as { path?: string }).path ?? "";
-      if (SENSITIVE_FILES.some((re) => re.test(path))) {
-        if (!ctx.hasUI) return { block: true, reason: "Blocked by guardrail: sensitive file path" };
-        const ok = await ctx.ui.confirm(
-          "Guardrail",
-          `About to write a sensitive-looking file: ${path}\n\nProceed?`,
-        );
-        if (!ok) return { block: true, reason: "Blocked by guardrail: sensitive file path" };
-      }
+      if (SENSITIVE_FILES.some((re) => re.test(path))) return confirmOrBlock(ctx, "sensitive file path", `About to write a sensitive-looking file: ${path}\n\nProceed?`);
     }
   });
 }
