@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Print the window class Chromium gives a web app launched with --app=URL.
+# Chromium canonicalizes the URL first, so this only matches for ASCII hosts and
+# paths that need no percent-encoding.
+
+if (($# < 1)); then
+  echo "Usage: webapp-class [url]"
+  exit 1
+fi
+
+address=${1#*://}
+address=${address%%[?#]*}
+host=${address%%/*}
+path=${address:${#host}}
+# Chromium names the window after the bare host, without credentials or port
+host=${host##*@}
+[[ $host =~ ^(.*):[0-9]+$ ]] && host=${BASH_REMATCH[1]}
+printf 'chrome-%s_%s-Default\n' "${host,,}" "${path:-/}" | tr / _
+
+# vim: ft=sh

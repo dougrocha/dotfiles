@@ -1,16 +1,13 @@
 #!/bin/bash
 
-# Launch or focus a web app identified by its name
-# Usage: launch-or-focus-webapp [app-name] [url]
+# Launch or focus a web app identified by its URL
+# Usage: launch-or-focus-webapp [url]
 
-if (($# < 2)); then
-  echo "Usage: launch-or-focus-webapp [app-name] [url]"
+if (($# != 1)); then
+  echo "Usage: launch-or-focus-webapp [url] (rerun install-webapp for launchers that also pass a name)" >&2
   exit 1
 fi
 
-APP_NAME="$1"
-APP_URL="$2"
-
-exec launch-or-focus "$APP_NAME" "launch-webapp $(printf %q "$APP_URL")"
+exec launch-or-focus "$(webapp-class "$1")" launch-webapp "$1"
 
 # vim: ft=sh
