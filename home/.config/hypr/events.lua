@@ -9,25 +9,42 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("uwsm-app -t service " .. wait_tray .. " -- cider")
 end)
 
--- Windows that ask to be activated while they load, keyed by address once their quiet period starts
-local quiet_launches = {}
-
-local function allow_activation_after_launch(window)
-    local quiet = false
+local function has_tag(window, name)
     for _, tag in ipairs(window.tags) do
-        if tag:find("^quiet%-launch") then
-            quiet = true
+        -- Tags set by a rule carry a trailing *
+        if tag == name or tag == name .. "*" then
+            return true
         end
     end
-    local address = window.address
-    if not quiet or quiet_launches[address] then
-        return
-    end
-    quiet_launches[address] = true
-    -- Discord asks again about a second after its window opens, so ignore activations for a few seconds
-    hl.timer(function()
-        hl.dispatch(hl.dsp.window.set_prop({ prop = "focus_on_activate", value = "1", window = "address:" .. address }))
-    end, { timeout = 5000, type = "oneshot" })
+    return false
 end
 
-hl.on("window.urgent", allow_activation_after_launch)
+-- Quiet-launch windows ignore activation while they load: for up to 30s after they open, and
+-- until 5s after their latest request, since Discord asks more than once and Cider asks late
+local quiet_windows = {}
+local quiet_generation = 0
+
+local function stay_quiet(selector, timeout)
+    quiet_generation = quiet_generation + 1
+    local generation = quiet_generation
+    quiet_windows[selector] = generation
+    hl.timer(function()
+        if quiet_windows[selector] == generation then
+            quiet_windows[selector] = nil
+            hl.dispatch(hl.dsp.window.set_prop({ prop = "focus_on_activate", value = "1", window = selector }))
+        end
+    end, { timeout = timeout, type = "oneshot" })
+end
+
+hl.on("window.open", function(window)
+    if has_tag(window, "quiet-launch") then
+        stay_quiet("address:" .. window.address, 30000)
+    end
+end)
+
+hl.on("window.urgent", function(window)
+    local selector = "address:" .. window.address
+    if quiet_windows[selector] then
+        stay_quiet(selector, 5000)
+    end
+end)

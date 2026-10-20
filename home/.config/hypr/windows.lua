@@ -51,18 +51,17 @@ hl.window_rule({
     size = "875 600",
 })
 
--- Floating window tag for specific apps
+-- Apps that ask to be activated while they load; events.lua turns activation back on once they settle
 hl.window_rule({
-    match = { class = "^org\\.arsene\\.(wiremix|bluetui|switch-audio|btop)$" },
-    tag = "+floating-window",
+    name = "quiet-launch",
+    match = { tag = "quiet-launch" },
+    focus_on_activate = false,
 })
 
+-- Floating window tag for specific apps
 hl.window_rule({
-    name = "kura-pick",
-    match = { class = "^org\\.arsene\\.kura-pick$" },
-    float = true,
-    center = true,
-    size = "875 600",
+    match = { class = "^org\\.arsene\\.(wiremix|bluetui|switch-audio|btop|kura)$" },
+    tag = "+floating-window",
 })
 
 -- Floating window tag for file dialogs
