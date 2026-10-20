@@ -1,5 +1,5 @@
 #!/bin/bash
-# Launch walker, ensuring elephant and walker daemon are running via uwsm-app
+# Launch walker, starting the elephant and walker daemons through uwsm-app if they are not running
 
 if ! pgrep -x elephant > /dev/null; then
   uwsm-app -- elephant &

@@ -81,6 +81,6 @@ xmlstarlet ed -L \
 
 fc-cache -f
 
-echo "Successfully updated $category font to: $font_name"
+echo "Set $category font to: $font_name"
 
 # vim: ft=sh

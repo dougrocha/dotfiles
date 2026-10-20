@@ -11,9 +11,8 @@ for sink in "${SINKS[@]}"; do
     sink=${sink#\*}
 
     SINK_ID=$(echo "$sink" | cut -d'.' -f1 | xargs)
-    wpctl inspect "$SINK_ID" 2>/dev/null | grep -q 'media.class = "Audio/Sink/Internal"' && continue
-    
     INSPECT=$(wpctl inspect "$SINK_ID" 2>/dev/null)
+    grep -q 'media.class = "Audio/Sink/Internal"' <<<"$INSPECT" && continue
     NODE_NAME=$(echo "$INSPECT" | grep 'node.name = ' | cut -d'"' -f2)
     SINK_NAME=$(echo "$sink" | cut -d'.' -f2- | sed 's/\[vol:.*\]//' | xargs)
     

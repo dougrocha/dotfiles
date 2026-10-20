@@ -2,9 +2,7 @@
 
 # Show Claude Code hook events as alerts in the Quickshell island
 input=$(cat)
-event=$(jq -r '.hook_event_name // empty' <<<"$input")
-session=$(jq -r '.session_id // "session"' <<<"$input" | cut -c1-8)
-project=$(basename "$(jq -r '.cwd // empty' <<<"$input")")
+{ read -r event; read -r session; read -r project; } < <(jq -r '(.hook_event_name // ""), (.session_id // "session")[0:8], ((.cwd // "") | sub("/+$"; "") | split("/") | last // "")' <<<"$input")
 id="claude-$session"
 
 case "$event" in

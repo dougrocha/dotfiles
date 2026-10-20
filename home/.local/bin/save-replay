@@ -9,18 +9,16 @@ sleep 0.5
 REPLAY_DIR="${HOME}/Videos/Replays"
 mkdir -p "$REPLAY_DIR"
 
-if [[ -d "$REPLAY_DIR" ]]; then
-    LATEST_REPLAY=$(find "$REPLAY_DIR" -type f -name "*.mp4" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+LATEST_REPLAY=$(find "$REPLAY_DIR" -type f -name "*.mp4" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 
-    if [[ -n "$LATEST_REPLAY" && -f "$LATEST_REPLAY" ]]; then
-        echo -n "$LATEST_REPLAY" | wl-copy
+if [[ -f "$LATEST_REPLAY" ]]; then
+    echo -n "$LATEST_REPLAY" | wl-copy
 
-        notify-send "Replay Saved" \
-            "Last 60 seconds saved\n$(basename "$LATEST_REPLAY")" \
-            -t 10000 \
-            -i "$LATEST_REPLAY" \
-            -a "GPU Screen Recorder"
-    fi
+    notify-send "Replay Saved" \
+        "Last 60 seconds saved\n$(basename "$LATEST_REPLAY")" \
+        -t 10000 \
+        -i "$LATEST_REPLAY" \
+        -a "GPU Screen Recorder"
 fi
 
 # vim: ft=sh
