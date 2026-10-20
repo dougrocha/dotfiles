@@ -1,8 +1,7 @@
 #!/bin/bash
 
 APP_ID="org.arsene.$(basename "$1")"
-LAUNCH_CMD="launch-tui $(printf '%q ' "$@")"
 
-exec launch-or-focus "$APP_ID" "$LAUNCH_CMD"
+exec launch-or-focus "$APP_ID" launch-tui "$@"
 
 # vim: ft=sh
