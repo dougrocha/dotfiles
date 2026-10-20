@@ -28,7 +28,7 @@ The HIG gives no exact durations. It asks for short motion that answers an actio
 - Do not use motion as the only signal of a state. Show the state with text, an icon, or a fill too.
 - For the Island: keep the position of each part when the Island expands. Make the parts larger. Do not move them to new places ([live-activities](https://developer.apple.com/design/human-interface-guidelines/live-activities)).
 
-Reduce Motion: the HIG asks for cross-fades in place of moves and scales when the user turns on Reduce Motion ([accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)). This shell has no such setting now. If you add one, put it in `SettingsService` and make `SizeMotion`, `ContentFade`, and `Theme.motion.nudge` read it.
+When the user turns on Reduce Motion, the HIG asks for cross-fades in place of moves and scales ([accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)). This shell has no such setting now. If you add one, put it in `SettingsService` and make `SizeMotion`, `ContentFade`, and `Theme.motion.nudge` read it.
 
 ## 3. Panels (popovers)
 

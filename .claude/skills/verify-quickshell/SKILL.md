@@ -69,7 +69,7 @@ Run `qsv reset` before each case. It hides every IPC target that has a `hide` fu
 
 Each proof captures the action and the resulting state, and checks side effects as well as pixels.
 
-- **Screen state.** `qsv shot <name> [geometry]` captures with grim. Wait approximately 0.8 seconds after an open before you capture. Then read the PNG.
+- **Screen state.** `qsv shot <name> [geometry]` captures with grim. Wait about 0.8 seconds after an open before you capture. Then read the PNG.
 - **Overlay surfaces.** `qsv layers qs.screenshot_overlay` lists the screenshot overlay surfaces that are mapped. Bar panels are popups, not layers, so they do not show here. Prove a panel with a shot.
 - **Saved files.** Run `qsv mark` before the action. After it, `qsv captured <name>` copies each new file in `~/Pictures/Screenshots` into the run directory. It prints the copy, its size, and the original file name. "none" with exit 1 means nothing was saved.
 - **Pixels.**

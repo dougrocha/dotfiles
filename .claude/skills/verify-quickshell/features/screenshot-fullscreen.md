@@ -27,5 +27,5 @@ Preconditions:
 ## Gotchas
 
 - The file name has a timestamp to the second. Two runs in the same second write the same name.
-- Before grim runs, the script waits for every `qs.screenshot_overlay` layer to unmap. It checks 50 times with a 0.02s sleep, and each check also runs `hyprctl` and `jq`. That measured about 1.7s in total when an overlay never closed. After that it captures anyway.
+- Before grim runs, `wait-screenshot-overlay` (in `home/.local/bin`) waits for every `qs.screenshot_overlay` layer to unmap. When an overlay never closes, it waits at most about 1.7s, then the capture runs anyway.
 - Clicking the toast opens the image in `imv`. Do not click it unless the task is about that.

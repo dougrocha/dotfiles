@@ -19,7 +19,7 @@ The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell`
 | `Services/`                    | Singletons that hold state and talk to the system (audio, Bluetooth, notifications, settings).                                       | Put state and system logic here. Do not put layout here. Each file starts with `pragma Singleton`, and its root is `Singleton {}`. |
 | `Services/Visibilities.qml`    | `current`, the name of the open panel, and one `PanelIpc` target for each panel.                                                     | Open and close panels only with `open`, `close`, `toggle`, and `closeAll`. While a panel is open, it keeps Hyprland in the `qs-panel` submap, whose Escape bind calls the `panels` target's `closeAll`. |
 | `Services/SettingsService.qml` | User settings. It writes them to `$XDG_STATE_HOME/quickshell/settings.json`. If `XDG_STATE_HOME` is not set, it uses `$HOME/.local/state`.                                                         | Add a persistent setting here. Put a feature's settings in its own `JsonObject` section, and read them as `SettingsService.<section>.<key>`. |
-| `Components/`                  | Shared controls: `Popup`, `PopupCard`, `ListRow`, `ToggleRow`, `SectionLabel`, `Divider`, `IconActionButton`, `CloseBadge`, sliders. | Use a component from here before you make a new one.                                  |
+| `Components/`                  | Shared controls: `Popup`, `PopupCard`, `ListRow`, `ToggleRow`, `SectionLabel`, `Divider`, `IconActionButton`, `CloseBadge`, `TextLink`, `SpringMotion`, sliders. | Use a component from here before you make a new one.                                  |
 | `Modules/<Name>/`              | One feature for each directory: `Bar`, `Notifications`, `Popups`, `Island`, `Screenshot`, `Polkit`, `TooltipOverlay`.                | Keep files for one feature in its directory. For a window on each monitor, use `Variants { model: Quickshell.screens }` with a `PanelWindow` delegate. |
 | `Widgets/`                     | Small items that the bar uses: clock, tray.                                                                                          |                                                                                       |
 | `palette.json`                 | Colors from matugen. `Theme.qml` reads this file and watches it for changes.                                                         | Do not edit it. Matugen writes it.                                                    |
@@ -29,7 +29,7 @@ Imports use the `qs.` prefix, for example `import qs.Components` and `import qs.
 
 A bar panel (settings, sound, Bluetooth, notification center) has four parts: a `PanelIpc` in `Visibilities.qml`, a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml`, and a bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. The panel name is also its IPC target. `Popup` sets its position and `shown`, and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
 
-`Visibilities.current` holds one name, so only one panel is open at a time. `Visibilities.close(name)` closes only that panel. Thus a late dismiss from an old panel does not close the new panel.
+`Visibilities.current` holds one name, so only one panel is open at a time. `Visibilities.close(name)` closes only that panel. So a late dismiss from an old panel does not close the new panel.
 
 A service does not own panel visibility. A service can read `Visibilities.isOpen(...)`, for example to hide the OSD while the sound panel is open.
 
@@ -52,7 +52,7 @@ Apply these rules to new code and to code that you change. Some old files do not
 - Use `?.` and `??` on Quickshell objects that can be `null`, for example `sink?.audio?.volume ?? 0`.
 - In `Connections`, write handlers as functions: `function onNotificationsChanged() { }`.
 - Keep persistent data in files (`SettingsService`, `FileView`). Do not use `PersistentProperties`.
-- Run `./format <files>` from the config root with the QML files that you changed. Do not run `./format` with no arguments: it formats every QML file.
+- Run `./format <files>` from the config root with the QML files that you changed. Do not run `./format` with no arguments. It formats every QML file.
 - Commit messages use this form: `fix(quickshell): <summary>` or `feat(quickshell): <summary>`.
 
 ## 3. Framework patterns
@@ -124,9 +124,9 @@ If a token does not exist, add it to `Theme.qml`. Do not write the value in the 
 
 Do the squint test first. Blur the surface in your mind. You must see the title, then the groups, then the rows. If you cannot, change the spacing first. Do not add a line, a fill, or a color first.
 
-- Put a small gap between a label and its content. Put a medium gap between rows. Put the largest gap between groups. The notification history uses approximately 8, 12, and 30 pixels.
+- Put a small gap between a label and its content. Put a medium gap between rows. Put the largest gap between groups. The notification history uses about 8, 12, and 30 pixels.
 - Put more space above a heading than below it.
-- Make a label row the same height as its text. A 22 px row with 11 px text adds approximately 5 px of hidden space above and below the text.
+- Make a label row the same height as its text. A 22 px row with 11 px text adds about 5 px of hidden space above and below the text.
 - Use this type order. Do not add new sizes.
 
   | Role | Size | Weight | Color |
@@ -153,7 +153,7 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 - Use `Theme.motion.normal` with `easeStandard` to open, and `Theme.motion.fast` with `easeExit` to close.
 - Use motion to show a change of state only.
 - To animate the size of a container, use `SizeMotion on height {}` (or `width`, `implicitWidth`, `Layout.preferredHeight`). It grows with `motion.normal` and shrinks with `motion.fast`. Do not write a `NumberAnimation` for size. Do not animate the size of a window. Make the window large enough for the largest state, and set `mask` to the animated item.
-- Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference: a short move and a fade, not a large slide. The code is in `references/qml-patterns.md`.
+- Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference. It uses a short move and a fade, not a large slide. The code is in `references/qml-patterns.md`.
 - Value fills (slider, OSD level, progress) and the Island springs are not size changes. Keep their own animations.
 - A surface that scales in grows from `Theme.motion.scaleFrom` (0.95) to 1, together with its opacity. Never scale from 0 or from another literal. qslint checks it.
 

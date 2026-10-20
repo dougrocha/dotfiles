@@ -75,7 +75,7 @@ The bar and popups are at the top right of the primary monitor. Take monitor pos
 
 1. Run `qsv start <name>` one time. It makes the directory for the images.
 2. Open the surface (step 3), or send toasts (step 4).
-3. Wait approximately 0.8 seconds for the open animation.
+3. Wait about 0.8 seconds for the open animation.
 4. Run `qsv shot <name> "<x>,<y> <w>x<h>"`. On a 2560-wide primary monitor at `0,0`, `"2150,40 400x620"` shows the bar panels and the toasts. For the music panel, capture the top center of the monitor. Without a geometry, `qsv shot` captures all monitors.
 5. Read the image.
 6. Close the panel with `hide`. Toasts close when they time out, or when you close them.
