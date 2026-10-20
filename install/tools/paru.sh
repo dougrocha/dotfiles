@@ -10,7 +10,7 @@ if ! is_linux; then
     exit 1
 fi
 
-if command -v paru >/dev/null 2>&1; then
+if has paru; then
     if [[ ${FORCE:-0} == 1 ]]; then
         paru -S --noconfirm --rebuild=yes paru
     else

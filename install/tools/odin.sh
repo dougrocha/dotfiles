@@ -28,7 +28,6 @@ fi
 
 ln -sf "$ODIN_DIR/odin" "$HOME/.local/bin/odin"
 
-export PATH="$HOME/.local/bin:$PATH"
 odin version
 
 build_and_install() {

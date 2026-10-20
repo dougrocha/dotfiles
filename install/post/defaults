@@ -21,10 +21,7 @@ set_default() {
         return 0
     fi
 
-    local mime
-    for mime in "$@"; do
-        xdg-mime default "$handler" "$mime"
-    done
+    xdg-mime default "$handler" "$@"
 }
 
 : "${XDG_DATA_DIRS:=/usr/local/share:/usr/share}"

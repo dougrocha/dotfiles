@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # apply-current-image.sh
 # Boot-time only: applies whatever default/systemd/kraken/images/current
-# points to. No saving, no pruning — that's set-kraken-image's job.
+# points to. It does no saving or pruning; set-kraken-image does that.
 
 set -euo pipefail
 

@@ -3,7 +3,6 @@
 set -euo pipefail
 
 SERVICE_FILE="$DOTFILES_DIR/default/systemd/kraken/kraken-lcd.service"
-APPLY_SCRIPT="$DOTFILES_DIR/default/systemd/kraken/apply-current-image.sh"
 CURRENT_IMAGE="$DOTFILES_DIR/default/systemd/kraken/images/current"
 
 echo "NZXT Kraken LCD Image Setup"
@@ -25,8 +24,6 @@ if [[ ! -L "$CURRENT_IMAGE" ]]; then
     echo "  Run 'set-kraken-image <image-path>' first."
     exit 1
 fi
-
-chmod +x "$APPLY_SCRIPT"
 
 echo "Current image: $(readlink -f "$CURRENT_IMAGE")"
 echo ""

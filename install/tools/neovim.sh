@@ -29,7 +29,7 @@ else
     info "neovim already built at ${commit:0:8}"
 fi
 
-if command -v cargo >/dev/null 2>&1; then
+if has cargo; then
     cargo install tree-sitter-cli
 else
     warn "cargo not found, skipping tree-sitter-cli"

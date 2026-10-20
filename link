@@ -7,7 +7,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export DOTFILES_DIR
 
 if ! command -v odin >/dev/null 2>&1; then
-    echo "link: needs the odin compiler -- run ./install/tools/odin.sh" >&2
+    echo "link: needs the odin compiler, run ./install/tools/odin.sh" >&2
     exit 1
 fi
 

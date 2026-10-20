@@ -487,7 +487,7 @@ ensure_dir :: proc(path: string) -> bool {
 // root, left behind when the destination directory already existed.
 //
 // `links` counts them, because "every file is ours" is vacuously true of a
-// tree with no files -- ~/.gem full of empty subdirectories would match.
+// tree with no files. A ~/.gem full of empty subdirectories would match.
 scan_reclaimable :: proc(path: string) -> (ok: bool, links: int) {
 	names, read := dir_names(path)
 	if !read do return false, 0

@@ -8,7 +8,6 @@ echo "NVIDIA Memory Clock Locking Setup"
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo ""
 
-# Check if nvidia-smi is available
 if ! command -v nvidia-smi &> /dev/null; then
     echo "✗ Error: nvidia-smi not found. Please install NVIDIA drivers first."
     exit 1

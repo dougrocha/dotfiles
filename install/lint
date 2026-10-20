@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 if ! command -v shellcheck >/dev/null 2>&1; then
-    echo "lint: needs shellcheck -- run mise install" >&2
+    echo "lint: needs shellcheck, run mise install" >&2
     exit 1
 fi
 
