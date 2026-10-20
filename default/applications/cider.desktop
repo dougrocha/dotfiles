@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=Cider
-StartupWMClass=Cider
+StartupWMClass=cider
 Comment=A cross-platform Apple Music experience built on Vue.js and written from the ground up with performance in mind.
 GenericName=Music Player
-Exec=launch-or-focus Cider "cider %U"
+Exec=launch-cider %U
 Icon=cider
 Categories=Audio;AudioVideo;Music;
 MimeType=x-scheme-handler/cider;x-scheme-handler/itms;x-scheme-handler/itmss;x-scheme-handler/music;x-scheme-handler/itunes;

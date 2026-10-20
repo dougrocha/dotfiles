@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# A second cider only hands its link to the running one and never raises the
+# window, so pass the link along and focus the window ourselves
+if hyprctl clients -j | jq -e 'any(.[]; .class == "cider")' >/dev/null; then
+  (($#)) && cider "$@"
+fi
+
+exec launch-or-focus cider uwsm-app -- cider "$@"
+
+# vim: ft=sh
