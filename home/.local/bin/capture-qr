@@ -1,15 +1,15 @@
 #!/bin/bash
 
 if [[ $1 != --geometry ]]; then
-  exec quickshell ipc call screenshot-overlay toggleQuickWith capture-qr
+  exec screenshot-ui toggleQuickWith capture-qr
 fi
 
-for _ in {1..50}; do
-  hyprctl layers -j | jq -e '[.. | .namespace? | strings | select(startswith("qs.screenshot_overlay"))] | length == 0' >/dev/null && break
-  sleep 0.02
-done
+wait-screenshot-overlay
 
-RESULT=$(grim -g "$2" - | zbarimg -q --raw -Sdisable -Sqrcode.enable - 2>/dev/null)
+# zbarimg ends the payload with a newline; keep any newlines that belong to the payload itself
+RESULT=$(grim -g "$2" - | zbarimg -q --raw -Sdisable -Sqrcode.enable - 2>/dev/null; echo .)
+RESULT=${RESULT%.}
+RESULT=${RESULT%$'\n'}
 
 if [[ -z $RESULT ]]; then
   notify-send -u critical "QR" "No QR code found in selection"

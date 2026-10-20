@@ -1,22 +1,22 @@
 #!/bin/bash
 
 if [[ $1 != --geometry ]]; then
-  exec quickshell ipc call screenshot-overlay toggleQuickWith ocr
+  exec screenshot-ui toggleQuickWith ocr
 fi
 
 TMPFILE=$(mktemp /tmp/ocr-XXXXXX.png)
 trap 'rm -f "$TMPFILE"' EXIT
 
-for _ in {1..50}; do
-  hyprctl layers -j | jq -e '[.. | .namespace? | strings | select(startswith("qs.screenshot_overlay"))] | length == 0' >/dev/null && break
-  sleep 0.02
-done
+wait-screenshot-overlay
 
 grim -g "$2" "$TMPFILE" || exit 1
 
-TEXT=$(ocrs "$TMPFILE" 2>/dev/null) || exit 1
+TEXT=$(ocrs "$TMPFILE" 2>/dev/null)
 
-[[ -z $TEXT ]] && exit 1
+if [[ -z $TEXT ]]; then
+  notify-send -u critical "OCR" "No text found in selection"
+  exit 1
+fi
 
 printf "%s" "$TEXT" | wl-copy
 

@@ -1,4 +1,4 @@
 #!/bin/bash
-quickshell ipc call screenshot-overlay "${1:-toggle}"
+quickshell ipc call screenshot-overlay "${@:-toggle}"
 
 # vim: ft=sh

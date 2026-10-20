@@ -61,15 +61,7 @@ save() {
   fi
 }
 
-wait_for_overlay_gone() {
-  local _
-  for _ in {1..50}; do
-    hyprctl layers -j | jq -e '[.. | .namespace? | strings | select(startswith("qs.screenshot_overlay"))] | length == 0' >/dev/null && return
-    sleep 0.02
-  done
-}
-
-wait_for_overlay_gone
+wait-screenshot-overlay
 if [[ -n $GEOMETRY ]]; then
   save "$GEOMETRY"
 elif [[ $MODE == fullscreen ]]; then

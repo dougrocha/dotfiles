@@ -1,11 +1,6 @@
 #!/bin/bash
 
-window=$(hyprctl activewindow -j)
-
-cwd=""
-if [[ $(jq -r '.class // empty' <<<"$window") == com.mitchellh.ghostty ]]; then
-  cwd=$(jq -r '.title // empty' <<<"$window")
-fi
+cwd=$(hyprctl activewindow -j | jq -r 'select(.class == "com.mitchellh.ghostty") | .title // empty')
 
 if [[ -d $cwd ]]; then
   echo "$cwd"

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for _ in {1..50}; do
+  ! hyprctl layers | grep -q 'namespace: qs\.screenshot_overlay' && exit
+  sleep 0.02
+done
+
+# vim: ft=sh
