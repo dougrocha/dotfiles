@@ -4,8 +4,11 @@ MODE=${1:-$(printf '%s\n' clipboard file folder | walker --dmenu)}
 
 case $MODE in
 clipboard)
-  FILE=$(mktemp --suffix=.txt)
-  wl-paste >"$FILE"
+  # LocalSend may hand the send to a running instance and exit before reading the file,
+  # so keep it in the private runtime dir and clear old ones on a later share
+  find "$XDG_RUNTIME_DIR" -maxdepth 1 -name "share-*.txt" -mmin +60 -delete
+  FILE=$(mktemp -p "$XDG_RUNTIME_DIR" share-XXXXXX.txt)
+  wl-paste --no-newline >"$FILE" || { rm -f "$FILE"; exit 1; }
   FILES=("$FILE")
   ;;
 file)
@@ -21,6 +24,6 @@ esac
 
 [[ -n ${FILES[0]} ]] || exit 0
 
-systemd-run --user --quiet --collect localsend --headless send "${FILES[@]}"
+systemd-run --user --quiet --collect localsend --headless send "${FILES[@]}" || { [[ -n $FILE ]] && rm -f "$FILE"; exit 1; }
 
 # vim: ft=sh
