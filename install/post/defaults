@@ -79,7 +79,7 @@ set_default mpv.desktop \
     application/ogg
 
 # Text editor defaults (nvim)
-set_default nvim.desktop \
+set_default org.neovim.nvim.desktop \
     text/plain \
     text/english \
     text/x-makefile \
