@@ -24,6 +24,7 @@ Singleton {
     readonly property string caretUp: String.fromCodePoint(0xE13C)
     readonly property string caretRight: String.fromCodePoint(0xE13A)
     readonly property string caretLeft: String.fromCodePoint(0xE138)
+    readonly property string caretUpDown: String.fromCodePoint(0xE140)
 
     readonly property string bell: String.fromCodePoint(0xE0CE)
     readonly property string bellSlash: String.fromCodePoint(0xE0D4)
@@ -82,6 +83,8 @@ Singleton {
     readonly property string power: String.fromCodePoint(0xE3DA)
     readonly property string lock: String.fromCodePoint(0xE2FA)
     readonly property string lockSimple: String.fromCodePoint(0xE308)
+    readonly property string user: String.fromCodePoint(0xE4C2)
+    readonly property string users: String.fromCodePoint(0xE4D6)
     readonly property string eye: String.fromCodePoint(0xE220)
     readonly property string eyeSlash: String.fromCodePoint(0xE224)
     readonly property string signOut: String.fromCodePoint(0xE42A)

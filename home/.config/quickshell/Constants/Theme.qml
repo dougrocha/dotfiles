@@ -183,6 +183,8 @@ Singleton {
         readonly property int enterDelay: 70
         readonly property int nudge: 4
         readonly property real scaleFrom: 0.95
+        readonly property int shakeDistance: 8
+        readonly property int shakeCycles: 3
         readonly property real springStiffness: 4.5
         readonly property real springDamping: 0.36
         readonly property real springEpsilon: 0.25

@@ -31,7 +31,7 @@ ShellRoot {
 
     DictationPill {}
 
-    PolkitAgent {}
+    PolkitDialog {}
 
     TooltipOverlay {}
 }
