@@ -7,6 +7,7 @@ import Quickshell.Services.Notifications
 import qs.Components
 import qs.Constants
 import qs.Services
+import "NotificationFormat.js" as NotificationFormat
 
 Column {
     id: root
@@ -24,7 +25,7 @@ Column {
     readonly property var groups: {
         const map = new Map();
         for (const n of NotificationService.history) {
-            const key = NotificationService.appDisplayName(n.appName);
+            const key = NotificationService.appDisplayName(n.appName ?? "");
             if (!map.has(key))
                 map.set(key, {
                     id: key,
@@ -114,7 +115,7 @@ Column {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         opacity: rowHover.hovered ? 0 : 1
-                        text: NotificationService.relativeTime(row.modelData.timestamp ?? Date.now())
+                        text: NotificationFormat.relativeTime(row.modelData.timestamp ?? Date.now())
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
@@ -148,7 +149,7 @@ Column {
                         }
 
                         TapHandler {
-                            onTapped: NotificationService.removeHistoryNotification(row.modelData.id)
+                            onTapped: NotificationService.removeFromHistory(row.modelData.id)
                         }
                     }
                 }
@@ -157,7 +158,7 @@ Column {
             Text {
                 Layout.fillWidth: true
                 visible: row.modelData.summary !== "" && text !== ""
-                text: NotificationService.styledBody(row.modelData.body)
+                text: NotificationFormat.styledBody(row.modelData.body, Theme.accent)
                 textFormat: Text.StyledText
                 color: Theme.text.secondary
                 font.family: Theme.font.ui
@@ -165,7 +166,7 @@ Column {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                onLinkActivated: link => NotificationService.openBodyLink(link)
+                onLinkActivated: link => NotificationFormat.openBodyLink(link)
             }
         }
     }
@@ -212,7 +213,7 @@ Column {
                     glyph: PhosphorIcons.x
                     opacity: groupHover.hovered ? 1 : 0
                     enabled: opacity > 0
-                    onTapped: NotificationService.clearAppHistory(group.modelData.app)
+                    onTapped: NotificationService.clearApp(group.modelData.app)
 
                     Behavior on opacity {
                         NumberAnimation {

@@ -7,6 +7,7 @@ import Quickshell.Services.Notifications
 import qs.Components
 import qs.Constants
 import qs.Services
+import "NotificationFormat.js" as NotificationFormat
 
 Item {
     id: card
@@ -17,16 +18,7 @@ Item {
 
     height: surface.height
 
-    function defaultAction() {
-        for (let i = 0; i < (card.modelData?.actions?.length ?? 0); i++) {
-            const a = card.modelData.actions[i];
-            if (a.identifier === "default") {
-                a.invoke();
-                return true;
-            }
-        }
-        return false;
-    }
+    readonly property bool hasDefaultAction: (card.modelData?.actions ?? []).some(a => a.identifier === "default")
 
     property bool actionHovered: false
     property bool menuHovered: false
@@ -76,7 +68,7 @@ Item {
         }
 
         TapHandler {
-            onTapped: modelData.invoke()
+            onTapped: NotificationService.invokeAction(card.modelData.id, modelData.identifier)
         }
     }
 
@@ -104,8 +96,10 @@ Item {
                     card.menuExpanded = false;
                     return;
                 }
-                if (button === Qt.RightButton || !card.defaultAction())
-                    NotificationService.removeNotification(card.modelData.id);
+                if (button === Qt.RightButton || !card.hasDefaultAction)
+                    NotificationService.dismiss(card.modelData.id);
+                else
+                    NotificationService.invokeAction(card.modelData.id, "default");
             }
         }
 
@@ -127,7 +121,7 @@ Item {
 
                     Text {
                         Layout.fillWidth: true
-                        text: card.modelData?.summary || NotificationService.appDisplayName(card.modelData?.appName)
+                        text: card.modelData?.summary || NotificationService.appDisplayName(card.modelData?.appName ?? "")
                         color: Theme.text.primary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.title.size
@@ -137,7 +131,7 @@ Item {
 
                     Text {
                         visible: !!card.modelData?.summary
-                        text: NotificationService.appDisplayName(card.modelData?.appName)
+                        text: NotificationService.appDisplayName(card.modelData?.appName ?? "")
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
@@ -145,7 +139,7 @@ Item {
 
                     Text {
                         Layout.leftMargin: Theme.space.xs
-                        text: NotificationService.relativeTime(card.modelData?.timestamp ?? Date.now())
+                        text: NotificationFormat.relativeTime(card.modelData?.timestamp ?? Date.now())
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
@@ -199,7 +193,7 @@ Item {
 
                 Text {
                     Layout.fillWidth: true
-                    text: NotificationService.styledBody(card.modelData?.body ?? "")
+                    text: NotificationFormat.styledBody(card.modelData?.body ?? "", Theme.accent)
                     visible: text !== ""
                     color: Theme.text.secondary
                     font.family: Theme.font.ui
@@ -208,7 +202,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 3
                     elide: Text.ElideRight
-                    onLinkActivated: link => NotificationService.openBodyLink(link)
+                    onLinkActivated: link => NotificationFormat.openBodyLink(link)
                 }
             }
 
@@ -298,7 +292,7 @@ Item {
 
                         TapHandler {
                             onTapped: {
-                                menuItem.modelData.invoke();
+                                NotificationService.invokeAction(card.modelData.id, menuItem.modelData.identifier);
                                 card.menuExpanded = false;
                             }
                         }
@@ -314,6 +308,6 @@ Item {
         x: Math.round(cornerInset - width / 2)
         y: Math.round(cornerInset - height / 2)
         revealed: cardHover.hovered
-        onTapped: NotificationService.removeNotification(card.modelData.id)
+        onTapped: NotificationService.dismiss(card.modelData.id)
     }
 }

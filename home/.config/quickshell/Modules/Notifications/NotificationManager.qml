@@ -21,7 +21,7 @@ Variants {
         color: "transparent"
 
         mask: Region {
-            item: localNotifications.length > 0 ? cardColumn : null
+            item: NotificationService.popups.length > 0 ? cardColumn : null
         }
 
         WlrLayershell.namespace: "qs.notification_overlay"
@@ -31,7 +31,7 @@ Variants {
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: localNotifications.length > 0 && !Visibilities.isOpen("notification-center")
+        visible: NotificationService.popups.length > 0 && !Visibilities.isOpen("notification-center")
 
         anchors {
             top: true
@@ -41,36 +41,6 @@ Variants {
         implicitWidth: 384
 
         implicitHeight: Math.max(1, modelData.height - Theme.topBarHeight)
-
-        property var localNotifications: []
-
-        function removeLocal(id) {
-            localNotifications = localNotifications.filter(n => n.id !== id);
-        }
-
-        Connections {
-            target: NotificationService
-            function onNotificationsChanged() {
-                const svc = NotificationService.notifications.slice(0, 5);
-                const byId = new Map(notificationPanel.localNotifications.map(n => [n.id, n]));
-                let next = notificationPanel.localNotifications;
-                let changed = false;
-                svc.forEach(n => {
-                    if (!n)
-                        return;
-                    const existing = byId.get(n.id);
-                    if (!existing) {
-                        next = [...next, n];
-                        changed = true;
-                    } else if (existing !== n) {
-                        next = next.map(x => x.id === n.id ? n : x);
-                        changed = true;
-                    }
-                });
-                if (changed)
-                    notificationPanel.localNotifications = next;
-            }
-        }
 
         Column {
             id: cardColumn
@@ -85,7 +55,7 @@ Variants {
                 onHoveredChanged: {
                     if (hovered) {
                         unhoverTimer.stop();
-                        NotificationService.hoverPaused = true;
+                        NotificationService.pause();
                     } else {
                         unhoverTimer.restart();
                     }
@@ -95,12 +65,12 @@ Variants {
             Timer {
                 id: unhoverTimer
                 interval: 100
-                onTriggered: NotificationService.hoverPaused = false
+                onTriggered: NotificationService.resume()
             }
 
             Repeater {
                 model: ScriptModel {
-                    values: notificationPanel.localNotifications
+                    values: NotificationService.popups
                     objectProp: "id"
                 }
 
@@ -108,7 +78,7 @@ Variants {
                     id: delegateWrapper
                     required property var modelData
 
-                    property bool leaving: false
+                    readonly property bool leaving: modelData?.leaving === true
                     property bool entered: false
 
                     readonly property int badgeInset: Theme.space.lg
@@ -140,26 +110,6 @@ Variants {
                         to: 1
                         duration: Theme.motion.normal
                         easing.type: Theme.motion.easeStandard
-                    }
-
-                    Connections {
-                        target: NotificationService
-                        function onNotificationsChanged() {
-                            const notif = delegateWrapper?.modelData;
-                            if (!notif)
-                                return;
-                            const gone = !NotificationService.notifications.some(n => n?.id === notif.id);
-                            if (gone && !delegateWrapper.leaving) {
-                                delegateWrapper.leaving = true;
-                                removeTimer.start();
-                            }
-                        }
-                    }
-
-                    Timer {
-                        id: removeTimer
-                        interval: Theme.motion.fast + 20
-                        onTriggered: notificationPanel.removeLocal(delegateWrapper.modelData.id)
                     }
 
                     NotificationCard {

@@ -10,37 +10,328 @@ import qs.Constants
 Singleton {
     id: root
 
-    property list<var> history: []
-    property list<var> notifications: []
+    readonly property list<var> popups: _popups
+    readonly property list<var> history: _history
 
-    readonly property string historySession: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
-    property int historySequence: 0
-
-    function historyId() {
-        return "history-" + historySession + "-" + (++historySequence);
+    function pause(): void {
+        if (root._paused)
+            return;
+        root._paused = true;
+        root._pausedAt = Date.now();
+        root._saveLiveNow();
     }
 
-    function loadHistory(entries) {
-        return entries.map(n => Object.assign({}, n, {
-                id: historyId()
-            }));
+    function resume(): void {
+        if (!root._paused)
+            return;
+        root._paused = false;
+        const now = Date.now();
+        root._setPopups(root._popups.map(n => Object.assign({}, n, {
+                expiresAt: n.expiresAt + root._pauseShift(root._pausedAt, n.timestamp, now)
+            })));
     }
 
-    property bool hoverPaused: false
-    property double pausedAt: 0
+    function dismiss(id: var): void {
+        const entry = root._live(id);
+        if (entry?.ref)
+            entry.ref.dismiss();
+        else if (entry)
+            root._toHistory(id);
+    }
 
-    onHoverPausedChanged: {
-        if (hoverPaused) {
-            pausedAt = Date.now();
-            if (liveLoaded) {
-                liveSaveDebounce.stop();
-                liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))));
-            }
-        } else {
-            const now = Date.now();
-            root.notifications = root.notifications.map(n => Object.assign({}, n, {
-                    expiresAt: n.expiresAt + Math.max(0, now - Math.max(pausedAt, n.timestamp))
+    function invokeAction(id: var, identifier: string): void {
+        const actions = root._live(id)?.ref?.actions ?? [];
+        actions.find(a => a.identifier === identifier)?.invoke();
+    }
+
+    function removeFromHistory(id: string): void {
+        if (!root._history.some(n => n.id === id))
+            return;
+        root._history = root._history.filter(n => n.id !== id);
+        historySave.restart();
+    }
+
+    function clearApp(app: string): void {
+        root._history = root._history.filter(n => root.appDisplayName(n.appName ?? "") !== app);
+        historySave.restart();
+    }
+
+    function clearHistory(): void {
+        root._history = [];
+        historySave.restart();
+    }
+
+    function appDisplayName(appName: string): string {
+        if (!appName)
+            return "Unknown";
+        const entry = DesktopEntries.heuristicLookup(appName);
+        return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
+    }
+
+    property list<var> _popups: []
+    property list<var> _history: []
+    property bool _paused: false
+    property double _pausedAt: 0
+    property bool _liveLoaded: false
+    property bool _migrateLegacyHistory: false
+    property var _islandWatchers: ({})
+    readonly property string _session: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+    property int _sequence: 0
+
+    function _arrive(notification) {
+        if (!notification.summary && !notification.body)
+            return;
+        notification.tracked = true;
+        const id = notification.id;
+        root._live(id)?.disconnect?.();
+
+        if (root._progressOf(notification) >= 0) {
+            root._leave(id);
+            root._bridgeToIsland(notification);
+            return;
+        }
+
+        const entry = root._entry(notification, Date.now(), root._duration(notification));
+
+        if ((Visibilities.isOpen("notification-center") || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
+            root._leave(id);
+            root._addToHistory(entry);
+            notification.expire();
+            return;
+        }
+
+        entry.disconnect = root._watch(notification);
+        root._popups.filter(n => n.restored && !n.leaving && n.appName === entry.appName && n.summary === entry.summary && n.body === entry.body).forEach(n => root._leave(n.id));
+        if (root._popups.some(n => n.id === id))
+            root._setPopups(root._popups.map(n => n.id === id ? entry : n));
+        else
+            root._setPopups([...root._popups, entry]);
+    }
+
+    function _refresh(id) {
+        const previous = root._live(id);
+        if (!previous?.ref)
+            return;
+        const entry = root._entry(previous.ref, previous.timestamp, previous.duration);
+        entry.expiresAt = previous.expiresAt;
+        entry.disconnect = previous.disconnect;
+        root._setPopups(root._popups.map(n => n.id === id ? entry : n));
+    }
+
+    function _expireDue(now) {
+        root._popups.filter(n => !n.leaving && root._expired(n, now)).forEach(n => n.ref ? n.ref.expire() : root._toHistory(n.id));
+    }
+
+    function _toHistory(id) {
+        const entry = root._live(id);
+        if (!entry)
+            return;
+        entry.disconnect?.();
+        root._leave(id);
+        root._addToHistory(entry);
+    }
+
+    function _leave(id) {
+        if (!root._live(id))
+            return;
+        const now = Date.now();
+        root._setPopups(root._popups.map(n => n.id === id && !n.leaving ? Object.assign({}, n, {
+                leaving: true,
+                leftUntil: now + Theme.motion.fast + 20,
+                ref: null,
+                disconnect: null
+            }) : n));
+        root._dropLeft(now);
+    }
+
+    function _dropLeft(now) {
+        const kept = root._popups.filter(n => !n.leaving || n.leftUntil > now);
+        if (kept.length !== root._popups.length)
+            root._setPopups(kept);
+        const next = Math.min(...kept.filter(n => n.leaving).map(n => n.leftUntil));
+        if (!isFinite(next))
+            return;
+        dropTimer.interval = Math.max(1, next - now);
+        dropTimer.restart();
+    }
+
+    function _restore(saved, now) {
+        const kept = saved.map(n => Object.assign({}, n, {
+                id: "restored-" + root._historyId(),
+                expiresAt: root._restoredExpiry(n, now),
+                actions: [],
+                leaving: false,
+                restored: true,
+                ref: null
+            })).filter(n => !root._expired(n, now));
+        root._setPopups([...kept, ...root._popups]);
+    }
+
+    function _addToHistory(entry) {
+        if (!entry.summary && !entry.body)
+            return;
+        const item = {
+            id: root._historyId(),
+            appName: entry.appName ?? "",
+            appIcon: entry.appIcon ?? "",
+            summary: entry.summary ?? "",
+            body: entry.body ?? "",
+            urgency: entry.urgency,
+            timestamp: entry.timestamp ?? Date.now()
+        };
+        root._history = [item, ...root._history].slice(0, 50);
+        historySave.restart();
+    }
+
+    function _live(id) {
+        return root._popups.find(n => n.id === id && !n.leaving) ?? null;
+    }
+
+    function _setPopups(next) {
+        root._popups = next;
+        if (root._liveLoaded)
+            liveSave.restart();
+    }
+
+    function _saveLiveNow() {
+        if (!root._liveLoaded)
+            return;
+        liveSave.stop();
+        liveFile.setText(root._liveJson());
+    }
+
+    function _liveJson() {
+        return JSON.stringify(root._popups.filter(n => !n.leaving).map(n => ({
+                    id: n.id,
+                    appName: n.appName,
+                    appIcon: n.appIcon,
+                    summary: n.summary,
+                    body: n.body,
+                    image: n.image,
+                    urgency: n.urgency,
+                    timestamp: n.timestamp,
+                    duration: n.duration,
+                    expiresAt: n.expiresAt,
+                    pausedAt: root._paused ? root._pausedAt : null
+                })));
+    }
+
+    function _entry(notification, timestamp, duration) {
+        return {
+            id: notification.id,
+            appName: notification.appName ?? "",
+            appIcon: notification.appIcon ?? "",
+            summary: notification.summary ?? "",
+            body: notification.body ?? "",
+            image: notification.image ?? "",
+            urgency: notification.urgency,
+            actions: (notification.actions ?? []).map(a => ({
+                        identifier: a.identifier,
+                        text: a.text
+                    })),
+            timestamp: timestamp,
+            duration: duration,
+            expiresAt: timestamp + duration,
+            leaving: false,
+            ref: notification
+        };
+    }
+
+    function _watch(notification) {
+        const id = notification.id;
+        const refresh = () => root._refresh(id);
+        const close = () => root._toHistory(id);
+        const updates = [notification.summaryChanged, notification.bodyChanged, notification.appNameChanged, notification.appIconChanged, notification.imageChanged, notification.actionsChanged];
+        updates.forEach(signal => signal.connect(refresh));
+        notification.closed.connect(close);
+        return () => {
+            updates.forEach(signal => signal.disconnect(refresh));
+            notification.closed.disconnect(close);
+        };
+    }
+
+    function _bridgeToIsland(notification) {
+        const id = notification.id;
+        const alertId = "notification-" + id;
+        const signals = [notification.hintsChanged, notification.summaryChanged];
+        root._islandWatchers[id]?.();
+
+        function update() {
+            const progress = root._progressOf(notification);
+            const label = notification.summary || root.appDisplayName(notification.appName);
+            if (progress >= 1)
+                IslandService.pushAlert(alertId, "checkCircle", label, 2);
+            else if (progress >= 0)
+                IslandService.setAlert(alertId, "", label, notification.expireTimeout > 0 ? notification.expireTimeout / 1000 : 0, progress);
+        }
+
+        function unwatch() {
+            signals.forEach(signal => signal.disconnect(update));
+            notification.closed.disconnect(close);
+            delete root._islandWatchers[id];
+        }
+
+        function close() {
+            unwatch();
+            if (IslandService.alerts.some(a => a.id === alertId && a.progress >= 0))
+                IslandService.clearAlert(alertId);
+        }
+
+        signals.forEach(signal => signal.connect(update));
+        notification.closed.connect(close);
+        root._islandWatchers[id] = unwatch;
+        update();
+    }
+
+    function _duration(notification) {
+        if (notification.expireTimeout === 0)
+            return -1;
+        if (notification.expireTimeout > 0)
+            return notification.expireTimeout;
+        if (notification.urgency === NotificationUrgency.Critical)
+            return -1;
+        if (notification.urgency === NotificationUrgency.Low)
+            return 2000;
+        return 3000;
+    }
+
+    function _expired(entry, now) {
+        return entry.duration !== -1 && now >= entry.expiresAt;
+    }
+
+    function _pauseShift(pausedAt, timestamp, now) {
+        return Math.max(0, now - Math.max(pausedAt, timestamp));
+    }
+
+    function _restoredExpiry(saved, now) {
+        const expiresAt = saved.expiresAt ?? (saved.timestamp + saved.duration);
+        return expiresAt + (typeof saved.pausedAt === "number" ? root._pauseShift(saved.pausedAt, saved.timestamp, now) : 0);
+    }
+
+    function _progressOf(notification) {
+        const value = notification.hints?.value;
+        return typeof value === "number" ? Math.max(0, Math.min(100, value)) / 100 : -1;
+    }
+
+    function _historyId() {
+        return "history-" + root._session + "-" + (++root._sequence);
+    }
+
+    function _loadHistory(text) {
+        const entries = root._parseArray(text);
+        if (entries)
+            root._history = entries.map(n => Object.assign({}, n, {
+                    id: root._historyId()
                 }));
+        return entries !== null;
+    }
+
+    function _parseArray(text) {
+        try {
+            const parsed = JSON.parse(text);
+            return Array.isArray(parsed) ? parsed : null;
+        } catch (e) {
+            return null;
         }
     }
 
@@ -53,282 +344,31 @@ Singleton {
         imageSupported: true
         extraHints: ["value"]
 
-        onNotification: notification => handleNotification(notification)
-    }
-
-    function calculateDuration(n) {
-        if (n.expireTimeout === 0) {
-            return -1;
-        }
-
-        if (n.expireTimeout > 0) {
-            return n.expireTimeout;
-        }
-
-        if (n.urgency === NotificationUrgency.Critical)
-            return -1;
-        if (n.urgency === NotificationUrgency.Low)
-            return 2000;
-        return 3000;
-    }
-
-    function snapshot(n, metadata) {
-        return {
-            id: n.id,
-            appName: n.appName ?? "",
-            appIcon: n.appIcon ?? "",
-            summary: n.summary ?? "",
-            body: n.body ?? "",
-            image: n.image ?? "",
-            urgency: n.urgency,
-            actions: (n.actions ?? []).map(a => ({
-                        identifier: a.identifier,
-                        text: a.text,
-                        invoke: () => root.invokeAction(n.id, a)
-                    })),
-            timestamp: metadata.timestamp,
-            duration: metadata.duration,
-            expiresAt: metadata.expiresAt,
-            isPopup: metadata.isPopup,
-            ref: n
-        };
-    }
-
-    function appDisplayName(appName) {
-        if (!appName)
-            return "Unknown";
-        const entry = DesktopEntries.heuristicLookup(appName);
-        return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
-    }
-
-    function relativeTime(timestamp: real): string {
-        const mins = Math.floor((Date.now() - timestamp) / 60000);
-        if (mins < 1)
-            return "now";
-        if (mins < 60)
-            return mins + "m";
-        const hours = Math.floor(mins / 60);
-        if (hours < 24)
-            return hours + "h";
-        return Math.floor(hours / 24) + "d";
-    }
-
-    function shortUrl(url: string): string {
-        const match = url.match(/^[a-z]+:\/\/(?:www\.)?([^\/?#]+)([^?#]*)/i);
-        if (!match)
-            return url;
-        const path = match[2].replace(/\/$/, "");
-        return match[1] + (path.length > 24 ? path.slice(0, 23) + "…" : path);
-    }
-
-    function styledBody(text) {
-        const anchors = [];
-        const linked = text.replace(/<a\s[^>]*>.*?<\/a>|<[^>]+>/gi, tag => {
-            anchors.push(tag);
-            return "\u0000" + (anchors.length - 1) + "\u0000";
-        }).replace(/\bhttps?:\/\/[^\s<>"']*[^\s<>"'.,;:!?)\]]/gi, url => `<a href="${url}">${root.shortUrl(url)}</a>`).replace(/\u0000(\d+)\u0000/g, (_, index) => anchors[index]);
-        return linked.replace(/<a\s+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, `<a href="$1"><font color="${Theme.accent}">$2</font></a>`);
-    }
-
-    function openBodyLink(link) {
-        const scheme = String(link).split(":", 1)[0].toLowerCase();
-        if (scheme === "http" || scheme === "https" || scheme === "mailto")
-            Qt.openUrlExternally(link);
-    }
-
-    function invokeAction(notificationId, action) {
-        const notif = root.notifications.find(n => n.id === notificationId);
-        if (notif?.ref)
-            action.invoke();
-    }
-
-    function watchForUpdates(notification, id) {
-        const refresh = () => refreshSnapshot(notification, id);
-        const signals = [notification.summaryChanged, notification.bodyChanged, notification.appNameChanged, notification.appIconChanged, notification.imageChanged, notification.actionsChanged];
-
-        signals.forEach(signal => signal.connect(refresh));
-        return () => signals.forEach(signal => signal.disconnect(refresh));
-    }
-
-    function refreshSnapshot(notification, id) {
-        const index = root.notifications.findIndex(n => n.id === id);
-        if (index === -1)
-            return;
-
-        const previous = root.notifications[index];
-        const data = snapshot(notification, {
-            timestamp: previous.timestamp,
-            duration: previous.duration,
-            expiresAt: previous.expiresAt,
-            isPopup: previous.isPopup
-        });
-        data.closeHandler = previous.closeHandler;
-        data.unwatch = previous.unwatch;
-
-        root.notifications = root.notifications.map((n, i) => i === index ? data : n);
-    }
-
-    property var progressWatchers: ({})
-
-    function progressOf(notification) {
-        const value = notification.hints?.value;
-        return typeof value === "number" ? Math.max(0, Math.min(100, value)) / 100 : -1;
-    }
-
-    function trackProgress(notification) {
-        const id = notification.id;
-        const alertId = "notification-" + id;
-        root.progressWatchers[id]?.();
-
-        const signals = [notification.hintsChanged, notification.summaryChanged];
-
-        function update() {
-            const progress = root.progressOf(notification);
-            const label = notification.summary || root.appDisplayName(notification.appName);
-            if (progress >= 1)
-                IslandService.pushAlert(alertId, "checkCircle", label, 2);
-            else if (progress >= 0)
-                IslandService.setAlert(alertId, "", label, notification.expireTimeout > 0 ? notification.expireTimeout / 1000 : 0, progress);
-        }
-
-        function unwatch() {
-            signals.forEach(signal => signal.disconnect(update));
-            notification.closed.disconnect(close);
-            delete root.progressWatchers[id];
-        }
-
-        function close() {
-            unwatch();
-            if (IslandService.alerts.some(a => a.id === alertId && a.progress >= 0))
-                IslandService.clearAlert(alertId);
-        }
-
-        signals.forEach(signal => signal.connect(update));
-        notification.closed.connect(close);
-        root.progressWatchers[id] = unwatch;
-        update();
-    }
-
-    function handleNotification(notification) {
-        if (!notification.summary && !notification.body)
-            return;
-
-        notification.tracked = true;
-
-        const id = notification.id;
-
-        const existing = root.notifications.find(notif => notif.id === id);
-        if (existing && existing.ref && existing.closeHandler)
-            existing.ref.closed.disconnect(existing.closeHandler);
-        existing?.unwatch?.();
-
-        if (progressOf(notification) >= 0) {
-            root.notifications = root.notifications.filter(notif => notif.id !== id);
-            trackProgress(notification);
-            return;
-        }
-
-        const timestamp = Date.now();
-        const duration = calculateDuration(notification);
-        const metadata = {
-            timestamp: timestamp,
-            duration: duration,
-            expiresAt: timestamp + duration,
-            isPopup: true
-        };
-
-        const data = snapshot(notification, metadata);
-
-        const closeHandler = () => {
-            notification.closed.disconnect(closeHandler);
-            discardNotification(id);
-        };
-        notification.closed.connect(closeHandler);
-        data.closeHandler = closeHandler;
-
-        if ((Visibilities.isOpen("notification-center") || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
-            addToHistory(data);
-            notification.expire();
-            return;
-        }
-
-        data.unwatch = watchForUpdates(notification, id);
-
-        root.notifications = [data, ...root.notifications.filter(notif => notif.id !== id && !(notif.restored && notif.appName === data.appName && notif.summary === data.summary && notif.body === data.body))];
-    }
-
-    function removeNotification(notificationId) {
-        const notif = root.notifications.find(n => n.id === notificationId);
-        if (!notif)
-            return;
-        if (notif.ref)
-            notif.ref.dismiss();
-        else
-            discardNotification(notificationId);
-    }
-
-    function removeHistoryNotification(notificationId) {
-        if (root.history.some(n => n.id === notificationId)) {
-            root.history = root.history.filter(n => n.id !== notificationId);
-            saveHistory();
-        }
-    }
-
-    function discardNotification(notificationId) {
-        const notif = root.notifications.find(n => n.id === notificationId);
-        if (!notif)
-            return;
-
-        if (notif.unwatch)
-            notif.unwatch();
-        notif.isPopup = false;
-        root.notifications = root.notifications.filter(n => n.id !== notificationId);
-        addToHistory(notif);
-    }
-
-    function addToHistory(notification) {
-        if (!notification.summary && !notification.body)
-            return;
-        const entry = {
-            id: historyId(),
-            appName: notification.appName ?? "",
-            appIcon: notification.appIcon ?? "",
-            summary: notification.summary ?? "",
-            body: notification.body ?? "",
-            urgency: notification.urgency,
-            timestamp: notification.timestamp ?? Date.now()
-        };
-        root.history = [entry, ...root.history].slice(0, 50);
-        saveHistory();
-    }
-
-    function clearAppHistory(appName) {
-        root.history = root.history.filter(n => root.appDisplayName(n.appName) !== appName);
-        saveHistory();
-    }
-
-    function clearHistory() {
-        root.history = [];
-        saveHistory();
-    }
-
-    function saveHistory() {
-        saveDebounce.restart();
+        onNotification: notification => root._arrive(notification)
     }
 
     Timer {
-        id: saveDebounce
-        interval: 300
-        onTriggered: historyFile.setText(JSON.stringify(root.history))
+        interval: 100
+        repeat: true
+        running: !root._paused && root._popups.some(n => !n.leaving && n.duration !== -1)
+        onTriggered: root._expireDue(Date.now())
     }
 
-    function parseArray(text) {
-        try {
-            const parsed = JSON.parse(text);
-            return Array.isArray(parsed) ? parsed : null;
-        } catch (e) {
-            return null;
-        }
+    Timer {
+        id: dropTimer
+        onTriggered: root._dropLeft(Date.now())
+    }
+
+    Timer {
+        id: historySave
+        interval: 300
+        onTriggered: historyFile.setText(JSON.stringify(root._history))
+    }
+
+    Timer {
+        id: liveSave
+        interval: 300
+        onTriggered: liveFile.setText(root._liveJson())
     }
 
     FileView {
@@ -338,60 +378,22 @@ Singleton {
         atomicWrites: true
         printErrors: false
 
-        onLoaded: {
-            const parsed = root.parseArray(text());
-            if (parsed)
-                root.history = root.loadHistory(parsed);
-        }
+        onLoaded: root._loadHistory(text())
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
-                root.migrateLegacyHistory = true;
+                root._migrateLegacyHistory = true;
         }
     }
 
-    property bool migrateLegacyHistory: false
+    FileView {
+        path: root._migrateLegacyHistory ? Quickshell.cacheDir + "/notifications.json" : ""
+        printErrors: false
 
-    function liveSnapshot(n) {
-        return {
-            id: n.id,
-            appName: n.appName,
-            appIcon: n.appIcon,
-            summary: n.summary,
-            body: n.body,
-            image: n.image,
-            urgency: n.urgency,
-            timestamp: n.timestamp,
-            duration: n.duration,
-            expiresAt: n.expiresAt,
-            pausedAt: root.hoverPaused ? root.pausedAt : null
-        };
+        onLoaded: {
+            if (root._loadHistory(text()))
+                historySave.restart();
+        }
     }
-
-    function restoreLive(entries) {
-        const now = Date.now();
-        const usable = entries.map(n => Object.assign({}, n, {
-                id: "restored-" + historyId(),
-                expiresAt: (n.expiresAt ?? (n.timestamp + n.duration)) + (typeof n.pausedAt === "number" ? Math.max(0, now - Math.max(n.pausedAt, n.timestamp)) : 0)
-            })).filter(n => n.duration === -1 || now < n.expiresAt);
-
-        root.notifications = [...usable.map(n => Object.assign({}, n, {
-                    actions: [],
-                    isPopup: true,
-                    restored: true,
-                    ref: null
-                })), ...root.notifications];
-    }
-
-    Timer {
-        id: liveSaveDebounce
-        interval: 300
-        onTriggered: liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))))
-    }
-
-    onNotificationsChanged: if (root.liveLoaded)
-        liveSaveDebounce.restart()
-
-    property bool liveLoaded: false
 
     FileView {
         id: liveFile
@@ -401,41 +403,17 @@ Singleton {
         printErrors: false
 
         onLoaded: {
-            const parsed = root.parseArray(text());
-            if (parsed)
-                root.restoreLive(parsed);
-            root.liveLoaded = true;
-            if (parsed || root.notifications.length > 0)
-                liveSaveDebounce.restart();
+            const saved = root._parseArray(text());
+            if (saved)
+                root._restore(saved, Date.now());
+            root._liveLoaded = true;
+            if (saved || root._popups.length > 0)
+                liveSave.restart();
         }
         onLoadFailed: {
-            root.liveLoaded = true;
-            if (root.notifications.length > 0)
-                liveSaveDebounce.restart();
-        }
-    }
-
-    FileView {
-        path: root.migrateLegacyHistory ? Quickshell.cacheDir + "/notifications.json" : ""
-        printErrors: false
-
-        onLoaded: {
-            const parsed = root.parseArray(text());
-            if (parsed) {
-                root.history = root.loadHistory(parsed);
-                root.saveHistory();
-            }
-        }
-    }
-
-    Timer {
-        interval: 100
-        repeat: true
-        running: !root.hoverPaused && notifications.some(n => n.duration !== -1)
-        onTriggered: {
-            const now = Date.now();
-
-            root.notifications.filter(notif => notif.duration !== -1 && now > notif.expiresAt).forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
+            root._liveLoaded = true;
+            if (root._popups.length > 0)
+                liveSave.restart();
         }
     }
 }

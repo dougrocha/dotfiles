@@ -64,7 +64,7 @@ IconActionButton {
     glyph: PhosphorIcons.x
     opacity: groupHover.hovered ? 1 : 0
     enabled: opacity > 0
-    onTapped: NotificationService.clearAppHistory(group.modelData.app)
+    onTapped: NotificationService.clearApp(group.modelData.app)
 
     Behavior on opacity {
         NumberAnimation {
