@@ -21,7 +21,9 @@ Singleton {
         })
     readonly property string currentUser: Quickshell.env("USER") ?? ""
 
-    readonly property var live: agent.flow ? readFlow(agent.flow) : null
+    property var flow: null
+    property var stranded: []
+    readonly property var live: flow ? readFlow(flow) : null
     property var held: blankRequest
     onLiveChanged: if (live)
         held = live
@@ -42,7 +44,7 @@ Singleton {
     signal inputReset
 
     function submit(response: string): void {
-        const flow = agent.flow;
+        const flow = root.flow;
         if (!flow?.isResponseRequired || submitted)
             return;
         submitted = true;
@@ -51,13 +53,13 @@ Singleton {
     }
 
     function cancel(): void {
-        const flow = agent.flow;
+        const flow = root.flow;
         end();
         flow?.cancelAuthenticationRequest();
     }
 
     function selectIdentity(index: int): void {
-        const flow = agent.flow;
+        const flow = root.flow;
         if (!flow || index === held.selected)
             return;
         const identity = flow.identities[index];
@@ -184,6 +186,24 @@ Singleton {
         checkLock();
     }
 
+    function track(next) {
+        if (next) {
+            if (flow && flow !== next && !flow.isCompleted)
+                stranded = stranded.concat([flow]);
+            flow = next;
+            adopt();
+        } else {
+            advance();
+        }
+    }
+
+    function advance() {
+        const waiting = stranded.filter(flow => flow && !flow.isCompleted);
+        flow = waiting.shift() ?? null;
+        stranded = waiting;
+        flow ? adopt() : end();
+    }
+
     function end() {
         active = false;
     }
@@ -214,7 +234,7 @@ Singleton {
 
         path: "/qs/PolkitAgent"
 
-        onFlowChanged: flow ? root.adopt() : root.end()
+        onFlowChanged: root.track(flow)
         onIsRegisteredChanged: {
             if (isRegistered)
                 console.log("quickshell polkit agent registered");
@@ -224,13 +244,18 @@ Singleton {
     }
 
     Connections {
-        target: agent.flow
+        target: root.flow
 
         function onIsResponseRequiredChanged() {
-            if (agent.flow?.isResponseRequired) {
+            if (root.flow?.isResponseRequired) {
                 root.submitted = false;
                 root.inputReset();
             }
+        }
+
+        function onIsCompletedChanged() {
+            if (root.flow?.isCompleted && !agent.flow)
+                root.advance();
         }
 
         function onAuthenticationFailed() {
