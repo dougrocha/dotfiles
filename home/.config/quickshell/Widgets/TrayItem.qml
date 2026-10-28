@@ -9,7 +9,7 @@ import qs.Services
 Rectangle {
     id: root
 
-    property var trayItem: modelData
+    property var trayItem: null
     property bool menuOpen: false
     property bool dragging: dragHandler.active
     property real previewOffsetX: 0
@@ -23,11 +23,11 @@ Rectangle {
     function requestPrimaryAction() {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
             root.menuRequested(root.trayItem, root);
-        } else if (trayOverrides.triggerPrimaryAction()) {
-            Visibilities.closeAll();
         } else {
+            const handled = trayOverrides.triggerPrimaryAction();
             Visibilities.closeAll();
-            root.trayItem.activate();
+            if (!handled)
+                root.trayItem.activate();
         }
     }
 

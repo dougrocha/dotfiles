@@ -12,8 +12,6 @@ Rectangle {
 
     signal tapped
 
-    readonly property color emphasis: root.danger ? Theme.danger : Theme.accent
-
     width: size
     height: size
     radius: circular ? width / 2 : Theme.radius.md
@@ -28,7 +26,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         text: root.glyph
-        color: hover.hovered ? root.emphasis : Theme.text.secondary
+        color: hover.hovered ? (root.danger ? Theme.danger : Theme.accent) : Theme.text.secondary
         font.family: Theme.font.icon
         font.pixelSize: root.glyphSize
 

@@ -201,17 +201,14 @@ Singleton {
         readonly property QtObject display: QtObject {
             readonly property int size: 20
             readonly property int weight: Font.Medium
-            readonly property real tracking: 0
         }
         readonly property QtObject title: QtObject {
             readonly property int size: 14
             readonly property int weight: Font.Medium
-            readonly property real tracking: 0
         }
         readonly property QtObject body: QtObject {
             readonly property int size: 13
             readonly property int weight: Font.Normal
-            readonly property real tracking: 0
         }
         readonly property QtObject label: QtObject {
             readonly property int size: 11
@@ -221,7 +218,6 @@ Singleton {
         readonly property QtObject caption: QtObject {
             readonly property int size: 11
             readonly property int weight: Font.Normal
-            readonly property real tracking: 0
         }
         readonly property QtObject mono: QtObject {
             readonly property int size: 13

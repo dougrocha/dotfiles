@@ -7,7 +7,7 @@ Item {
     property string text: ""
     property Item targetItem: null
     property bool hovered: false
-    property int delay: 500
+    readonly property int delay: 500
 
     onHoveredChanged: {
         if (hovered) {
@@ -29,7 +29,7 @@ Item {
         onTriggered: {
             if (!root.text || !root.targetItem)
                 return;
-            var p = root.targetItem.mapToItem(null, root.targetItem.width / 2, 0);
+            const p = root.targetItem.mapToItem(null, root.targetItem.width / 2, 0);
             TooltipService.showTooltip(root.text, p.x, root.targetItem);
         }
     }

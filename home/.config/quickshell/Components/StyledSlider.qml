@@ -10,8 +10,6 @@ Slider {
     property bool holding: false
 
     property color trackColor: Theme.stroke.strong
-    property color accentColor: Theme.text.primary
-    property color handleColor: Theme.text.primary
     property int handleSize: 12
 
     leftPadding: 0
@@ -40,7 +38,7 @@ Slider {
         Rectangle {
             width: slider.visualPosition * parent.width
             height: parent.height
-            color: slider.accentColor
+            color: Theme.text.primary
             radius: Theme.radius.xxs
 
             Behavior on width {
@@ -58,6 +56,6 @@ Slider {
         implicitWidth: slider.handleSize * 1.5
         implicitHeight: slider.handleSize
         radius: height / 2
-        color: slider.handleColor
+        color: Theme.text.primary
     }
 }

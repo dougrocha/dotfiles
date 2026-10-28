@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.Constants
 import qs.Modules.Popups
@@ -196,7 +195,7 @@ Item {
         visible: root.dragSource !== null
         width: 16
         height: 16
-        source: root.draggedTrayItem ? root.draggedTrayItem.icon : ""
+        source: root.draggedTrayItem?.icon ?? ""
         x: root.dragPoint().x - width / 2
         y: root.dragPoint().y - height / 2
         z: 20
