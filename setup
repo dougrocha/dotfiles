@@ -73,7 +73,13 @@ if is_linux; then
     try "$DOTFILES_DIR/install/post/dictation"
 
     step "Services"
-    for service in hyprpaper hyprpolkitagent hypridle hyprsunset; do
+    # Quickshell owns the session's Polkit agent. Retire the previous service.
+    if systemctl --user is-enabled --quiet hyprpolkitagent.service; then
+        try systemctl --user disable --now hyprpolkitagent.service
+    elif systemctl --user is-active --quiet hyprpolkitagent.service; then
+        try systemctl --user stop hyprpolkitagent.service
+    fi
+    for service in hyprpaper hypridle hyprsunset; do
         try systemctl --user enable --now "$service.service"
     done
 fi
