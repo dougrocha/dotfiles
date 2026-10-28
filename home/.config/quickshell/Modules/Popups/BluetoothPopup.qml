@@ -217,7 +217,6 @@ Popup {
 
         PopupActionButton {
             label: "Bluetui"
-            bleed: Theme.panel.rowBleed
             onTapped: {
                 panel.close();
                 Quickshell.execDetached(["launch-or-focus-tui", "bluetui"]);

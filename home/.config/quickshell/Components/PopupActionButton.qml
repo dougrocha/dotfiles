@@ -1,41 +1,17 @@
 import QtQuick
 import qs.Constants
 
-Rectangle {
+PanelRow {
     id: root
 
     property string label: ""
     property string glyph: PhosphorIcons.terminal
-    property int bleed: 0
-    property bool danger: false
 
-    signal tapped
-
-    readonly property bool highlighted: buttonHover.hovered || activeFocus
-
-    activeFocusOnTab: true
-    width: parent.width
-    height: 30
-    radius: Theme.radius.sm
-    color: "transparent"
-
-    Rectangle {
-        z: -1
-        anchors.fill: parent
-        anchors.leftMargin: -root.bleed
-        anchors.rightMargin: -root.bleed
-        radius: parent.radius
-        color: root.highlighted ? (root.danger ? Theme.withAlpha(Theme.danger, 0.10) : Theme.fill.hover) : Theme.withAlpha(Theme.fill.hover, 0)
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
-            }
-        }
-    }
+    implicitHeight: 30
 
     Text {
         id: actionIcon
+
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         text: root.glyph
@@ -60,19 +36,5 @@ Rectangle {
         font.pixelSize: Theme.type.body.size
         font.family: Theme.font.ui
         elide: Text.ElideRight
-    }
-
-    HoverHandler {
-        id: buttonHover
-        cursorShape: Qt.PointingHandCursor
-    }
-    TapHandler {
-        onTapped: root.tapped()
-    }
-    Keys.onPressed: function (event) {
-        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-            root.tapped();
-            event.accepted = true;
-        }
     }
 }

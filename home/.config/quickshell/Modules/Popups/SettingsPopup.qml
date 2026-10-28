@@ -188,7 +188,6 @@ Popup {
             PopupActionButton {
                 glyph: PhosphorIcons.lockSimple
                 label: "Lock"
-                bleed: Theme.panel.rowBleed
                 onTapped: {
                     Quickshell.execDetached(["loginctl", "lock-session"]);
                     panel.close();
@@ -198,14 +197,12 @@ Popup {
             PopupActionButton {
                 glyph: PhosphorIcons.signOut
                 label: "Log out"
-                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""])
             }
 
             PopupActionButton {
                 glyph: PhosphorIcons.arrowCounterClockwise
                 label: "Restart"
-                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""])
             }
 
@@ -213,7 +210,6 @@ Popup {
                 glyph: PhosphorIcons.power
                 label: "Shut down"
                 danger: true
-                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""])
             }
         }

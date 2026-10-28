@@ -111,7 +111,7 @@ PopupWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.margins: Theme.panel.padding
-            spacing: Theme.space.md
+            spacing: Theme.space.xl
         }
     }
 }
