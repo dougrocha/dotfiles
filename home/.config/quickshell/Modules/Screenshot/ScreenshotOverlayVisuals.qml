@@ -13,15 +13,17 @@ Item {
     readonly property color selectionColor: Theme.accent
     readonly property color dimColor: Theme.withAlpha(Theme.shadow, 0.62)
 
-    function labelPosition(pointer, extent, direction, available): real {
+    function preferredPosition(pointer, extent, direction): real {
         const gap = 14;
-        const preferred = direction < 0 ? pointer - gap - extent : pointer + gap;
-        return Math.max(8, Math.min(available - extent - 8, preferred));
+        return direction < 0 ? pointer - gap - extent : pointer + gap;
+    }
+
+    function labelPosition(pointer, extent, direction, available): real {
+        return Math.max(8, Math.min(available - extent - 8, preferredPosition(pointer, extent, direction)));
     }
 
     function labelIsClamped(pointer, extent, direction, available): bool {
-        const gap = 14;
-        const preferred = direction < 0 ? pointer - gap - extent : pointer + gap;
+        const preferred = preferredPosition(pointer, extent, direction);
         return preferred < 8 || preferred > available - extent - 8;
     }
 

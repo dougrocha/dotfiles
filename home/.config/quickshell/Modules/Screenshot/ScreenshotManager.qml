@@ -20,7 +20,6 @@ Item {
     readonly property string visualMode: quickMode ? (hasSelection ? "region" : "windows") : selectedMode
     property string controlMonitor: ""
     readonly property string toolbarHostMonitor: Theme.primaryScreen?.name ?? ""
-    property string toolbarMonitor: ""
     property real toolbarX: -1
     property real toolbarY: -1
     property int timerDelay: 0
@@ -54,6 +53,7 @@ Item {
     property bool systemAudioEnabled: true
     property bool optionsOpen: false
     readonly property var desktopGeometry: calculateDesktopGeometry()
+    readonly property bool canCapture: selectedMode === "region" ? hasSelection : selectedMode === "windows" ? selectedWindow != null : true
 
     function calculateDesktopGeometry(): var {
         const monitors = Quickshell.screens;
@@ -151,11 +151,18 @@ Item {
     }
 
     function selectionContainedByMonitor(monitor): bool {
-        return hasSelection && selectionWidth >= 2 && selectionHeight >= 2 && selectionX >= monitor.x && selectionY >= monitor.y && selectionX + selectionWidth <= monitor.x + monitor.width && selectionY + selectionHeight <= monitor.y + monitor.height;
+        return hasSelection && selectionX >= monitor.x && selectionY >= monitor.y && selectionX + selectionWidth <= monitor.x + monitor.width && selectionY + selectionHeight <= monitor.y + monitor.height;
+    }
+
+    function setSelection(x, y, width, height) {
+        selectionX = x;
+        selectionY = y;
+        selectionWidth = width;
+        selectionHeight = height;
+        hasSelection = width >= 2 && height >= 2;
     }
 
     function restoreOverlayState() {
-        toolbarMonitor = "";
         toolbarX = -1;
         toolbarY = -1;
         if (!SettingsService.loaded)
@@ -163,7 +170,6 @@ Item {
 
         const toolbarSaved = monitorEntry(toolbarHostMonitor)?.toolbar;
         if (isValidSavedToolbarPosition(toolbarSaved)) {
-            toolbarMonitor = toolbarHostMonitor;
             toolbarX = toolbarSaved.x;
             toolbarY = toolbarSaved.y;
         }
@@ -179,11 +185,7 @@ Item {
 
         const regionSaved = entry.region;
         if (rememberLastSelection && isValidSavedRegion(regionSaved, monitor)) {
-            selectionX = monitor.x + regionSaved.x;
-            selectionY = monitor.y + regionSaved.y;
-            selectionWidth = regionSaved.width;
-            selectionHeight = regionSaved.height;
-            hasSelection = true;
+            setSelection(monitor.x + regionSaved.x, monitor.y + regionSaved.y, regionSaved.width, regionSaved.height);
         }
     }
 
@@ -304,9 +306,7 @@ Item {
     }
 
     function capture() {
-        if (countdownActive)
-            return;
-        if ((selectedMode === "region" && !hasSelection) || (selectedMode === "windows" && selectedWindow == null))
+        if (countdownActive || !canCapture)
             return;
         pendingMode = selectedMode;
         pendingGeometry = selectedMode === "region" ? selectionGeometry() : selectedMode === "windows" ? rectGeometry(selectedWindow) : "";
@@ -348,11 +348,7 @@ Item {
     }
 
     function resetSelection() {
-        selectionX = 0;
-        selectionY = 0;
-        selectionWidth = 0;
-        selectionHeight = 0;
-        hasSelection = false;
+        setSelection(0, 0, 0, 0);
         hoveredWindow = null;
         selectedWindow = null;
         readoutVisible = false;
@@ -391,10 +387,11 @@ Item {
     }
 
     function selectSaveDirectory(path) {
-        const normalized = path.replace(/\/+$/, "");
-        const normalizedDefault = defaultSaveDirectory.replace(/\/+$/, "");
+        const trimmed = location => location.replace(/\/+$/, "");
+        const normalized = trimmed(path);
+        const normalizedDefault = trimmed(defaultSaveDirectory);
         const remaining = recentSaveLocations.filter(location => {
-            const candidate = location.replace(/\/+$/, "");
+            const candidate = trimmed(location);
             return candidate !== normalized && candidate !== normalizedDefault;
         });
         if (normalized === normalizedDefault) {
@@ -467,6 +464,62 @@ Item {
         optionsOpen = false;
     }
 
+    component OptionDivider: Rectangle {
+        Layout.fillWidth: true
+        implicitHeight: 1
+        color: Theme.stroke.hairline
+        Layout.topMargin: 4
+        Layout.bottomMargin: 1
+    }
+
+    component ToolbarDivider: Rectangle {
+        implicitWidth: 1
+        implicitHeight: 24
+        Layout.alignment: Qt.AlignVCenter
+        color: Theme.stroke.hairline
+        Layout.leftMargin: 3
+        Layout.rightMargin: 3
+    }
+
+    component ModeButton: Rectangle {
+        id: modeButton
+
+        required property string mode
+        required property string glyph
+
+        implicitWidth: 36
+        implicitHeight: 36
+        radius: Theme.radius.md
+        color: manager.selectedMode === modeButton.mode || modeHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.motion.fast
+            }
+        }
+
+        Text {
+            anchors.centerIn: parent
+            text: modeButton.glyph
+            color: manager.selectedMode === modeButton.mode ? Theme.text.primary : Theme.text.secondary
+            font.pixelSize: Theme.icon.lg
+            font.family: Theme.font.icon
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.motion.fast
+                }
+            }
+        }
+
+        HoverHandler {
+            id: modeHover
+            cursorShape: Qt.PointingHandCursor
+        }
+        TapHandler {
+            onTapped: manager.setSelectedMode(modeButton.mode)
+        }
+    }
+
     Variants {
         model: manager.overlayVisible ? Quickshell.screens : []
 
@@ -495,10 +548,6 @@ Item {
             property int resizeVertical: 0
             property bool interactionMoved: false
 
-            function ownsSelection(): bool {
-                return manager.hasSelection;
-            }
-
             function isNearEdge(value, edge, hit): bool {
                 return Math.abs(value - edge) <= hit;
             }
@@ -517,12 +566,13 @@ Item {
             }
 
             function hitTest(px, py): var {
-                if (!ownsSelection())
-                    return {
-                        mode: "create",
-                        horizontal: 0,
-                        vertical: 0
-                    };
+                const create = {
+                    mode: "create",
+                    horizontal: 0,
+                    vertical: 0
+                };
+                if (!manager.hasSelection)
+                    return create;
 
                 const hit = 10;
                 const left = manager.selectionX;
@@ -543,23 +593,20 @@ Item {
                         horizontal: 0,
                         vertical: 0
                     };
-                return {
-                    mode: "create",
-                    horizontal: 0,
-                    vertical: 0
-                };
+                return create;
             }
 
-            function desktopBounds(): var {
-                return manager.desktopGeometry;
-            }
-
-            function axisReadoutDirection(pointer, resizeSign, initialStart, initialExtent, selectionStart, selectionExtent): int {
+            function resolvedResizeSign(pointer, resizeSign, initialStart, initialExtent): int {
                 if (resizeSign < 0)
                     return pointer <= initialStart + initialExtent ? -1 : 1;
                 if (resizeSign > 0)
                     return pointer >= initialStart ? 1 : -1;
-                return pointer < selectionStart + selectionExtent / 2 ? -1 : 1;
+                return 0;
+            }
+
+            function axisReadoutDirection(pointer, resizeSign, initialStart, initialExtent, selectionStart, selectionExtent): int {
+                const sign = resolvedResizeSign(pointer, resizeSign, initialStart, initialExtent);
+                return sign !== 0 ? sign : pointer < selectionStart + selectionExtent / 2 ? -1 : 1;
             }
 
             function updateReadoutDirection(px, py) {
@@ -597,23 +644,6 @@ Item {
                 manager.readoutMonitor = nearest != null ? nearest.name : "";
             }
 
-            function currentResizeAxes(): var {
-                let h = resizeHorizontal;
-                let v = resizeVertical;
-                if (h < 0)
-                    h = pointerX <= initialX + initialWidth ? -1 : 1;
-                else if (h > 0)
-                    h = pointerX >= initialX ? 1 : -1;
-                if (v < 0)
-                    v = pointerY <= initialY + initialHeight ? -1 : 1;
-                else if (v > 0)
-                    v = pointerY >= initialY ? 1 : -1;
-                return {
-                    horizontal: h,
-                    vertical: v
-                };
-            }
-
             function cursorForResize(horizontal, vertical): int {
                 if (horizontal !== 0 && vertical !== 0)
                     return horizontal === vertical ? Qt.SizeFDiagCursor : Qt.SizeBDiagCursor;
@@ -633,20 +663,14 @@ Item {
                     return Qt.SizeAllCursor;
                 if (interaction === "create")
                     return Qt.CrossCursor;
-                if (interaction === "resize") {
-                    const axes = currentResizeAxes();
-                    return cursorForResize(axes.horizontal, axes.vertical);
-                }
+                if (interaction === "resize")
+                    return cursorForResize(resolvedResizeSign(pointerX, resizeHorizontal, initialX, initialWidth), resolvedResizeSign(pointerY, resizeVertical, initialY, initialHeight));
 
                 return cursorForHit(hitTest(px, py));
             }
 
             function applyCreateInteraction(boundedX, boundedY) {
-                manager.selectionX = Math.min(dragStartX, boundedX);
-                manager.selectionY = Math.min(dragStartY, boundedY);
-                manager.selectionWidth = Math.abs(boundedX - dragStartX);
-                manager.selectionHeight = Math.abs(boundedY - dragStartY);
-                manager.hasSelection = manager.selectionWidth >= 2 && manager.selectionHeight >= 2;
+                manager.setSelection(Math.min(dragStartX, boundedX), Math.min(dragStartY, boundedY), Math.abs(boundedX - dragStartX), Math.abs(boundedY - dragStartY));
                 updateReadoutDirection(boundedX, boundedY);
             }
 
@@ -669,18 +693,25 @@ Item {
                 else if (resizeVertical > 0)
                     bottom = boundedY;
 
-                manager.selectionX = Math.min(left, right);
-                manager.selectionY = Math.min(top, bottom);
-                manager.selectionWidth = Math.abs(right - left);
-                manager.selectionHeight = Math.abs(bottom - top);
-                manager.hasSelection = manager.selectionWidth >= 2 && manager.selectionHeight >= 2;
+                manager.setSelection(Math.min(left, right), Math.min(top, bottom), Math.abs(right - left), Math.abs(bottom - top));
                 updateReadoutDirection(boundedX, boundedY);
+            }
+
+            function restoreInitialSelection() {
+                manager.setSelection(initialX, initialY, initialWidth, initialHeight);
+            }
+
+            function endInteraction() {
+                interaction = "idle";
+                interactionMoved = false;
+                manager.readoutVisible = false;
+                manager.pointerCursorShape = cursorAt(pointerX, pointerY);
             }
 
             function updateInteraction(px, py) {
                 const dx = px - dragStartX;
                 const dy = py - dragStartY;
-                const bounds = desktopBounds();
+                const bounds = manager.desktopGeometry;
                 const boundedX = Math.max(bounds.left, Math.min(bounds.right, px));
                 const boundedY = Math.max(bounds.top, Math.min(bounds.bottom, py));
                 pointerX = px;
@@ -721,9 +752,8 @@ Item {
             anchors.left: true
 
             onVisibleChanged: {
-                if (visible) {
+                if (visible)
                     keyHandler.forceActiveFocus();
-                }
             }
 
             Process {
@@ -831,30 +861,15 @@ Item {
                         manager.captureQuick(overlayWindow.pointerX, overlayWindow.pointerY);
                         return;
                     }
-                    if (overlayWindow.interaction === "create" && !overlayWindow.interactionMoved) {
-                        manager.selectionX = overlayWindow.initialX;
-                        manager.selectionY = overlayWindow.initialY;
-                        manager.selectionWidth = overlayWindow.initialWidth;
-                        manager.selectionHeight = overlayWindow.initialHeight;
-                        manager.hasSelection = overlayWindow.initialWidth >= 2 && overlayWindow.initialHeight >= 2;
-                    } else if (overlayWindow.interactionMoved) {
+                    if (overlayWindow.interaction === "create" && !overlayWindow.interactionMoved)
+                        overlayWindow.restoreInitialSelection();
+                    else if (overlayWindow.interactionMoved)
                         manager.commitRegion();
-                    }
-                    overlayWindow.interaction = "idle";
-                    overlayWindow.interactionMoved = false;
-                    manager.readoutVisible = false;
-                    manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.pointerX, overlayWindow.pointerY);
+                    overlayWindow.endInteraction();
                 }
                 onCanceled: {
-                    manager.selectionX = overlayWindow.initialX;
-                    manager.selectionY = overlayWindow.initialY;
-                    manager.selectionWidth = overlayWindow.initialWidth;
-                    manager.selectionHeight = overlayWindow.initialHeight;
-                    manager.hasSelection = overlayWindow.initialWidth >= 2 && overlayWindow.initialHeight >= 2;
-                    overlayWindow.interaction = "idle";
-                    overlayWindow.interactionMoved = false;
-                    manager.readoutVisible = false;
-                    manager.pointerCursorShape = overlayWindow.cursorAt(overlayWindow.pointerX, overlayWindow.pointerY);
+                    overlayWindow.restoreInitialSelection();
+                    overlayWindow.endInteraction();
                 }
             }
 
@@ -934,16 +949,8 @@ Item {
                         text: "Save to"
                     }
 
-                    ScreenshotOptionRow {
-                        implicitHeight: 28
-                        glyphSize: Theme.icon.sm
-                        label: "Pictures/Screenshots"
-                        checked: manager.saveDirectory === ""
-                        onTapped: manager.selectSaveDirectory(manager.defaultSaveDirectory)
-                    }
-
                     Repeater {
-                        model: manager.recentSaveLocations
+                        model: [""].concat(manager.recentSaveLocations)
 
                         delegate: ScreenshotOptionRow {
                             required property string modelData
@@ -951,7 +958,7 @@ Item {
                             glyphSize: Theme.icon.sm
                             label: manager.locationLabel(modelData)
                             checked: manager.saveDirectory === modelData
-                            onTapped: manager.selectSaveDirectory(modelData)
+                            onTapped: manager.selectSaveDirectory(modelData === "" ? manager.defaultSaveDirectory : modelData)
                         }
                     }
 
@@ -965,7 +972,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: 28
                             anchors.verticalCenter: parent.verticalCenter
-                            text: "Other Location…"
+                            text: "Other location…"
                             color: Theme.accent
                             font.pixelSize: Theme.type.body.size
                             font.weight: Theme.type.title.weight
@@ -985,13 +992,7 @@ Item {
                         }
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 1
-                        color: Theme.stroke.hairline
-                        Layout.topMargin: 4
-                        Layout.bottomMargin: 1
-                    }
+                    OptionDivider {}
 
                     ScreenshotOptionHeader {
                         text: "Timer"
@@ -1047,26 +1048,20 @@ Item {
                         }
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 1
-                        color: Theme.stroke.hairline
-                        Layout.topMargin: 4
-                        Layout.bottomMargin: 1
-                    }
+                    OptionDivider {}
 
                     ScreenshotOptionHeader {
                         text: "Options"
                     }
 
                     ScreenshotOptionRow {
-                        label: "Show Notification"
+                        label: "Show notification"
                         checked: manager.showNotification
                         onTapped: manager.toggleSetting("showNotification")
                     }
 
                     ScreenshotOptionRow {
-                        label: "Remember Last Selection"
+                        label: "Remember last selection"
                         checked: manager.rememberLastSelection
                         onTapped: {
                             manager.toggleSetting("rememberLastSelection");
@@ -1076,7 +1071,7 @@ Item {
                     }
 
                     ScreenshotOptionRow {
-                        label: "System Audio"
+                        label: "System audio"
                         checked: manager.systemAudioEnabled
                         onTapped: manager.toggleSetting("systemAudioEnabled")
                     }
@@ -1087,20 +1082,14 @@ Item {
                         onTapped: manager.toggleSetting("micEnabled")
                     }
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        implicitHeight: 1
-                        color: Theme.stroke.hairline
-                        Layout.topMargin: 4
-                        Layout.bottomMargin: 1
-                    }
+                    OptionDivider {}
 
                     ScreenshotOptionHeader {
                         text: "Capture"
                     }
 
                     ScreenshotOptionRow {
-                        label: "Show Cursor"
+                        label: "Show cursor"
                         checked: manager.showCursor
                         onTapped: manager.toggleSetting("showCursor")
                     }
@@ -1117,8 +1106,8 @@ Item {
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52
-                x: overlayWindow.outputX + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.outputWidth - width, manager.toolbarX)) : (overlayWindow.outputWidth - width) / 2)
-                y: overlayWindow.outputY + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.outputHeight - height, manager.toolbarY)) : overlayWindow.outputHeight - height - 52)
+                x: overlayWindow.outputX + (manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.outputWidth - width, manager.toolbarX)) : (overlayWindow.outputWidth - width) / 2)
+                y: overlayWindow.outputY + (manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.outputHeight - height, manager.toolbarY)) : overlayWindow.outputHeight - height - 52)
                 radius: Theme.radius.lg
                 color: Theme.colors.surface
                 border.width: 1
@@ -1138,7 +1127,6 @@ Item {
                     drag.minimumY: overlayWindow.outputY
                     drag.maximumY: overlayWindow.outputY + overlayWindow.outputHeight - toolbar.height
                     onReleased: {
-                        manager.toolbarMonitor = manager.toolbarHostMonitor;
                         manager.toolbarX = toolbar.x - overlayWindow.outputX;
                         manager.toolbarY = toolbar.y - overlayWindow.outputY;
                         manager.persistToolbarPosition();
@@ -1165,7 +1153,6 @@ Item {
                         }
 
                         HoverHandler {
-                            id: closeArea
                             cursorShape: Qt.PointingHandCursor
                         }
                         TapHandler {
@@ -1189,99 +1176,27 @@ Item {
                             }
                         ]
 
-                        delegate: Rectangle {
+                        delegate: ModeButton {
                             required property var modelData
-                            implicitWidth: 36
-                            implicitHeight: 36
-                            radius: Theme.radius.md
-                            color: manager.selectedMode === modelData.mode || modeArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.motion.fast
-                                }
-                            }
-
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.icon
-                                color: manager.selectedMode === modelData.mode ? Theme.text.primary : Theme.text.secondary
-                                font.pixelSize: Theme.icon.lg
-                                font.family: Theme.font.icon
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.motion.fast
-                                    }
-                                }
-                            }
-
-                            HoverHandler {
-                                id: modeArea
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                            TapHandler {
-                                onTapped: manager.setSelectedMode(modelData.mode)
-                            }
+                            mode: modelData.mode
+                            glyph: modelData.icon
                         }
                     }
 
-                    Rectangle {
-                        implicitWidth: 1
-                        implicitHeight: 24
-                        Layout.alignment: Qt.AlignVCenter
-                        color: Theme.stroke.hairline
-                        Layout.leftMargin: 3
-                        Layout.rightMargin: 3
+                    ToolbarDivider {}
+
+                    ModeButton {
+                        mode: "video"
+                        glyph: PhosphorIcons.videoCamera
                     }
 
-                    Rectangle {
-                        implicitWidth: 36
-                        implicitHeight: 36
-                        radius: Theme.radius.md
-                        color: manager.selectedMode === "video" || videoArea.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.motion.fast
-                            }
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: PhosphorIcons.videoCamera
-                            color: manager.selectedMode === "video" ? Theme.text.primary : Theme.text.secondary
-                            font.pixelSize: Theme.icon.lg
-                            font.family: Theme.font.icon
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.motion.fast
-                                }
-                            }
-                        }
-
-                        HoverHandler {
-                            id: videoArea
-                            cursorShape: Qt.PointingHandCursor
-                        }
-                        TapHandler {
-                            onTapped: manager.setSelectedMode("video")
-                        }
-                    }
-
-                    Rectangle {
-                        implicitWidth: 1
-                        implicitHeight: 24
-                        Layout.alignment: Qt.AlignVCenter
-                        color: Theme.stroke.hairline
-                        Layout.leftMargin: 3
-                        Layout.rightMargin: 3
-                    }
+                    ToolbarDivider {}
 
                     Rectangle {
                         implicitWidth: optionsLabel.implicitWidth + 16
                         implicitHeight: 36
                         radius: Theme.radius.md
-                        color: manager.optionsOpen ? Theme.fill.hover : (optionsBtn.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
+                        color: manager.optionsOpen || optionsBtn.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {
                             ColorAnimation {
@@ -1330,8 +1245,7 @@ Item {
                         implicitWidth: captureLabel.implicitWidth + 22
                         implicitHeight: 36
                         radius: Theme.radius.md
-                        readonly property bool canCapture: manager.selectedMode === "region" ? manager.hasSelection : manager.selectedMode === "windows" ? manager.selectedWindow != null : true
-                        opacity: canCapture ? 1.0 : 0.45
+                        opacity: manager.canCapture ? 1.0 : 0.45
                         color: captureBtn.hovered && captureBtn.enabled ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
                         Layout.leftMargin: 3
 
@@ -1353,11 +1267,11 @@ Item {
 
                         HoverHandler {
                             id: captureBtn
-                            enabled: parent.canCapture && !manager.countdownActive
+                            enabled: manager.canCapture && !manager.countdownActive
                             cursorShape: Qt.PointingHandCursor
                         }
                         TapHandler {
-                            enabled: parent.canCapture && !manager.countdownActive
+                            enabled: manager.canCapture && !manager.countdownActive
                             onTapped: manager.capture()
                         }
                     }

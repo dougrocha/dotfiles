@@ -9,7 +9,6 @@ import qs.Constants
 import qs.Services
 
 Variants {
-    id: root
     model: Theme.primaryScreens
 
     delegate: PanelWindow {
@@ -18,8 +17,8 @@ Variants {
         required property var modelData
         screen: modelData
 
-        readonly property bool shown: ScreenshotToastService.paths.length > 0
         readonly property int previewCount: ScreenshotToastService.paths.length
+        readonly property bool shown: previewCount > 0
 
         readonly property real maxDimension: 220
         readonly property real groupedPreviewWidth: 180
@@ -114,7 +113,7 @@ Variants {
             layer.enabled: true
             layer.effect: MultiEffect {
                 shadowEnabled: true
-                shadowColor: Qt.rgba(0, 0, 0, 0.45)
+                shadowColor: Theme.withAlpha(Theme.shadow, 0.45)
                 shadowBlur: 0.6
                 shadowVerticalOffset: 2
             }
@@ -153,15 +152,12 @@ Variants {
                 }
 
                 HoverHandler {
-                    id: cardHover
                     onHoveredChanged: ScreenshotToastService.hoverPaused = hovered
                 }
 
                 TapHandler {
-                    acceptedButtons: Qt.LeftButton
-                    gesturePolicy: TapHandler.DragThreshold
                     onTapped: {
-                        if (ScreenshotToastService.paths.length === 0)
+                        if (!toastWindow.shown)
                             return;
                         ScreenshotToastService.editorPath = ScreenshotToastService.path;
                         ScreenshotToastService.dismiss();
@@ -170,9 +166,8 @@ Variants {
 
                 DragHandler {
                     target: null
-                    acceptedButtons: Qt.LeftButton
                     onActiveChanged: {
-                        if (!active || card.Drag.active || ScreenshotToastService.paths.length === 0)
+                        if (!active || card.Drag.active || !toastWindow.shown)
                             return;
                         const urls = ScreenshotToastService.paths.map(path => ScreenshotToastService.localFileUrl(path));
                         card.dragPayload = {

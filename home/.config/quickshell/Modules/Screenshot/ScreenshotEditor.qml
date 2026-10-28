@@ -142,7 +142,7 @@ FloatingWindow {
         Text {
             anchors.centerIn: parent
             text: toolButton.glyph
-            color: !toolButton.enabled ? Theme.text.tertiary : toolButton.selected ? Theme.text.primary : toolHover.hovered ? Theme.text.primary : Theme.text.secondary
+            color: !toolButton.enabled ? Theme.text.tertiary : toolButton.selected || toolHover.hovered ? Theme.text.primary : Theme.text.secondary
             font.family: toolButton.selected ? Theme.font.iconFill : Theme.font.icon
             font.pixelSize: Theme.icon.md
 
