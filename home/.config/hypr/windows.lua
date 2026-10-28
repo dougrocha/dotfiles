@@ -73,8 +73,17 @@ hl.window_rule({
     tag = "+floating-window",
 })
 
--- Screenshot save-location picker (portal-backed Zenity dialog)
+-- Screenshot markup opens above the current workspace.
 hl.window_rule({
+    name = "screenshot-markup",
+    match = { class = "^org\\.quickshell$", title = "^Screenshot Markup$" },
+    float = true,
+    center = true,
+    opacity = "1 1",
+})
+
+hl.window_rule({
+    -- Screenshot save-location picker (portal-backed Zenity dialog).
     name = "screenshot-save-location",
     match = {
         class = "^xdg-desktop-portal-gtk$",

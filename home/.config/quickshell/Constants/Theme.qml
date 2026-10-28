@@ -123,6 +123,7 @@ Singleton {
     readonly property color dangerText: root.foregroundFor(root.danger)
     readonly property color caution: root.palette.caution
     readonly property color shadow: "#000000"
+    readonly property list<color> markupInks: ["#e53935", "#ffcc00", "#007aff", "#ffffff", "#111111"]
 
     readonly property QtObject fill: QtObject {
         readonly property color hover: root.withAlpha(root.text.primary, 0.06)

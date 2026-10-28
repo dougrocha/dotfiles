@@ -44,6 +44,10 @@ Singleton {
     readonly property string filmStrip: String.fromCodePoint(0xE792)
     readonly property string crop: String.fromCodePoint(0xE1D4)
     readonly property string cursor: String.fromCodePoint(0xE1DC)
+    readonly property string pencilSimple: String.fromCodePoint(0xE3B4)
+    readonly property string lineSegment: String.fromCodePoint(0xE6D2)
+    readonly property string arrowUpRight: String.fromCodePoint(0xE092)
+    readonly property string rectangle: String.fromCodePoint(0xE3F0)
 
     readonly property string arrowClockwise: String.fromCodePoint(0xE036)
     readonly property string arrowCounterClockwise: String.fromCodePoint(0xE038)

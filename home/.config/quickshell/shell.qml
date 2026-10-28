@@ -25,6 +25,8 @@ ShellRoot {
 
     ScreenshotToast {}
 
+    ScreenshotEditor {}
+
     Island {}
 
     DictationPill {}

@@ -163,7 +163,7 @@ Variants {
                     onTapped: {
                         if (ScreenshotToastService.paths.length === 0)
                             return;
-                        Quickshell.execDetached(["imv"].concat(ScreenshotToastService.paths));
+                        ScreenshotToastService.editorPath = ScreenshotToastService.path;
                         ScreenshotToastService.dismiss();
                     }
                 }
