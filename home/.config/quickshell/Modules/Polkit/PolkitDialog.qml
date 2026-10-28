@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -13,22 +14,19 @@ Scope {
     readonly property color scrim: Theme.withAlpha(Theme.shadow, 0.5)
     property var hostScreen: Theme.primaryScreen
 
-    property real presence: PolkitService.active ? 1 : 0
-    Behavior on presence {
-        NumberAnimation {
-            duration: PolkitService.active ? Theme.motion.normal : Theme.motion.fast
-            easing.type: PolkitService.active ? Theme.motion.easeStandard : Theme.motion.easeExit
-        }
-    }
+    readonly property var dimScreens: presence.mapped ? Quickshell.screens.filter(s => s !== hostScreen) : []
 
-    readonly property bool mapped: PolkitService.active || presence > 0
-    readonly property var dimScreens: mapped ? Quickshell.screens.filter(s => s !== hostScreen) : []
+    Presence {
+        id: presence
+
+        active: PolkitService.active
+    }
 
     Connections {
         target: PolkitService
 
         function onRequestStarted() {
-            if (!root.mapped)
+            if (!presence.mapped)
                 root.hostScreen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Theme.primaryScreen;
             Visibilities.closeAll();
         }
@@ -41,7 +39,7 @@ Scope {
             required property var modelData
 
             screen: modelData
-            visible: root.mapped
+            visible: presence.mapped
             color: "transparent"
             exclusionMode: ExclusionMode.Ignore
             WlrLayershell.namespace: "qs.polkit.dim"
@@ -58,7 +56,7 @@ Scope {
             Rectangle {
                 anchors.fill: parent
                 color: root.scrim
-                opacity: root.presence
+                opacity: presence.progress
             }
 
             TapHandler {
@@ -69,7 +67,7 @@ Scope {
 
     PanelWindow {
         screen: root.hostScreen
-        visible: root.mapped
+        visible: presence.mapped
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
         WlrLayershell.namespace: "qs.polkit"
@@ -86,7 +84,7 @@ Scope {
         Rectangle {
             anchors.fill: parent
             color: root.scrim
-            opacity: root.presence
+            opacity: presence.progress
         }
 
         TapHandler {
@@ -97,8 +95,8 @@ Scope {
             id: card
 
             anchors.centerIn: parent
-            opacity: root.presence
-            scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * root.presence
+            opacity: presence.progress
+            scale: presence.scale
         }
     }
 }

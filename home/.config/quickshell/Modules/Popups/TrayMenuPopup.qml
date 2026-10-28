@@ -9,7 +9,9 @@ PopupWindow {
 
     property Item anchorItem
     property var menuOpener: null
+    property bool open: false
     signal closeRequested
+    signal hidden
     readonly property var barWindow: anchorItem ? anchorItem.QsWindow.window : null
     readonly property real maximumHeight: barWindow && barWindow.screen ? Math.max(120, barWindow.screen.height - barWindow.height - 24) : 600
 
@@ -17,11 +19,15 @@ PopupWindow {
 
     implicitHeight: maximumHeight
     color: "transparent"
-    visible: false
+    visible: presence.mapped
 
-    onVisibleChanged: {
-        if (visible)
+    onOpenChanged: {
+        if (open)
             Qt.callLater(() => menuRect.forceActiveFocus());
+    }
+    onVisibleChanged: {
+        if (!visible)
+            hidden();
     }
 
     anchor.item: root.anchorItem
@@ -37,7 +43,7 @@ PopupWindow {
     anchor.rect.y: anchorItem ? anchorItem.height + 12 : 0
 
     PopupGrab {
-        active: root.visible
+        active: root.open
         windows: root.barWindow ? [root, root.barWindow] : [root]
         onDismissed: root.closeRequested()
     }
@@ -50,7 +56,13 @@ PopupWindow {
     }
 
     mask: Region {
-        item: menuRect
+        item: root.open ? menuRect : null
+    }
+
+    Presence {
+        id: presence
+
+        active: root.open
     }
 
     Rectangle {
@@ -65,11 +77,12 @@ PopupWindow {
         border.width: 1
 
         transformOrigin: Item.Top
-        scale: root.visible ? 1 : Theme.motion.scaleFrom
-        opacity: root.visible ? 1.0 : 0.0
+        scale: presence.scale
+        opacity: presence.progress
+        enabled: root.open
         clip: true
 
-        focus: root.visible
+        focus: root.open
         Keys.onPressed: function (event) {
             if (event.key === Qt.Key_Escape) {
                 root.closeRequested();
@@ -77,20 +90,9 @@ PopupWindow {
             }
         }
 
-        Behavior on scale {
-            SpringAnimation {
-                spring: 8.0
-                damping: 0.7
-                mass: 0.5
-            }
+        SizeMotion on height {
+            enabled: presence.progress === 1
         }
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.motion.instant
-                easing.type: Theme.motion.easeStandard
-            }
-        }
-        SizeMotion on height {}
 
         Flickable {
             id: menuFlickable

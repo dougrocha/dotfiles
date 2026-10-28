@@ -28,18 +28,22 @@ Item {
         return TrayState.items.findIndex(candidate => itemId(candidate) === id);
     }
     function toggleMenu(trayItem, anchorItem) {
-        const shouldClose = trayMenu.visible && activeTrayItem === trayItem;
+        const shouldClose = trayMenu.open && activeTrayItem === trayItem;
         Visibilities.closeAll();
         if (shouldClose)
             return;
         activeTrayItem = trayItem;
         activeAnchor = anchorItem;
-        trayMenu.visible = true;
+        trayMenu.open = true;
     }
     function clearMenu(anchorItem) {
         if (anchorItem && activeAnchor !== anchorItem)
             return;
-        trayMenu.visible = false;
+        trayMenu.open = false;
+        if (anchorItem)
+            releaseMenu();
+    }
+    function releaseMenu() {
         activeTrayItem = null;
         activeAnchor = null;
     }
@@ -155,7 +159,7 @@ Item {
     component ItemDelegate: TrayItem {
         required property var modelData
         trayItem: modelData
-        menuOpen: trayMenu.visible && root.activeTrayItem === trayItem
+        menuOpen: trayMenu.open && root.activeTrayItem === trayItem
         previewOffsetX: root.dragSource ? root.previewOffset(trayItem) : 0
         onMenuRequested: (trayItem, anchorItem) => root.toggleMenu(trayItem, anchorItem)
         onDisappearing: anchorItem => root.clearMenu(anchorItem)
@@ -207,5 +211,6 @@ Item {
         anchorItem: root.activeAnchor
         menuOpener: menuOpener
         onCloseRequested: root.clearMenu(null)
+        onHidden: root.releaseMenu()
     }
 }

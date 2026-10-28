@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -22,7 +23,7 @@ PanelWindow {
     property real wavePhase: 0
 
     screen: Quickshell.screens.find(s => s.name === window.monitorName) ?? Theme.primaryScreen
-    visible: DictationService.active || pill.opacity > 0
+    visible: presence.mapped
     color: "transparent"
     focusable: false
 
@@ -38,6 +39,12 @@ PanelWindow {
     implicitHeight: window.pillHeight
 
     mask: Region {}
+
+    Presence {
+        id: presence
+
+        active: DictationService.active
+    }
 
     Connections {
         target: DictationService
@@ -80,15 +87,8 @@ PanelWindow {
         color: Theme.colors.bg
         border.width: 1
         border.color: Theme.stroke.strong
-        opacity: DictationService.active ? 1 : 0
-        scale: Theme.motion.scaleFrom + (1 - Theme.motion.scaleFrom) * opacity
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: DictationService.active ? Theme.motion.normal : Theme.motion.fast
-                easing.type: DictationService.active ? Theme.motion.easeStandard : Theme.motion.easeExit
-            }
-        }
+        opacity: presence.progress
+        scale: presence.scale
 
         Row {
             id: bars
