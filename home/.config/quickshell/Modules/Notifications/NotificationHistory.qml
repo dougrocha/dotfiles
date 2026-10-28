@@ -150,7 +150,7 @@ Column {
                         }
 
                         TapHandler {
-                            onTapped: NotificationService.removeNotification(row.modelData.id)
+                            onTapped: NotificationService.removeHistoryNotification(row.modelData.id)
                         }
                     }
                 }

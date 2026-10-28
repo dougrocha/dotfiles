@@ -13,15 +13,34 @@ Singleton {
     property list<var> history: []
     property list<var> notifications: []
 
+    readonly property string historySession: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
+    property int historySequence: 0
+
+    function historyId() {
+        return "history-" + historySession + "-" + (++historySequence);
+    }
+
+    function loadHistory(entries) {
+        return entries.map(n => Object.assign({}, n, {
+                id: historyId()
+            }));
+    }
+
     property bool hoverPaused: false
     property double pausedAt: 0
 
     onHoverPausedChanged: {
         if (hoverPaused) {
             pausedAt = Date.now();
+            if (liveLoaded) {
+                liveSaveDebounce.stop();
+                liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))));
+            }
         } else {
-            const delta = Date.now() - pausedAt;
-            root.notifications.forEach(n => n.timestamp += delta);
+            const now = Date.now();
+            root.notifications = root.notifications.map(n => Object.assign({}, n, {
+                    expiresAt: n.expiresAt + Math.max(0, now - Math.max(pausedAt, n.timestamp))
+                }));
         }
     }
 
@@ -69,6 +88,7 @@ Singleton {
                     })),
             timestamp: metadata.timestamp,
             duration: metadata.duration,
+            expiresAt: metadata.expiresAt,
             isPopup: metadata.isPopup,
             ref: n
         };
@@ -139,6 +159,7 @@ Singleton {
         const data = snapshot(notification, {
             timestamp: previous.timestamp,
             duration: previous.duration,
+            expiresAt: previous.expiresAt,
             isPopup: previous.isPopup
         });
         data.closeHandler = previous.closeHandler;
@@ -208,9 +229,12 @@ Singleton {
             return;
         }
 
+        const timestamp = Date.now();
+        const duration = calculateDuration(notification);
         const metadata = {
-            timestamp: Date.now(),
-            duration: calculateDuration(notification),
+            timestamp: timestamp,
+            duration: duration,
+            expiresAt: timestamp + duration,
             isPopup: true
         };
 
@@ -243,7 +267,9 @@ Singleton {
                 discardNotification(notificationId);
             return;
         }
+    }
 
+    function removeHistoryNotification(notificationId) {
         if (root.history.some(n => n.id === notificationId)) {
             root.history = root.history.filter(n => n.id !== notificationId);
             saveHistory();
@@ -266,7 +292,7 @@ Singleton {
         if (!notification.summary && !notification.body)
             return;
         const entry = {
-            id: notification.id,
+            id: historyId(),
             appName: notification.appName ?? "",
             appIcon: notification.appIcon ?? "",
             summary: notification.summary ?? "",
@@ -274,7 +300,7 @@ Singleton {
             urgency: notification.urgency,
             timestamp: notification.timestamp ?? Date.now()
         };
-        root.history = [entry, ...root.history.filter(n => n.id !== entry.id)].slice(0, 50);
+        root.history = [entry, ...root.history].slice(0, 50);
         saveHistory();
     }
 
@@ -318,7 +344,7 @@ Singleton {
         onLoaded: {
             const parsed = root.parseArray(text());
             if (parsed)
-                root.history = parsed;
+                root.history = root.loadHistory(parsed);
         }
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
@@ -338,13 +364,18 @@ Singleton {
             image: n.image,
             urgency: n.urgency,
             timestamp: n.timestamp,
-            duration: n.duration
+            duration: n.duration,
+            expiresAt: n.expiresAt,
+            pausedAt: root.hoverPaused ? root.pausedAt : null
         };
     }
 
     function restoreLive(entries) {
         const now = Date.now();
-        const usable = entries.filter(n => n.duration === -1 || (now - n.timestamp) < n.duration);
+        const usable = entries.map(n => Object.assign({}, n, {
+                id: "restored-" + historyId(),
+                expiresAt: (n.expiresAt ?? (n.timestamp + n.duration)) + (typeof n.pausedAt === "number" ? Math.max(0, now - Math.max(n.pausedAt, n.timestamp)) : 0)
+            })).filter(n => n.duration === -1 || now < n.expiresAt);
 
         root.notifications = [...usable.map(n => Object.assign({}, n, {
                     actions: [],
@@ -378,8 +409,14 @@ Singleton {
             if (parsed)
                 root.restoreLive(parsed);
             root.liveLoaded = true;
+            if (parsed || root.notifications.length > 0)
+                liveSaveDebounce.restart();
         }
-        onLoadFailed: root.liveLoaded = true
+        onLoadFailed: {
+            root.liveLoaded = true;
+            if (root.notifications.length > 0)
+                liveSaveDebounce.restart();
+        }
     }
 
     FileView {
@@ -389,7 +426,7 @@ Singleton {
         onLoaded: {
             const parsed = root.parseArray(text());
             if (parsed) {
-                root.history = parsed;
+                root.history = root.loadHistory(parsed);
                 root.saveHistory();
             }
         }
@@ -403,7 +440,7 @@ Singleton {
             const now = Date.now();
 
             const expired = notifications.filter(notif => {
-                return notif.duration !== -1 && !root.hoverPaused && (now - notif.timestamp) > notif.duration;
+                return notif.duration !== -1 && !root.hoverPaused && now > notif.expiresAt;
             });
 
             expired.forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
