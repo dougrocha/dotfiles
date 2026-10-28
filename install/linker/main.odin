@@ -57,7 +57,7 @@ options:
   -p, --platform NAME   force "linux" or "darwin" instead of detecting
   -P, --prune           remove symlinks into the repo that are no longer listed
   -n, --dry-run         report what would change without touching anything
-  -f, --force           move a conflicting real file aside to <name>.bak
+  -f, --force           move conflicts into a unique <name>.bak directory
   -h, --help            show this message
 
 <dotfiles> comes from $DOTFILES_DIR, or the grandparent of this executable.`
@@ -348,10 +348,28 @@ link_one :: proc(src, dst: string) {
 			return
 		}
 
-		backup := strings.concatenate({dst, ".bak"})
+		// Reserve a unique directory atomically, so an existing backup can never
+		// be replaced, even by concurrent linker runs.
+		backup_dir := strings.concatenate({dst, ".bak"})
+		for suffix := 1;; suffix += 1 {
+			if opts.dry_run {
+				if !path_exists(backup_dir) do break
+			} else {
+				err := os.make_directory(backup_dir)
+				if err == nil do break
+				if !path_exists(backup_dir) {
+					fmt.eprintfln("link: cannot reserve backup %s: %v", display(backup_dir), err)
+					stats.errors += 1
+					return
+				}
+			}
+			backup_dir = fmt.aprintf("%s.bak.%d", dst, suffix)
+		}
+		backup := join({backup_dir, filepath.base(dst)})
 		if opts.dry_run {
 			fmt.printfln("  would back up %s -> %s", display(dst), display(backup))
 		} else if rerr := os.rename(dst, backup); rerr != nil {
+			os.remove(backup_dir)
 			fmt.eprintfln("link: cannot back up %s: %v", display(dst), rerr)
 			stats.errors += 1
 			return
