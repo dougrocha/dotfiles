@@ -10,6 +10,8 @@ Item {
     required property string monitorName
     required property real monitorX
     required property real monitorY
+    readonly property color selectionColor: Theme.accent
+    readonly property color dimColor: Theme.withAlpha(Theme.shadow, 0.62)
 
     function labelPosition(pointer, extent, direction, available): real {
         const gap = 14;
@@ -40,9 +42,9 @@ Item {
         width: targetWindow != null ? targetWindow.width : 0
         height: targetWindow != null ? targetWindow.height : 0
         radius: Theme.radius.md
-        color: Theme.withAlpha(Theme.accent, 0.055)
+        color: Theme.withAlpha(root.selectionColor, 0.08)
         border.width: 1
-        border.color: Theme.withAlpha(Theme.accent, 0.7)
+        border.color: root.selectionColor
     }
 
     Item {
@@ -64,7 +66,7 @@ Item {
         Rectangle {
             anchors.fill: parent
             visible: !regionVisuals.hasIntersection
-            color: Theme.withAlpha(Theme.shadow, 0.4)
+            color: root.dimColor
         }
         Rectangle {
             x: 0
@@ -72,7 +74,7 @@ Item {
             width: regionVisuals.width
             height: regionVisuals.intersectionTop
             visible: regionVisuals.hasIntersection
-            color: Theme.withAlpha(Theme.shadow, 0.4)
+            color: root.dimColor
         }
         Rectangle {
             x: 0
@@ -80,7 +82,7 @@ Item {
             width: regionVisuals.intersectionLeft
             height: regionVisuals.intersectionBottom - y
             visible: regionVisuals.hasIntersection
-            color: Theme.withAlpha(Theme.shadow, 0.4)
+            color: root.dimColor
         }
         Rectangle {
             x: regionVisuals.intersectionRight
@@ -88,7 +90,7 @@ Item {
             width: regionVisuals.width - x
             height: regionVisuals.intersectionBottom - y
             visible: regionVisuals.hasIntersection
-            color: Theme.withAlpha(Theme.shadow, 0.4)
+            color: root.dimColor
         }
         Rectangle {
             x: 0
@@ -96,7 +98,18 @@ Item {
             width: regionVisuals.width
             height: regionVisuals.height - y
             visible: regionVisuals.hasIntersection
-            color: Theme.withAlpha(Theme.shadow, 0.4)
+            color: root.dimColor
+        }
+
+        Rectangle {
+            x: regionVisuals.sx - 1
+            y: regionVisuals.sy - 1
+            width: regionVisuals.sw + 2
+            height: regionVisuals.sh + 2
+            visible: root.manager.hasSelection
+            color: "transparent"
+            border.width: 1
+            border.color: Theme.withAlpha(Theme.foregroundFor(root.selectionColor), 0.8)
         }
 
         Rectangle {
@@ -106,7 +119,7 @@ Item {
             height: regionVisuals.sh
             color: "transparent"
             border.width: root.manager.hasSelection && regionVisuals.sw > 0 ? 2 : 0
-            border.color: Theme.accent
+            border.color: root.selectionColor
         }
 
         Repeater {
@@ -121,9 +134,9 @@ Item {
                 width: 8
                 height: 8
                 radius: Theme.radius.xs
-                color: Theme.accent
+                color: root.selectionColor
                 border.width: 1
-                border.color: Theme.accentText
+                border.color: Theme.foregroundFor(root.selectionColor)
             }
         }
 
