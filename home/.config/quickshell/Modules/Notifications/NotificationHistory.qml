@@ -11,9 +11,7 @@ import qs.Services
 Column {
     id: root
 
-    property int bleed: Theme.space.sm
-
-    readonly property int groupGap: Theme.space.xl
+    required property int bleed
 
     property var expandedApps: ({})
 
@@ -188,12 +186,7 @@ Column {
             readonly property bool expanded: root.expandedApps[modelData.app] === true && count > 1
 
             width: root.width
-
-            Item {
-                width: parent.width
-                height: root.groupGap
-                visible: group.index > 0
-            }
+            topPadding: index > 0 ? Theme.space.xl : 0
 
             RowLayout {
                 width: parent.width

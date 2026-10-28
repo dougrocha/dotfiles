@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
-import Quickshell
 import Quickshell.Services.Notifications
 import qs.Components
 import qs.Constants
@@ -36,6 +35,8 @@ Item {
     function isSettingsAction(a) {
         return /^\s*settings\s*$/i.test(a.text);
     }
+
+    readonly property bool menuShown: menuExpanded && menuActions.length > 0
 
     readonly property var menuActions: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && card.isSettingsAction(a))
     readonly property var buttonActions: (card.modelData?.actions ?? []).filter(a => a.identifier !== "default" && a.text !== "" && !card.isSettingsAction(a))
@@ -103,13 +104,8 @@ Item {
                     card.menuExpanded = false;
                     return;
                 }
-                if (button === Qt.RightButton) {
+                if (button === Qt.RightButton || !card.defaultAction())
                     NotificationService.removeNotification(card.modelData.id);
-                    return;
-                }
-                if (!card.defaultAction()) {
-                    NotificationService.removeNotification(card.modelData.id);
-                }
             }
         }
 
@@ -196,7 +192,7 @@ Item {
 
                 Item {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: card.menuExpanded && card.menuActions.length > 0 ? popover.height + 6 : 0
+                    Layout.preferredHeight: card.menuShown ? popover.height + Theme.space.sm : 0
 
                     SizeMotion on Layout.preferredHeight {}
                 }
@@ -231,14 +227,14 @@ Item {
         Rectangle {
             id: popover
 
-            visible: card.menuExpanded && card.menuActions.length > 0
+            visible: card.menuShown
             opacity: visible ? 1 : 0
             z: 10
 
-            x: Math.max(0, surface.width - width - 12)
+            x: Math.max(0, surface.width - width - Theme.space.lg)
             y: cardContent.y + textColumn.y + headerRow.y + headerRow.height + textColumn.spacing
-            width: popoverColumn.implicitWidth + 8
-            height: popoverColumn.implicitHeight + 8
+            width: popoverColumn.implicitWidth + Theme.space.md
+            height: popoverColumn.implicitHeight + Theme.space.md
 
             radius: Theme.radius.md
             color: Theme.colors.raised
@@ -248,7 +244,7 @@ Item {
             layer.enabled: true
             layer.effect: MultiEffect {
                 shadowEnabled: true
-                shadowColor: Qt.rgba(0, 0, 0, 0.45)
+                shadowColor: Theme.withAlpha(Theme.shadow, 0.45)
                 shadowBlur: 0.6
                 shadowVerticalOffset: 2
             }
@@ -285,7 +281,7 @@ Item {
                         Text {
                             id: menuItemLabel
                             anchors.left: parent.left
-                            anchors.leftMargin: 8
+                            anchors.leftMargin: Theme.space.md
                             anchors.verticalCenter: parent.verticalCenter
                             text: menuItem.modelData.text
                             color: Theme.text.secondary

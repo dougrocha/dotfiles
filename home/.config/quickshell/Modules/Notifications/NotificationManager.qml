@@ -1,10 +1,8 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -97,7 +95,6 @@ Variants {
             Timer {
                 id: unhoverTimer
                 interval: 100
-                repeat: false
                 onTriggered: NotificationService.hoverPaused = false
             }
 
@@ -162,7 +159,6 @@ Variants {
                     Timer {
                         id: removeTimer
                         interval: Theme.motion.fast + 20
-                        repeat: false
                         onTriggered: notificationPanel.removeLocal(delegateWrapper.modelData.id)
                     }
 

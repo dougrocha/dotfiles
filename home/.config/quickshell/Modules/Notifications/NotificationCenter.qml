@@ -11,7 +11,7 @@ Item {
 
     readonly property bool hasHistory: NotificationService.history.length > 0
 
-    readonly property int bleed: Theme.space.sm
+    readonly property int bleed: Theme.panel.rowBleed
 
     implicitHeight: stack.implicitHeight
 
