@@ -56,7 +56,7 @@ Item {
     readonly property var desktopGeometry: calculateDesktopGeometry()
 
     function calculateDesktopGeometry(): var {
-        const monitors = Hyprland.monitors.values;
+        const monitors = Quickshell.screens;
         if (monitors.length === 0)
             return {
                 left: 0,
@@ -173,7 +173,7 @@ Item {
         const entry = monitorEntry(controlMonitor);
         if (entry == null)
             return;
-        const monitor = Hyprland.monitors.values.find(m => m.name === controlMonitor);
+        const monitor = Quickshell.screens.find(m => m.name === controlMonitor);
         if (monitor == null)
             return;
 
@@ -190,7 +190,7 @@ Item {
     function commitRegion() {
         if (!rememberLastSelection || !SettingsService.loaded || controlMonitor === "")
             return;
-        const monitor = Hyprland.monitors.values.find(m => m.name === controlMonitor);
+        const monitor = Quickshell.screens.find(m => m.name === controlMonitor);
         if (monitor == null)
             return;
         const monitors = Object.assign({}, SettingsService.screenshot.monitors);
@@ -382,7 +382,7 @@ Item {
     function captureQuick(px, py) {
         if (regionOnly && !hasSelection)
             return;
-        const target = hasSelection ? null : windowAt(px, py) ?? Hyprland.monitors.values.find(m => px >= m.x && px < m.x + m.width && py >= m.y && py < m.y + m.height);
+        const target = hasSelection ? null : windowAt(px, py) ?? Quickshell.screens.find(m => px >= m.x && px < m.x + m.width && py >= m.y && py < m.y + m.height);
         if (!hasSelection && target == null)
             return;
         pendingMode = regionOnly ? "command" : "region";
@@ -475,10 +475,13 @@ Item {
             required property var modelData
             screen: modelData
 
-            readonly property var monitor: Hyprland.monitorFor(modelData)
-            readonly property real monitorX: monitor?.x ?? 0
-            readonly property real monitorY: monitor?.y ?? 0
+            readonly property real monitorX: manager.desktopGeometry.left
+            readonly property real monitorY: manager.desktopGeometry.top
             readonly property bool hostsToolbar: modelData.name === manager.toolbarHostMonitor
+            readonly property real outputX: modelData.x - monitorX
+            readonly property real outputY: modelData.y - monitorY
+            readonly property real outputWidth: modelData.width
+            readonly property real outputHeight: modelData.height
             property real dragStartX: 0
             property real dragStartY: 0
             property real pointerX: 0
@@ -574,7 +577,7 @@ Item {
             }
 
             function updateReadoutMonitor(px, py) {
-                const monitors = Hyprland.monitors.values;
+                const monitors = Quickshell.screens;
                 let nearest = null;
                 let nearestDistance = Infinity;
                 for (let i = 0; i < monitors.length; ++i) {
@@ -704,6 +707,10 @@ Item {
 
             visible: manager.overlayVisible
             color: "transparent"
+            implicitWidth: manager.desktopGeometry.width
+            implicitHeight: manager.desktopGeometry.height
+            WlrLayershell.margins.left: manager.desktopGeometry.left - modelData.x
+            WlrLayershell.margins.top: manager.desktopGeometry.top - modelData.y
 
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.namespace: "qs.screenshot_overlay"
@@ -711,9 +718,7 @@ Item {
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
             anchors.top: true
-            anchors.bottom: true
             anchors.left: true
-            anchors.right: true
 
             onVisibleChanged: {
                 if (visible) {
@@ -854,11 +859,14 @@ Item {
             }
 
             ScreenshotOverlayVisuals {
-                anchors.fill: parent
+                x: overlayWindow.outputX
+                y: overlayWindow.outputY
+                width: overlayWindow.outputWidth
+                height: overlayWindow.outputHeight
                 manager: manager
                 monitorName: overlayWindow.modelData.name
-                monitorX: overlayWindow.monitorX
-                monitorY: overlayWindow.monitorY
+                monitorX: overlayWindow.modelData.x
+                monitorY: overlayWindow.modelData.y
             }
 
             Item {
@@ -880,8 +888,8 @@ Item {
                 visible: manager.overlayVisible && !manager.quickMode && overlayWindow.hostsToolbar
                 enabled: manager.optionsOpen
 
-                x: Math.max(8, Math.min(parent.width - width - 8, toolbar.x + (toolbar.width - width) / 2))
-                y: toolbar.y >= height + 8 ? toolbar.y - height - 8 : Math.min(parent.height - height - 8, toolbar.y + toolbar.height + 8)
+                x: Math.max(overlayWindow.outputX + 8, Math.min(overlayWindow.outputX + overlayWindow.outputWidth - width - 8, toolbar.x + (toolbar.width - width) / 2))
+                y: toolbar.y - overlayWindow.outputY >= height + 8 ? toolbar.y - height - 8 : Math.min(overlayWindow.outputY + overlayWindow.outputHeight - height - 8, toolbar.y + toolbar.height + 8)
 
                 implicitWidth: 248
                 implicitHeight: optionsColumn.implicitHeight + 16
@@ -1109,8 +1117,8 @@ Item {
 
                 implicitWidth: (manager.countdownActive ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
                 implicitHeight: 52
-                x: (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.width - width, manager.toolbarX)) : (overlayWindow.width - width) / 2)
-                y: (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.height - height, manager.toolbarY)) : overlayWindow.height - height - 52)
+                x: overlayWindow.outputX + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarX >= 0 ? Math.max(0, Math.min(overlayWindow.outputWidth - width, manager.toolbarX)) : (overlayWindow.outputWidth - width) / 2)
+                y: overlayWindow.outputY + (manager.toolbarMonitor === manager.toolbarHostMonitor && manager.toolbarY >= 0 ? Math.max(0, Math.min(overlayWindow.outputHeight - height, manager.toolbarY)) : overlayWindow.outputHeight - height - 52)
                 radius: Theme.radius.lg
                 color: Theme.colors.surface
                 border.width: 1
@@ -1125,14 +1133,14 @@ Item {
                     anchors.fill: parent
                     cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
                     drag.target: toolbar
-                    drag.minimumX: 0
-                    drag.maximumX: overlayWindow.width - toolbar.width
-                    drag.minimumY: 0
-                    drag.maximumY: overlayWindow.height - toolbar.height
+                    drag.minimumX: overlayWindow.outputX
+                    drag.maximumX: overlayWindow.outputX + overlayWindow.outputWidth - toolbar.width
+                    drag.minimumY: overlayWindow.outputY
+                    drag.maximumY: overlayWindow.outputY + overlayWindow.outputHeight - toolbar.height
                     onReleased: {
                         manager.toolbarMonitor = manager.toolbarHostMonitor;
-                        manager.toolbarX = toolbar.x;
-                        manager.toolbarY = toolbar.y;
+                        manager.toolbarX = toolbar.x - overlayWindow.outputX;
+                        manager.toolbarY = toolbar.y - overlayWindow.outputY;
                         manager.persistToolbarPosition();
                     }
                 }
