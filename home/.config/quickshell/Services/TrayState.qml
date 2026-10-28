@@ -94,8 +94,7 @@ Singleton {
                 saved.push(id);
         }
 
-        const filtered = saved.filter(id => id !== itemId);
-        const reordered = insertAtLiveIndex(filtered, items, itemId, index);
+        const reordered = insertAtLiveIndex(saved, items, itemId, index);
 
         SettingsService.tray.version = 1;
         SettingsService.tray.order = reordered;

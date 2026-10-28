@@ -8,11 +8,11 @@ Singleton {
 
     property bool active: false
 
-    function refresh() {
+    function refresh(): void {
         statusProcess.running = true;
     }
 
-    function toggle() {
+    function toggle(): void {
         toggleProcess.running = true;
     }
 
@@ -33,8 +33,6 @@ Singleton {
         id: toggleProcess
 
         command: ["toggle-sunset"]
-        onExited: (exitCode, exitStatus) => {
-            statusProcess.running = true;
-        }
+        onExited: statusProcess.running = true
     }
 }

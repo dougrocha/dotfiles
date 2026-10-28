@@ -220,8 +220,7 @@ Singleton {
         const existing = root.notifications.find(notif => notif.id === id);
         if (existing && existing.ref && existing.closeHandler)
             existing.ref.closed.disconnect(existing.closeHandler);
-        if (existing && existing.unwatch)
-            existing.unwatch();
+        existing?.unwatch?.();
 
         if (progressOf(notification) >= 0) {
             root.notifications = root.notifications.filter(notif => notif.id !== id);
@@ -260,13 +259,12 @@ Singleton {
 
     function removeNotification(notificationId) {
         const notif = root.notifications.find(n => n.id === notificationId);
-        if (notif) {
-            if (notif.ref)
-                notif.ref.dismiss();
-            else
-                discardNotification(notificationId);
+        if (!notif)
             return;
-        }
+        if (notif.ref)
+            notif.ref.dismiss();
+        else
+            discardNotification(notificationId);
     }
 
     function removeHistoryNotification(notificationId) {
@@ -321,7 +319,6 @@ Singleton {
     Timer {
         id: saveDebounce
         interval: 300
-        repeat: false
         onTriggered: historyFile.setText(JSON.stringify(root.history))
     }
 
@@ -388,7 +385,6 @@ Singleton {
     Timer {
         id: liveSaveDebounce
         interval: 300
-        repeat: false
         onTriggered: liveFile.setText(JSON.stringify(root.notifications.map(n => root.liveSnapshot(n))))
     }
 
@@ -439,11 +435,7 @@ Singleton {
         onTriggered: {
             const now = Date.now();
 
-            const expired = notifications.filter(notif => {
-                return notif.duration !== -1 && !root.hoverPaused && now > notif.expiresAt;
-            });
-
-            expired.forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
+            root.notifications.filter(notif => notif.duration !== -1 && now > notif.expiresAt).forEach(notif => notif.ref ? notif.ref.expire() : root.discardNotification(notif.id));
         }
     }
 }

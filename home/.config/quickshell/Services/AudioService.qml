@@ -5,7 +5,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
-import Quickshell.Widgets
 import qs.Constants
 
 Singleton {
@@ -48,11 +47,11 @@ Singleton {
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
 
-    readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
-    readonly property real volume: sink && sink.audio ? (sink.audio.volume ?? 0) : 0
+    readonly property bool muted: sink?.audio?.muted ?? false
+    readonly property real volume: sink?.audio?.volume ?? 0
 
-    readonly property bool sourceMuted: source && source.audio ? source.audio.muted : false
-    readonly property real sourceVolume: source && source.audio ? (source.audio.volume ?? 0) : 0
+    readonly property bool sourceMuted: source?.audio?.muted ?? false
+    readonly property real sourceVolume: source?.audio?.volume ?? 0
 
     function setVolume(newVolume) {
         setStreamVolume(sink, newVolume, 1);

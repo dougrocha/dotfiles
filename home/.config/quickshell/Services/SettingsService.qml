@@ -79,14 +79,10 @@ Singleton {
                 id: audioSettings
 
                 property JsonObject outputs: JsonObject {
-                    id: audioOutputSettings
-
                     property list<string> hidden: []
                 }
 
                 property JsonObject inputs: JsonObject {
-                    id: audioInputSettings
-
                     property list<string> hidden: []
                 }
             }

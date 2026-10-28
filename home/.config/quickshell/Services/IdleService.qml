@@ -8,7 +8,7 @@ Singleton {
 
     property bool active: false
 
-    function refresh() {
+    function refresh(): void {
         statusProcess.running = true;
     }
 
@@ -31,8 +31,6 @@ Singleton {
         id: toggleProcess
 
         command: ["toggle-idle", "--silent"]
-        onExited: (exitCode, exitStatus) => {
-            statusProcess.running = true;
-        }
+        onExited: statusProcess.running = true
     }
 }

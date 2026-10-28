@@ -9,7 +9,7 @@ Singleton {
     readonly property var screenState: {
         let foundStreaming = false;
         let foundRecording = false;
-        let apps = [];
+        const apps = [];
         for (const node of Pipewire.nodes.values) {
             const props = node?.properties;
             if (!props)
@@ -50,7 +50,7 @@ Singleton {
     readonly property bool isScreenshare: screenState.streaming
     readonly property list<string> screenAccessApps: screenState.apps
 
-    function stopRecording() {
+    function stopRecording(): void {
         Quickshell.execDetached(["toggle-recording"]);
     }
 
