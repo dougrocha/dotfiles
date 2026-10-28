@@ -22,13 +22,12 @@ PanelWindow {
     Rectangle {
         id: tip
         readonly property int padH: 10
-        readonly property int padV: 4
 
-        x: Math.max(4, Math.min(parent.width - width - 4, TooltipService.tooltipX - width / 2))
-        y: Theme.topBarHeight + 6
+        x: Math.max(Theme.space.xs, Math.min(parent.width - width - Theme.space.xs, TooltipService.tooltipX - width / 2))
+        y: Theme.topBarHeight + Theme.space.sm
 
         width: label.implicitWidth + padH * 2
-        height: label.implicitHeight + padV * 2
+        height: label.implicitHeight + Theme.space.xs * 2
         radius: Theme.radius.sm
         color: Theme.colors.raised
         border.color: Theme.stroke.strong

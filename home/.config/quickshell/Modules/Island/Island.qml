@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
@@ -9,12 +8,61 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Components
 import qs.Constants
-import qs.Modules.Popups
 import qs.Services
 
 Variants {
     id: root
     model: Theme.primaryScreens
+
+    component RecordingDot: Rectangle {
+        id: dot
+
+        property bool pulsing: false
+
+        width: 8
+        height: 8
+        radius: Theme.radius.xs
+        color: Theme.danger
+
+        SequentialAnimation on opacity {
+            running: dot.pulsing
+            loops: Animation.Infinite
+            NumberAnimation {
+                to: 0.3
+                duration: Theme.motion.pulse
+            }
+            NumberAnimation {
+                to: 1
+                duration: Theme.motion.pulse
+            }
+        }
+    }
+
+    component ProgressTrack: Rectangle {
+        id: track
+
+        property real fraction: 0
+        property color fillColor: Theme.text.primary
+        property int fillDuration: Theme.motion.normal
+
+        height: 4
+        radius: Theme.radius.xxs
+        color: Theme.stroke.strong
+
+        Rectangle {
+            width: track.fraction * track.width
+            height: track.height
+            radius: Theme.radius.xxs
+            color: track.fillColor
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: track.fillDuration
+                    easing.type: Theme.motion.easeStandard
+                }
+            }
+        }
+    }
 
     delegate: PanelWindow {
         id: overlay
@@ -83,6 +131,7 @@ Variants {
                 readonly property int compactHeight: Theme.topBarHeight - 8
 
                 readonly property int inset: 16
+                readonly property int notifWidth: 380
 
                 readonly property int targetHeight: full ? fullContent.implicitHeight + inset * 2 : notif ? notifContent.implicitHeight + inset * 2 : recDetails ? compactHeight + recArea.implicitHeight + 12 : compactHeight
 
@@ -98,7 +147,7 @@ Variants {
                 anchors.horizontalCenter: parent.horizontalCenter
                 y: 4
 
-                width: full ? musicColumn.width + inset * 2 : notif ? 380 : compactRow.implicitWidth + 28
+                width: full ? musicColumn.width + inset * 2 : notif ? notifWidth : compactRow.implicitWidth + 28
                 height: targetHeight
                 radius: Math.min(height / 2, cornerRadius)
                 color: pill.full ? Theme.colors.overlay : Theme.colors.surface
@@ -267,25 +316,12 @@ Variants {
                                 font.pixelSize: Theme.icon.md
                                 font.family: Theme.font.icon
                             }
-                            Rectangle {
+                            ProgressTrack {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: 120
-                                height: 4
-                                radius: Theme.radius.xxs
-                                color: Theme.stroke.strong
-
-                                Rectangle {
-                                    width: Math.min(IslandService.osdLevel, 1) * parent.width
-                                    height: parent.height
-                                    radius: Theme.radius.xxs
-                                    color: IslandService.osdMuted ? Theme.text.tertiary : Theme.text.primary
-                                    Behavior on width {
-                                        NumberAnimation {
-                                            duration: Theme.motion.instant
-                                            easing.type: Theme.motion.easeStandard
-                                        }
-                                    }
-                                }
+                                fraction: Math.min(IslandService.osdLevel, 1)
+                                fillColor: IslandService.osdMuted ? Theme.text.tertiary : Theme.text.primary
+                                fillDuration: Theme.motion.instant
                             }
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
@@ -324,27 +360,11 @@ Variants {
                                 elide: Text.ElideRight
                             }
 
-                            Rectangle {
+                            ProgressTrack {
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: (IslandService.currentAlert?.progress ?? -1) >= 0
                                 width: 80
-                                height: 4
-                                radius: Theme.radius.xxs
-                                color: Theme.stroke.strong
-
-                                Rectangle {
-                                    width: Math.max(0, IslandService.currentAlert?.progress ?? 0) * parent.width
-                                    height: parent.height
-                                    radius: Theme.radius.xxs
-                                    color: Theme.text.primary
-
-                                    Behavior on width {
-                                        NumberAnimation {
-                                            duration: Theme.motion.normal
-                                            easing.type: Theme.motion.easeStandard
-                                        }
-                                    }
-                                }
+                                fraction: Math.max(0, IslandService.currentAlert?.progress ?? 0)
                             }
                         }
 
@@ -357,25 +377,9 @@ Variants {
 
                             ContentFade on opacity {}
 
-                            Rectangle {
+                            RecordingDot {
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: 8
-                                height: 8
-                                radius: Theme.radius.xs
-                                color: Theme.danger
-
-                                SequentialAnimation on opacity {
-                                    running: pill.activity === "recording"
-                                    loops: Animation.Infinite
-                                    NumberAnimation {
-                                        to: 0.3
-                                        duration: Theme.motion.pulse
-                                    }
-                                    NumberAnimation {
-                                        to: 1
-                                        duration: Theme.motion.pulse
-                                    }
-                                }
+                                pulsing: pill.activity === "recording"
 
                                 TapHandler {
                                     onTapped: pill.recDetails = !pill.recDetails
@@ -478,7 +482,7 @@ Variants {
                     anchors.top: parent.top
                     anchors.topMargin: pill.inset
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 380 - pill.inset * 2
+                    width: pill.notifWidth - pill.inset * 2
                     spacing: Theme.space.lg
                     opacity: pill.notif ? 1 : 0
                     visible: opacity > 0
@@ -831,26 +835,10 @@ Variants {
                     font.pixelSize: Theme.icon.xs
                 }
 
-                Rectangle {
+                RecordingDot {
                     anchors.centerIn: parent
                     visible: bubble.shownKind === "recording"
-                    width: 8
-                    height: 8
-                    radius: Theme.radius.xs
-                    color: Theme.danger
-
-                    SequentialAnimation on opacity {
-                        running: bubble.visible && bubble.shownKind === "recording"
-                        loops: Animation.Infinite
-                        NumberAnimation {
-                            to: 0.3
-                            duration: Theme.motion.pulse
-                        }
-                        NumberAnimation {
-                            to: 1
-                            duration: Theme.motion.pulse
-                        }
-                    }
+                    pulsing: bubble.visible && bubble.shownKind === "recording"
                 }
 
                 HoverHandler {
