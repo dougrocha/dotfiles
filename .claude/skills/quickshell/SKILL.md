@@ -17,9 +17,9 @@ The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell`
 | `shell.qml`                    | The root. It makes one instance of each top-level module.                                                                            | Add a module here only when it has its own window.                                    |
 | `Constants/`                   | `Theme.qml` (all design tokens) and `PhosphorIcons.qml` (icon glyphs).                                                               | Singletons in this directory cannot import each other. Put all tokens in `Theme.qml`. |
 | `Services/`                    | Singletons that hold state and talk to the system (audio, Bluetooth, notifications, settings).                                       | Put state and system logic here. Do not put layout here. Each file starts with `pragma Singleton`, and its root is `Singleton {}`. |
-| `Services/Visibilities.qml`    | `current`, the name of the open panel, and one `PanelIpc` target for each panel.                                                     | Open and close panels only with `open`, `close`, `toggle`, and `closeAll`. While a panel is open, it keeps Hyprland in the `qs-panel` submap, whose Escape bind calls the `panels` target's `closeAll`. |
+| `Services/Visibilities.qml`    | `current`, the name of the open panel. Each bar panel's `Popup` registers its own IPC target.                                                     | Open and close panels only with `open`, `close`, `toggle`, and `closeAll`. While a panel is open, it keeps Hyprland in the `qs-panel` submap, whose Escape bind calls the `panels` target's `closeAll`. |
 | `Services/SettingsService.qml` | User settings. It writes them to `$XDG_STATE_HOME/quickshell/settings.json`. If `XDG_STATE_HOME` is not set, it uses `$HOME/.local/state`.                                                         | Add a persistent setting here. Put a feature's settings in its own `JsonObject` section, and read them as `SettingsService.<section>.<key>`. |
-| `Components/`                  | Shared controls: `Popup`, `PopupCard`, `ListRow`, `ToggleRow`, `SectionLabel`, `Divider`, `IconActionButton`, `CloseBadge`, `TextLink`, `SpringMotion`, sliders. | Use a component from here before you make a new one.                                  |
+| `Components/`                  | Shared controls: `Popup`, `Presence`, `PanelHeader`, `PanelGroup`, `PanelRow`, `DeviceRow`, `PanelFooterLink`, `ToggleRow`, `SectionLabel`, `Divider`, `IconActionButton`, `CloseBadge`, `TextLink`, `SpringMotion`, sliders. | Use a component from here before you make a new one.                                  |
 | `Modules/<Name>/`              | One feature for each directory: `Bar`, `Notifications`, `Popups`, `Island`, `Screenshot`, `Polkit`, `TooltipOverlay`.                | Keep files for one feature in its directory. For a window on each monitor, use `Variants { model: Quickshell.screens }` with a `PanelWindow` delegate. |
 | `Widgets/`                     | Small items that the bar uses: clock, tray.                                                                                          |                                                                                       |
 | `palette.json`                 | Colors from matugen. `Theme.qml` reads this file and watches it for changes.                                                         | Do not edit it. Matugen writes it.                                                    |
@@ -27,13 +27,13 @@ The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell`
 
 Imports use the `qs.` prefix, for example `import qs.Components` and `import qs.Services`.
 
-A bar panel (settings, sound, Bluetooth, notification center) has four parts: a `PanelIpc` in `Visibilities.qml`, a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml`, and a bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. The panel name is also its IPC target. `Popup` sets its position and `shown`, and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
+A bar panel (settings, sound, Bluetooth, notification center) has three parts: a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml` that sets `trigger` to the bar control, and the bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. The panel name is also its IPC target, and `Popup` registers it. `Popup` sets its position, `shown`, and its enter and exit motion, and closes itself when it is dismissed. Use `onOpened` for work at open time. Call `panel.close()` to close it from a control.
 
 `Visibilities.current` holds one name, so only one panel is open at a time. `Visibilities.close(name)` closes only that panel. So a late dismiss from an old panel does not close the new panel.
 
 A service does not own panel visibility. A service can read `Visibilities.isOpen(...)`, for example to hide the OSD while the sound panel is open.
 
-Other popups use different patterns. Tray menus use `TrayMenuPopup.qml`, which is a `PopupWindow` with local state. The music panel is part of `Modules/Island/`.
+Other popups use different patterns. Tray menus use `TrayMenuPopup.qml`, which is a `PopupWindow` with an `open` flag that `TraySection` sets. The music panel is part of `Modules/Island/`.
 
 ## 2. Code rules
 
@@ -107,7 +107,7 @@ If a token does not exist, add it to `Theme.qml`. Do not write the value in the 
 
 ### 5.1 Surfaces
 
-- Use one level of container. A popup is a card already (`PopupCard`). Do not put a filled card or a bordered card in it.
+- Use one level of container. A popup is a card already (`Popup`). Do not put a filled card or a bordered card in it.
 - Make groups with spacing, `Divider`, and hover fills.
 - Card radius is `Theme.radius.xl`. Controls in a card use `radius.md` or `radius.sm`.
 - Use a border or a shadow for elevation. Do not use the two together on one surface.
@@ -143,7 +143,7 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 
 - Show secondary controls on an item (close, clear group) only on hover. Fade them with `Theme.motion.fast`, and set `enabled: opacity > 0`.
 - Keep primary actions and panel actions visible, for example "Clear all" in the notification center header.
-- Align the row text with the content edge. Let the hover fill extend past the edge with `bleed: panel.rowBleed`.
+- Align the row text with the content edge. Let the hover fill extend past the edge: build the row on `PanelRow`, or pass `bleed: Theme.panel.rowBleed`.
 - If an ancestor has `clip: true`, set `x: -bleed` and `width: parent.width + bleed * 2`, and move the content back with `x: bleed`. If not, the clip cuts the hover fill.
 - Put a badge on a rounded corner at the center of the curve, as `CloseBadge` in `NotificationCard.qml` does.
 
@@ -155,7 +155,8 @@ Do the squint test first. Blur the surface in your mind. You must see the title,
 - To animate the size of a container, use `SizeMotion on height {}` (or `width`, `implicitWidth`, `Layout.preferredHeight`). It grows with `motion.normal` and shrinks with `motion.fast`. Do not write a `NumberAnimation` for size. Do not animate the size of a window. Make the window large enough for the largest state, and set `mask` to the animated item.
 - Content that appears in a container that grows fades in with `ContentFade on opacity {}` and moves `Theme.motion.nudge` into place with a `Translate`. The calendar month change is the reference. It uses a short move and a fade, not a large slide. The code is in `references/qml-patterns.md`.
 - Value fills (slider, OSD level, progress) and the Island springs are not size changes. Keep their own animations.
-- A surface that scales in grows from `Theme.motion.scaleFrom` (0.95) to 1, together with its opacity. Never scale from 0 or from another literal. qslint checks it.
+- A surface that appears and disappears uses `Presence`: `visible: presence.mapped`, `opacity: presence.progress`, `scale: presence.scale`. It grows from `Theme.motion.scaleFrom` (0.95) to 1 with a strong ease-out, enters in `motion.normal`, and exits in `motion.fast`, and the window stays mapped until the exit ends. Do not write a second enter or exit animation. The code is in `references/qml-patterns.md`.
+- Scale a popover from the side of its trigger, and an alert from its centre. Never scale from 0 or from another literal. qslint checks it.
 
 ### 5.6 More design decisions
 
