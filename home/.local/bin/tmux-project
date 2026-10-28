@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Pick a project folder or an open session with fzf, then switch to it.
+# Each project gets a session named after its folder, created on first pick.
+# Pass a path to skip the picker.
+
+SEARCH_PATHS=(~/dev)
+
+list() {
+  local current=""
+  [[ -n $TMUX ]] && current=$(tmux display-message -p '#S')
+  tmux list-sessions -F '[tmux] #{session_name}' 2>/dev/null | grep -vFx "[tmux] $current"
+  fd --type d --min-depth 1 --max-depth 1 . "${SEARCH_PATHS[@]}" | sed "s|^$HOME|~|; s|/$||"
+}
+
+if (($# > 0)); then
+  selected="$1"
+else
+  selected=$(list | fzf --reverse --prompt 'project> ') || exit 0
+fi
+
+if [[ $selected == "[tmux] "* ]]; then
+  name="${selected#\[tmux\] }"
+else
+  dir="${selected/#\~/$HOME}"
+  # tmux reserves . and : in session names
+  name=$(basename "$dir" | tr '.:' '__')
+  tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$dir"
+fi
+
+if [[ -n $TMUX ]]; then
+  tmux switch-client -t "=$name"
+else
+  tmux attach-session -t "=$name"
+fi
+
+# vim: ft=sh
