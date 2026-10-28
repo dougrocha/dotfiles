@@ -35,6 +35,17 @@ A service does not own panel visibility. A service can read `Visibilities.isOpen
 
 Two panels do not use `Popup`. Tray menus use `Modules/Popups/TrayMenuPopup.qml`, a `PopupWindow` with an `open` flag that `Widgets/TraySection.qml` sets. The music panel is part of `Modules/Island/`.
 
+### 1.1 Architecture style
+
+Write imperative code that a reader can follow from top to bottom. The config has one author. Do not add plugins, manifests, registries, or tests.
+
+- A feature has one owner of its state, usually a singleton in `Services/`. The owner exposes named commands, for example `capture()`, `dismiss(id)`, or `pause()`. Each command changes state in one function, step by step.
+- Views read state and call commands. A view never writes the owner's state.
+- Bindings only display state, for example `text: ScreenshotSession.mode`. Do not put logic in a chain of bindings that react to each other.
+- Put maths, such as geometry, expiry, or date rules, in plain functions in the owner. Move them to a `.js` file next to it only when the owner gets too long.
+- Keep one list for one set of items, such as capture modes or timer delays, in the owner. Other code reads that list.
+- Keep the owner's interface small. A property or function that only the owner uses is not part of it; prefix it with `_`.
+
 ## 2. Code rules
 
 Apply these rules to new code and to code that you change. Some old files do not obey them yet. Do not change a file only to obey a rule.
