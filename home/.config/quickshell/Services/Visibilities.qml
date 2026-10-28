@@ -62,22 +62,6 @@ Singleton {
         target: "music-panel"
     }
 
-    PanelIpc {
-        target: "settings-panel"
-    }
-
-    PanelIpc {
-        target: "sound-panel"
-    }
-
-    PanelIpc {
-        target: "bluetooth-panel"
-    }
-
-    PanelIpc {
-        target: "notification-center"
-    }
-
     IpcHandler {
         target: "panels"
         function closeAll(): void {

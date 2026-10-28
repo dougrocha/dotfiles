@@ -12,6 +12,6 @@ Popup {
 
     NotificationCenter {
         width: parent.width
-        maxHeight: panel.implicitHeight - panel.cardPadding * 2
+        maxHeight: panel.contentMaxHeight
     }
 }

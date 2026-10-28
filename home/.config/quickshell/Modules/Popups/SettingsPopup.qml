@@ -11,6 +11,7 @@ Popup {
     id: panel
 
     panelName: "settings-panel"
+    cardWidth: 300
 
     onOpened: {
         IdleService.refresh();
@@ -88,7 +89,7 @@ Popup {
         ToggleRow {
             width: parent.width
             style: "switch"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             glyph: PhosphorIcons.lockSimple
             label: "Idle lock"
             active: IdleService.active
@@ -98,7 +99,7 @@ Popup {
         ToggleRow {
             width: parent.width
             style: "switch"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             glyph: PhosphorIcons.bellSlash
             label: "Do not disturb"
             active: SettingsService.doNotDisturb
@@ -108,7 +109,7 @@ Popup {
         ToggleRow {
             width: parent.width
             style: "switch"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             glyph: PhosphorIcons.moon
             label: "Night light"
             active: SunsetService.active
@@ -118,7 +119,7 @@ Popup {
         ToggleRow {
             width: parent.width
             style: "switch"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
             label: "Microphone"
             active: !AudioService.sourceMuted
@@ -187,7 +188,7 @@ Popup {
             PopupActionButton {
                 glyph: PhosphorIcons.lockSimple
                 label: "Lock"
-                bleed: panel.rowBleed
+                bleed: Theme.panel.rowBleed
                 onTapped: {
                     Quickshell.execDetached(["loginctl", "lock-session"]);
                     panel.close();
@@ -197,14 +198,14 @@ Popup {
             PopupActionButton {
                 glyph: PhosphorIcons.signOut
                 label: "Log out"
-                bleed: panel.rowBleed
+                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""])
             }
 
             PopupActionButton {
                 glyph: PhosphorIcons.arrowCounterClockwise
                 label: "Restart"
-                bleed: panel.rowBleed
+                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""])
             }
 
@@ -212,7 +213,7 @@ Popup {
                 glyph: PhosphorIcons.power
                 label: "Shut down"
                 danger: true
-                bleed: panel.rowBleed
+                bleed: Theme.panel.rowBleed
                 onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""])
             }
         }

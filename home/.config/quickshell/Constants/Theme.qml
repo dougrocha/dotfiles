@@ -139,6 +139,12 @@ Singleton {
         readonly property color accent: root.accent
     }
 
+    readonly property QtObject panel: QtObject {
+        readonly property int width: 320
+        readonly property int padding: root.space.lg
+        readonly property int rowBleed: padding - root.space.sm
+    }
+
     readonly property QtObject radius: QtObject {
         readonly property int xxs: 2
         readonly property int xs: 4
@@ -180,6 +186,7 @@ Singleton {
         readonly property int easeExit: Easing.InCubic
         readonly property int easeSmooth: Easing.InOutQuad
         readonly property int easeSoft: Easing.OutQuad
+        readonly property list<real> curveOut: [0.23, 1, 0.32, 1, 1, 1]
         readonly property int enterDelay: 70
         readonly property int nudge: 4
         readonly property real scaleFrom: 0.95

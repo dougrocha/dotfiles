@@ -166,15 +166,23 @@ Variants {
 
                     CpuIndicator {}
 
-                    BluetoothIndicator {}
+                    BluetoothIndicator {
+                        id: bluetoothIndicator
+                    }
 
-                    VolumeIndicator {}
+                    VolumeIndicator {
+                        id: volumeIndicator
+                    }
 
-                    SettingsButton {}
+                    SettingsButton {
+                        id: settingsButton
+                    }
 
                     DoNotDisturbIndicator {}
 
-                    ClockButton {}
+                    ClockButton {
+                        id: clockButton
+                    }
                 }
             }
         }
@@ -184,6 +192,7 @@ Variants {
 
             SettingsPopup {
                 anchor.window: topBar
+                trigger: settingsButton
             }
         }
 
@@ -192,6 +201,7 @@ Variants {
 
             SoundPopup {
                 anchor.window: topBar
+                trigger: volumeIndicator
             }
         }
 
@@ -200,6 +210,7 @@ Variants {
 
             BluetoothPopup {
                 anchor.window: topBar
+                trigger: bluetoothIndicator
             }
         }
 
@@ -208,6 +219,7 @@ Variants {
 
             NotificationPopup {
                 anchor.window: topBar
+                trigger: clockButton
             }
         }
     }

@@ -37,8 +37,8 @@ PopupWindow {
     anchor.rect.y: anchorItem ? anchorItem.height + 12 : 0
 
     PopupGrab {
-        popup: root
-        anchorWindow: root.barWindow
+        active: root.visible
+        windows: root.barWindow ? [root, root.barWindow] : [root]
         onDismissed: root.closeRequested()
     }
 

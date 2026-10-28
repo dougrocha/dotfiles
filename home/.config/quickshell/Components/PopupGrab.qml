@@ -5,35 +5,32 @@ import Quickshell.Hyprland
 Scope {
     id: root
 
-    required property var popup
-    property var anchorWindow: popup ? popup.anchor.window : null
+    required property bool active
+    required property list<QtObject> windows
 
     signal dismissed
 
+    onActiveChanged: {
+        if (active) {
+            armDelay.restart();
+        } else {
+            armDelay.stop();
+            grab.active = false;
+        }
+    }
+
     HyprlandFocusGrab {
         id: grab
+
         active: false
-        windows: root.anchorWindow ? [root.popup, root.anchorWindow] : [root.popup]
+        windows: root.windows
         onCleared: root.dismissed()
     }
 
     Timer {
-        id: grabDelay
+        id: armDelay
+
         interval: 50
-        repeat: false
-        onTriggered: grab.active = true
-    }
-
-    Connections {
-        target: root.popup
-
-        function onVisibleChanged() {
-            if (root.popup.visible) {
-                grabDelay.restart();
-            } else {
-                grabDelay.stop();
-                grab.active = false;
-            }
-        }
+        onTriggered: grab.active = root.active
     }
 }

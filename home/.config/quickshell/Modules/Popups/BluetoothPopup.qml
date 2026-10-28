@@ -10,6 +10,7 @@ Popup {
     id: panel
 
     panelName: "bluetooth-panel"
+    cardWidth: 300
 
     component DeviceEntry: Rectangle {
         id: entry
@@ -27,8 +28,8 @@ Popup {
         Rectangle {
             z: -1
             anchors.fill: parent
-            anchors.leftMargin: -panel.rowBleed
-            anchors.rightMargin: -panel.rowBleed
+            anchors.leftMargin: -Theme.panel.rowBleed
+            anchors.rightMargin: -Theme.panel.rowBleed
             radius: parent.radius
             color: entry.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
@@ -112,7 +113,7 @@ Popup {
         ToggleRow {
             width: parent.width
             style: "switch"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             glyph: BluetoothService.glyph
             label: "Bluetooth"
             active: BluetoothService.powered
@@ -167,8 +168,8 @@ Popup {
 
             Flickable {
                 id: pairedScroll
-                x: -panel.rowBleed
-                width: parent.width + panel.rowBleed * 2
+                x: -Theme.panel.rowBleed
+                width: parent.width + Theme.panel.rowBleed * 2
                 height: Math.min(pairedColumn.implicitHeight, 240)
                 contentHeight: pairedColumn.implicitHeight
                 clip: true
@@ -177,8 +178,8 @@ Popup {
 
                 Column {
                     id: pairedColumn
-                    x: panel.rowBleed
-                    width: pairedScroll.width - panel.rowBleed * 2
+                    x: Theme.panel.rowBleed
+                    width: pairedScroll.width - Theme.panel.rowBleed * 2
                     spacing: Theme.space.xxs
 
                     Repeater {
@@ -216,7 +217,7 @@ Popup {
 
         PopupActionButton {
             label: "Bluetui"
-            bleed: panel.rowBleed
+            bleed: Theme.panel.rowBleed
             onTapped: {
                 panel.close();
                 Quickshell.execDetached(["launch-or-focus-tui", "bluetui"]);

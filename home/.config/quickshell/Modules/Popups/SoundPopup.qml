@@ -16,7 +16,6 @@ Popup {
     }
 
     panelName: "sound-panel"
-    cardWidth: 320
 
     Column {
         width: parent.width
@@ -165,8 +164,8 @@ Popup {
                 color: "transparent"
 
                 Rectangle {
-                    x: -panel.rowBleed
-                    width: parent.width + panel.rowBleed * 2
+                    x: -Theme.panel.rowBleed
+                    width: parent.width + Theme.panel.rowBleed * 2
                     height: parent.height
                     radius: parent.radius
                     color: footerHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
@@ -229,8 +228,8 @@ Popup {
         height: 34
 
         Rectangle {
-            x: -panel.rowBleed
-            width: parent.width + panel.rowBleed * 2
+            x: -Theme.panel.rowBleed
+            width: parent.width + Theme.panel.rowBleed * 2
             height: parent.height
             radius: Theme.radius.sm
             color: rowHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
