@@ -1,11 +1,11 @@
 # Notification toasts
 
-Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after the sender's timeout, or 3 seconds by default, and then moves to history. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card, and while the center is open it waits until the center closes.
+Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after the sender's timeout, or by default after 3 seconds (2 seconds for low urgency), and then moves to history. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card, and while the center is open it waits until the center closes.
 
 ## Sub-features
 
 - `toast-normal` shows a card that closes after its timeout.
-- `toast-close` closes a normal card on a left click. The source also closes it on a right click and on its X badge, which shows on hover. Those two paths were not driven on 2026-10-09.
+- `toast-close` closes a normal card on a left click, unless the notification has a default action. A left click runs that action instead. The source also closes a card on a right click and on its X badge, which shows on hover. Those two paths were not driven on 2026-10-09.
 - `toast-critical` shows a red-tinted card that stays.
 - `toast-actions` shows the sender's action buttons.
 - `toast-history` sends normal notifications to history while the center is open or Do Not Disturb is on.
@@ -38,7 +38,6 @@ Preconditions:
 ## Gotchas
 
 - Click a card with `qsv click <x> <y>`, which moves and clicks at once. On 2026-10-09 a click that came after the pointer rested on the stack for 0.3s or more did not register on any card, normal or critical. A fresh `qsv click` on the same spot then worked. Do not report a card as unclosable before you retry with `qsv click`.
-- Send critical tests through `qsv notify` so `qsv cleanup` can close them over D-Bus.
-- `notify-send -A` waits for a click and prints no ID while it waits, so `qsv notify` cannot record it. Run it in the background as shown and let it time out.
-- Without `-t 0`, a sender timeout can close a critical card.
+- Send critical tests through `qsv notify` so `qsv cleanup` can close them over D-Bus. Use `-t 0` so a sender timeout does not close them.
+- `notify-send -A` cannot be recorded by `qsv notify`. Run it in the background as shown and let it time out. See quickshell-dev, section 4.
 - Test titles stay in the history file. Clear them from the center's `Clear all` only if the user agrees, because that clears their real history too.

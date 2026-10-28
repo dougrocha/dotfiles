@@ -17,7 +17,7 @@ Every monitor has a bar whose right-hand group holds CPU, Bluetooth, volume, set
 
 - Click the control in any bar's right-hand group.
 - Click the island at the top center of DP-1 while media plays.
-- Run `qs ipc call <target> open|hide|toggle`. This is for setup only. Targets are `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, and `music-panel`. `qs ipc call panels closeAll` closes whichever is open.
+- Run `qs ipc call <target> open|hide|toggle`. This is for setup only. The panel targets are listed in quickshell-dev, section 3. `qs ipc call panels closeAll` closes whichever panel is open.
 
 ## Driving it with qsv
 
@@ -36,9 +36,8 @@ Preconditions:
 
 ## Gotchas
 
-- Escape works through the Hyprland submap `qs-panel`, which quickshell enters while a card is open. If `hyprctl submap` still prints `qs-panel` with no card open, the reset failed. Press Escape once to leave it.
+- Escape works through the Hyprland submap `qs-panel`, which quickshell enters while a card is open. The bind is in `home/.config/hypr/bindings.lua`. If `hyprctl submap` still prints `qs-panel` with no card open, the reset failed. Press Escape once to leave it.
 - The island and the music panel are hidden while no player is active. Report `panel-music` as unreachable with that prerequisite. Do not start playback on the user's machine to test it.
 - The pointer stays on the control, so a shot can include its tooltip, for example `Settings`. Do not read the tooltip as a card.
 - Cards are popups, not layer surfaces, so `qsv layers` does not list them. The music panel is part of the `qs.island` layer. Prove cards with a shot. Brightness averages do not tell a card from the window behind it.
 - Tray items sit to the left of the controls and do not move them. The clock's text width and the Do Not Disturb bell do. Find the positions again from a bar shot each run.
-- After a reload, wait 1s. Before that, IPC replies `Not ready to accept queries yet` and ignores the call.

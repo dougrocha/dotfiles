@@ -21,7 +21,7 @@ Do not use iOS ideas here: tab bars, sheets from the bottom of the screen, "tap"
 
 The HIG gives no exact durations. It asks for short motion that answers an action ([motion](https://developer.apple.com/design/human-interface-guidelines/motion)). The tokens in `Theme.motion` and `SizeMotion` already follow it.
 
-- Animate only a change of state that the user caused or must see. Do not animate routine, frequent actions more than the control already does.
+- Do not animate a routine, frequent action more than its control already does.
 - Keep motion brief. A path that the user takes many times must take less than 500 ms.
 - When a popover changes size, animate the size. Do not make it look as if a new popover replaced the old one ([popovers](https://developer.apple.com/design/human-interface-guidelines/popovers)). Use `SizeMotion`.
 - Let a new action interrupt an animation. A `Behavior` restarts from the current value, so do not lock input during motion.
@@ -59,7 +59,7 @@ The shell is the notification server, so most HIG rules about notifications are 
 - Show urgency as the sender set it. A critical notification stays until the user closes it. Other toasts close by themselves ([feedback](https://developer.apple.com/design/human-interface-guidelines/feedback)).
 - Stack toasts in a queue. Do not let them overlap.
 - Put an undo action in a toast that confirms a destructive action, for example a cleared group.
-- An empty state says what will show there. Example: "No notifications" with "New notifications show here." Do not show a blank area.
+- An empty state says what will show there. The notification center shows "No notifications". Do not show a blank area.
 
 ## 6. Alerts (polkit)
 

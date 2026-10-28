@@ -1,10 +1,10 @@
 # QML patterns
 
-Copy these patterns. Each one comes from a real file in the config root.
+Copy these patterns. Each one comes from a real file in the config root. The rules behind them are in `../SKILL.md`.
 
 ## Add a bar panel
 
-`Popup` registers the panel name as its IPC target. `Modules/Popups/SoundPopup.qml`:
+`Popup` registers the panel name as its IPC target. This is a short version of `Modules/Popups/SoundPopup.qml`:
 
 ```qml
 Popup {
@@ -48,7 +48,7 @@ LazyLoader {
 }
 ```
 
-`trigger` is the bar control, with an `id` in `Bar.qml`. The panel grows from it. The bar control, from `Modules/Bar/Components/VolumeIndicator.qml`:
+`trigger` is the bar control, which has an `id` in `Bar.qml`. The panel grows from it. The bar control, from `Modules/Bar/Components/VolumeIndicator.qml`:
 
 ```qml
 active: AudioService.muted || Visibilities.isOpen("sound-panel")
@@ -57,7 +57,7 @@ onTapped: Visibilities.toggle("sound-panel")
 
 ## Show a secondary control on hover
 
-From `Modules/Notifications/NotificationHistory.qml`:
+From `Modules/Notifications/NotificationHistory.qml`, shortened:
 
 ```qml
 IconActionButton {
@@ -89,7 +89,7 @@ PanelRow {
 }
 ```
 
-`DeviceRow`, `PopupActionButton`, and `PanelFooterLink` are built on it. `ToggleRow` and `Divider` still take `bleed: Theme.panel.rowBleed`.
+`DeviceRow`, `PopupActionButton`, and `PanelFooterLink` are built on it. `ToggleRow` and `Divider` take `bleed: Theme.panel.rowBleed` instead.
 
 ## Put a badge on a rounded corner
 
@@ -121,7 +121,7 @@ transform: Translate {
 
 ## Show and hide a surface
 
-From `Modules/Dictation/DictationPill.qml`. `Presence` owns the enter and exit motion: 200 ms in, 140 ms out, both on `Theme.motion.curveOut`, and a reversal starts from the current value. The window stays mapped until the exit ends.
+From `Modules/Dictation/DictationPill.qml`. `Presence` owns the enter and exit motion. A reversal starts from the current value. The window stays mapped until the exit ends. The timings are in `../SKILL.md`, section 5.5.
 
 ```qml
 Presence {
@@ -138,4 +138,4 @@ Rectangle {
 }
 ```
 
-Set the origin to the trigger side for a popover (`Popup` does it from `trigger`) and keep the centre for an alert. Gate a `SizeMotion` on the same surface with `enabled: presence.progress === 1`, or content that lays out at open time animates as a slide.
+For a popover, set the scale origin to the trigger side (`Popup` does this from `trigger`). For an alert, keep the center. Gate a `SizeMotion` on the same surface with `enabled: presence.progress === 1`. Otherwise content that lays out at open time animates as a slide.

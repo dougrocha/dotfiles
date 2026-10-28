@@ -41,4 +41,5 @@ Preconditions:
 - The bind toggles. If a case fails with the overlay still open, the next `qsv key super+ctrl+s` closes it. Run `qsv reset` before each case.
 - `qsv drag` lands about 1px off at times, so a drag may save `499x400`. Treat ±1px as a pass.
 - Clicking in a window gap captures the whole monitor.
+- `Super+Ctrl+O` and `Super+Ctrl+Q` open the same overlay through `screenshot-ui toggleQuickWith ocr` and `toggleQuickWith capture-qr`. No recipe covers them.
 - Each capture overwrites the clipboard. It shows a toast only when Show Notification is on. The toast lives at the bottom right of DP-1, so grab `"2150,1250 410x190"` to see it.

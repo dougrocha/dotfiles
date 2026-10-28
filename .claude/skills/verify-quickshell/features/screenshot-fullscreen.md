@@ -10,7 +10,7 @@ Fullscreen screenshot saves one file per monitor with no overlay. Each file goes
 
 ## How to get to it (user POV)
 
-- Press `Super+Shift+P`.
+- Press `Super+Shift+P`. The bind runs `screenshot fullscreen`.
 - Choose the monitor button in the screenshot toolbar, then Capture.
 
 ## Driving it with qsv
@@ -27,5 +27,5 @@ Preconditions:
 ## Gotchas
 
 - The file name has a timestamp to the second. Two runs in the same second write the same name.
-- Before grim runs, `wait-screenshot-overlay` (in `home/.local/bin`) waits for every `qs.screenshot_overlay` layer to unmap. When an overlay never closes, it waits at most about 1.7s, then the capture runs anyway.
+- Before grim runs, `wait-screenshot-overlay` (in `home/.local/bin`) waits for every `qs.screenshot_overlay` layer to unmap. It checks up to 50 times, 20 ms apart, plus the time of each `hyprctl layers` call. When an overlay never closes, the capture runs anyway.
 - Clicking the toast opens the image in `imv`. Do not click it unless the task is about that.

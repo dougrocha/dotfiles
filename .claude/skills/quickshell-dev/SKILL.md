@@ -5,20 +5,20 @@ description: Procedure to apply, verify, and examine a change to the quickshell 
 
 # Quickshell development procedure
 
-The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell` links to it. All paths and commands in this skill are relative to that directory, the config root.
+The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell` links to it. Paths and commands in this skill are relative to that directory, the config root.
 
 `qsv` is the helper of the verify-quickshell skill: `.claude/skills/verify-quickshell/bin/qsv`, relative to the repo root. Use the full path, or put its directory on `PATH` for the session. Run `qsv help` for every subcommand.
 
 ## Rules
 
-- WARNING: Do not start Quickshell. Do not run `qs`, `quickshell`, or `qs -p .`. One instance runs in the user session already. A second instance makes a second bar.
+- WARNING: Do not start Quickshell. Do not run `qs`, `quickshell`, or `qs -p .` to launch it. One instance runs in the user session already, and a second instance makes a second bar. The `qs ipc` subcommands talk to the running instance and are safe.
 - Do not run `qs kill` unless the user tells you to.
 - Examine the log after each change. A failed reload keeps the old build on the screen.
 
 ## 1. Apply the change
 
 1. Save the file. The active instance reloads when a file changes.
-2. If you replaced the full file (for example with `Write`), run `touch shell.qml` from the config root. The file watcher can miss a replaced file.
+2. If you replaced the whole file (for example with `Write`), run `touch shell.qml` from the config root. The file watcher can miss a replaced file.
 
 ## 2. Read the log
 
@@ -37,16 +37,13 @@ Use IPC to open and close a panel:
 qs ipc call notification-center toggle
 ```
 
-Panel targets: `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, `music-panel`.
-
-- Use `open` to open a panel.
-- Use `hide` to close a panel.
+Panel targets: `notification-center`, `settings-panel`, `sound-panel`, `bluetooth-panel`, `music-panel`. Each has `open`, `hide`, and `toggle`. Use `open` to open a panel and `hide` to close it. The `panels` target has `closeAll`, which closes whichever panel is open.
 
 The `top-bar` target does not show or hide the bar. Its `pin`, `unpin`, and `toggle` functions pin the bar above fullscreen windows.
 
 Other targets: `island`, `music-control`, `screenshot-overlay`, `screenshot-toast`. Run `qs ipc show` for every target and its functions.
 
-CAUTION: Wait 1 second after a reload before you send an IPC call. Before that, the instance replies `Not ready to accept queries yet` and ignores the call. Then a later `toggle` opens the panel when you expect it to close. Use `open` and `hide`.
+CAUTION: Wait 1 second after a reload before you send an IPC call. Before that, the instance replies `Not ready to accept queries yet` and ignores the call. A later `toggle` then opens the panel when you expect it to close. Use `open` and `hide`.
 
 CAUTION: `qs ipc call <target> show` does not call the function. It prints the list of functions and gives no error. Do not use `show` as the name of a new `IpcHandler` function.
 
@@ -66,14 +63,14 @@ qsv notify -a Chromium "GitHub" "Review requested on #412: refactor notification
 qsv notify -a Steam "Download complete" "Baldur's Gate 3 is ready to play"
 ```
 
-- Actions: `( notify-send -A open=Open -A dismiss=Dismiss -a Zen "Title" "Body" >/dev/null & )`. The command waits for a click, so run it in the background.
+- Actions: `( notify-send -A open=Open -A dismiss=Dismiss -a Zen "Title" "Body" >/dev/null & )`. The command waits for a click, so run it in the background. It prints no ID while it waits, so `qsv notify` cannot record it. Let it time out.
 - Critical: add `-u critical -t 0`. The notification stays until you close it. Without `-t 0`, a timeout from the sender can close it.
 
 ## 5. Get a screenshot
 
 The bar and popups are at the top right of the primary monitor. Take monitor positions and sizes from `qsv doctor`, not from memory.
 
-1. Run `qsv start <name>` one time. It makes the directory for the images.
+1. Run `qsv start <name>` once. It makes the directory for the images.
 2. Open the surface (step 3), or send toasts (step 4).
 3. Wait about 0.8 seconds for the open animation.
 4. Run `qsv shot <name> "<x>,<y> <w>x<h>"`. On a 2560-wide primary monitor at `0,0`, `"2150,40 400x620"` shows the bar panels and the toasts. For the music panel, capture the top center of the monitor. Without a geometry, `qsv shot` captures all monitors.
@@ -84,12 +81,12 @@ To examine a hover state, run `qsv at <x> <y>`. It moves the pointer and starts 
 
 ## 6. Iterate
 
-1. Examine the render one time. Write down all problems.
+1. Examine the render once. Write down all problems.
 2. Correct all problems in one change.
-3. Examine the render one more time.
+3. Examine the render again.
 4. Stop. Tell the user what you changed, what problems remain, and what you could not examine.
 
 ## 7. Known problems
 
 - After you change `Theme.qml`, a clean reload shows only that the file parsed. Search for the modules that use the changed token. Examine them too.
-- When you rename tokens with `sed`, replace the longer name first. For example, `Theme.fill.selected` is the start of `Theme.fill.selectedSolid`. After the rename, search for broken names such as `selectedSolid[A-Za-z]`.
+- When you rename tokens with `sd`, replace the longer name first. For example, `Theme.fill.selected` is the start of `Theme.fill.selectedSolid`. After the rename, search for broken names such as `selectedSolid[A-Za-z]`.

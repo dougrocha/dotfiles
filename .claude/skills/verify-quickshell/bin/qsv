@@ -61,7 +61,7 @@ cmd_doctor() {
   check "last reload clean" '[[ -z $(cmd_log) ]]' "run: qsv log"
   check "Hyprland answers" 'hyprctl monitors -j | jq -e "length > 0"' "not in a Hyprland session"
   check "ydotoold accepts input" 'ydotool mousemove -x 0 -y 0' "sudo rm -f $YDOTOOL_SOCKET; sudo -b ydotoold --socket-path=$YDOTOOL_SOCKET --socket-own=$(id -u):$(id -g)"
-  check "grim, magick, jq, wtype installed" 'command -v grim && command -v magick && command -v jq && command -v wtype' "pacman -S grim imagemagick jq wtype"
+  check "grim, magick, jq, wtype installed" 'command -v grim && command -v magick && command -v jq && command -v wtype' "paru -S grim imagemagick jq wtype"
   hyprctl monitors -j | jq -r '.[] | "info  monitor \(.name) at \(.x),\(.y) \(.width)x\(.height) scale \(.scale) special=\(.specialWorkspace.name)"'
   echo "info  cursor $(hyprctl cursorpos)"
   $ok

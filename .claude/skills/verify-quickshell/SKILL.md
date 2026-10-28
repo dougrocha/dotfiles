@@ -5,7 +5,7 @@ description: Drive the running quickshell shell on Hyprland with real keyboard a
 
 # Verify quickshell
 
-This skill proves a quickshell feature works by driving the live session like a user. It presses the real keybinds, moves and clicks the real pointer, and captures the screen with grim.
+This skill proves a quickshell feature works by driving the live session like a user. It presses the real keybinds, moves and clicks the real pointer, and captures the screen with grim. Use quickshell-dev to reload, read the log, and send IPC calls.
 
 The helper is `.claude/skills/verify-quickshell/bin/qsv`, relative to the repo root. Run `qsv help` for every subcommand. The examples below call it as `qsv`. Use the full path, or put its directory on `PATH` for the session.
 
@@ -13,10 +13,8 @@ The feature recipes are in `features/`. Read `features/README.md` first.
 
 ## 1. Launch
 
-Nothing to launch. Quickshell, Hyprland, and the user's apps already run in the user's session. You drive that one instance.
+Nothing to launch. Quickshell, Hyprland, and the user's apps already run in the user's session. You drive that one instance. The Rules section of quickshell-dev applies: never start Quickshell, and do not run `qs kill` unless the user tells you to.
 
-- Never start `qs` or `quickshell`. A second instance makes a second bar.
-- Do not run `qs kill` unless the user tells you to.
 - A file save reloads quickshell. Wait about 2 seconds after a save before you send input. Read `qsv log` to see that the reload is clean.
 - Start a run before you capture anything. It makes the evidence directory:
 
@@ -82,12 +80,13 @@ Write each result line with the expected value next to it, for example `quick dr
 
 ## 5. Cleanup
 
-Run `qsv cleanup` at the end of a run and after every failed attempt. `qsv start` also runs it on the previous run before it starts a new one, so a forgotten cleanup does not leave files behind. It does four things:
+Run `qsv cleanup` at the end of a run and after every failed attempt. `qsv start` also runs it on the previous run before it starts a new one, so a forgotten cleanup does not leave files behind. It does three things:
 
 - Runs `qsv reset`.
 - Closes every notification that `qsv notify` sent, over D-Bus. Critical test toasts never time out, so this removes them without a click.
 - Deletes the test files this run created in `~/Pictures/Screenshots`. It deletes only files that `qsv captured` recorded.
-- Keeps the evidence directory under `~/.cache/verify-quickshell/`. The proof stays there.
+
+It keeps the evidence directory under `~/.cache/verify-quickshell/`. The proof stays there.
 
 Restore any state you changed: special workspaces, fullscreen, and overlay settings such as the capture mode. Then tell the user these things:
 
@@ -107,7 +106,6 @@ Restore any state you changed: special workspaces, fullscreen, and overlay setti
     ```
 
     Remove the probe before you commit.
-- **`qs ipc call <target> show` does not call `show()`.** It prints the function list. Use `toggle`, `open`, `hide`, or a function with another name.
 - **Remembered screenshot regions are stored per monitor.** The overlay uses the monitor that is focused when it opens, and focus follows the mouse. If that monitor has no saved region, Enter in toolbar region mode does nothing. That is correct behavior.
 - **The focused monitor decides some results.** Set it with `hl.dsp.focus` before a case that depends on it.
 - **A flaky multi-monitor result needs a rerun from `qsv reset`.** Do this before you look for a bug. A held key or button from an aborted run makes later cases fail.
