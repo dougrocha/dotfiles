@@ -1031,7 +1031,7 @@ Item {
                                 Text {
                                     anchors.centerIn: parent
                                     text: modelData.label
-                                    color: manager.timerDelay === modelData.delay ? Theme.accent : Theme.text.secondary
+                                    color: manager.timerDelay === modelData.delay ? Theme.text.primary : Theme.text.secondary
                                     font.pixelSize: Theme.type.body.size
                                     font.family: Theme.font.ui
                                 }
@@ -1205,7 +1205,7 @@ Item {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData.icon
-                                color: manager.selectedMode === modelData.mode ? Theme.accent : Theme.text.secondary
+                                color: manager.selectedMode === modelData.mode ? Theme.text.primary : Theme.text.secondary
                                 font.pixelSize: Theme.icon.lg
                                 font.family: Theme.font.icon
                                 Behavior on color {
@@ -1249,7 +1249,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: PhosphorIcons.videoCamera
-                            color: manager.selectedMode === "video" ? Theme.accent : Theme.text.secondary
+                            color: manager.selectedMode === "video" ? Theme.text.primary : Theme.text.secondary
                             font.pixelSize: Theme.icon.lg
                             font.family: Theme.font.icon
                             Behavior on color {
