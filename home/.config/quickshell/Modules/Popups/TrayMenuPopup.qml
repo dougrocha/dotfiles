@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
-import qs.Constants
 import qs.Components
+import qs.Constants
 import qs.Services
 
 PopupWindow {
@@ -70,7 +70,7 @@ PopupWindow {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: Math.min(menuColumn.implicitHeight + 16, root.maximumHeight)
+        height: Math.min(menuList.implicitHeight + 16, root.maximumHeight)
         radius: Theme.radius.lg
         color: Theme.colors.raised
         border.color: Theme.stroke.hairline
@@ -83,12 +83,7 @@ PopupWindow {
         clip: true
 
         focus: root.open
-        Keys.onPressed: function (event) {
-            if (event.key === Qt.Key_Escape) {
-                root.closeRequested();
-                event.accepted = true;
-            }
-        }
+        Keys.onEscapePressed: root.closeRequested()
 
         SizeMotion on height {
             enabled: presence.progress === 1
@@ -102,20 +97,15 @@ PopupWindow {
             }
             clip: true
             contentWidth: width
-            contentHeight: menuColumn.implicitHeight
+            contentHeight: menuList.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
             flickableDirection: Flickable.VerticalFlick
 
-            Column {
-                id: menuColumn
+            TrayMenuList {
+                id: menuList
                 width: menuFlickable.width
-                spacing: 0
-
-                TrayMenuList {
-                    width: menuColumn.width
-                    menuHandle: root.menuOpener ? root.menuOpener.menu : null
-                    onCloseRequested: root.closeRequested()
-                }
+                menuHandle: root.menuOpener?.menu ?? null
+                onCloseRequested: root.closeRequested()
             }
         }
     }

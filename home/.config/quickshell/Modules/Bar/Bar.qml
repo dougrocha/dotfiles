@@ -30,12 +30,12 @@ Variants {
         readonly property var activeToplevel: Hyprland.activeToplevel
         readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
         readonly property bool fullscreenOnScreen: fullscreenMode === hyprlandFullscreenModeExclusive
-        readonly property bool popupOpen: Visibilities.anyOpen
-        readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || popupOpen || Visibilities.barPinned
+        readonly property bool primary: modelData === Theme.primaryScreen
+        readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || Visibilities.anyOpen || Visibilities.barPinned
         property bool revealed: true
 
         onRevealedChanged: {
-            if (modelData === Theme.primaryScreen)
+            if (primary)
                 Visibilities.barRevealed = revealed;
         }
 
@@ -102,8 +102,7 @@ Variants {
             TapHandler {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                 onTapped: eventPoint => {
-                    const point = traySection.mapFromItem(content, eventPoint.position.x, eventPoint.position.y);
-                    if (point.x < 0 || point.x > traySection.width || point.y < 0 || point.y > traySection.height)
+                    if (!traySection.contains(traySection.mapFromItem(content, eventPoint.position)))
                         Visibilities.closeTrayMenus();
                 }
             }
@@ -157,11 +156,9 @@ Variants {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.space.lg
 
-                    readonly property int trayGap: Theme.space.md
-
                     TraySection {
                         id: traySection
-                        Layout.rightMargin: indicatorRow.trayGap - indicatorRow.spacing
+                        Layout.rightMargin: Theme.space.md - indicatorRow.spacing
                     }
 
                     CpuIndicator {}
@@ -188,7 +185,7 @@ Variants {
         }
 
         LazyLoader {
-            active: modelData === Theme.primaryScreen
+            active: topBar.primary
 
             SettingsPopup {
                 anchor.window: topBar
@@ -197,7 +194,7 @@ Variants {
         }
 
         LazyLoader {
-            active: modelData === Theme.primaryScreen
+            active: topBar.primary
 
             SoundPopup {
                 anchor.window: topBar
@@ -206,7 +203,7 @@ Variants {
         }
 
         LazyLoader {
-            active: modelData === Theme.primaryScreen
+            active: topBar.primary
 
             BluetoothPopup {
                 anchor.window: topBar
@@ -215,7 +212,7 @@ Variants {
         }
 
         LazyLoader {
-            active: modelData === Theme.primaryScreen
+            active: topBar.primary
 
             NotificationPopup {
                 anchor.window: topBar

@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Components
 import qs.Modules.Notifications
-import qs.Services
 
 Popup {
     id: panel

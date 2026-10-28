@@ -12,48 +12,21 @@ Popup {
     panelName: "bluetooth-panel"
     cardWidth: 300
 
-    component DeviceEntry: Rectangle {
+    component DeviceEntry: PanelRow {
         id: entry
 
-        required property var row
+        required property var device
 
-        readonly property bool hovered: rowMouse.hovered
-        readonly property string statusText: BluetoothService.rowStatus(row)
+        readonly property string statusText: BluetoothService.rowStatus(device)
 
-        width: parent.width
-        height: 34
-        radius: Theme.radius.sm
-        color: "transparent"
-
-        Rectangle {
-            z: -1
-            anchors.fill: parent
-            anchors.leftMargin: -Theme.panel.rowBleed
-            anchors.rightMargin: -Theme.panel.rowBleed
-            radius: parent.radius
-            color: entry.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
-        }
-
-        HoverHandler {
-            id: rowMouse
-            cursorShape: Qt.PointingHandCursor
-        }
-        TapHandler {
-            onTapped: BluetoothService.activate(entry.row)
-        }
+        onTapped: BluetoothService.activate(device)
 
         Text {
             id: entryIcon
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            text: entry.row.icon
-            color: entry.row.connected ? Theme.accent : Theme.text.secondary
+            text: entry.device.icon
+            color: entry.device.connected ? Theme.accent : Theme.text.secondary
             font.pixelSize: Theme.icon.sm
             font.family: Theme.font.icon
 
@@ -74,11 +47,11 @@ Popup {
 
             Text {
                 width: parent.width
-                text: entry.row.label
-                color: entry.row.connected ? Theme.text.primary : Theme.text.secondary
+                text: entry.device.label
+                color: entry.device.connected ? Theme.text.primary : Theme.text.secondary
                 font.pixelSize: Theme.type.body.size
                 font.family: Theme.font.ui
-                font.weight: entry.row.connected ? Theme.type.title.weight : Theme.type.body.weight
+                font.weight: entry.device.connected ? Theme.type.title.weight : Theme.type.body.weight
                 elide: Text.ElideRight
             }
 
@@ -86,7 +59,7 @@ Popup {
                 visible: entry.statusText !== ""
                 width: parent.width
                 text: entry.statusText
-                color: entry.row.connected ? Theme.accent : Theme.text.secondary
+                color: entry.device.connected ? Theme.accent : Theme.text.secondary
                 font.pixelSize: Theme.type.caption.size
                 font.family: Theme.font.ui
                 elide: Text.ElideRight
@@ -95,14 +68,14 @@ Popup {
 
         IconActionButton {
             id: forgetButton
-            visible: entry.row.known && entry.hovered
+            visible: entry.device.known && entry.hovered
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             size: 22
             circular: true
             danger: true
             glyph: PhosphorIcons.x
-            onTapped: BluetoothService.forget(entry.row)
+            onTapped: BluetoothService.forget(entry.device)
         }
     }
 
@@ -146,7 +119,7 @@ Popup {
 
                     delegate: DeviceEntry {
                         required property var modelData
-                        row: modelData
+                        device: modelData
                     }
                 }
             }
@@ -190,7 +163,7 @@ Popup {
 
                         delegate: DeviceEntry {
                             required property var modelData
-                            row: modelData
+                            device: modelData
                         }
                     }
                 }

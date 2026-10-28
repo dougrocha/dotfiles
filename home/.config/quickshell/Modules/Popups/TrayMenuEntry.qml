@@ -9,15 +9,24 @@ Item {
     property int indentLevel: 0
     property bool expanded: false
     readonly property bool valid: entry !== null && entry !== undefined
+    readonly property bool separator: entry?.isSeparator ?? false
+    readonly property bool interactive: valid && !separator && entry.enabled
 
     signal toggleRequested
     signal triggerRequested
 
-    implicitHeight: !valid ? 0 : entry.isSeparator ? 9 : 28
-    activeFocusOnTab: valid && !entry.isSeparator && entry.enabled
+    function activate() {
+        if (entry.hasChildren)
+            toggleRequested();
+        else
+            triggerRequested();
+    }
+
+    implicitHeight: !valid ? 0 : separator ? 9 : 28
+    activeFocusOnTab: interactive
 
     Rectangle {
-        visible: root.valid && root.entry.isSeparator
+        visible: root.separator
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
         height: 1
@@ -25,10 +34,10 @@ Item {
     }
 
     Rectangle {
-        visible: root.valid && !root.entry.isSeparator
+        visible: root.valid && !root.separator
         anchors.fill: parent
         radius: Theme.radius.sm
-        color: root.valid && (rowHover.hovered || root.activeFocus) && root.entry.enabled ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        color: root.interactive && (rowHover.hovered || root.activeFocus) ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
         border.width: root.activeFocus ? 1 : 0
         border.color: Theme.stroke.accent
 
@@ -41,7 +50,7 @@ Item {
             spacing: Theme.space.sm
 
             Text {
-                visible: root.valid && root.entry.checkState === Qt.Checked
+                visible: root.entry?.checkState === Qt.Checked
                 text: PhosphorIcons.check
                 color: Theme.accent
                 font.pixelSize: Theme.type.body.size
@@ -50,15 +59,15 @@ Item {
 
             Text {
                 Layout.fillWidth: true
-                text: root.valid ? root.entry.text : ""
-                color: root.valid && root.entry.enabled ? Theme.text.primary : Theme.text.secondary
+                text: root.entry?.text ?? ""
+                color: root.interactive ? Theme.text.primary : Theme.text.secondary
                 font.pixelSize: Theme.type.body.size
                 font.family: Theme.font.ui
                 elide: Text.ElideRight
             }
 
             Text {
-                visible: root.valid && root.entry.hasChildren
+                visible: root.entry?.hasChildren ?? false
                 text: PhosphorIcons.caretRight
                 color: root.expanded ? Theme.text.primary : Theme.text.secondary
                 font.pixelSize: Theme.type.body.size
@@ -81,12 +90,12 @@ Item {
 
         HoverHandler {
             id: rowHover
-            enabled: root.valid && root.entry.enabled && !root.entry.isSeparator
-            cursorShape: root.valid && root.entry.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+            enabled: root.interactive
+            cursorShape: root.interactive ? Qt.PointingHandCursor : Qt.ArrowCursor
         }
         TapHandler {
-            enabled: root.valid && root.entry.enabled && !root.entry.isSeparator
-            onTapped: root.entry.hasChildren ? root.toggleRequested() : root.triggerRequested()
+            enabled: root.interactive
+            onTapped: root.activate()
         }
     }
 
@@ -95,7 +104,7 @@ Item {
             return;
 
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-            root.entry.hasChildren ? root.toggleRequested() : root.triggerRequested();
+            root.activate();
             event.accepted = true;
         }
     }

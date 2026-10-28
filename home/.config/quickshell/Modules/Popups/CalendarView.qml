@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -43,15 +42,10 @@ Item {
         return weekday === 0 || weekday === 6;
     }
 
-    readonly property int displayYear: {
-        const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + monthOffset, 1);
-        return d.getFullYear();
-    }
-    readonly property int displayMonth: {
-        const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + monthOffset, 1);
-        return d.getMonth();
-    }
-    readonly property string monthName: Qt.formatDate(new Date(displayYear, displayMonth, 1), "MMMM")
+    readonly property var displayDate: new Date(baseDate.getFullYear(), baseDate.getMonth() + monthOffset, 1)
+    readonly property int displayYear: displayDate.getFullYear()
+    readonly property int displayMonth: displayDate.getMonth()
+    readonly property string monthName: Qt.formatDate(displayDate, "MMMM")
     readonly property var cells: buildCells(displayYear, displayMonth, baseDate)
 
     function reset() {
@@ -125,10 +119,7 @@ Item {
             return "Columbus Day";
         if (month === 10 && day === nthWeekday(year, 10, 4, 4))
             return "Thanksgiving";
-        const offset = Math.round((new Date(year, month, day).getTime() - easter.getTime()) / 86400000);
-        if (offset === 0)
-            return "Easter Sunday";
-        return "";
+        return new Date(year, month, day).getTime() === easter.getTime() ? "Easter Sunday" : "";
     }
 
     function buildCells(year, month, today) {
@@ -185,14 +176,7 @@ Item {
         return days > 0 ? "In " + days + " days" : -days + " days ago";
     }
 
-    readonly property string selectedDayHoliday: {
-        if (selectedDay <= 0)
-            return "";
-        for (let i = 0; i < cells.length; i++)
-            if (cells[i].day === selectedDay)
-                return cells[i].holiday;
-        return "";
-    }
+    readonly property string selectedDayHoliday: cells.find(cell => cell.day === selectedDay)?.holiday ?? ""
 
     ParallelAnimation {
         id: monthSlide
@@ -226,6 +210,7 @@ Item {
             Row {
                 id: monthTitle
                 Layout.alignment: Qt.AlignVCenter
+                Layout.fillWidth: true
                 spacing: Theme.space.sm
 
                 Text {
@@ -244,10 +229,6 @@ Item {
                     font.pixelSize: Theme.type.display.size
                     font.weight: Theme.type.body.weight
                 }
-            }
-
-            Item {
-                Layout.fillWidth: true
             }
 
             Row {

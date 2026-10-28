@@ -48,11 +48,11 @@ Item {
 
     function openExtra(workspace) {
         Visibilities.closeAll();
-        const name = JSON.stringify(labelFor(workspace));
+        const name = labelFor(workspace);
         if (isSpecial(workspace))
-            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${name})`);
+            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${JSON.stringify(name)})`);
         else
-            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify("name:" + labelFor(workspace))} })`);
+            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify("name:" + name)} })`);
     }
 
     function workspaceFor(id) {

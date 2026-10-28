@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import qs.Components
 import qs.Constants
 import qs.Services
@@ -16,6 +15,6 @@ IconButton {
     }
     active: AudioService.muted || Visibilities.isOpen("sound-panel")
     activeColor: AudioService.muted ? Theme.danger : Theme.text.primary
-    tooltipText: AudioService.muted ? "Volume: Muted" : "Volume: " + Math.round(AudioService.volume * 100) + "%"
+    tooltipText: AudioService.muted ? "Volume: muted" : "Volume: " + Math.round(AudioService.volume * 100) + "%"
     onTapped: Visibilities.toggle("sound-panel")
 }

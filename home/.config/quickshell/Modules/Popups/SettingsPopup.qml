@@ -13,9 +13,20 @@ Popup {
     panelName: "settings-panel"
     cardWidth: 300
 
+    function hyprshutdown(title: string, postCommand: string): void {
+        const post = postCommand ? ` --post-cmd '${postCommand}'` : "";
+        Quickshell.execDetached(["hyprctl", "dispatch", `hl.dsp.exec_cmd([[hyprshutdown -t '${title}'${post}]])`]);
+    }
+
     onOpened: {
         IdleService.refresh();
         SunsetService.refresh();
+    }
+
+    component SwitchRow: ToggleRow {
+        width: parent.width
+        style: "switch"
+        bleed: Theme.panel.rowBleed
     }
 
     component DeviceBatteryRow: Item {
@@ -29,7 +40,7 @@ Popup {
         width: parent.width
         height: 32
 
-        readonly property color batteryColor: charging ? Theme.text.secondary : pct <= 10 ? Theme.danger : pct <= 20 ? Theme.caution : Theme.text.secondary
+        readonly property color batteryColor: charging || pct > 20 ? Theme.text.secondary : pct > 10 ? Theme.caution : Theme.danger
 
         Text {
             id: deviceIcon
@@ -86,40 +97,28 @@ Popup {
         width: parent.width
         spacing: Theme.space.sm
 
-        ToggleRow {
-            width: parent.width
-            style: "switch"
-            bleed: Theme.panel.rowBleed
+        SwitchRow {
             glyph: PhosphorIcons.lockSimple
             label: "Idle lock"
             active: IdleService.active
             onToggled: IdleService.toggle()
         }
 
-        ToggleRow {
-            width: parent.width
-            style: "switch"
-            bleed: Theme.panel.rowBleed
+        SwitchRow {
             glyph: PhosphorIcons.bellSlash
             label: "Do not disturb"
             active: SettingsService.doNotDisturb
             onToggled: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
         }
 
-        ToggleRow {
-            width: parent.width
-            style: "switch"
-            bleed: Theme.panel.rowBleed
+        SwitchRow {
             glyph: PhosphorIcons.moon
             label: "Night light"
             active: SunsetService.active
             onToggled: SunsetService.toggle()
         }
 
-        ToggleRow {
-            width: parent.width
-            style: "switch"
-            bleed: Theme.panel.rowBleed
+        SwitchRow {
             glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
             label: "Microphone"
             active: !AudioService.sourceMuted
@@ -197,20 +196,20 @@ Popup {
             PopupActionButton {
                 glyph: PhosphorIcons.signOut
                 label: "Log out"
-                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Logging out...']])\""])
+                onTapped: panel.hyprshutdown("Logging out...", "")
             }
 
             PopupActionButton {
                 glyph: PhosphorIcons.arrowCounterClockwise
                 label: "Restart"
-                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Restarting...' --post-cmd 'systemctl reboot']])\""])
+                onTapped: panel.hyprshutdown("Restarting...", "systemctl reboot")
             }
 
             PopupActionButton {
                 glyph: PhosphorIcons.power
                 label: "Shut down"
                 danger: true
-                onTapped: Quickshell.execDetached(["sh", "-c", "hyprctl dispatch \"hl.dsp.exec_cmd([[hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0']])\""])
+                onTapped: panel.hyprshutdown("Shutting down...", "shutdown -P 0")
             }
         }
     }

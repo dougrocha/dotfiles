@@ -64,7 +64,6 @@ Item {
                             onToggleRequested: entryColumn.expanded = !entryColumn.expanded
                             onTriggerRequested: {
                                 entryColumn.modelData.triggered();
-
                                 branch.closeRequested();
                             }
                         }
