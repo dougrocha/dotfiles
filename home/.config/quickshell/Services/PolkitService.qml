@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.Polkit
 
 Singleton {
@@ -28,11 +29,12 @@ Singleton {
     property bool active: false
     property bool submitted: false
     property bool failed: false
+    property real lockedUntil: 0
 
     readonly property var request: held
     readonly property bool canSubmit: held.responseRequired && !submitted
     readonly property bool canChooseIdentity: held.identities.length > 1
-    readonly property var status: statusFor(held, submitted, failed)
+    readonly property var status: statusFor(held, submitted, failed, lockedUntil)
     readonly property string instruction: instructionFor(held)
 
     signal requestStarted
@@ -109,7 +111,19 @@ Singleton {
         return `Enter the password for ${identity.name} to allow this.`;
     }
 
-    function statusFor(request, submitted, failed) {
+    function statusFor(request, submitted, failed, lockedUntil) {
+        if (lockedUntil === Infinity)
+            return {
+                error: true,
+                text: "Too many attempts. This account is locked."
+            };
+        if (lockedUntil > 0) {
+            const minutes = Math.max(1, Math.ceil((lockedUntil - Date.now()) / 60000));
+            return {
+                error: true,
+                text: `Too many attempts. Try again in ${minutes} ${minutes === 1 ? "minute" : "minutes"}.`
+            };
+        }
         if (request.note?.isError)
             return {
                 error: true,
@@ -133,15 +147,66 @@ Singleton {
         return null;
     }
 
+    function lockUser() {
+        const identity = held.identities[held.selected];
+        return identity && !identity.isGroup ? identity.name : currentUser;
+    }
+
+    function checkLock() {
+        lockCheck.command = ["faillock", "--user", lockUser()];
+        lockCheck.running = true;
+    }
+
+    function confValue(key, fallback) {
+        const match = faillockConf.text().match(new RegExp(`^\\s*${key}\\s*=\\s*(\\d+)`, "m"));
+        return match ? Number(match[1]) : fallback;
+    }
+
+    function lockEnd(output, deny, unlockTime, failInterval) {
+        if (deny <= 0)
+            return 0;
+        const times = output.split("\n").map(line => line.match(/^(\d{4}-\d\d-\d\d) (\d\d:\d\d:\d\d)\s.*\sV\s*$/)).filter(match => match).map(match => new Date(`${match[1]}T${match[2]}`).getTime());
+        const last = times[times.length - 1];
+        if (times.filter(time => last - time <= failInterval * 1000).length < deny)
+            return 0;
+        if (unlockTime === 0)
+            return Infinity;
+        const end = last + unlockTime * 1000;
+        return end > Date.now() ? end : 0;
+    }
+
     function adopt() {
         submitted = false;
         failed = false;
+        lockedUntil = 0;
         active = true;
         requestStarted();
+        checkLock();
     }
 
     function end() {
         active = false;
+    }
+
+    FileView {
+        id: faillockConf
+
+        path: "/etc/security/faillock.conf"
+        printErrors: false
+    }
+
+    Process {
+        id: lockCheck
+
+        stdout: StdioCollector {
+            onStreamFinished: root.lockedUntil = root.lockEnd(text, root.confValue("deny", 3), root.confValue("unlock_time", 600), root.confValue("fail_interval", 900))
+        }
+    }
+
+    Timer {
+        running: root.lockedUntil > 0 && root.lockedUntil !== Infinity
+        interval: Math.max(1000, root.lockedUntil - Date.now())
+        onTriggered: root.lockedUntil = 0
     }
 
     PolkitAgent {
@@ -172,6 +237,7 @@ Singleton {
             root.submitted = false;
             root.failed = true;
             root.attemptFailed();
+            root.checkLock();
         }
 
         function onAuthenticationSucceeded() {
