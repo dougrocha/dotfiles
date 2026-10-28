@@ -198,9 +198,8 @@ Item {
             color: Theme.withAlpha(Theme.shadow, 0.5)
         }
 
-        MouseArea {
-            anchors.fill: parent
-            onClicked: passwordInput.forceActiveFocus()
+        TapHandler {
+            onTapped: passwordInput.forceActiveFocus()
         }
 
         Rectangle {

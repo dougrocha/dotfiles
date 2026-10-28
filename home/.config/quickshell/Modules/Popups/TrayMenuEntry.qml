@@ -28,7 +28,7 @@ Item {
         visible: root.valid && !root.entry.isSeparator
         anchors.fill: parent
         radius: Theme.radius.sm
-        color: root.valid && (rowMouseArea.hovered || root.activeFocus) && root.entry.enabled ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        color: root.valid && (rowHover.hovered || root.activeFocus) && root.entry.enabled ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
         border.width: root.activeFocus ? 1 : 0
         border.color: Theme.stroke.accent
 
@@ -80,7 +80,7 @@ Item {
         }
 
         HoverHandler {
-            id: rowMouseArea
+            id: rowHover
             enabled: root.valid && root.entry.enabled && !root.entry.isSeparator
             cursorShape: root.valid && root.entry.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         }
