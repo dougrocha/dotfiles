@@ -2,14 +2,14 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs.Constants
+import qs.Services
 
 Item {
     id: root
 
-    required property var manager
-    required property string monitorName
-    required property real monitorX
-    required property real monitorY
+    required property string outputName
+    required property real outputOriginX
+    required property real outputOriginY
     readonly property color selectionColor: Theme.accent
     readonly property color dimColor: Theme.withAlpha(Theme.shadow, 0.62)
 
@@ -37,10 +37,10 @@ Item {
     }
 
     Rectangle {
-        readonly property var targetWindow: root.manager.hoveredWindow ?? root.manager.selectedWindow
-        visible: root.manager.visualMode === "windows" && targetWindow != null
-        x: targetWindow != null ? targetWindow.x - root.monitorX : 0
-        y: targetWindow != null ? targetWindow.y - root.monitorY : 0
+        readonly property var targetWindow: ScreenshotSession.highlightWindow
+        visible: targetWindow != null
+        x: targetWindow != null ? targetWindow.x - root.outputOriginX : 0
+        y: targetWindow != null ? targetWindow.y - root.outputOriginY : 0
         width: targetWindow != null ? targetWindow.width : 0
         height: targetWindow != null ? targetWindow.height : 0
         radius: Theme.radius.md
@@ -52,18 +52,19 @@ Item {
     Item {
         id: regionVisuals
         anchors.fill: parent
-        visible: root.manager.visualMode === "region"
+        visible: ScreenshotSession.visualMode === "region"
         clip: true
 
-        readonly property real sx: root.manager.selectionX - root.monitorX
-        readonly property real sy: root.manager.selectionY - root.monitorY
-        readonly property real sw: root.manager.selectionWidth
-        readonly property real sh: root.manager.selectionHeight
+        readonly property var selection: ScreenshotSession.selection
+        readonly property real sx: selection.x - root.outputOriginX
+        readonly property real sy: selection.y - root.outputOriginY
+        readonly property real sw: selection.width
+        readonly property real sh: selection.height
         readonly property real intersectionLeft: Math.max(0, sx)
         readonly property real intersectionTop: Math.max(0, sy)
         readonly property real intersectionRight: Math.min(width, sx + sw)
         readonly property real intersectionBottom: Math.min(height, sy + sh)
-        readonly property bool hasIntersection: root.manager.hasSelection && intersectionRight > intersectionLeft && intersectionBottom > intersectionTop
+        readonly property bool hasIntersection: ScreenshotSession.hasSelection && intersectionRight > intersectionLeft && intersectionBottom > intersectionTop
 
         Rectangle {
             anchors.fill: parent
@@ -108,7 +109,7 @@ Item {
             y: regionVisuals.sy - 1
             width: regionVisuals.sw + 2
             height: regionVisuals.sh + 2
-            visible: root.manager.hasSelection
+            visible: ScreenshotSession.hasSelection
             color: "transparent"
             border.width: 1
             border.color: Theme.withAlpha(Theme.foregroundFor(root.selectionColor), 0.8)
@@ -120,12 +121,12 @@ Item {
             width: regionVisuals.sw
             height: regionVisuals.sh
             color: "transparent"
-            border.width: root.manager.hasSelection && regionVisuals.sw > 0 ? 2 : 0
+            border.width: ScreenshotSession.hasSelection && regionVisuals.sw > 0 ? 2 : 0
             border.color: root.selectionColor
         }
 
         Repeater {
-            model: root.manager.hasSelection ? 8 : 0
+            model: ScreenshotSession.hasSelection ? 8 : 0
 
             delegate: Rectangle {
                 required property int index
@@ -144,24 +145,25 @@ Item {
 
         Rectangle {
             id: sizeReadout
-            readonly property real localPointerX: root.manager.pointerGlobalX - root.monitorX
-            readonly property real localPointerY: root.manager.pointerGlobalY - root.monitorY
-            readonly property string edgeAxis: root.manager.readoutEdgeAxis
-            readonly property bool clampedOnBothAxes: root.labelIsClamped(localPointerX, width, root.manager.readoutDirectionX, regionVisuals.width) && root.labelIsClamped(localPointerY, height, root.manager.readoutDirectionY, regionVisuals.height)
-            visible: root.manager.readoutVisible && root.manager.readoutMonitor === root.monitorName
+            readonly property var readout: ScreenshotSession.readout
+            readonly property real localPointerX: readout.x - root.outputOriginX
+            readonly property real localPointerY: readout.y - root.outputOriginY
+            readonly property string edgeAxis: readout.edgeAxis
+            readonly property bool clampedOnBothAxes: root.labelIsClamped(localPointerX, width, readout.directionX, regionVisuals.width) && root.labelIsClamped(localPointerY, height, readout.directionY, regionVisuals.height)
+            visible: readout.visible && readout.screen === root.outputName
             x: {
                 if (edgeAxis === "vertical")
                     return root.centeredPosition(localPointerX, width, regionVisuals.width);
                 if (edgeAxis === "horizontal")
-                    return root.directedPosition(localPointerX, width, root.manager.readoutDirectionX, regionVisuals.width);
-                return root.labelPosition(localPointerX, width, clampedOnBothAxes ? -root.manager.readoutDirectionX : root.manager.readoutDirectionX, regionVisuals.width);
+                    return root.directedPosition(localPointerX, width, readout.directionX, regionVisuals.width);
+                return root.labelPosition(localPointerX, width, clampedOnBothAxes ? -readout.directionX : readout.directionX, regionVisuals.width);
             }
             y: {
                 if (edgeAxis === "horizontal")
                     return root.centeredPosition(localPointerY, height, regionVisuals.height);
                 if (edgeAxis === "vertical")
-                    return root.directedPosition(localPointerY, height, root.manager.readoutDirectionY, regionVisuals.height);
-                return root.labelPosition(localPointerY, height, clampedOnBothAxes ? -root.manager.readoutDirectionY : root.manager.readoutDirectionY, regionVisuals.height);
+                    return root.directedPosition(localPointerY, height, readout.directionY, regionVisuals.height);
+                return root.labelPosition(localPointerY, height, clampedOnBothAxes ? -readout.directionY : readout.directionY, regionVisuals.height);
             }
             width: sizeText.implicitWidth + 16
             height: sizeText.implicitHeight + 10
@@ -173,7 +175,7 @@ Item {
             Text {
                 id: sizeText
                 anchors.centerIn: parent
-                text: Math.round(root.manager.selectionWidth) + " × " + Math.round(root.manager.selectionHeight)
+                text: Math.round(regionVisuals.sw) + " × " + Math.round(regionVisuals.sh)
                 color: Theme.text.primary
                 font.pixelSize: Theme.type.body.size
                 font.family: Theme.font.ui

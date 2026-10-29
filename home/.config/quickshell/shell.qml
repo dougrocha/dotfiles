@@ -16,7 +16,7 @@ ShellRoot {
 
     NotificationManager {}
 
-    ScreenshotManager {}
+    ScreenshotOverlay {}
 
     ScreenshotToast {}
 
