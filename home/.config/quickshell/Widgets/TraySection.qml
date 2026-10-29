@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.Constants
 import qs.Modules.Popups
@@ -212,6 +213,17 @@ Item {
 
         function onTrayMenuChanged() {
             root.retainMenu();
+        }
+    }
+    Connections {
+        target: SystemTray.items
+
+        function onObjectRemovedPre(object, index) {
+            if (object !== root.activeTrayItem)
+                return;
+            if (root.menuHere)
+                Visibilities.closeTrayMenu();
+            root.releaseMenu();
         }
     }
     QsMenuOpener {
