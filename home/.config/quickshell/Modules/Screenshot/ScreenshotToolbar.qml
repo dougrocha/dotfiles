@@ -13,7 +13,7 @@ Rectangle {
     required property real outputY
     required property real outputWidth
     required property real outputHeight
-    readonly property bool counting: ScreenshotSession.phase === "countdown"
+    readonly property bool counting: ScreenshotSession.counting
     readonly property point placed: ScreenshotSession.toolbarPosition(width, height)
 
     implicitWidth: (counting ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16

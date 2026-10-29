@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQml
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 
 Singleton {
@@ -76,7 +75,7 @@ Singleton {
         if (slot !== _trayMenuSlot)
             _trayMenu = null;
         if (wasOpen !== (slot !== ""))
-            Hyprland.dispatch(slot !== "" ? 'hl.dsp.submap("qs-panel")' : 'hl.dsp.submap("reset")');
+            Desktop.setSubmap(slot !== "" ? "qs-panel" : "reset");
     }
 
     component PanelIpc: IpcHandler {

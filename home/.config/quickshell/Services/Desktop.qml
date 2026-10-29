@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Constants
+import "ScreenshotGeometry.js" as Geometry
 
 Singleton {
     id: root
@@ -34,12 +35,15 @@ Singleton {
         return root.screenNamed(Hyprland.focusedMonitor?.name ?? "") ?? root.primaryScreen;
     }
 
-    function fullscreenOn(screen: var): bool {
+    function fullscreenKind(screen: var): string {
         const workspace = Hyprland.monitorFor(screen)?.activeWorkspace;
-        if (!workspace?.hasFullscreen)
-            return false;
-        const active = Hyprland.activeToplevel;
-        return active?.workspace === workspace && (active.lastIpcObject?.fullscreen ?? 0) === root._fullscreenExclusive;
+        if (!workspace)
+            return "none";
+        if (workspace.hasFullscreen && Hyprland.toplevels.values.some(t => t.workspace === workspace && (t.lastIpcObject?.fullscreen ?? 0) === root._fullscreenExclusive))
+            return "exclusive";
+        if (root._fullscreen?.screen === screen.name && Hyprland.toplevels.values.some(t => "0x" + t.address === root._fullscreen.address && t.workspace === workspace))
+            return "windowed";
+        return "none";
     }
 
     function toggleFullscreen(): void {
@@ -56,25 +60,16 @@ Singleton {
         }
         if (root._fullscreen)
             root._leaveFullscreen();
-        const screen = root.focusedScreen();
+        const window = root._windowArg(active.address);
+        Hyprland.dispatch(`hl.dsp.window.tag({ tag = "+${root._fullscreenTag}", ${window} })`);
+        Hyprland.dispatch(`hl.dsp.window.float({ action = "set", ${window} })`);
         root._fullscreen = {
             address: active.address,
-            screen: screen?.name ?? "",
+            screen: root.focusedScreen()?.name ?? "",
             floating: active.floating,
             at: active.at,
             size: active.size
         };
-        const window = root._windowArg(active.address);
-        Hyprland.dispatch(`hl.dsp.window.tag({ tag = "+${root._fullscreenTag}", ${window} })`);
-        Hyprland.dispatch(`hl.dsp.window.float({ action = "set", ${window} })`);
-        root.placeFullscreen(screen, false);
-    }
-
-    function fullscreenWindowOn(screen: var): bool {
-        if (!root._fullscreen || root._fullscreen.screen !== screen?.name)
-            return false;
-        const workspace = Hyprland.monitorFor(screen)?.activeWorkspace;
-        return Hyprland.toplevels.values.some(t => t.lastIpcObject?.address === root._fullscreen.address && t.workspace === workspace);
     }
 
     function placeFullscreen(screen: var, barShown: bool): void {
@@ -84,8 +79,32 @@ Singleton {
         root._placeWindow(root._fullscreen.address, screen.x, screen.y + top, screen.width, screen.height - top);
     }
 
-    function openSpecial(monitor: var): string {
-        return monitor?.lastIpcObject?.specialWorkspace?.name ?? "";
+    function activeWorkspaceId(screen: var): int {
+        return Hyprland.monitorFor(screen)?.activeWorkspace?.id ?? -1;
+    }
+
+    function openSpecial(screen: var): string {
+        return Hyprland.monitorFor(screen)?.lastIpcObject?.specialWorkspace?.name ?? "";
+    }
+
+    function focusWorkspace(id: int): void {
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${id} })`);
+    }
+
+    function focusNamedWorkspace(name: string): void {
+        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify("name:" + name)} })`);
+    }
+
+    function toggleSpecial(name: string): void {
+        Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${JSON.stringify(name)})`);
+    }
+
+    function setSubmap(name: string): void {
+        Hyprland.dispatch(`hl.dsp.submap(${JSON.stringify(name)})`);
+    }
+
+    function visibleWindows(): var {
+        return Geometry.visibleWindows(Hyprland.toplevels.values, Hyprland.monitors.values);
     }
 
     function isShowing(name: string): bool {

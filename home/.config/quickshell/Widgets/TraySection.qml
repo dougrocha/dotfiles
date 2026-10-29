@@ -13,8 +13,11 @@ Item {
     id: root
     readonly property string screenName: QsWindow.window?.screen?.name ?? ""
     readonly property bool menuHere: Visibilities.trayMenu?.screen === screenName
-    property var activeTrayItem: null
-    property Item activeAnchor: null
+    readonly property string openId: menuHere ? (Visibilities.trayMenu?.itemId ?? "") : ""
+    property bool retained: false
+    property string retainedId: ""
+    readonly property Item activeAnchor: retained ? delegateFor(retainedId) : null
+    readonly property var activeTrayItem: activeAnchor?.trayItem ?? null
     property Item dragSource: null
     property var draggedTrayItem: null
     property int dragIndex: -1
@@ -43,20 +46,6 @@ Item {
     function clearMenu(anchorItem) {
         if (Visibilities.isTrayMenuOpen(screenName, itemId(anchorItem.trayItem)))
             Visibilities.closeTrayMenu();
-    }
-    function releaseMenu() {
-        activeTrayItem = null;
-        activeAnchor = null;
-    }
-    function retainMenu() {
-        const menu = Visibilities.trayMenu;
-        if (!menu || menu.screen !== screenName)
-            return;
-        const delegate = delegateFor(menu.itemId);
-        if (!delegate)
-            return;
-        activeTrayItem = delegate.trayItem;
-        activeAnchor = delegate;
     }
     function beginDrag(sourceItem) {
         if (!itemId(sourceItem.trayItem))
@@ -160,6 +149,21 @@ Item {
         pendingFocusId = "";
     }
 
+    function retain() {
+        const menu = Visibilities.trayMenu;
+        if (menu?.screen !== screenName)
+            return;
+        retainedId = menu.itemId;
+        retained = true;
+    }
+    function release() {
+        retained = false;
+        retainedId = "";
+    }
+
+    onMenuHereChanged: retain()
+    onOpenIdChanged: retain()
+
     visible: TrayState.liveItems.length > 0
     implicitWidth: visible ? visibleRow.width : 0
     implicitHeight: Theme.topBarHeight
@@ -211,13 +215,6 @@ Item {
         mipmap: true
     }
     Connections {
-        target: Visibilities
-
-        function onTrayMenuChanged() {
-            root.retainMenu();
-        }
-    }
-    Connections {
         target: SystemTray.items
 
         function onObjectRemovedPre(object, index) {
@@ -225,7 +222,7 @@ Item {
                 return;
             if (root.menuHere)
                 Visibilities.closeTrayMenu();
-            root.releaseMenu();
+            root.release();
         }
     }
     QsMenuOpener {
@@ -238,6 +235,6 @@ Item {
         open: root.menuHere && root.activeAnchor !== null
         menuOpener: menuOpener
         onCloseRequested: Visibilities.closeTrayMenu()
-        onHidden: root.releaseMenu()
+        onHidden: root.release()
     }
 }

@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Constants
 import "ScreenshotGeometry.js" as Geometry
@@ -71,14 +70,15 @@ Singleton {
         }
     ]
 
-    readonly property string phase: _phase
-    readonly property bool overlayVisible: _phase === "selecting" || _phase === "countdown"
+    readonly property bool selecting: _phase === "selecting"
+    readonly property bool counting: _phase === "countdown"
+    readonly property bool overlayVisible: selecting || counting
     readonly property string mode: _mode
     readonly property string visualMode: _quick ? (hasSelection ? "region" : "windows") : _mode
     readonly property var selection: _selection
     readonly property bool hasSelection: Geometry.isSelection(_selection)
     readonly property var highlightWindow: visualMode !== "windows" ? null : _quick ? _hoveredWindow : _targetWindow
-    readonly property bool canCapture: _phase === "selecting" && !_quick && (_modeTarget === "none" || _captureRect() != null)
+    readonly property bool canCapture: selecting && !_quick && (_modeTarget === "none" || _captureRect() != null)
     readonly property int countdown: _countdown
     readonly property var readout: _readout
     readonly property int cursorShape: _optionsOpen ? Qt.ArrowCursor : _cursorShape
@@ -97,6 +97,8 @@ Singleton {
             [option.key]: option.fallback
         }), {})
     readonly property string _modeTarget: modes.find(entry => entry.id === _mode)?.target ?? "none"
+    readonly property bool _picksRegion: _quick || _modeTarget === "selection"
+    readonly property var _windows: overlayVisible ? Desktop.visibleWindows() : []
     readonly property var _toolbarHost: Desktop.primaryScreen
     readonly property string _toolbarScreen: _toolbarHost?.name ?? ""
     readonly property var _idleDrag: ({
@@ -184,7 +186,7 @@ Singleton {
     }
 
     function hoverAt(x: real, y: real): void {
-        if (_phase !== "selecting" || _optionsOpen)
+        if (!selecting || _optionsOpen)
             return;
         const windowMode = !_quick && _modeTarget === "window";
         if (windowMode || (_quick && _quickCommand === "")) {
@@ -319,7 +321,7 @@ Singleton {
     }
 
     function toggleOptions(): void {
-        if (_phase === "selecting" && !_quick)
+        if (selecting && !_quick)
             _optionsOpen = !_optionsOpen;
     }
 
@@ -338,7 +340,7 @@ Singleton {
     }
 
     function browseSaveLocation(): void {
-        if (_phase !== "selecting" || saveLocationProcess.running)
+        if (!selecting || saveLocationProcess.running)
             return;
         _optionsOpen = false;
         _phase = "choosingDirectory";
@@ -471,7 +473,7 @@ Singleton {
     }
 
     function _windowAt(x, y) {
-        return Geometry.windowAt(Geometry.visibleWindows(Hyprland.toplevels.values, Hyprland.monitors.values), x, y);
+        return Geometry.windowAt(_windows, x, y);
     }
 
     function _setSelection(rect) {
@@ -485,9 +487,9 @@ Singleton {
     function _hitAt(x, y) {
         if (_optionsOpen)
             return Geometry.hit("background");
-        if (_phase === "countdown")
+        if (counting)
             return _modeTarget === "none" ? Geometry.hit("background") : Geometry.hit("idle");
-        if (_quick || _modeTarget === "selection")
+        if (_picksRegion)
             return Geometry.hitTest(_selection, x, y);
         if (_modeTarget === "window")
             return Geometry.hit("pick");
@@ -516,9 +518,9 @@ Singleton {
             return Qt.CrossCursor;
         if (drag.kind === "resize")
             return _resizeCursor(Geometry.resolvedResizeSign(drag.pointerX, drag.horizontal, drag.initial.x, drag.initial.width), Geometry.resolvedResizeSign(drag.pointerY, drag.vertical, drag.initial.y, drag.initial.height));
-        if (drag.kind !== "idle" || _phase !== "selecting")
+        if (drag.kind !== "idle" || !selecting)
             return Qt.ArrowCursor;
-        if (_quick || _modeTarget === "selection") {
+        if (_picksRegion) {
             const hit = Geometry.hitTest(_selection, x, y);
             if (hit.kind === "move")
                 return Qt.SizeAllCursor;

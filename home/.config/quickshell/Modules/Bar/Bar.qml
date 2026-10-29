@@ -3,7 +3,6 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.Components
 import qs.Constants
@@ -22,61 +21,12 @@ Variants {
         required property var modelData
         screen: modelData
 
-        readonly property var monitor: Hyprland.monitorFor(modelData)
-        readonly property bool fullscreenOnScreen: Desktop.fullscreenOn(modelData)
-        readonly property bool ownsFullscreen: Desktop.fullscreenWindowOn(modelData)
-        readonly property bool autoHide: fullscreenOnScreen || ownsFullscreen
+        readonly property string fullscreenKind: Desktop.fullscreenKind(modelData)
+        readonly property bool autoHide: fullscreenKind !== "none"
         readonly property bool primary: modelData === Desktop.primaryScreen
-        readonly property bool wantRevealed: BarService.wantsReveal(autoHide, barHover.hovered)
-        property bool revealed: true
+        readonly property bool revealed: BarService.revealedOn(modelData)
 
-        function placeFullscreen() {
-            Desktop.placeFullscreen(modelData, revealed);
-        }
-
-        onRevealedChanged: {
-            if (primary)
-                BarService.setRevealed(revealed);
-            if (ownsFullscreen)
-                placeFullscreen();
-        }
-
-        onAutoHideChanged: {
-            if (autoHide && !BarService.wantsReveal(true, barHover.hovered)) {
-                hideTimer.stop();
-                revealed = false;
-            }
-        }
-
-        onOwnsFullscreenChanged: {
-            if (ownsFullscreen)
-                placeFullscreen();
-        }
-
-        onWantRevealedChanged: {
-            hideTimer.stop();
-            revealTimer.stop();
-            if (!wantRevealed)
-                hideTimer.restart();
-            else if (autoHide && !BarService.wantsReveal(true, false))
-                revealTimer.restart();
-            else
-                revealed = true;
-        }
-
-        Timer {
-            id: revealTimer
-            interval: 250
-            onTriggered: topBar.revealed = true
-        }
-
-        Timer {
-            id: hideTimer
-            interval: 1000
-            onTriggered: topBar.revealed = false
-        }
-
-        WlrLayershell.layer: fullscreenOnScreen ? WlrLayer.Overlay : WlrLayer.Top
+        WlrLayershell.layer: fullscreenKind === "exclusive" ? WlrLayer.Overlay : WlrLayer.Top
         WlrLayershell.namespace: "qs.topbar"
         exclusionMode: autoHide ? ExclusionMode.Ignore : ExclusionMode.Auto
 
@@ -98,7 +48,7 @@ Variants {
             anchors.fill: parent
 
             HoverHandler {
-                id: barHover
+                onHoveredChanged: BarService.setHovered(topBar.modelData, hovered)
             }
         }
 
@@ -155,7 +105,7 @@ Variants {
 
                 Workspaces {
                     id: workspaceModule
-                    monitor: topBar.monitor
+                    screen: topBar.modelData
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.space.md / 2
                     anchors.verticalCenter: parent.verticalCenter

@@ -10,10 +10,10 @@ import qs.Services
 Item {
     id: root
 
-    required property var monitor
+    required property var screen
 
-    readonly property var activeWorkspace: monitor?.activeWorkspace
-    readonly property string openSpecialName: Desktop.openSpecial(monitor)
+    readonly property int activeWorkspaceId: Desktop.activeWorkspaceId(screen)
+    readonly property string openSpecialName: Desktop.openSpecial(screen)
 
     readonly property list<int> workspaceIds: {
         const ids = [1, 2, 3, 4, 5];
@@ -39,7 +39,7 @@ Item {
     }
 
     function isCurrentExtra(workspace) {
-        return isSpecial(workspace) ? workspace.name === openSpecialName : activeWorkspace?.id === workspace.id;
+        return isSpecial(workspace) ? workspace.name === openSpecialName : activeWorkspaceId === workspace.id;
     }
 
     function labelFor(workspace) {
@@ -50,9 +50,9 @@ Item {
         Visibilities.dismissAll();
         const name = labelFor(workspace);
         if (isSpecial(workspace))
-            Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${JSON.stringify(name)})`);
+            Desktop.toggleSpecial(name);
         else
-            Hyprland.dispatch(`hl.dsp.focus({ workspace = ${JSON.stringify("name:" + name)} })`);
+            Desktop.focusNamedWorkspace(name);
     }
 
     function workspaceFor(id) {
@@ -61,7 +61,7 @@ Item {
 
     function focusWorkspace(id) {
         Visibilities.dismissAll();
-        Hyprland.dispatch(`hl.dsp.focus({ workspace = ${id} })`);
+        Desktop.focusWorkspace(id);
     }
 
     implicitWidth: row.implicitWidth
@@ -73,7 +73,7 @@ Item {
         required property int modelData
 
         readonly property var workspace: root.workspaceFor(modelData)
-        readonly property bool current: root.activeWorkspace?.id === modelData
+        readonly property bool current: root.activeWorkspaceId === modelData
         readonly property bool occupied: root.isOccupied(workspace)
 
         implicitWidth: 22

@@ -19,6 +19,7 @@ Singleton {
             return;
         root._paused = true;
         root._pausedAt = Date.now();
+        root._armExpiry();
         root._saveLiveNow();
     }
 
@@ -59,8 +60,11 @@ Singleton {
     function appDisplayName(appName: string): string {
         if (!appName)
             return "Unknown";
-        const entry = DesktopEntries.heuristicLookup(appName);
-        return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
+        if (!Object.prototype.hasOwnProperty.call(root._appNames, appName)) {
+            const entry = DesktopEntries.heuristicLookup(appName);
+            root._appNames[appName] = entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
+        }
+        return root._appNames[appName];
     }
 
     readonly property int _maxVisible: 5
@@ -73,6 +77,7 @@ Singleton {
     property bool _liveLoaded: false
     property bool _migrateLegacyHistory: false
     property var _islandWatchers: ({})
+    property var _appNames: ({})
     readonly property string _session: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2)
     property int _sequence: 0
 
@@ -118,6 +123,19 @@ Singleton {
 
     function _expireDue(now) {
         root._popups.filter(n => !n.leaving && !n.queued && root._expired(n, now)).forEach(n => root._close(n, true));
+        root._armExpiry();
+    }
+
+    function _armExpiry() {
+        expiryTimer.stop();
+        if (root._paused)
+            return;
+        const times = root._popups.filter(n => !n.leaving && !n.queued && n.duration !== -1).map(n => n.expiresAt);
+        if (times.length === 0)
+            return;
+        const delay = Math.min(...times) - Date.now();
+        expiryTimer.interval = delay > 0 ? delay : 100;
+        expiryTimer.start();
     }
 
     function _close(entry, expired) {
@@ -212,6 +230,7 @@ Singleton {
                 expiresAt: now + n.duration
             });
         });
+        root._armExpiry();
         if (root._liveLoaded)
             liveSave.restart();
     }
@@ -379,10 +398,16 @@ Singleton {
     }
 
     Timer {
-        interval: 100
-        repeat: true
-        running: !root._paused && root._popups.some(n => !n.leaving && n.duration !== -1)
+        id: expiryTimer
         onTriggered: root._expireDue(Date.now())
+    }
+
+    Connections {
+        target: DesktopEntries.applications
+
+        function onValuesChanged() {
+            root._appNames = {};
+        }
     }
 
     Timer {
