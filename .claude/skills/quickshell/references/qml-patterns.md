@@ -107,7 +107,7 @@ CloseBadge {
 
 ## Animate a size change and fade in new content
 
-From `Components/Popup.qml` and `Modules/Popups/CalendarView.qml`:
+From `Components/Popup.qml` and `Modules/Notifications/CalendarView.qml`:
 
 ```qml
 SizeMotion on height {}

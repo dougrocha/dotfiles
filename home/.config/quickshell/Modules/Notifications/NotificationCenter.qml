@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Components
 import qs.Constants
-import qs.Modules.Popups
 import qs.Services
 
 Item {
