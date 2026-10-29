@@ -39,7 +39,7 @@ Put groups directly in the `Popup`. Its column puts `Theme.space.xl` between the
 
 ```qml
 LazyLoader {
-    active: modelData === Theme.primaryScreen
+    active: modelData === Desktop.primaryScreen
 
     SoundPopup {
         anchor.window: topBar
