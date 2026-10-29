@@ -7,7 +7,6 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property bool pinned: _pinned
     readonly property bool revealed: _revealed
 
     property bool _pinned: false

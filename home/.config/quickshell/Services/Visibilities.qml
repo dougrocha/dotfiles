@@ -17,7 +17,7 @@ Singleton {
             music: "music-panel"
         })
     readonly property bool anyOpen: _current !== ""
-    readonly property var trayMenu: _current === _trayMenuSlot ? _trayMenu : null
+    readonly property var trayMenu: _trayMenu
 
     readonly property string _trayMenuSlot: "tray-menu"
     property string _current: ""

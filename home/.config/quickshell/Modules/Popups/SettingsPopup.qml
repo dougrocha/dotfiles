@@ -23,10 +23,7 @@ Popup {
     }
 
     component ControlRow: DeviceRow {
-        required property bool active
-
-        detail: active ? "On" : "Off"
-        selected: active
+        detail: selected ? "On" : "Off"
     }
 
     component BatteryRow: DeviceRow {
@@ -132,28 +129,28 @@ Popup {
             ControlRow {
                 glyph: PhosphorIcons.lockSimple
                 label: "Idle lock"
-                active: IdleService.active
+                selected: IdleService.active
                 onTapped: IdleService.toggle()
             }
 
             ControlRow {
                 glyph: PhosphorIcons.bellSlash
                 label: "Do not disturb"
-                active: SettingsService.doNotDisturb
+                selected: SettingsService.doNotDisturb
                 onTapped: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
             }
 
             ControlRow {
                 glyph: PhosphorIcons.moon
                 label: "Night light"
-                active: SunsetService.active
+                selected: SunsetService.active
                 onTapped: SunsetService.toggle()
             }
 
             ControlRow {
                 glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
                 label: "Microphone"
-                active: !AudioService.sourceMuted
+                selected: !AudioService.sourceMuted
                 onTapped: AudioService.toggleSourceMute()
             }
         }

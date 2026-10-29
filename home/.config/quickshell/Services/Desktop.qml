@@ -9,18 +9,29 @@ import qs.Constants
 Singleton {
     id: root
 
-    readonly property string primaryMonitor: "DP-1"
-    readonly property var primaryScreen: Quickshell.screens.find(s => s.name === primaryMonitor) ?? Quickshell.screens[0] ?? null
+    readonly property string _primaryMonitor: "DP-1"
+    readonly property var primaryScreen: screenNamed(_primaryMonitor) ?? Quickshell.screens[0] ?? null
     readonly property var primaryScreens: primaryScreen ? [primaryScreen] : []
 
     readonly property int _fullscreenExclusive: 2
     readonly property string _fullscreenTag: "qs-fullscreen"
     readonly property list<string> _browserClasses: ["zen"]
     property var _fullscreen: null
-    readonly property list<string> _refreshEvents: ["workspace", "activespecial", "focusedmon", "fullscreen", "openwindow", "closewindow"]
+    readonly property var _refreshEvents: ({
+            workspace: true,
+            activespecial: true,
+            focusedmon: true,
+            fullscreen: true,
+            openwindow: true,
+            closewindow: true
+        })
+
+    function screenNamed(name: string): var {
+        return Quickshell.screens.find(s => s.name === name) ?? null;
+    }
 
     function focusedScreen(): var {
-        return Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? root.primaryScreen;
+        return root.screenNamed(Hyprland.focusedMonitor?.name ?? "") ?? root.primaryScreen;
     }
 
     function fullscreenOn(screen: var): bool {
@@ -45,9 +56,10 @@ Singleton {
         }
         if (root._fullscreen)
             root._leaveFullscreen();
+        const screen = root.focusedScreen();
         root._fullscreen = {
             address: active.address,
-            screen: root.focusedScreen()?.name ?? "",
+            screen: screen?.name ?? "",
             floating: active.floating,
             at: active.at,
             size: active.size
@@ -55,7 +67,7 @@ Singleton {
         const window = root._windowArg(active.address);
         Hyprland.dispatch(`hl.dsp.window.tag({ tag = "+${root._fullscreenTag}", ${window} })`);
         Hyprland.dispatch(`hl.dsp.window.float({ action = "set", ${window} })`);
-        root.placeFullscreen(root.focusedScreen(), false);
+        root.placeFullscreen(screen, false);
     }
 
     function fullscreenWindowOn(screen: var): bool {
@@ -69,9 +81,7 @@ Singleton {
         if (!root._fullscreen || !screen || root._fullscreen.screen !== screen.name)
             return;
         const top = barShown ? Theme.topBarCompactHeight : 0;
-        const window = root._windowArg(root._fullscreen.address);
-        Hyprland.dispatch(`hl.dsp.window.resize({ x = ${screen.width}, y = ${screen.height - top}, ${window} })`);
-        Hyprland.dispatch(`hl.dsp.window.move({ x = ${screen.x}, y = ${screen.y + top}, ${window} })`);
+        root._placeWindow(root._fullscreen.address, screen.x, screen.y + top, screen.width, screen.height - top);
     }
 
     function openSpecial(monitor: var): string {
@@ -95,6 +105,12 @@ Singleton {
         return `window = "address:${address}"`;
     }
 
+    function _placeWindow(address, x, y, width, height) {
+        const window = root._windowArg(address);
+        Hyprland.dispatch(`hl.dsp.window.resize({ x = ${width}, y = ${height}, ${window} })`);
+        Hyprland.dispatch(`hl.dsp.window.move({ x = ${x}, y = ${y}, ${window} })`);
+    }
+
     function _leaveFullscreen() {
         const saved = root._fullscreen;
         root._fullscreen = null;
@@ -104,8 +120,7 @@ Singleton {
             Hyprland.dispatch(`hl.dsp.window.float({ action = "unset", ${window} })`);
             return;
         }
-        Hyprland.dispatch(`hl.dsp.window.resize({ x = ${saved.size[0]}, y = ${saved.size[1]}, ${window} })`);
-        Hyprland.dispatch(`hl.dsp.window.move({ x = ${saved.at[0]}, y = ${saved.at[1]}, ${window} })`);
+        root._placeWindow(saved.address, saved.at[0], saved.at[1], saved.size[0], saved.size[1]);
     }
 
     function refresh(): void {
@@ -121,9 +136,15 @@ Singleton {
         function onRawEvent(event) {
             if (event.name === "closewindow" && root._fullscreen?.address === "0x" + event.data)
                 root._fullscreen = null;
-            if (root._refreshEvents.includes(event.name))
-                root.refresh();
+            if (root._refreshEvents[event.name])
+                refreshTimer.restart();
         }
+    }
+
+    Timer {
+        id: refreshTimer
+        interval: 16
+        onTriggered: root.refresh()
     }
 
     IpcHandler {

@@ -34,10 +34,7 @@ Singleton {
 
     function dismiss(id: var): void {
         const entry = root._live(id);
-        if (entry?.ref)
-            entry.ref.dismiss();
-        else if (entry)
-            root._toHistory(id);
+        root._close(entry, false);
     }
 
     function invokeAction(id: var, identifier: string): void {
@@ -48,18 +45,15 @@ Singleton {
     function removeFromHistory(id: string): void {
         if (!root._history.some(n => n.id === id))
             return;
-        root._history = root._history.filter(n => n.id !== id);
-        historySave.restart();
+        root._setHistory(root._history.filter(n => n.id !== id));
     }
 
     function clearApp(app: string): void {
-        root._history = root._history.filter(n => root.appDisplayName(n.appName ?? "") !== app);
-        historySave.restart();
+        root._setHistory(root._history.filter(n => root.appDisplayName(n.appName ?? "") !== app));
     }
 
     function clearHistory(): void {
-        root._history = [];
-        historySave.restart();
+        root._setHistory([]);
     }
 
     function appDisplayName(appName: string): string {
@@ -123,7 +117,18 @@ Singleton {
     }
 
     function _expireDue(now) {
-        root._popups.filter(n => !n.leaving && !n.queued && root._expired(n, now)).forEach(n => n.ref ? n.ref.expire() : root._toHistory(n.id));
+        root._popups.filter(n => !n.leaving && !n.queued && root._expired(n, now)).forEach(n => root._close(n, true));
+    }
+
+    function _close(entry, expired) {
+        if (!entry)
+            return;
+        if (!entry.ref)
+            root._toHistory(entry.id);
+        else if (expired)
+            entry.ref.expire();
+        else
+            entry.ref.dismiss();
     }
 
     function _toHistory(id) {
@@ -183,8 +188,7 @@ Singleton {
             urgency: entry.urgency,
             timestamp: entry.timestamp ?? Date.now()
         };
-        root._history = [item, ...root._history].slice(0, 50);
-        historySave.restart();
+        root._setHistory([item, ...root._history].slice(0, 50));
     }
 
     function _live(id) {
@@ -210,6 +214,11 @@ Singleton {
         });
         if (root._liveLoaded)
             liveSave.restart();
+    }
+
+    function _setHistory(next) {
+        root._history = next;
+        historySave.restart();
     }
 
     function _saveLiveNow() {
@@ -258,7 +267,8 @@ Singleton {
 
     function _watch(notification) {
         const id = notification.id;
-        const refresh = () => root._refresh(id);
+        const update = () => root._refresh(id);
+        const refresh = () => Qt.callLater(update);
         const close = () => root._toHistory(id);
         const updates = [notification.summaryChanged, notification.bodyChanged, notification.appNameChanged, notification.appIconChanged, notification.imageChanged, notification.actionsChanged];
         updates.forEach(signal => signal.connect(refresh));
@@ -341,9 +351,9 @@ Singleton {
     function _loadHistory(text) {
         const entries = root._parseArray(text);
         if (entries)
-            root._history = entries.map(n => Object.assign({}, n, {
+            root._setHistory(entries.map(n => Object.assign({}, n, {
                     id: root._historyId()
-                }));
+                })));
         return entries !== null;
     }
 

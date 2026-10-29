@@ -7,6 +7,18 @@ const toolbarBottomGap = 52;
 const optionsGap = 8;
 const unfocusedOrder = 9999;
 
+function clamp(value, low, high) {
+    return Math.max(low, Math.min(high, value));
+}
+
+function hit(kind, horizontal = 0, vertical = 0) {
+    return {
+        kind: kind,
+        horizontal: horizontal,
+        vertical: vertical
+    };
+}
+
 function isSelection(rect) {
     return rect.width >= minimumSide && rect.height >= minimumSide;
 }
@@ -53,8 +65,8 @@ function desktopBounds(screens) {
 
 function clampToDesktop(desktop, x, y) {
     return {
-        x: Math.max(desktop.left, Math.min(desktop.right, x)),
-        y: Math.max(desktop.top, Math.min(desktop.bottom, y))
+        x: clamp(x, desktop.left, desktop.right),
+        y: clamp(y, desktop.top, desktop.bottom)
     };
 }
 
@@ -81,8 +93,8 @@ function rectFromPoints(ax, ay, bx, by) {
 
 function movedRect(initial, dx, dy, desktop) {
     return {
-        x: Math.max(desktop.left, Math.min(desktop.right - initial.width, initial.x + dx)),
-        y: Math.max(desktop.top, Math.min(desktop.bottom - initial.height, initial.y + dy)),
+        x: clamp(initial.x + dx, desktop.left, desktop.right - initial.width),
+        y: clamp(initial.y + dy, desktop.top, desktop.bottom - initial.height),
         width: initial.width,
         height: initial.height
     };
@@ -112,14 +124,9 @@ function containsPoint(rect, x, y) {
     return x >= rect.x && x < rect.x + rect.width && y >= rect.y && y < rect.y + rect.height;
 }
 
-function hitTest(selection, hasSelection, x, y) {
-    const create = {
-        kind: "create",
-        horizontal: 0,
-        vertical: 0
-    };
-    if (!hasSelection)
-        return create;
+function hitTest(selection, x, y) {
+    if (!isSelection(selection))
+        return hit("create");
     const left = selection.x;
     const right = left + selection.width;
     const top = selection.y;
@@ -130,18 +137,10 @@ function hitTest(selection, hasSelection, x, y) {
     const horizontal = withinY && near(x, left) ? -1 : withinY && near(x, right) ? 1 : 0;
     const vertical = withinX && near(y, top) ? -1 : withinX && near(y, bottom) ? 1 : 0;
     if (horizontal !== 0 || vertical !== 0)
-        return {
-            kind: "resize",
-            horizontal: horizontal,
-            vertical: vertical
-        };
+        return hit("resize", horizontal, vertical);
     if (x > left && x < right && y > top && y < bottom)
-        return {
-            kind: "move",
-            horizontal: 0,
-            vertical: 0
-        };
-    return create;
+        return hit("move");
+    return hit("create");
 }
 
 function resolvedResizeSign(pointer, sign, start, extent) {
@@ -254,13 +253,13 @@ function isSavedToolbar(position) {
 
 function clampToolbar(position, size, screen) {
     return {
-        x: position.x >= 0 ? Math.max(0, Math.min(screen.width - size.width, position.x)) : (screen.width - size.width) / 2,
-        y: position.y >= 0 ? Math.max(0, Math.min(screen.height - size.height, position.y)) : screen.height - size.height - toolbarBottomGap
+        x: position.x >= 0 ? clamp(position.x, 0, screen.width - size.width) : (screen.width - size.width) / 2,
+        y: position.y >= 0 ? clamp(position.y, 0, screen.height - size.height) : screen.height - size.height - toolbarBottomGap
     };
 }
 
 function optionsPlacement(toolbar, size, screen) {
-    const x = Math.max(optionsGap, Math.min(screen.width - size.width - optionsGap, toolbar.x + (toolbar.width - size.width) / 2));
+    const x = clamp(toolbar.x + (toolbar.width - size.width) / 2, optionsGap, screen.width - size.width - optionsGap);
     const y = toolbar.y >= size.height + optionsGap ? toolbar.y - size.height - optionsGap : Math.min(screen.height - size.height - optionsGap, toolbar.y + toolbar.height + optionsGap);
     return {
         x: x,

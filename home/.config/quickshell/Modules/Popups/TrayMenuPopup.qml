@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell
 import qs.Components
 import qs.Constants
-import qs.Services
 
 PopupWindow {
     id: root

@@ -29,6 +29,14 @@ Item {
         const id = itemId(item);
         return TrayState.items.findIndex(candidate => itemId(candidate) === id);
     }
+    function delegateFor(id) {
+        for (let i = 0; i < visibleRepeater.count; ++i) {
+            const delegate = visibleRepeater.itemAt(i);
+            if (delegate && itemId(delegate.trayItem) === id)
+                return delegate;
+        }
+        return null;
+    }
     function toggleMenu(trayItem) {
         Visibilities.toggleTrayMenu(screenName, itemId(trayItem));
     }
@@ -44,14 +52,11 @@ Item {
         const menu = Visibilities.trayMenu;
         if (!menu || menu.screen !== screenName)
             return;
-        for (let i = 0; i < visibleRepeater.count; ++i) {
-            const delegate = visibleRepeater.itemAt(i);
-            if (delegate && itemId(delegate.trayItem) === menu.itemId) {
-                activeTrayItem = delegate.trayItem;
-                activeAnchor = delegate;
-                return;
-            }
-        }
+        const delegate = delegateFor(menu.itemId);
+        if (!delegate)
+            return;
+        activeTrayItem = delegate.trayItem;
+        activeAnchor = delegate;
     }
     function beginDrag(sourceItem) {
         if (!itemId(sourceItem.trayItem))
@@ -148,14 +153,11 @@ Item {
         Qt.callLater(restoreFocus);
     }
     function restoreFocus() {
-        for (let i = 0; i < visibleRepeater.count; ++i) {
-            const delegate = visibleRepeater.itemAt(i);
-            if (delegate && itemId(delegate.trayItem) === pendingFocusId) {
-                delegate.forceActiveFocus();
-                pendingFocusId = "";
-                return;
-            }
-        }
+        const delegate = delegateFor(pendingFocusId);
+        if (!delegate)
+            return;
+        delegate.forceActiveFocus();
+        pendingFocusId = "";
     }
 
     visible: TrayState.liveItems.length > 0

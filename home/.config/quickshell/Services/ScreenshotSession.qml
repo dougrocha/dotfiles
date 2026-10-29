@@ -119,24 +119,26 @@ Singleton {
             directionY: 1,
             edgeAxis: "none"
         })
-
-    property string _phase: "idle"
-    property bool _quick: false
-    property string _quickCommand: ""
-    property string _mode: "region"
-    property var _selection: ({
+    readonly property var _emptyRect: ({
             x: 0,
             y: 0,
             width: 0,
             height: 0
         })
-    property var _hoveredWindow: null
-    property var _targetWindow: null
-    property string _controlScreen: ""
-    property var _toolbar: ({
+    readonly property var _unsetToolbar: ({
             x: -1,
             y: -1
         })
+
+    property string _phase: "idle"
+    property bool _quick: false
+    property string _quickCommand: ""
+    property string _mode: "region"
+    property var _selection: _emptyRect
+    property var _hoveredWindow: null
+    property var _targetWindow: null
+    property string _controlScreen: ""
+    property var _toolbar: _unsetToolbar
     property bool _optionsOpen: false
     property int _delay: 0
     property int _countdown: 0
@@ -328,13 +330,9 @@ Singleton {
             const candidate = Geometry.normalizedDirectory(location);
             return candidate !== normalized && candidate !== defaultDirectory;
         });
-        if (normalized === defaultDirectory) {
-            _saveDirectory = "";
-            _recentSaveLocations = remaining.slice(0, 3);
-        } else {
-            _saveDirectory = normalized;
-            _recentSaveLocations = [normalized].concat(remaining).slice(0, 3);
-        }
+        const isDefault = normalized === defaultDirectory;
+        _saveDirectory = isDefault ? "" : normalized;
+        _recentSaveLocations = (isDefault ? remaining : [normalized].concat(remaining)).slice(0, 3);
         _persist("saveDirectory", _saveDirectory);
         _persist("recentSaveLocations", _recentSaveLocations);
     }
@@ -392,31 +390,20 @@ Singleton {
     }
 
     function _beginSession(quick, command) {
-        _stopCountdown();
+        _resetInteraction();
         _pendingArgv = [];
         _quick = quick;
         _quickCommand = command;
-        _optionsOpen = false;
-        _setSelection({
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0
-        });
+        _setSelection(_emptyRect);
         _hoveredWindow = null;
         _targetWindow = null;
-        _drag = _idleDrag;
-        _readout = _hiddenReadout;
         _cursorShape = Qt.CrossCursor;
         Desktop.refresh();
         _controlScreen = Desktop.focusedScreen()?.name ?? "";
     }
 
     function _endSession() {
-        _stopCountdown();
-        _drag = _idleDrag;
-        _readout = _hiddenReadout;
-        _optionsOpen = false;
+        _resetInteraction();
         _quick = false;
         _quickCommand = "";
         _phase = "idle";
@@ -433,6 +420,13 @@ Singleton {
     function _stopCountdown() {
         countdownTimer.stop();
         _countdown = 0;
+    }
+
+    function _resetInteraction() {
+        _stopCountdown();
+        _optionsOpen = false;
+        _drag = _idleDrag;
+        _readout = _hiddenReadout;
     }
 
     function _captureRect() {
@@ -489,28 +483,15 @@ Singleton {
     }
 
     function _hitAt(x, y) {
-        const background = {
-            kind: "background",
-            horizontal: 0,
-            vertical: 0
-        };
         if (_optionsOpen)
-            return background;
+            return Geometry.hit("background");
         if (_phase === "countdown")
-            return _modeTarget === "none" ? background : {
-                kind: "idle",
-                horizontal: 0,
-                vertical: 0
-            };
+            return _modeTarget === "none" ? Geometry.hit("background") : Geometry.hit("idle");
         if (_quick || _modeTarget === "selection")
-            return Geometry.hitTest(_selection, hasSelection, x, y);
+            return Geometry.hitTest(_selection, x, y);
         if (_modeTarget === "window")
-            return {
-                kind: "pick",
-                horizontal: 0,
-                vertical: 0
-            };
-        return background;
+            return Geometry.hit("pick");
+        return Geometry.hit("background");
     }
 
     function _finishDrag(x, y) {
@@ -538,7 +519,7 @@ Singleton {
         if (drag.kind !== "idle" || _phase !== "selecting")
             return Qt.ArrowCursor;
         if (_quick || _modeTarget === "selection") {
-            const hit = Geometry.hitTest(_selection, hasSelection, x, y);
+            const hit = Geometry.hitTest(_selection, x, y);
             if (hit.kind === "move")
                 return Qt.SizeAllCursor;
             return hit.kind === "resize" ? _resizeCursor(hit.horizontal, hit.vertical) : Qt.CrossCursor;
@@ -565,10 +546,7 @@ Singleton {
     }
 
     function _restore() {
-        _toolbar = {
-            x: -1,
-            y: -1
-        };
+        _toolbar = _unsetToolbar;
         if (!SettingsService.loaded)
             return;
         const toolbarSaved = _monitorEntry(_toolbarScreen)?.toolbar;
@@ -577,7 +555,7 @@ Singleton {
                 x: toolbarSaved.x,
                 y: toolbarSaved.y
             };
-        const screen = Quickshell.screens.find(candidate => candidate.name === _controlScreen);
+        const screen = Desktop.screenNamed(_controlScreen);
         const region = _monitorEntry(_controlScreen)?.region;
         if (_options.rememberLastSelection && screen != null && Geometry.isSavedRegion(region, screen))
             _setSelection(Geometry.fromOutput(region, screen));
@@ -586,7 +564,7 @@ Singleton {
     function _commitRegion() {
         if (!_options.rememberLastSelection || !SettingsService.loaded || _controlScreen === "")
             return;
-        const screen = Quickshell.screens.find(candidate => candidate.name === _controlScreen);
+        const screen = Desktop.screenNamed(_controlScreen);
         if (screen == null)
             return;
         const contained = hasSelection && Geometry.containsRect(screen, _selection);

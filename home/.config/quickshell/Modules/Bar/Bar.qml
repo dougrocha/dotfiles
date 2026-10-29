@@ -30,11 +30,15 @@ Variants {
         readonly property bool wantRevealed: BarService.wantsReveal(autoHide, barHover.hovered)
         property bool revealed: true
 
+        function placeFullscreen() {
+            Desktop.placeFullscreen(modelData, revealed);
+        }
+
         onRevealedChanged: {
             if (primary)
                 BarService.setRevealed(revealed);
             if (ownsFullscreen)
-                Desktop.placeFullscreen(modelData, revealed);
+                placeFullscreen();
         }
 
         onAutoHideChanged: {
@@ -46,7 +50,7 @@ Variants {
 
         onOwnsFullscreenChanged: {
             if (ownsFullscreen)
-                Desktop.placeFullscreen(modelData, revealed);
+                placeFullscreen();
         }
 
         onWantRevealedChanged: {
@@ -139,20 +143,12 @@ Variants {
                 }
             }
 
-            Rectangle {
+            BarPill {
+                faded: topBar.autoHide
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
                 width: workspaceModule.implicitWidth + Theme.space.md
-                height: Theme.topBarHeight - 8
-                radius: height / 2
-                color: topBar.autoHide ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
                 clip: true
 
                 SizeMotion on width {}
@@ -166,8 +162,10 @@ Variants {
                 }
             }
 
-            Rectangle {
+            BarPill {
                 id: indicatorPill
+
+                faded: topBar.autoHide
 
                 readonly property int rightPadding: 14
                 readonly property int leftPadding: traySection.visible ? rightPadding - 4 : rightPadding
@@ -176,16 +174,6 @@ Variants {
                 anchors.rightMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
                 width: indicatorRow.implicitWidth + leftPadding + rightPadding
-                height: Theme.topBarHeight - 8
-                radius: height / 2
-                color: topBar.autoHide ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
-
                 RowLayout {
                     id: indicatorRow
                     anchors.right: parent.right
@@ -254,6 +242,20 @@ Variants {
             NotificationPopup {
                 anchor.window: topBar
                 trigger: clockButton
+            }
+        }
+    }
+
+    component BarPill: Rectangle {
+        property bool faded: false
+
+        height: Theme.topBarHeight - 8
+        radius: height / 2
+        color: faded ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.motion.fast
             }
         }
     }
