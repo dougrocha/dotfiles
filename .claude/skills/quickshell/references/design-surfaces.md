@@ -35,7 +35,7 @@ When the user turns on Reduce Motion, the HIG asks for cross-fades in place of m
 From [popovers](https://developer.apple.com/design/human-interface-guidelines/popovers):
 
 - A panel holds a small amount of information or a few controls.
-- Only one panel is open at a time. Do not open a panel from a panel. `Visibilities.current` enforces this.
+- Only one panel is open at a time. Do not open a panel from a panel. `Visibilities` enforces this with one slot.
 - Nothing shows above a panel, except an alert (polkit).
 - A panel closes when the user clicks outside it or chooses an item. Add a close button only when it removes doubt, for example to tell "cancel" from "save".
 - A change made in a panel applies at once, or saves when the panel closes. Discard a change only on an explicit Cancel.

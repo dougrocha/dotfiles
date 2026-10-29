@@ -4,13 +4,13 @@ Copy these patterns. Each one comes from a real file in the config root. The rul
 
 ## Add a bar panel
 
-`Popup` registers the panel name as its IPC target. This is a short version of `Modules/Popups/SoundPopup.qml`:
+Add the name to `Visibilities.names` in `Services/Visibilities.qml`, and add one `PanelIpc { target: root.names.<key> }` line there. The value of the name is the IPC target. This is a short version of `Modules/Popups/SoundPopup.qml`:
 
 ```qml
 Popup {
     id: panel
 
-    panelName: "sound-panel"
+    panelName: Visibilities.names.sound
 
     PanelHeader {
         title: "Sound"
@@ -51,8 +51,8 @@ LazyLoader {
 `trigger` is the bar control, which has an `id` in `Bar.qml`. The panel grows from it. The bar control, from `Modules/Bar/Components/VolumeIndicator.qml`:
 
 ```qml
-active: AudioService.muted || Visibilities.isOpen("sound-panel")
-onTapped: Visibilities.toggle("sound-panel")
+active: AudioService.muted || Visibilities.isOpen(Visibilities.names.sound)
+onTapped: Visibilities.toggle(Visibilities.names.sound)
 ```
 
 ## Show a secondary control on hover
