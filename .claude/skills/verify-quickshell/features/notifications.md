@@ -1,6 +1,6 @@
 # Notification toasts
 
-Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after the sender's timeout, or by default after 3 seconds (2 seconds for low urgency), and then moves to history. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card, and while the center is open it waits until the center closes.
+Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after the sender's timeout, or by default after 5 seconds (about 3.3 seconds for low urgency, at least 10 seconds for a card with action buttons), and then moves to history. At most five cards show at once; the rest wait behind an "N more" pill and start their timeout when they move up. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card, and while the center is open it waits until the center closes.
 
 ## Sub-features
 
