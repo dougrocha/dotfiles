@@ -15,12 +15,8 @@ Item {
 
     implicitHeight: stack.implicitHeight
 
-    Connections {
-        target: Visibilities
-        function onOpened(name) {
-            if (name === "notification-center")
-                calendar.reset();
-        }
+    function reset(): void {
+        calendar.reset();
     }
 
     Column {

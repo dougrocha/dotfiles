@@ -28,7 +28,7 @@ Scope {
         function onRequestStarted() {
             if (!presence.mapped)
                 root.hostScreen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Theme.primaryScreen;
-            Visibilities.closeAll();
+            Visibilities.dismissAll();
         }
     }
 

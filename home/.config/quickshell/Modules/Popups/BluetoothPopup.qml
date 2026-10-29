@@ -9,7 +9,7 @@ import qs.Services
 Popup {
     id: panel
 
-    panelName: "bluetooth-panel"
+    panelName: Visibilities.names.bluetooth
     cardWidth: 300
 
     component DeviceEntry: PanelRow {

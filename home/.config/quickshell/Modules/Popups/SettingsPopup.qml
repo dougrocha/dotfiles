@@ -10,7 +10,7 @@ import qs.Services
 Popup {
     id: panel
 
-    panelName: "settings-panel"
+    panelName: Visibilities.names.settings
     cardWidth: 300
 
     function hyprshutdown(title: string, postCommand: string): void {

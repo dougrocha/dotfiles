@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Constants
 import qs.Services
 
@@ -48,22 +47,6 @@ PopupWindow {
 
     mask: Region {
         item: popup.shown ? card : null
-    }
-
-    IpcHandler {
-        target: popup.panelName
-
-        function open(): void {
-            Visibilities.open(popup.panelName);
-        }
-
-        function hide(): void {
-            Visibilities.close(popup.panelName);
-        }
-
-        function toggle(): void {
-            Visibilities.toggle(popup.panelName);
-        }
     }
 
     Presence {

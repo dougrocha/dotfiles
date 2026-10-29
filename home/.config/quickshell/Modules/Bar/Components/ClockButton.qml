@@ -7,7 +7,7 @@ ClockWidget {
     id: clock
 
     readonly property var formats: ["h:mmAP", "ddd h:mmAP", "MMM d  h:mmAP"]
-    readonly property bool active: Visibilities.isOpen("notification-center")
+    readonly property bool active: Visibilities.isOpen(Visibilities.names.notifications)
 
     function cycleFormat() {
         const next = (formats.indexOf(SettingsService.clockFormat) + 1) % formats.length;
@@ -33,7 +33,7 @@ ClockWidget {
     }
 
     TapHandler {
-        onTapped: Visibilities.toggle("notification-center")
+        onTapped: Visibilities.toggle(Visibilities.names.notifications)
     }
 
     TapHandler {

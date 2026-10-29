@@ -31,12 +31,12 @@ Variants {
         readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
         readonly property bool fullscreenOnScreen: fullscreenMode === hyprlandFullscreenModeExclusive
         readonly property bool primary: modelData === Theme.primaryScreen
-        readonly property bool wantRevealed: !fullscreenOnScreen || barHover.hovered || Visibilities.anyOpen || Visibilities.barPinned
+        readonly property bool wantRevealed: BarService.wantsReveal(fullscreenOnScreen, barHover.hovered)
         property bool revealed: true
 
         onRevealedChanged: {
             if (primary)
-                Visibilities.barRevealed = revealed;
+                BarService.setRevealed(revealed);
         }
 
         onFullscreenOnScreenChanged: {
@@ -103,7 +103,7 @@ Variants {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                 onTapped: eventPoint => {
                     if (!traySection.contains(traySection.mapFromItem(content, eventPoint.position)))
-                        Visibilities.closeTrayMenus();
+                        Visibilities.closeTrayMenu();
                 }
             }
 

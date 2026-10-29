@@ -13,7 +13,7 @@ Rectangle {
     property bool menuOpen: false
     property bool dragging: dragHandler.active
     property real previewOffsetX: 0
-    signal menuRequested(var trayItem, Item anchorItem)
+    signal menuRequested(var trayItem)
     signal disappearing(Item anchorItem)
     signal dragStarted(Item sourceItem)
     signal dragMoved(Item sourceItem, point translation)
@@ -22,10 +22,10 @@ Rectangle {
 
     function requestPrimaryAction() {
         if (root.trayItem.onlyMenu && root.trayItem.hasMenu) {
-            root.menuRequested(root.trayItem, root);
+            root.menuRequested(root.trayItem);
         } else {
             const handled = trayOverrides.triggerPrimaryAction();
-            Visibilities.closeAll();
+            Visibilities.dismissAll();
             if (!handled)
                 root.trayItem.activate();
         }
@@ -106,7 +106,7 @@ Rectangle {
         acceptedButtons: Qt.RightButton
         onTapped: {
             if (root.trayItem.hasMenu)
-                root.menuRequested(root.trayItem, root);
+                root.menuRequested(root.trayItem);
         }
     }
 
@@ -114,7 +114,7 @@ Rectangle {
         enabled: !root.dragging
         acceptedButtons: Qt.MiddleButton
         onTapped: {
-            Visibilities.closeAll();
+            Visibilities.dismissAll();
             root.trayItem.secondaryActivate();
         }
     }
@@ -134,7 +134,7 @@ Rectangle {
             root.requestPrimaryAction();
             event.accepted = true;
         } else if (event.key === Qt.Key_Menu && root.trayItem.hasMenu) {
-            root.menuRequested(root.trayItem, root);
+            root.menuRequested(root.trayItem);
             event.accepted = true;
         } else if (event.modifiers & Qt.ControlModifier) {
             if (event.key === Qt.Key_Left)

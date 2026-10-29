@@ -10,6 +10,8 @@ import qs.Services
 
 Item {
     id: root
+    readonly property string screenName: QsWindow.window?.screen?.name ?? ""
+    readonly property bool menuHere: Visibilities.trayMenu?.screen === screenName
     property var activeTrayItem: null
     property Item activeAnchor: null
     property Item dragSource: null
@@ -26,25 +28,29 @@ Item {
         const id = itemId(item);
         return TrayState.items.findIndex(candidate => itemId(candidate) === id);
     }
-    function toggleMenu(trayItem, anchorItem) {
-        const shouldClose = trayMenu.open && activeTrayItem === trayItem;
-        Visibilities.closeAll();
-        if (shouldClose)
-            return;
-        activeTrayItem = trayItem;
-        activeAnchor = anchorItem;
-        trayMenu.open = true;
+    function toggleMenu(trayItem) {
+        Visibilities.toggleTrayMenu(screenName, itemId(trayItem));
     }
     function clearMenu(anchorItem) {
-        if (anchorItem && activeAnchor !== anchorItem)
-            return;
-        trayMenu.open = false;
-        if (anchorItem)
-            releaseMenu();
+        if (Visibilities.isTrayMenuOpen(screenName, itemId(anchorItem.trayItem)))
+            Visibilities.closeTrayMenu();
     }
     function releaseMenu() {
         activeTrayItem = null;
         activeAnchor = null;
+    }
+    function retainMenu() {
+        const menu = Visibilities.trayMenu;
+        if (!menu || menu.screen !== screenName)
+            return;
+        for (let i = 0; i < visibleRepeater.count; ++i) {
+            const delegate = visibleRepeater.itemAt(i);
+            if (delegate && itemId(delegate.trayItem) === menu.itemId) {
+                activeTrayItem = delegate.trayItem;
+                activeAnchor = delegate;
+                return;
+            }
+        }
     }
     function beginDrag(sourceItem) {
         if (!itemId(sourceItem.trayItem))
@@ -158,9 +164,9 @@ Item {
     component ItemDelegate: TrayItem {
         required property var modelData
         trayItem: modelData
-        menuOpen: trayMenu.open && root.activeTrayItem === trayItem
+        menuOpen: Visibilities.isTrayMenuOpen(root.screenName, root.itemId(trayItem))
         previewOffsetX: root.dragSource ? root.previewOffset(trayItem) : 0
-        onMenuRequested: (trayItem, anchorItem) => root.toggleMenu(trayItem, anchorItem)
+        onMenuRequested: trayItem => root.toggleMenu(trayItem)
         onDisappearing: anchorItem => root.clearMenu(anchorItem)
         onDragStarted: sourceItem => root.beginDrag(sourceItem)
         onDragMoved: (sourceItem, translation) => root.moveDrag(sourceItem, translation)
@@ -201,6 +207,13 @@ Item {
         z: 20
         mipmap: true
     }
+    Connections {
+        target: Visibilities
+
+        function onTrayMenuChanged() {
+            root.retainMenu();
+        }
+    }
     QsMenuOpener {
         id: menuOpener
         menu: root.activeTrayItem ? root.activeTrayItem.menu : null
@@ -208,8 +221,9 @@ Item {
     TrayMenuPopup {
         id: trayMenu
         anchorItem: root.activeAnchor
+        open: root.menuHere && root.activeAnchor !== null
         menuOpener: menuOpener
-        onCloseRequested: root.clearMenu(null)
+        onCloseRequested: Visibilities.closeTrayMenu()
         onHidden: root.releaseMenu()
     }
 }

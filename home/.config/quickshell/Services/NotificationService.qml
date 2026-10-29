@@ -93,7 +93,7 @@ Singleton {
 
         const entry = root._entry(notification, Date.now(), root._duration(notification));
 
-        if ((Visibilities.isOpen("notification-center") || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
+        if ((Visibilities.isOpen(Visibilities.names.notifications) || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
             root._leave(id);
             root._addToHistory(entry);
             notification.expire();

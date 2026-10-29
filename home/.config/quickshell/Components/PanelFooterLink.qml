@@ -17,7 +17,7 @@ Column {
     PanelRow {
         implicitHeight: 28
         onTapped: {
-            Visibilities.closeAll();
+            Visibilities.dismissAll();
             Quickshell.execDetached(footer.command);
         }
 

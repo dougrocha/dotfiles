@@ -9,7 +9,7 @@ PopupWindow {
 
     property Item anchorItem
     property var menuOpener: null
-    property bool open: false
+    required property bool open
     signal closeRequested
     signal hidden
     readonly property var barWindow: anchorItem ? anchorItem.QsWindow.window : null
@@ -46,13 +46,6 @@ PopupWindow {
         active: root.open
         windows: root.barWindow ? [root, root.barWindow] : [root]
         onDismissed: root.closeRequested()
-    }
-
-    Connections {
-        target: Visibilities
-        function onCloseTrayMenus() {
-            root.closeRequested();
-        }
     }
 
     mask: Region {

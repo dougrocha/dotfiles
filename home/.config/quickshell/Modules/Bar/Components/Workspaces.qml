@@ -47,7 +47,7 @@ Item {
     }
 
     function openExtra(workspace) {
-        Visibilities.closeAll();
+        Visibilities.dismissAll();
         const name = labelFor(workspace);
         if (isSpecial(workspace))
             Hyprland.dispatch(`hl.dsp.workspace.toggle_special(${JSON.stringify(name)})`);
@@ -60,7 +60,7 @@ Item {
     }
 
     function focusWorkspace(id) {
-        Visibilities.closeAll();
+        Visibilities.dismissAll();
         Hyprland.dispatch(`hl.dsp.focus({ workspace = ${id} })`);
     }
 

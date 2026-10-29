@@ -15,7 +15,7 @@ Popup {
         return volume < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
     }
 
-    panelName: "sound-panel"
+    panelName: Visibilities.names.sound
 
     PanelHeader {
         title: "Sound"

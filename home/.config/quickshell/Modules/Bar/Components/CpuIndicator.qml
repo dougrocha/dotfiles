@@ -10,7 +10,7 @@ IconButton {
     activeColor: Theme.danger
     tooltipText: "CPU: " + CpuService.usage + "%"
     onTapped: {
-        Visibilities.closeAll();
+        Visibilities.dismissAll();
         Quickshell.execDetached(["launch-or-focus-tui", "btop"]);
     }
 }

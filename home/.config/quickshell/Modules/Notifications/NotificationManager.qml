@@ -31,7 +31,7 @@ Variants {
         WlrLayershell.margins.right: 5
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        visible: NotificationService.popups.length > 0 && !Visibilities.isOpen("notification-center")
+        visible: NotificationService.popups.length > 0 && !Visibilities.isOpen(Visibilities.names.notifications)
 
         anchors {
             top: true
