@@ -9,6 +9,7 @@ limine-mkinitcpio-hook
 
 # System Utilities
 snapper
+tailscale
 xdg-desktop-portal-gtk
 
 uwsm

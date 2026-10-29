@@ -73,6 +73,7 @@ if is_linux; then
     try "$DOTFILES_DIR/install/post/dictation"
 
     step "Services"
+    try sudo systemctl enable --now tailscaled.service
     # Quickshell owns the session's Polkit agent. Retire the previous service.
     if systemctl --user is-enabled --quiet hyprpolkitagent.service; then
         try systemctl --user disable --now hyprpolkitagent.service
