@@ -305,11 +305,7 @@ Variants {
                                 text: {
                                     if (IslandService.osdMode === "mic")
                                         return IslandService.osdMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone;
-                                    if (IslandService.osdMuted)
-                                        return PhosphorIcons.speakerSlash;
-                                    if (IslandService.osdLevel === 0)
-                                        return PhosphorIcons.speakerNone;
-                                    return IslandService.osdLevel < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
+                                    return AudioService.speakerGlyph(IslandService.osdLevel, IslandService.osdMuted);
                                 }
                                 color: IslandService.osdMuted ? Theme.text.secondary : Theme.text.primary
                                 font.pixelSize: Theme.icon.md

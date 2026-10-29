@@ -11,7 +11,6 @@ Singleton {
     readonly property int duration: 5000
 
     property var paths: []
-    property string editorPath: ""
     readonly property string path: paths.length > 0 ? paths[0] : ""
     property double remaining: duration
     property double resumedAt: 0

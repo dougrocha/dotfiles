@@ -140,6 +140,16 @@ Singleton {
         return desc;
     }
 
+    function speakerGlyph(volume: real, muted: bool): string {
+        if (muted || volume <= 0)
+            return PhosphorIcons.speakerSlash;
+        if (volume < 0.34)
+            return PhosphorIcons.speakerNone;
+        if (volume < 0.67)
+            return PhosphorIcons.speakerLow;
+        return PhosphorIcons.speakerHigh;
+    }
+
     function deviceIcon(node) {
         if (!node)
             return PhosphorIcons.speakerHigh;

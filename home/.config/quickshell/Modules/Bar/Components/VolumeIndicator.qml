@@ -4,15 +4,7 @@ import qs.Constants
 import qs.Services
 
 IconButton {
-    glyph: {
-        if (AudioService.muted || AudioService.volume <= 0)
-            return PhosphorIcons.speakerSlash;
-        if (AudioService.volume < 0.34)
-            return PhosphorIcons.speakerNone;
-        if (AudioService.volume < 0.67)
-            return PhosphorIcons.speakerLow;
-        return PhosphorIcons.speakerHigh;
-    }
+    glyph: AudioService.speakerGlyph(AudioService.volume, AudioService.muted)
     active: AudioService.muted || Visibilities.isOpen(Visibilities.names.sound)
     activeColor: AudioService.muted ? Theme.danger : Theme.text.primary
     tooltipText: AudioService.muted ? "Volume: muted" : "Volume: " + Math.round(AudioService.volume * 100) + "%"

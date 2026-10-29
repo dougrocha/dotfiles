@@ -9,12 +9,6 @@ import qs.Services
 Popup {
     id: panel
 
-    function speakerGlyph(volume, muted) {
-        if (muted || volume <= 0)
-            return PhosphorIcons.speakerSlash;
-        return volume < 0.5 ? PhosphorIcons.speakerLow : PhosphorIcons.speakerHigh;
-    }
-
     panelName: Visibilities.names.sound
 
     PanelHeader {
@@ -28,7 +22,7 @@ Popup {
             width: parent.width
             boundValue: AudioService.volume
             muted: AudioService.muted
-            glyph: panel.speakerGlyph(AudioService.volume, AudioService.muted)
+            glyph: AudioService.speakerGlyph(AudioService.volume, AudioService.muted)
             onMoved: AudioService.setVolume(value)
         }
 
@@ -142,7 +136,7 @@ Popup {
                     width: parent.width
                     boundValue: app.volume
                     muted: app.muted
-                    glyph: panel.speakerGlyph(app.volume, app.muted)
+                    glyph: AudioService.speakerGlyph(app.volume, app.muted)
                     onMoved: AudioService.setGroupVolume(app.modelData, value)
                 }
             }

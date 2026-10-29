@@ -159,7 +159,7 @@ Variants {
                     onTapped: {
                         if (!toastWindow.shown)
                             return;
-                        ScreenshotToastService.editorPath = ScreenshotToastService.path;
+                        ScreenshotEditorService.open(ScreenshotToastService.path);
                         ScreenshotToastService.dismiss();
                     }
                 }

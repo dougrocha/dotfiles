@@ -11,7 +11,7 @@ FloatingWindow {
     id: editor
 
     title: "Screenshot Markup"
-    visible: ScreenshotToastService.editorPath !== ""
+    visible: ScreenshotEditorService.path !== ""
     color: Theme.colors.bg
 
     readonly property int controlSize: 32
@@ -60,13 +60,13 @@ FloatingWindow {
     property string statusDetail: ""
 
     onVisibleChanged: {
-        if (!visible && ScreenshotToastService.editorPath !== "")
-            ScreenshotToastService.editorPath = "";
+        if (!visible)
+            ScreenshotEditorService.close();
     }
 
     Connections {
-        target: ScreenshotToastService
-        function onEditorPathChanged() {
+        target: ScreenshotEditorService
+        function onPathChanged() {
             editor.marks = [];
             editor.draft = null;
             editor.statusShown = false;
@@ -87,7 +87,7 @@ FloatingWindow {
     }
 
     function close() {
-        ScreenshotToastService.editorPath = "";
+        ScreenshotEditorService.close();
     }
 
     function report(ok, title, detail) {
@@ -102,7 +102,7 @@ FloatingWindow {
         if (saving || photo.status !== Image.Ready || !hasImage)
             return;
         saving = true;
-        const input = ScreenshotToastService.editorPath;
+        const input = ScreenshotEditorService.path;
         const output = input.replace(/\.png$/i, "") + "-annotated-" + Date.now() + ".png";
         const fileName = output.split("/").pop();
         if (!page.grabToImage(result => {
@@ -395,7 +395,7 @@ FloatingWindow {
                 Image {
                     id: photo
                     anchors.fill: parent
-                    source: ScreenshotToastService.editorPath ? ScreenshotToastService.localFileUrl(ScreenshotToastService.editorPath) : ""
+                    source: ScreenshotEditorService.path ? ScreenshotToastService.localFileUrl(ScreenshotEditorService.path) : ""
                     cache: false
                     fillMode: Image.Stretch
                     asynchronous: false
