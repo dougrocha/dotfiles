@@ -74,7 +74,7 @@ From [alerts](https://developer.apple.com/design/human-interface-guidelines/aler
 
 From [toggles](https://developer.apple.com/design/human-interface-guidelines/toggles) and [sliders](https://developer.apple.com/design/human-interface-guidelines/sliders):
 
-- A switch belongs in a list row (`ToggleRow`). Outside a row, use a button with an on and an off state.
+- A setting that turns on and off is a `DeviceRow` with `selected` and an "On" or "Off" detail. A `Switch` goes only in a panel header, for the panel's main power state.
 - On and off differ by more than color: position and fill change too.
 - A slider has its minimum on the left and its maximum on the right. Apply its value while the user drags it.
 - Pointer targets are 28 by 28 px by default. The absolute minimum is 20 by 20 px ([accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)).

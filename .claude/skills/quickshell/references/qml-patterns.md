@@ -89,7 +89,7 @@ PanelRow {
 }
 ```
 
-`DeviceRow`, `PopupActionButton`, and `PanelFooterLink` are built on it. `ToggleRow` and `Divider` take `bleed: Theme.panel.rowBleed` instead.
+`DeviceRow` and `PanelFooterLink` are built on it. `Divider` takes `bleed: Theme.panel.rowBleed` instead.
 
 ## Put a badge on a rounded corner
 
