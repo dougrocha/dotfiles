@@ -122,6 +122,46 @@ Variants {
                     }
                 }
             }
+
+            Item {
+                width: cardColumn.width
+                height: presence.mapped ? morePill.height + Theme.space.sm : 0
+                visible: presence.mapped
+
+                SizeMotion on height {}
+
+                Presence {
+                    id: presence
+
+                    active: NotificationService.queuedCount > 0
+                }
+
+                Rectangle {
+                    id: morePill
+
+                    anchors.right: parent.right
+                    y: Theme.space.sm
+                    width: moreLabel.implicitWidth + Theme.space.lg * 2
+                    height: moreLabel.implicitHeight + Theme.space.xs * 2
+                    radius: height / 2
+                    color: Theme.colors.surface
+                    border.width: 1
+                    border.color: Theme.stroke.hairline
+                    opacity: presence.progress
+                    scale: presence.scale
+                    transformOrigin: Item.Top
+
+                    Text {
+                        id: moreLabel
+
+                        anchors.centerIn: parent
+                        text: NotificationService.queuedCount + " more"
+                        color: Theme.text.secondary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.caption.size
+                    }
+                }
+            }
         }
     }
 }

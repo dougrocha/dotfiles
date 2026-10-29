@@ -10,7 +10,8 @@ import qs.Constants
 Singleton {
     id: root
 
-    readonly property list<var> popups: _popups
+    readonly property list<var> popups: _popups.filter(n => !n.queued)
+    readonly property int queuedCount: _popups.filter(n => n.queued).length
     readonly property list<var> history: _history
 
     function pause(): void {
@@ -68,6 +69,9 @@ Singleton {
         return entry?.name || appName.charAt(0).toUpperCase() + appName.slice(1);
     }
 
+    readonly property int _maxVisible: 5
+    readonly property int _baseDuration: 5000
+    readonly property int _actionDuration: 10000
     property list<var> _popups: []
     property list<var> _history: []
     property bool _paused: false
@@ -119,7 +123,7 @@ Singleton {
     }
 
     function _expireDue(now) {
-        root._popups.filter(n => !n.leaving && root._expired(n, now)).forEach(n => n.ref ? n.ref.expire() : root._toHistory(n.id));
+        root._popups.filter(n => !n.leaving && !n.queued && root._expired(n, now)).forEach(n => n.ref ? n.ref.expire() : root._toHistory(n.id));
     }
 
     function _toHistory(id) {
@@ -188,7 +192,22 @@ Singleton {
     }
 
     function _setPopups(next) {
-        root._popups = next;
+        const now = Date.now();
+        let shown = 0;
+        root._popups = next.map(n => {
+            if (n.leaving)
+                return n;
+            shown += 1;
+            const queued = shown > root._maxVisible;
+            if (queued === (n.queued === true))
+                return n;
+            return Object.assign({}, n, queued ? {
+                queued: true
+            } : {
+                queued: false,
+                expiresAt: now + n.duration
+            });
+        });
         if (root._liveLoaded)
             liveSave.restart();
     }
@@ -291,8 +310,10 @@ Singleton {
         if (notification.urgency === NotificationUrgency.Critical)
             return -1;
         if (notification.urgency === NotificationUrgency.Low)
-            return 2000;
-        return 3000;
+            return Math.round(root._baseDuration * 2 / 3);
+        if ((notification.actions ?? []).length > 0)
+            return Math.max(root._baseDuration, root._actionDuration);
+        return root._baseDuration;
     }
 
     function _expired(entry, now) {
