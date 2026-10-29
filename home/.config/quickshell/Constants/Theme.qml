@@ -6,12 +6,6 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property string primaryMonitor: "DP-1"
-
-    readonly property var primaryScreen: Quickshell.screens.find(s => s.name === primaryMonitor) ?? Quickshell.screens[0] ?? null
-
-    readonly property var primaryScreens: primaryScreen ? [primaryScreen] : []
-
     readonly property int topBarHeight: 36
 
     property var paletteOverrides: ({})

@@ -97,7 +97,7 @@ Singleton {
             [option.key]: option.fallback
         }), {})
     readonly property string _modeTarget: modes.find(entry => entry.id === _mode)?.target ?? "none"
-    readonly property var _toolbarHost: Theme.primaryScreen
+    readonly property var _toolbarHost: Desktop.primaryScreen
     readonly property string _toolbarScreen: _toolbarHost?.name ?? ""
     readonly property var _idleDrag: ({
             kind: "idle",
@@ -408,9 +408,8 @@ Singleton {
         _drag = _idleDrag;
         _readout = _hiddenReadout;
         _cursorShape = Qt.CrossCursor;
-        Hyprland.refreshToplevels();
-        Hyprland.refreshMonitors();
-        _controlScreen = Hyprland.focusedMonitor?.name ?? "";
+        Desktop.refresh();
+        _controlScreen = Desktop.focusedScreen()?.name ?? "";
     }
 
     function _endSession() {

@@ -17,12 +17,12 @@ PanelWindow {
     readonly property int barMaxHeight: 18
     readonly property int pillHeight: 34
     readonly property int bottomMargin: 56
-    property string monitorName: ""
+    property var hostScreen: Desktop.primaryScreen
     property var levels: Array(barCount).fill(0)
     property int head: 0
     property real wavePhase: 0
 
-    screen: Quickshell.screens.find(s => s.name === window.monitorName) ?? Theme.primaryScreen
+    screen: window.hostScreen
     visible: presence.mapped
     color: "transparent"
     focusable: false
@@ -50,7 +50,7 @@ PanelWindow {
         target: DictationService
         function onRecordingChanged() {
             if (DictationService.recording) {
-                window.monitorName = Hyprland.focusedMonitor?.name ?? "";
+                window.hostScreen = Desktop.focusedScreen();
                 window.levels = Array(window.barCount).fill(0);
                 window.head = 0;
             }

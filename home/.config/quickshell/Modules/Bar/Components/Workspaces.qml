@@ -13,7 +13,7 @@ Item {
     required property var monitor
 
     readonly property var activeWorkspace: monitor?.activeWorkspace
-    readonly property string openSpecialName: monitor?.lastIpcObject?.specialWorkspace?.name ?? ""
+    readonly property string openSpecialName: Desktop.openSpecial(monitor)
 
     readonly property list<int> workspaceIds: {
         const ids = [1, 2, 3, 4, 5];

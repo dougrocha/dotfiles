@@ -9,7 +9,7 @@ import qs.Constants
 import qs.Services
 
 Variants {
-    model: Theme.primaryScreens
+    model: Desktop.primaryScreens
 
     delegate: PanelWindow {
         id: toastWindow

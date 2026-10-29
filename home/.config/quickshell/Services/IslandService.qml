@@ -241,35 +241,13 @@ Singleton {
     }
 
     readonly property bool songNotif: songNotifTimer.running
-    readonly property bool scratchpadOpen: root.isInWorkspace("special:scratchpad")
+    readonly property bool scratchpadOpen: Desktop.isShowing("special:scratchpad")
     property string lastTrackKey: ""
-
-    function isInWorkspace(name) {
-        return Hyprland.monitors.values.some(monitor => {
-            const state = monitor.lastIpcObject;
-            return [state?.activeWorkspace, state?.specialWorkspace].some(workspace => {
-                if (!workspace || workspace.id === 0)
-                    return false;
-                return workspace.name === name;
-            });
-        });
-    }
 
     onScratchpadOpenChanged: if (scratchpadOpen)
         root.dismissSongNotif()
 
-    Component.onCompleted: {
-        Hyprland.refreshMonitors();
-        stageTrack();
-    }
-
-    Connections {
-        target: Hyprland
-        function onRawEvent(event) {
-            if (event.name === "activespecial" || event.name === "workspace")
-                Hyprland.refreshMonitors();
-        }
-    }
+    Component.onCompleted: stageTrack()
 
     Timer {
         id: songNotifTimer

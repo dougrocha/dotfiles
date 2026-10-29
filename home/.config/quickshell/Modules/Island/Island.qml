@@ -11,7 +11,7 @@ import qs.Services
 
 Variants {
     id: root
-    model: Theme.primaryScreens
+    model: Desktop.primaryScreens
 
     component RecordingDot: Rectangle {
         id: dot

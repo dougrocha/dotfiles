@@ -22,15 +22,9 @@ Variants {
         required property var modelData
         screen: modelData
 
-        readonly property int hyprlandFullscreenModeExclusive: 2
-
         readonly property var monitor: Hyprland.monitorFor(modelData)
-        readonly property var workspace: monitor?.activeWorkspace
-        readonly property bool hasFullscreen: workspace?.hasFullscreen ?? false
-        readonly property var activeToplevel: Hyprland.activeToplevel
-        readonly property int fullscreenMode: (hasFullscreen && activeToplevel?.workspace === workspace) ? (activeToplevel.lastIpcObject?.fullscreen ?? 0) : 0
-        readonly property bool fullscreenOnScreen: fullscreenMode === hyprlandFullscreenModeExclusive
-        readonly property bool primary: modelData === Theme.primaryScreen
+        readonly property bool fullscreenOnScreen: Desktop.fullscreenOn(modelData)
+        readonly property bool primary: modelData === Desktop.primaryScreen
         readonly property bool wantRevealed: BarService.wantsReveal(fullscreenOnScreen, barHover.hovered)
         property bool revealed: true
 
@@ -44,12 +38,6 @@ Variants {
                 hideTimer.stop();
                 revealed = false;
             }
-        }
-
-        Component.onCompleted: Hyprland.refreshToplevels()
-        onHasFullscreenChanged: {
-            if (hasFullscreen)
-                Hyprland.refreshToplevels();
         }
 
         onWantRevealedChanged: {

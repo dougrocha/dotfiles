@@ -9,7 +9,7 @@ import qs.Services
 
 Variants {
     id: root
-    model: Theme.primaryScreens
+    model: Desktop.primaryScreens
 
     delegate: PanelWindow {
         id: notificationPanel

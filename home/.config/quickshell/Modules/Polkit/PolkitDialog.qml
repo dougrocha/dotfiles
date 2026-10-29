@@ -12,7 +12,7 @@ Scope {
     id: root
 
     readonly property color scrim: Theme.withAlpha(Theme.shadow, 0.5)
-    property var hostScreen: Theme.primaryScreen
+    property var hostScreen: Desktop.primaryScreen
 
     readonly property var dimScreens: presence.mapped ? Quickshell.screens.filter(s => s !== hostScreen) : []
 
@@ -27,7 +27,7 @@ Scope {
 
         function onRequestStarted() {
             if (!presence.mapped)
-                root.hostScreen = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Theme.primaryScreen;
+                root.hostScreen = Desktop.focusedScreen();
             Visibilities.dismissAll();
         }
     }
