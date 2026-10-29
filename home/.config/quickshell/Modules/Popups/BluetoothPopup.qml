@@ -9,191 +9,74 @@ import qs.Services
 Popup {
     id: panel
 
+    readonly property var devices: BluetoothService.connectedRows.concat(BluetoothService.pairedRows)
+
     panelName: Visibilities.names.bluetooth
-    cardWidth: 300
 
-    component DeviceEntry: PanelRow {
-        id: entry
+    PanelHeader {
+        title: "Bluetooth"
 
-        required property var device
-
-        readonly property string statusText: BluetoothService.rowStatus(device)
-
-        onTapped: BluetoothService.activate(device)
-
-        Text {
-            id: entryIcon
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            text: entry.device.icon
-            color: entry.device.connected ? Theme.accent : Theme.text.secondary
-            font.pixelSize: Theme.icon.sm
-            font.family: Theme.font.icon
-
-            Behavior on color {
-                ColorAnimation {
-                    duration: Theme.motion.fast
-                }
-            }
-        }
-
-        Column {
-            anchors.left: entryIcon.right
-            anchors.leftMargin: 10
-            anchors.right: forgetButton.left
-            anchors.rightMargin: Theme.space.sm
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.space.xxs
-
-            Text {
-                width: parent.width
-                text: entry.device.label
-                color: entry.device.connected ? Theme.text.primary : Theme.text.secondary
-                font.pixelSize: Theme.type.body.size
-                font.family: Theme.font.ui
-                font.weight: entry.device.connected ? Theme.type.title.weight : Theme.type.body.weight
-                elide: Text.ElideRight
-            }
-
-            Text {
-                visible: entry.statusText !== ""
-                width: parent.width
-                text: entry.statusText
-                color: entry.device.connected ? Theme.accent : Theme.text.secondary
-                font.pixelSize: Theme.type.caption.size
-                font.family: Theme.font.ui
-                elide: Text.ElideRight
-            }
-        }
-
-        IconActionButton {
-            id: forgetButton
-            visible: entry.device.known && entry.hovered
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            size: 22
-            circular: true
-            danger: true
-            glyph: PhosphorIcons.x
-            onTapped: BluetoothService.forget(entry.device)
-        }
-    }
-
-    Column {
-        width: parent.width
-        spacing: Theme.space.sm
-
-        ToggleRow {
-            width: parent.width
-            style: "switch"
-            bleed: Theme.panel.rowBleed
-            glyph: BluetoothService.glyph
-            label: "Bluetooth"
+        Switch {
             active: BluetoothService.powered
             onToggled: BluetoothService.togglePower()
         }
+    }
+
+    PanelGroup {
+        label: "Devices"
+        visible: panel.devices.length > 0
 
         Column {
             width: parent.width
-            spacing: Theme.space.sm
-            visible: BluetoothService.connectedRows.length > 0
 
-            Item {
-                width: parent.width
-                height: 4
-            }
+            Repeater {
+                model: ScriptModel {
+                    values: panel.devices
+                    objectProp: "address"
+                }
 
-            SectionLabel {
-                text: "CONNECTED"
-            }
+                delegate: DeviceRow {
+                    id: deviceRow
 
-            Column {
-                width: parent.width
-                spacing: Theme.space.xxs
+                    required property var modelData
 
-                Repeater {
-                    model: ScriptModel {
-                        values: BluetoothService.connectedRows
-                        objectProp: "address"
-                    }
+                    glyph: modelData.icon
+                    label: modelData.label
+                    detail: BluetoothService.rowStatus(modelData)
+                    selected: modelData.connected
+                    onTapped: BluetoothService.activate(modelData)
 
-                    delegate: DeviceEntry {
-                        required property var modelData
-                        device: modelData
+                    IconActionButton {
+                        visible: deviceRow.modelData.known && deviceRow.hovered
+                        size: 22
+                        circular: true
+                        danger: true
+                        glyph: PhosphorIcons.x
+                        onTapped: BluetoothService.forget(deviceRow.modelData)
                     }
                 }
             }
         }
+    }
 
-        Column {
-            width: parent.width
-            spacing: Theme.space.sm
-            visible: BluetoothService.pairedRows.length > 0
-
-            Item {
-                width: parent.width
-                height: 4
-            }
-
-            SectionLabel {
-                text: "PAIRED"
-            }
-
-            Flickable {
-                id: pairedScroll
-                x: -Theme.panel.rowBleed
-                width: parent.width + Theme.panel.rowBleed * 2
-                height: Math.min(pairedColumn.implicitHeight, 240)
-                contentHeight: pairedColumn.implicitHeight
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
-                interactive: contentHeight > height
-
-                Column {
-                    id: pairedColumn
-                    x: Theme.panel.rowBleed
-                    width: pairedScroll.width - Theme.panel.rowBleed * 2
-                    spacing: Theme.space.xxs
-
-                    Repeater {
-                        model: ScriptModel {
-                            values: BluetoothService.pairedRows
-                            objectProp: "address"
-                        }
-
-                        delegate: DeviceEntry {
-                            required property var modelData
-                            device: modelData
-                        }
-                    }
-                }
-            }
+    Text {
+        visible: panel.devices.length === 0
+        width: parent.width
+        text: {
+            if (!BluetoothService.available)
+                return "No Bluetooth adapter";
+            if (!BluetoothService.powered)
+                return "Bluetooth is off";
+            return "No paired devices";
         }
+        color: Theme.text.tertiary
+        font.family: Theme.font.ui
+        font.pixelSize: Theme.type.body.size
+        wrapMode: Text.WordWrap
+    }
 
-        Text {
-            visible: BluetoothService.connectedRows.length === 0 && BluetoothService.pairedRows.length === 0
-            width: parent.width
-            text: {
-                if (!BluetoothService.available)
-                    return "No Bluetooth adapter";
-                if (!BluetoothService.powered)
-                    return "Turn Bluetooth on";
-                return "No paired devices";
-            }
-            color: Theme.text.secondary
-            font.pixelSize: Theme.type.body.size
-            font.family: Theme.font.ui
-            wrapMode: Text.WordWrap
-        }
-
-        Divider {}
-
-        PopupActionButton {
-            label: "Bluetui"
-            onTapped: {
-                panel.close();
-                Quickshell.execDetached(["launch-or-focus-tui", "bluetui"]);
-            }
-        }
+    PanelFooterLink {
+        label: "Bluetooth Settings…"
+        command: ["launch-or-focus-tui", "bluetui"]
     }
 }

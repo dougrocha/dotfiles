@@ -10,6 +10,8 @@ PanelRow {
     property bool selected: false
     default property alias trailing: trailingSlot.data
 
+    implicitHeight: Math.max(34, labels.implicitHeight + Theme.space.sm * 2)
+
     Rectangle {
         id: badge
 
@@ -35,6 +37,8 @@ PanelRow {
     }
 
     Column {
+        id: labels
+
         anchors.left: badge.right
         anchors.leftMargin: Theme.space.md
         anchors.right: trailingSlot.left
