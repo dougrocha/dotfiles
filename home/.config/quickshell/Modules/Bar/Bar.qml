@@ -24,42 +24,59 @@ Variants {
 
         readonly property var monitor: Hyprland.monitorFor(modelData)
         readonly property bool fullscreenOnScreen: Desktop.fullscreenOn(modelData)
+        readonly property bool ownsFullscreen: Desktop.fullscreenWindowOn(modelData)
+        readonly property bool autoHide: fullscreenOnScreen || ownsFullscreen
         readonly property bool primary: modelData === Desktop.primaryScreen
-        readonly property bool wantRevealed: BarService.wantsReveal(fullscreenOnScreen, barHover.hovered)
+        readonly property bool wantRevealed: BarService.wantsReveal(autoHide, barHover.hovered)
         property bool revealed: true
 
         onRevealedChanged: {
             if (primary)
                 BarService.setRevealed(revealed);
+            if (ownsFullscreen)
+                Desktop.placeFullscreen(modelData, revealed);
         }
 
-        onFullscreenOnScreenChanged: {
-            if (fullscreenOnScreen && !wantRevealed) {
+        onAutoHideChanged: {
+            if (autoHide && !BarService.wantsReveal(true, barHover.hovered)) {
                 hideTimer.stop();
                 revealed = false;
             }
         }
 
+        onOwnsFullscreenChanged: {
+            if (ownsFullscreen)
+                Desktop.placeFullscreen(modelData, revealed);
+        }
+
         onWantRevealedChanged: {
-            if (wantRevealed) {
-                hideTimer.stop();
-                revealed = true;
-            } else {
+            hideTimer.stop();
+            revealTimer.stop();
+            if (!wantRevealed)
                 hideTimer.restart();
-            }
+            else if (autoHide && !BarService.wantsReveal(true, false))
+                revealTimer.restart();
+            else
+                revealed = true;
+        }
+
+        Timer {
+            id: revealTimer
+            interval: 250
+            onTriggered: topBar.revealed = true
         }
 
         Timer {
             id: hideTimer
-            interval: 400
+            interval: 1000
             onTriggered: topBar.revealed = false
         }
 
         WlrLayershell.layer: fullscreenOnScreen ? WlrLayer.Overlay : WlrLayer.Top
         WlrLayershell.namespace: "qs.topbar"
-        exclusionMode: fullscreenOnScreen ? ExclusionMode.Ignore : ExclusionMode.Auto
+        exclusionMode: autoHide ? ExclusionMode.Ignore : ExclusionMode.Auto
 
-        implicitHeight: Theme.topBarHeight
+        implicitHeight: autoHide ? Theme.topBarCompactHeight : Theme.topBarHeight
         color: "transparent"
 
         mask: Region {
@@ -103,13 +120,39 @@ Variants {
             }
 
             Rectangle {
+                anchors.fill: parent
+                color: Theme.colors.bg
+                opacity: topBar.autoHide ? 1 : 0
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.motion.fast
+                    }
+                }
+
+                Rectangle {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 1
+                    color: Theme.stroke.hairline
+                }
+            }
+
+            Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: Theme.space.md
                 anchors.verticalCenter: parent.verticalCenter
                 width: workspaceModule.implicitWidth + Theme.space.md
                 height: Theme.topBarHeight - 8
                 radius: height / 2
-                color: Theme.colors.surface
+                color: topBar.autoHide ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.motion.fast
+                    }
+                }
                 clip: true
 
                 SizeMotion on width {}
@@ -135,7 +178,13 @@ Variants {
                 width: indicatorRow.implicitWidth + leftPadding + rightPadding
                 height: Theme.topBarHeight - 8
                 radius: height / 2
-                color: Theme.colors.surface
+                color: topBar.autoHide ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.motion.fast
+                    }
+                }
 
                 RowLayout {
                     id: indicatorRow

@@ -37,7 +37,7 @@ bind({ "SHIFT", "S" }, hl.dsp.window.move({ workspace = "special:scratchpad" }))
 bind({ "P" }, hl.dsp.window.pseudo())
 bind({ "M" }, hl.dsp.layout("togglesplit"))
 bind({ "T" }, hl.dsp.window.float({ action = "toggle" }))
-bind({ "F" }, hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+bind({ "F" }, hl.dsp.exec_cmd("quickshell ipc call desktop toggleFullscreen"))
 bind({ "CTRL", "F" }, hl.dsp.window.fullscreen_state({ internal = 0, client = 2 }))
 bind({ "ALT", "F" }, hl.dsp.window.fullscreen({ mode = "maximized" }))
 

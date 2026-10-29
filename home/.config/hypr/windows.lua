@@ -99,3 +99,12 @@ hl.window_rule({
     tag = "-default-opacity",
     opacity = "1 1",
 })
+
+-- Super+F on a browser: Quickshell floats it over the whole screen and moves it below the bar when the bar shows
+hl.window_rule({
+    name = "qs-fullscreen",
+    match = { tag = "qs-fullscreen" },
+    border_size = 0,
+    rounding = 0,
+    opacity = "1 1",
+})

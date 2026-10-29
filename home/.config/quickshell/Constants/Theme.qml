@@ -7,6 +7,7 @@ Singleton {
     id: root
 
     readonly property int topBarHeight: 36
+    readonly property int topBarCompactHeight: 30
 
     property var paletteOverrides: ({})
 
