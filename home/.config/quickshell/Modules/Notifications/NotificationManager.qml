@@ -88,7 +88,7 @@ Variants {
                     clip: true
                     opacity: leaving ? 0 : 1
 
-                    SizeMotion on height {}
+                    SpringMotion on height {}
 
                     Behavior on opacity {
                         NumberAnimation {
@@ -114,7 +114,8 @@ Variants {
 
                     NotificationCard {
                         id: card
-                        x: delegateWrapper.badgeInset
+                        x: delegateWrapper.badgeInset + (delegateWrapper.entered ? 0 : delegateWrapper.width)
+                        SpringMotion on x {}
                         y: delegateWrapper.badgeInset
                         width: delegateWrapper.width - delegateWrapper.badgeInset
                         modelData: delegateWrapper.modelData
@@ -128,7 +129,7 @@ Variants {
                 height: presence.mapped ? morePill.height + Theme.space.sm : 0
                 visible: presence.mapped
 
-                SizeMotion on height {}
+                SpringMotion on height {}
 
                 Presence {
                     id: presence

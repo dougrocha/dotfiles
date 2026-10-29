@@ -3,6 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Effects
+import Quickshell
+import Quickshell.Widgets
 import Quickshell.Services.Notifications
 import qs.Components
 import qs.Constants
@@ -118,6 +120,15 @@ Item {
                     id: headerRow
                     Layout.fillWidth: true
                     spacing: Theme.space.sm
+
+                    IconImage {
+                        readonly property string iconName: card.modelData?.appIcon || DesktopEntries.heuristicLookup(card.modelData?.appName ?? "")?.icon || ""
+                        Layout.preferredWidth: 20
+                        Layout.preferredHeight: 20
+                        visible: iconName !== ""
+                        source: iconName ? Quickshell.iconPath(iconName, true) : ""
+                        mipmap: true
+                    }
 
                     Text {
                         Layout.fillWidth: true

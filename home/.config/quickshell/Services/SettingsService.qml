@@ -15,6 +15,23 @@ Singleton {
     property alias tray: traySettings
     property alias screenshot: screenshotSettings
     property alias audio: audioSettings
+    property alias notificationRules: adapter.notificationRules
+
+    // Exact sender app names: { "Example": { mute: true, timeoutMs: 8000,
+    // hide: false, allowDuringDnd: false } }. Mute keeps history; hide discards.
+    // timeoutMs: 0 keeps a card until dismissed; omit it for the default timeout.
+    function notificationRule(appName: string): var {
+        return Object.prototype.hasOwnProperty.call(root.notificationRules, appName) ? root.notificationRules[appName] ?? {} : {};
+    }
+
+    function setNotificationRule(appName: string, rule: var): void {
+        const rules = Object.assign({}, root.notificationRules);
+        if (rule === null)
+            delete rules[appName];
+        else
+            rules[appName] = rule;
+        root.notificationRules = rules;
+    }
 
     property bool loaded: false
 
@@ -47,6 +64,7 @@ Singleton {
             id: adapter
 
             property bool doNotDisturb: false
+            property var notificationRules: ({})
 
             property int weekStart: 1
 

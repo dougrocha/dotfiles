@@ -88,15 +88,24 @@ Singleton {
         const id = notification.id;
         root._live(id)?.disconnect?.();
 
-        if (root._progressOf(notification) >= 0) {
+        const rule = SettingsService.notificationRule(notification.appName ?? "");
+        if (rule.hide === true) {
+            root._leave(id);
+            notification.expire();
+            return;
+        }
+
+        if (rule.mute !== true && root._progressOf(notification) >= 0) {
             root._leave(id);
             root._bridgeToIsland(notification);
             return;
         }
 
-        const entry = root._entry(notification, Date.now(), root._duration(notification));
+        const entry = root._entry(notification, Date.now(), root._duration(notification, rule));
+        const centerOpen = Visibilities.isOpen(Visibilities.names.notifications);
+        const dndBlocked = SettingsService.doNotDisturb && rule.allowDuringDnd !== true;
 
-        if ((Visibilities.isOpen(Visibilities.names.notifications) || SettingsService.doNotDisturb) && notification.urgency !== NotificationUrgency.Critical) {
+        if (rule.mute === true || ((centerOpen || dndBlocked) && notification.urgency !== NotificationUrgency.Critical)) {
             root._leave(id);
             root._addToHistory(entry);
             notification.expire();
@@ -331,7 +340,9 @@ Singleton {
         update();
     }
 
-    function _duration(notification) {
+    function _duration(notification, rule) {
+        if (typeof rule?.timeoutMs === "number" && isFinite(rule.timeoutMs) && rule.timeoutMs >= 0)
+            return rule.timeoutMs === 0 ? -1 : Math.round(rule.timeoutMs);
         if (notification.expireTimeout === 0)
             return -1;
         if (notification.expireTimeout > 0)
