@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -23,21 +24,15 @@ Rectangle {
     color: Theme.colors.surface
     border.width: 1
     border.color: Theme.stroke.hairline
-    opacity: ScreenshotSession.optionsOpen ? 1.0 : 0.0
-    scale: ScreenshotSession.optionsOpen ? 1 : Theme.motion.scaleFrom
+    visible: presence.mapped
+    opacity: presence.progress
+    scale: presence.scale
     transformOrigin: Item.Bottom
 
-    Behavior on opacity {
-        NumberAnimation {
-            duration: Theme.motion.fast
-            easing.type: Theme.motion.easeStandard
-        }
-    }
-    Behavior on scale {
-        NumberAnimation {
-            duration: Theme.motion.fast
-            easing.type: Theme.motion.easeStandard
-        }
+    Presence {
+        id: presence
+
+        active: ScreenshotSession.optionsOpen
     }
 
     HoverHandler {

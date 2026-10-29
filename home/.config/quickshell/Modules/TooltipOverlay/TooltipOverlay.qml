@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import qs.Components
 import qs.Constants
 import qs.Services
 
@@ -17,7 +18,13 @@ PanelWindow {
     WlrLayershell.namespace: "qs.tooltip"
     mask: Region {}
 
-    visible: TooltipService.tooltipShown
+    visible: presence.mapped
+
+    Presence {
+        id: presence
+
+        active: TooltipService.tooltipShown
+    }
 
     Rectangle {
         id: tip
@@ -32,14 +39,9 @@ PanelWindow {
         color: Theme.colors.raised
         border.color: Theme.stroke.strong
         border.width: 1
-        opacity: TooltipService.tooltipShown ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: TooltipService.tooltipShown ? 120 : 80
-                easing.type: TooltipService.tooltipShown ? Easing.OutCubic : Easing.InCubic
-            }
-        }
+        opacity: presence.progress
+        scale: presence.scale
+        transformOrigin: Item.Top
 
         Text {
             id: label
