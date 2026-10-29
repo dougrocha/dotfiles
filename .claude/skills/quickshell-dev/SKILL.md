@@ -41,7 +41,7 @@ Panel targets: `notification-center`, `settings-panel`, `sound-panel`, `bluetoot
 
 The `top-bar` target does not show or hide the bar. Its `pin`, `unpin`, and `toggle` functions pin the bar above fullscreen windows.
 
-Other targets: `island`, `music-control`, `screenshot-overlay`, `screenshot-toast`. Run `qs ipc show` for every target and its functions.
+Other targets: `island`, `music-control`, `screenshot-overlay`, `screenshot-toast`, `screenshot-editor` (`open <png>`, `close`), `desktop`. Run `qs ipc show` for every target and its functions.
 
 CAUTION: Wait 1 second after a reload before you send an IPC call. Before that, the instance replies `Not ready to accept queries yet` and ignores the call. A later `toggle` then opens the panel when you expect it to close. Use `open` and `hide`.
 
