@@ -8,8 +8,8 @@ Source: the `ebuntario/apple-hig` skill (commit `c434b91`, verified against the 
 
 | Shell surface | Apple term | HIG page |
 |---|---|---|
-| Bar panels (`Popup`): sound, Bluetooth, settings, notification center | Popover from a menu bar extra | [popovers](https://developer.apple.com/design/human-interface-guidelines/popovers) |
-| Tray menus (`TrayMenuPopup`) | Menu | [menus](https://developer.apple.com/design/human-interface-guidelines/menus) |
+| Bar panels (`Popover` via `Popup`): sound, Bluetooth, settings, notification center | Popover from a menu bar extra | [popovers](https://developer.apple.com/design/human-interface-guidelines/popovers) |
+| Tray menus (`Popover` via `TrayMenuPopup`) | Menu | [menus](https://developer.apple.com/design/human-interface-guidelines/menus) |
 | Toasts (`NotificationManager`) | Notification banner | [managing-notifications](https://developer.apple.com/design/human-interface-guidelines/managing-notifications) |
 | Island | Dynamic Island with a Live Activity | [live-activities](https://developer.apple.com/design/human-interface-guidelines/live-activities) |
 | Polkit dialog | Alert | [alerts](https://developer.apple.com/design/human-interface-guidelines/alerts) |
