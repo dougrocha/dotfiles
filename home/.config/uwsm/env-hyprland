@@ -10,4 +10,13 @@ export SDL_VIDEODRIVER="wayland,x11"
 export MOZ_ENABLE_WAYLAND=1
 export ELECTRON_OZONE_PLATFORM_HINT=wayland
 
+# TEMPORARY workaround for hyprwm/Hyprland#16648 (RLIMIT_RTTIME SIGKILL on dpms off).
+# Added 2026-10-31. Once a Hyprland release includes PR #16737
+# (https://github.com/hyprwm/Hyprland/pull/16737), undo it:
+#   1. Delete the export line below AND this whole comment block
+#   2. Log out and back in (or: uwsm stop)
+#   3. Verify: chrt -p $(pgrep -x Hyprland)  -> should show SCHED_RR again
+#   4. sudo rm /etc/pacman.d/hooks/95-hyprland-no-rt-reminder.hook
+export HYPRLAND_NO_RT=1
+
 # vim: ft=sh
