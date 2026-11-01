@@ -67,7 +67,9 @@ Variants {
             Drag.imageSource: dragPayload ? dragPayload.preview : ""
             Drag.imageSourceSize: Qt.size(toastWindow.cardWidth, toastWindow.cardHeight)
             Drag.hotSpot: Qt.point(width / 2, height / 2)
-            Drag.onDragFinished: {
+            Drag.onDragFinished: dropAction => {
+                if (dropAction !== Qt.IgnoreAction)
+                    ScreenshotToastService.dismiss();
                 card.Drag.active = false;
             }
             Drag.onActiveChanged: {
