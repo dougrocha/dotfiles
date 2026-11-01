@@ -16,7 +16,6 @@ hl.config({
         rounding = 8,
         rounding_power = 2,
 
-        -- Change transparency of focused and unfocused windows
         active_opacity = 1.0,
         inactive_opacity = 1.0,
 
@@ -58,6 +57,10 @@ hl.config({
 
     binds = {
         hide_special_on_workspace_change = true,
+    },
+
+    render = {
+        cm_auto_hdr = 0,
     },
 })
 
