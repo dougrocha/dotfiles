@@ -37,8 +37,6 @@ Popup {
 
                 delegate: DeviceRow {
                     required property var modelData
-
-                    glyph: AudioService.deviceIcon(modelData)
                     label: AudioService.shortLabel(modelData)
                     selected: modelData.id === AudioService.sink?.id
                     onTapped: AudioService.setAudioSink(modelData)
@@ -69,8 +67,6 @@ Popup {
 
                 delegate: DeviceRow {
                     required property var modelData
-
-                    glyph: AudioService.deviceIcon(modelData)
                     label: AudioService.shortLabel(modelData)
                     selected: modelData.id === AudioService.source?.id
                     onTapped: AudioService.setAudioSource(modelData)

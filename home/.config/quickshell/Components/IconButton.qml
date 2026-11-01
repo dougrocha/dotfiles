@@ -8,9 +8,11 @@ Rectangle {
     property int glyphSize: Theme.type.title.size
     property int box: 0
     property bool filled: false
+    property bool plate: false
+    property bool open: false
 
     property bool active: false
-    property color restColor: Theme.text.secondary
+    property color restColor: plate ? Theme.text.primary : Theme.text.secondary
     property color hoverColor: Theme.text.primary
     property color activeColor: Theme.accent
 
@@ -19,11 +21,35 @@ Rectangle {
     signal tapped
 
     readonly property int side: filled ? 40 : box
+    readonly property int plateWidth: Math.max(Theme.bar.plateHeight, glyphLabel.implicitWidth + Theme.bar.platePadding * 2)
 
-    implicitWidth: side > 0 ? side : glyphLabel.implicitWidth
+    implicitWidth: side > 0 ? side : plate ? plateWidth : glyphLabel.implicitWidth
     implicitHeight: side > 0 ? side : Theme.topBarHeight
     radius: filled ? width / 2 : 0
     color: filled ? Theme.fill.press : Theme.withAlpha(Theme.fill.press, 0)
+    scale: plate && tap.pressed ? Theme.motion.pressScale : 1
+
+    Behavior on scale {
+        NumberAnimation {
+            duration: Theme.motion.instant
+            easing.type: Theme.motion.easeStandard
+        }
+    }
+
+    Rectangle {
+        visible: root.plate
+        anchors.centerIn: parent
+        width: root.plateWidth
+        height: Theme.bar.plateHeight
+        radius: Theme.bar.plateRadius
+        color: root.open || tap.pressed ? Theme.fill.press : hover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Theme.motion.fast
+            }
+        }
+    }
 
     Text {
         id: glyphLabel
@@ -46,6 +72,7 @@ Rectangle {
     }
 
     TapHandler {
+        id: tap
         onTapped: root.tapped()
     }
 

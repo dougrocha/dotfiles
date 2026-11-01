@@ -5,7 +5,9 @@ import qs.Services
 
 IconButton {
     glyph: PhosphorIcons.gear
-    active: Visibilities.isOpen(Visibilities.names.settings)
+    plate: true
+    open: Visibilities.isOpen(Visibilities.names.settings)
+    active: open
     activeColor: Theme.text.primary
     tooltipText: "Settings"
     onTapped: Visibilities.toggle(Visibilities.names.settings)

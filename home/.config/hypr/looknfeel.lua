@@ -3,7 +3,7 @@ local c = require("colors")
 hl.config({
     general = {
         gaps_in = 5,
-        gaps_out = 10,
+        gaps_out = { top = 5, right = 10, bottom = 10, left = 10 },
         border_size = 2,
         col = {
             active_border = { colors = { c.primary, c.tertiary }, angle = 45 },

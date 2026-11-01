@@ -4,7 +4,7 @@ import Quickshell
 Text {
     id: clockWidget
 
-    property string format: "h:mmAP"
+    property string format: "h:mm AP"
 
     text: Qt.formatDateTime(clock.date, clockWidget.format)
 
