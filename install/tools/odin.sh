@@ -68,12 +68,17 @@ build_stb() {
     odin_root="$(odin root)"
 
     # Odin ships prebuilt STB for Windows/macOS/wasm only; the Linux .a files must
-    # be compiled locally, and a pacman upgrade of `odin` wipes them every time.
-    if [[ -f "$odin_root/vendor/stb/lib/stb_image.a" ]]; then
+    # be compiled locally. Rebuild when any Windows .lib lacks its .a, which also
+    # catches a library that a new Odin commit added.
+    local lib missing=0
+    for lib in "$odin_root"/vendor/stb/lib/*.lib; do
+        [[ -f "${lib%.lib}.a" ]] || missing=1
+    done
+    if (( ! missing )); then
         return
     fi
 
-    sudo "$odin_root/vendor/stb/src/build_stb.sh"
+    "$odin_root/vendor/stb/src/build_stb.sh" unix
 }
 
 build_stb
