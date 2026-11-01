@@ -9,7 +9,7 @@ Slider {
     property bool muted: false
     property string glyph: ""
 
-    implicitHeight: 22
+    implicitHeight: Theme.control.volumeHeight
     leftPadding: 0
     rightPadding: 0
     topPadding: 0

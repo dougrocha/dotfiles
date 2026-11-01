@@ -34,6 +34,8 @@ Singleton {
     readonly property string pause: String.fromCodePoint(0xE39E)
     readonly property string skipForward: String.fromCodePoint(0xE5A6)
     readonly property string skipBack: String.fromCodePoint(0xE5A4)
+    readonly property string rewind: String.fromCodePoint(0xE6A8)
+    readonly property string fastForward: String.fromCodePoint(0xE6A6)
     readonly property string broom: String.fromCodePoint(0xEC54)
     readonly property string dotsThree: String.fromCodePoint(0xE1FE)
 

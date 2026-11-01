@@ -14,7 +14,7 @@ Rectangle {
 
     width: size
     height: size
-    radius: circular ? width / 2 : Theme.radius.md
+    radius: circular ? width / 2 : Theme.radius.control
     color: hover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
     Behavior on color {

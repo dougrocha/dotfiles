@@ -15,7 +15,7 @@ Column {
     Divider {}
 
     PanelRow {
-        implicitHeight: 28
+        implicitHeight: Theme.row.control
         onTapped: {
             Visibilities.dismissAll();
             Quickshell.execDetached(footer.command);

@@ -1,15 +1,12 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.Components
 import qs.Constants
-import qs.Modules.Bar.Components
 import qs.Modules.Popups
 import qs.Services
-import qs.Widgets
 
 Variants {
     id: root
@@ -52,87 +49,18 @@ Variants {
             }
         }
 
-        Item {
+        BarContent {
             id: content
             width: parent.width
             height: parent.height
             y: topBar.revealed ? 0 : -height
-
-            TapHandler {
-                acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
-                onTapped: eventPoint => {
-                    if (!traySection.contains(traySection.mapFromItem(content, eventPoint.position)))
-                        Visibilities.closeTrayMenu();
-                }
-            }
+            screen: topBar.modelData
+            autoHide: topBar.autoHide
 
             Behavior on y {
                 NumberAnimation {
                     duration: Theme.motion.normal
                     easing.type: Theme.motion.easeStandard
-                }
-            }
-
-            Rectangle {
-                id: tint
-                anchors.fill: parent
-
-                function tintAt(alpha) {
-                    return Theme.withAlpha(Theme.colors.bg, topBar.autoHide ? 1 : alpha);
-                }
-
-                gradient: Gradient {
-                    GradientStop {
-                        position: 0
-                        color: tint.tintAt(Theme.bar.tintTop)
-                    }
-                    GradientStop {
-                        position: 0.55
-                        color: tint.tintAt(Theme.bar.tintMid)
-                    }
-                    GradientStop {
-                        position: 1
-                        color: tint.tintAt(0)
-                    }
-                }
-            }
-
-            Workspaces {
-                screen: topBar.modelData
-                anchors.left: parent.left
-                anchors.leftMargin: Theme.bar.edgeMargin
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            RowLayout {
-                id: indicatorRow
-                anchors.right: parent.right
-                anchors.rightMargin: Theme.bar.edgeMargin
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.space.xxs
-
-                TraySection {
-                    id: traySection
-                }
-
-                CpuIndicator {}
-
-                BluetoothIndicator {
-                    id: bluetoothIndicator
-                }
-
-                VolumeIndicator {
-                    id: volumeIndicator
-                }
-
-                SettingsButton {
-                    id: settingsButton
-                }
-
-                DoNotDisturbIndicator {}
-
-                ClockButton {
-                    id: clockButton
                 }
             }
         }
@@ -142,7 +70,7 @@ Variants {
 
             SettingsPopup {
                 anchor.window: topBar
-                trigger: settingsButton
+                trigger: content.settingsButton
             }
         }
 
@@ -151,7 +79,7 @@ Variants {
 
             SoundPopup {
                 anchor.window: topBar
-                trigger: volumeIndicator
+                trigger: content.volumeIndicator
             }
         }
 
@@ -160,7 +88,7 @@ Variants {
 
             BluetoothPopup {
                 anchor.window: topBar
-                trigger: bluetoothIndicator
+                trigger: content.bluetoothIndicator
             }
         }
 
@@ -169,7 +97,7 @@ Variants {
 
             NotificationPopup {
                 anchor.window: topBar
-                trigger: clockButton
+                trigger: content.clockButton
             }
         }
     }

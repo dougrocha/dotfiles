@@ -39,8 +39,8 @@ Item {
         required property var modelData
 
         Layout.fillWidth: true
-        Layout.preferredHeight: 28
-        radius: Theme.radius.md
+        Layout.preferredHeight: Theme.row.control
+        radius: Theme.radius.small
         color: actionHover.hovered ? Theme.fill.strong : Theme.fill.hover
 
         Behavior on color {
@@ -80,7 +80,7 @@ Item {
         width: card.width
         height: cardContent.implicitHeight + Theme.space.lg * 2
 
-        radius: Theme.radius.xl
+        radius: Theme.radius.surface
         border.width: 1
         color: card.isCritical ? Qt.tint(Theme.colors.surface, Theme.withAlpha(Theme.danger, 0.12)) : Theme.colors.surface
         border.color: card.isCritical ? Theme.withAlpha(Theme.danger, 0.6) : Theme.stroke.hairline
@@ -123,8 +123,8 @@ Item {
 
                     IconImage {
                         readonly property string iconName: card.modelData?.appIcon || DesktopEntries.heuristicLookup(card.modelData?.appName ?? "")?.icon || ""
-                        Layout.preferredWidth: 20
-                        Layout.preferredHeight: 20
+                        Layout.preferredWidth: Theme.icon.lg
+                        Layout.preferredHeight: Theme.icon.lg
                         visible: iconName !== ""
                         source: iconName ? Quickshell.iconPath(iconName, true) : ""
                         mipmap: true
@@ -142,10 +142,12 @@ Item {
 
                     Text {
                         visible: !!card.modelData?.summary
+                        Layout.maximumWidth: Theme.toast.width / 3
                         text: NotificationService.appDisplayName(card.modelData?.appName ?? "")
                         color: Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
+                        elide: Text.ElideRight
                     }
 
                     Text {
@@ -238,13 +240,11 @@ Item {
 
             x: Math.max(0, surface.width - width - Theme.space.lg)
             y: cardContent.y + textColumn.y + headerRow.y + headerRow.height + textColumn.spacing
-            width: popoverColumn.implicitWidth + Theme.space.md
-            height: popoverColumn.implicitHeight + Theme.space.md
+            width: popoverColumn.implicitWidth + Theme.row.inset * 2
+            height: popoverColumn.implicitHeight + Theme.row.inset * 2
 
-            radius: Theme.radius.md
+            radius: Theme.radius.surface
             color: Theme.colors.raised
-            border.width: 1
-            border.color: Theme.stroke.hairline
 
             layer.enabled: true
             layer.effect: MultiEffect {
@@ -272,9 +272,9 @@ Item {
                         required property var modelData
 
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 26
-                        Layout.preferredWidth: menuItemLabel.implicitWidth + 20
-                        radius: Theme.radius.sm
+                        Layout.preferredHeight: Theme.row.compact
+                        Layout.preferredWidth: menuItemLabel.implicitWidth + Theme.space.xl
+                        radius: Theme.radius.row
                         color: menuItemHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
                         Behavior on color {

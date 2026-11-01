@@ -130,7 +130,7 @@ FloatingWindow {
 
         implicitWidth: editor.controlSize
         implicitHeight: editor.controlSize
-        radius: Theme.radius.md
+        radius: Theme.radius.control
         color: selected ? Theme.fill.selected : toolHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
         Behavior on color {
@@ -173,7 +173,7 @@ FloatingWindow {
 
         implicitWidth: actionContent.implicitWidth + Theme.space.lg * 2
         implicitHeight: editor.controlSize
-        radius: Theme.radius.md
+        radius: Theme.radius.control
         color: primary ? Theme.accent : Theme.withAlpha(Theme.fill.hover, 0)
 
         Rectangle {
@@ -502,7 +502,7 @@ FloatingWindow {
                 anchors.bottomMargin: editor.canvasPadding + Theme.space.md
                 width: Math.min(canvasArea.width - Theme.space.xxl * 2, statusRow.implicitWidth + Theme.space.lg * 2)
                 height: statusRow.implicitHeight + Theme.space.md * 2
-                radius: Theme.radius.lg
+                radius: Theme.radius.hud
                 color: Theme.colors.raised
                 border.width: 1
                 border.color: Theme.stroke.strong

@@ -298,4 +298,60 @@ Singleton {
 
     readonly property string activity: activities[0]?.id ?? "idle"
     readonly property string secondaryActivity: activities.find(a => a.id !== "osd" && a.id !== activity)?.id ?? ""
+
+    readonly property var modes: ({
+            compact: "compact",
+            song: "song",
+            music: "music",
+            recording: "recording"
+        })
+
+    readonly property bool musicOpen: Visibilities.isOpen(Visibilities.names.music)
+    property bool recordingDetails: false
+
+    readonly property string mode: {
+        if (musicOpen)
+            return modes.music;
+        if (songNotif && !osdActive)
+            return modes.song;
+        if (recordingDetails)
+            return modes.recording;
+        return modes.compact;
+    }
+
+    readonly property bool hasContent: musicOpen || songNotif || activity !== "idle" || AudioService.micInUse
+    readonly property bool revealed: (BarService.revealed && hasContent) || osdActive || songNotif || transientAlertActive
+
+    onActivityChanged: recordingDetails = false
+    onRecordingChanged: if (!recording)
+        recordingDetails = false
+    onMusicOpenChanged: if (musicOpen) {
+        recordingDetails = false;
+        dismissSongNotif();
+    }
+
+    function toggleRecordingDetails(): void {
+        recordingDetails = recording && !recordingDetails;
+    }
+
+    function bubbleKind(mode: string, activity: string, secondary: string): string {
+        return mode === modes.compact && activity !== "osd" ? secondary : "";
+    }
+
+    function pillTapped(mode: string, activity: string): void {
+        if (mode !== modes.music && activity === "alert") {
+            clearAlert(currentAlert?.id ?? "");
+            return;
+        }
+        Visibilities.open(Visibilities.names.music);
+    }
+
+    function bubbleTapped(kind: string): void {
+        if (kind === "recording")
+            toggleRecordingDetails();
+        else if (kind === "alert")
+            clearAlert(currentAlert?.id ?? "");
+        else
+            Visibilities.open(Visibilities.names.music);
+    }
 }

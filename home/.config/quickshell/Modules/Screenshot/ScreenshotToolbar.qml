@@ -16,11 +16,11 @@ Rectangle {
     readonly property bool counting: ScreenshotSession.counting
     readonly property point placed: ScreenshotSession.toolbarPosition(width, height)
 
-    implicitWidth: (counting ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + 16
-    implicitHeight: 52
+    implicitWidth: (counting ? countdownRow.implicitWidth : toolbarRow.implicitWidth) + Theme.space.xl
+    implicitHeight: Theme.row.button + Theme.space.xl
     x: outputX + placed.x
     y: outputY + placed.y
-    radius: Theme.radius.lg
+    radius: Theme.radius.surface
     color: Theme.colors.surface
     border.width: 1
     border.color: Theme.stroke.hairline
@@ -82,9 +82,9 @@ Rectangle {
         ToolbarDivider {}
 
         Rectangle {
-            implicitWidth: optionsLabel.implicitWidth + 16
-            implicitHeight: 36
-            radius: Theme.radius.md
+            implicitWidth: optionsLabel.implicitWidth + Theme.space.xl
+            implicitHeight: Theme.row.button
+            radius: Theme.radius.control
             color: ScreenshotSession.optionsOpen || optionsHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
             Behavior on color {
@@ -134,8 +134,8 @@ Rectangle {
 
         Rectangle {
             implicitWidth: captureLabel.implicitWidth + 22
-            implicitHeight: 36
-            radius: Theme.radius.md
+            implicitHeight: Theme.row.button
+            radius: Theme.radius.control
             opacity: ScreenshotSession.canCapture ? 1.0 : 0.45
             color: captureHover.hovered && captureHover.enabled ? Qt.lighter(Theme.accent, 1.1) : Theme.accent
             Layout.leftMargin: 3
@@ -178,9 +178,9 @@ Rectangle {
         visible: toolbar.counting
 
         Rectangle {
-            implicitWidth: cancelLabel.implicitWidth + 16
-            implicitHeight: 32
-            radius: Theme.radius.sm
+            implicitWidth: cancelLabel.implicitWidth + Theme.space.xl
+            implicitHeight: Theme.row.action
+            radius: Theme.radius.control
             color: cancelHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
             Text {
@@ -237,9 +237,9 @@ Rectangle {
         }
 
         Rectangle {
-            implicitWidth: 36
-            implicitHeight: 36
-            radius: Theme.radius.md
+            implicitWidth: Theme.row.button
+            implicitHeight: Theme.row.button
+            radius: Theme.radius.control
             color: modeButton.selected || modeHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
             Behavior on color {

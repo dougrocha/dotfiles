@@ -12,8 +12,8 @@ Rectangle {
     signal tapped
 
     Layout.fillWidth: true
-    implicitHeight: 30
-    radius: Theme.radius.sm
+    implicitHeight: Theme.row.menu
+    radius: Theme.radius.row
     color: checkHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
     Behavior on color {
@@ -24,8 +24,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: 6
-        anchors.rightMargin: 6
+        anchors.leftMargin: Theme.space.sm
+        anchors.rightMargin: Theme.space.sm
 
         Text {
             Layout.preferredWidth: 16

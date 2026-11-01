@@ -9,7 +9,7 @@ PanelRow {
     property bool selected: false
     default property alias trailing: trailingSlot.data
 
-    implicitHeight: Math.max(Theme.panel.menuRowHeight, labels.implicitHeight + Theme.space.sm * 2)
+    implicitHeight: Math.max(Theme.row.menu, labels.implicitHeight + Theme.space.sm * 2)
 
     Column {
         id: labels

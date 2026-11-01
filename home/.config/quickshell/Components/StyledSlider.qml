@@ -31,7 +31,7 @@ Slider {
         x: slider.leftPadding
         y: slider.topPadding + slider.availableHeight / 2 - height / 2
         width: slider.availableWidth
-        height: 4
+        height: Theme.control.track
         radius: height / 2
         color: slider.trackColor
 
@@ -39,7 +39,7 @@ Slider {
             width: slider.visualPosition * parent.width
             height: parent.height
             color: Theme.text.primary
-            radius: Theme.radius.xxs
+            radius: height / 2
 
             Behavior on width {
                 NumberAnimation {
@@ -56,6 +56,7 @@ Slider {
         implicitWidth: slider.handleSize * 1.5
         implicitHeight: slider.handleSize
         radius: height / 2
+        visible: slider.handleSize > 0
         color: Theme.text.primary
     }
 }

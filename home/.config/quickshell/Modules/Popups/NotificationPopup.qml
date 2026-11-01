@@ -6,8 +6,6 @@ import qs.Services
 Popup {
     id: panel
 
-    cardWidth: 356
-
     panelName: Visibilities.names.notifications
     onOpened: center.reset()
 
@@ -15,6 +13,5 @@ Popup {
         id: center
 
         width: parent.width
-        maxHeight: panel.contentMaxHeight
     }
 }

@@ -8,8 +8,8 @@ Rectangle {
 
     signal toggled
 
-    implicitWidth: 32
-    implicitHeight: 18
+    implicitWidth: Theme.control.switchWidth
+    implicitHeight: Theme.control.switchHeight
     radius: height / 2
     color: active ? Theme.accent : Theme.stroke.strong
 

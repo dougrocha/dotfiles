@@ -44,15 +44,6 @@ Singleton {
         return Qt.hsla(hue / 360, c.hslSaturation, c.hslLightness, c.a);
     }
 
-    function tame(c, keep) {
-        c = Qt.color(c);
-        if (c.hslHue < 0)
-            return c;
-        return Qt.hsla(c.hslHue, c.hslSaturation * keep, c.hslLightness, c.a);
-    }
-
-    readonly property real neutralKeep: 0.25
-
     FileView {
         id: paletteFile
         path: Quickshell.shellDir + "/palette.json"
@@ -64,13 +55,13 @@ Singleton {
     }
 
     readonly property QtObject palette: QtObject {
-        readonly property color bg: root.tame(root.paletteColor("bg", "#16181a"), root.neutralKeep)
-        readonly property color surface: root.tame(root.paletteColor("surface", "#1e2124"), root.neutralKeep)
-        readonly property color raised: root.tame(root.paletteColor("raised", "#282c30"), root.neutralKeep)
-        readonly property color overlay: root.tame(root.paletteColor("overlay", "#31363b"), root.neutralKeep)
-        readonly property color text: root.tame(root.paletteColor("text", "#e6e8ea"), root.neutralKeep)
-        readonly property color subtext: root.tame(root.paletteColor("subtext", "#9aa0a6"), root.neutralKeep)
-        readonly property color muted: root.tame(root.paletteColor("muted", "#6b7075"), root.neutralKeep)
+        readonly property color bg: root.paletteColor("bg", "#121913")
+        readonly property color surface: root.paletteColor("surface", "#1b251c")
+        readonly property color raised: root.paletteColor("raised", "#233125")
+        readonly property color overlay: root.paletteColor("overlay", "#2c3d2e")
+        readonly property color text: root.paletteColor("text", "#e9ede9")
+        readonly property color subtext: root.paletteColor("subtext", "#abbaad")
+        readonly property color muted: root.paletteColor("muted", "#738c76")
         readonly property color accent: root.paletteColor("accent", "#9bd4a2")
         readonly property color accentText: root.readableOn(accent, root.paletteColor("accentText", "#0c1f12"))
         readonly property color danger: root.separateHue("#ff5f57", accent, 15)
@@ -122,7 +113,7 @@ Singleton {
     readonly property list<color> markupInks: ["#e53935", "#ffcc00", "#007aff", "#ffffff", "#111111"]
 
     readonly property QtObject fill: QtObject {
-        readonly property color hover: root.withAlpha(root.text.primary, 0.06)
+        readonly property color hover: root.withAlpha(root.text.primary, 0.05)
         readonly property color press: root.withAlpha(root.text.primary, 0.10)
         readonly property color strong: root.withAlpha(root.text.primary, 0.16)
         readonly property color selected: root.withAlpha(root.text.primary, 0.10)
@@ -130,14 +121,14 @@ Singleton {
     }
 
     readonly property QtObject stroke: QtObject {
-        readonly property color hairline: root.withAlpha(root.text.primary, 0.08)
+        readonly property color hairline: root.withAlpha(root.text.primary, 0.10)
         readonly property color strong: root.withAlpha(root.text.primary, 0.16)
         readonly property color accent: root.accent
     }
 
     readonly property QtObject bar: QtObject {
         readonly property int plateHeight: 24
-        readonly property int plateRadius: root.radius.sm
+        readonly property int plateRadius: root.radius.small
         readonly property int platePadding: root.space.sm
         readonly property int edgeMargin: root.space.md
         readonly property real tintTop: 0.25
@@ -145,20 +136,70 @@ Singleton {
     }
 
     readonly property QtObject panel: QtObject {
-        readonly property int width: 320
-        readonly property int padding: root.space.lg
-        readonly property int rowBleed: padding - root.space.sm
-        readonly property int menuRowHeight: 30
+        readonly property int width: 360
+        readonly property int padding: root.space.xl
+        readonly property int rowBleed: padding - root.row.inset
+        readonly property int menuWidth: 240
+        readonly property real visibleRows: 4.5
+    }
+
+    readonly property QtObject toast: QtObject {
+        readonly property int width: 372
+    }
+
+    readonly property QtObject dialog: QtObject {
+        readonly property int width: 400
+    }
+
+    readonly property QtObject island: QtObject {
+        readonly property int top: 4
+        readonly property int compactHeight: root.topBarHeight - 8
+        readonly property int compactPadding: 28
+        readonly property int lineHeight: 20
+        readonly property int inset: root.space.xl
+        readonly property int detailsPadding: 12
+        readonly property int noticeWidth: 380
+        readonly property int panelWidth: 380
+        readonly property int artSize: 72
+        readonly property int titleMaxWidth: 360
+        readonly property int alertTextMaxWidth: 320
+        readonly property int osdTrackWidth: 120
+        readonly property int alertTrackWidth: 80
+        readonly property int dot: 8
+        readonly property int stopHeight: 24
+        readonly property int stopPadding: 24
+        readonly property int noticeBlur: 48
+        readonly property int glowBlur: 40
+    }
+
+    readonly property QtObject row: QtObject {
+        readonly property int tile: 44
+        readonly property int menu: 36
+        readonly property int action: 32
+        readonly property int separator: 17
+        readonly property int control: 28
+        readonly property int compact: 26
+        readonly property int badge: 20
+        readonly property int button: 36
+        readonly property int inset: 6
+        readonly property int gap: 10
+    }
+
+    readonly property QtObject control: QtObject {
+        readonly property int switchWidth: 34
+        readonly property int switchHeight: 18
+        readonly property int track: 4
+        readonly property int volumeHeight: 22
     }
 
     readonly property QtObject radius: QtObject {
-        readonly property int xxs: 2
-        readonly property int xs: 4
-        readonly property int sm: 6
-        readonly property int md: 8
-        readonly property int lg: 12
-        readonly property int xl: 16
-        readonly property int xxl: 24
+        readonly property int island: 24
+        readonly property int surface: 16
+        readonly property int hud: 12
+        readonly property int row: 10
+        readonly property int control: 8
+        readonly property int small: 6
+        readonly property int track: 2
     }
 
     readonly property QtObject space: QtObject {
@@ -206,7 +247,11 @@ Singleton {
 
     readonly property QtObject type: QtObject {
         readonly property QtObject display: QtObject {
-            readonly property int size: 20
+            readonly property int size: 21
+            readonly property int weight: Font.Medium
+        }
+        readonly property QtObject heading: QtObject {
+            readonly property int size: 17
             readonly property int weight: Font.Medium
         }
         readonly property QtObject title: QtObject {
@@ -218,18 +263,18 @@ Singleton {
             readonly property int weight: Font.Normal
         }
         readonly property QtObject label: QtObject {
-            readonly property int size: 11
+            readonly property int size: 12
             readonly property int weight: Font.Medium
-            readonly property real tracking: 0.3
+            readonly property real tracking: 0
         }
         readonly property QtObject caption: QtObject {
-            readonly property int size: 11
+            readonly property int size: 12
             readonly property int weight: Font.Normal
         }
         readonly property QtObject mono: QtObject {
             readonly property int size: 13
             readonly property int weight: Font.Normal
-            readonly property real tracking: 0.5
+            readonly property real tracking: 0
         }
     }
 

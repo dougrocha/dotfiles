@@ -22,7 +22,7 @@ Item {
             triggerRequested();
     }
 
-    implicitHeight: !valid ? 0 : separator ? 9 : 28
+    implicitHeight: !valid ? 0 : separator ? Theme.row.separator : Theme.row.menu
     activeFocusOnTab: interactive
 
     Rectangle {
@@ -30,22 +30,22 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
         height: 1
-        color: Theme.text.secondary
+        color: Theme.stroke.hairline
     }
 
     Rectangle {
         visible: root.valid && !root.separator
         anchors.fill: parent
-        radius: Theme.radius.sm
-        color: root.interactive && (rowHover.hovered || root.activeFocus) ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
+        radius: Theme.radius.row
+        color: root.interactive && (rowHover.hovered || root.activeFocus) ? Theme.fill.selected : Theme.withAlpha(Theme.fill.selected, 0)
         border.width: root.activeFocus ? 1 : 0
         border.color: Theme.stroke.accent
 
         RowLayout {
             anchors {
                 fill: parent
-                leftMargin: 8 + root.indentLevel * 12
-                rightMargin: 8
+                leftMargin: Theme.space.md + root.indentLevel * Theme.space.lg
+                rightMargin: Theme.space.md
             }
             spacing: Theme.space.sm
 
