@@ -1,14 +1,14 @@
 # Notification toasts
 
-Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after the sender's timeout and then moves to history. Without one, a normal card lasts 5 seconds, a low-urgency card about 3.3 seconds, and a card with action buttons at least 10 seconds. At most five cards show at once; the rest wait behind an "N more" pill and start their timeout when they move up. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card, and while the center is open it waits until the center closes.
+Notifications show as a stack of cards at the top right of DP-1, below the bar. A normal card closes after a per-app rule's timeout if one exists, otherwise the sender's timeout, and then moves to history. Without either, a normal card lasts 5 seconds, a low-urgency card about 3.3 seconds, and a card with action buttons 10 seconds. Low urgency wins over actions, so a low-urgency card with actions lasts about 3.3 seconds. At most five cards show at once; the rest wait behind an "N more" pill and start their timeout when they move up. Hover pauses the timeout. A critical card has a red-tinted fill and border and stays unless the sender gave a positive timeout. While Do Not Disturb is on or the notification center is open, normal notifications go straight to history. A critical one still shows as a card. While the center is open, an untimed critical waits until the center closes. A critical with a positive timeout keeps counting and can expire to history before you see it.
 
 ## Sub-features
 
 - `toast-normal` shows a card that closes after its timeout.
-- `toast-close` closes a normal card on a left click, unless the notification has a default action. A left click runs that action instead. The source also closes a card on a right click and on its X badge, which shows on hover. Those two paths were not driven on 2026-10-09.
+- `toast-close` closes a card, critical included, on a left click, unless the notification has a default action. A left click runs that action instead. The source also closes a card on a right click and on its X badge, which shows on hover. Those two paths were not driven on 2026-10-09.
 - `toast-critical` shows a red-tinted card that stays.
-- `toast-actions` shows the sender's action buttons.
-- `toast-history` sends normal notifications to history while the center is open or Do Not Disturb is on.
+- `toast-actions` shows the sender's action buttons. A card with a settings action shows a caret menu for it.
+- `toast-history` sends normal notifications to history while the center is open or Do Not Disturb is on. Per-app rules can let an app through Do Not Disturb or mute it.
 - `toast-held-critical` holds a critical card while the center is open and shows it after the center closes.
 - `toast-history-file` saves history to `~/.local/state/quickshell/notifications.json`.
 
@@ -16,14 +16,14 @@ Notifications show as a stack of cards at the top right of DP-1, below the bar. 
 
 - Any app sends a notification. In tests, `qsv notify` stands in for the app.
 - Open history from the bar clock.
-- Toggle Do not disturb in the settings card from the gear.
+- Toggle Do Not Disturb with the `Focus` tile in the settings card from the gear.
 
 ## Driving it with qsv
 
 Preconditions:
 
 - Baseline from `README.md`.
-- Do not disturb is off. The settings card shows its switch off, and the bar has no bell icon.
+- Do Not Disturb is off. The settings card's `Focus` tile reads `Off`, and the bar has no bell icon.
 - Move the pointer away from the stack with `qsv at 1200 800`. A hovered card does not time out.
 
 - **Normal.** Run `qsv notify -a QsvTest "qsv normal" "normal body"`, wait 0.8s, then `qsv shot toast "2150,40 400x620"`. The card shows the title, the body, and `QsvTest`. A shot 4.3s later shows no card.
