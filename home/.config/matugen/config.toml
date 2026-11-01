@@ -12,10 +12,7 @@ post_hook = "hyprctl reload"
 input_path = "~/.config/matugen/templates/hyprland-colors.lua"
 output_path = "~/.config/hypr/colors.lua"
 
-[templates.quickshell-palette]
-input_path = "~/.config/matugen/templates/quickshell-palette.json"
-output_path = "~/.config/quickshell/palette.json"
-
-[templates.walker]
-input_path = "~/.config/matugen/templates/walker.css"
-output_path = "~/.config/walker/themes/default/colors.css"
+[templates.ramp]
+input_path = "~/.config/matugen/templates/ramp-seed.json"
+output_path = "~/.cache/matugen/seed.json"
+post_hook = "~/.config/matugen/ramp"

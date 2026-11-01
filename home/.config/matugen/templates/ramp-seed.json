@@ -1,0 +1,4 @@
+{
+  "accent": "{{colors.primary.default.hex}}",
+  "accentText": "{{colors.on_primary.default.hex}}"
+}
