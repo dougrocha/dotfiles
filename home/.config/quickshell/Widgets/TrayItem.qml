@@ -31,8 +31,8 @@ Rectangle {
         }
     }
 
-    Layout.preferredWidth: 24
-    Layout.preferredHeight: 24
+    Layout.preferredWidth: Theme.bar.plateHeight
+    Layout.preferredHeight: Theme.bar.plateHeight
     activeFocusOnTab: true
     radius: Theme.bar.plateRadius
     color: menuOpen || activeFocus ? Theme.fill.press : hoverHandler.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
@@ -57,8 +57,8 @@ Rectangle {
     IconImage {
         id: trayIcon
         anchors.centerIn: parent
-        width: 16
-        height: 16
+        width: Theme.icon.sm
+        height: Theme.icon.sm
         source: root.trayItem?.icon ?? ""
         visible: status === Image.Ready && !root.dragging
         mipmap: true

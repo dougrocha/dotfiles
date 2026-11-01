@@ -7,13 +7,13 @@ Column {
     required property string label
 
     width: parent ? parent.width : implicitWidth
-    spacing: Theme.space.sm
+    spacing: Theme.space.xs
 
     Text {
         text: group.label
-        color: Theme.text.secondary
+        color: Theme.text.tertiary
         font.family: Theme.font.ui
         font.pixelSize: Theme.type.label.size
-        font.weight: Font.DemiBold
+        font.weight: Theme.type.label.weight
     }
 }

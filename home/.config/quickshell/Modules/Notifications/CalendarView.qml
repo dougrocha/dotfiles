@@ -22,10 +22,10 @@ Item {
 
     readonly property int dayCellWidth: width > 0 ? Math.floor(width / 7) : 40
     readonly property int dayCellHeight: 34
-    readonly property int dayPillWidth: 32
+    readonly property int dayPillWidth: 28
     readonly property int dayPillHeight: 28
-    readonly property int dayMarkerWidth: 12
-    readonly property int dayMarkerHeight: 2
+    readonly property int dayMarkerWidth: 4
+    readonly property int dayMarkerHeight: 4
     readonly property int dayMarkerInset: 3
     readonly property int headerRowHeight: 20
     readonly property int headerGap: Theme.space.md
@@ -156,11 +156,10 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         text: modelData
-                        color: weekdayHover.hovered ? Theme.text.primary : CalendarDates.isWeekendColumn(root.weekStart, index) ? Theme.text.tertiary : Theme.text.secondary
+                        color: weekdayHover.hovered ? Theme.text.secondary : Theme.text.tertiary
                         font.family: Theme.font.ui
                         font.pixelSize: Theme.type.caption.size
-                        font.letterSpacing: 1
-                        font.weight: Theme.type.label.weight
+                        font.weight: Theme.type.caption.weight
 
                         Behavior on color {
                             ColorAnimation {
@@ -213,7 +212,7 @@ Item {
                                 anchors.top: parent.top
                                 width: root.dayPillWidth
                                 height: root.dayPillHeight
-                                radius: Theme.radius.md
+                                radius: height / 2
                                 antialiasing: true
                                 color: {
                                     if (dayCell.isToday)
@@ -233,11 +232,14 @@ Item {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    anchors.verticalCenterOffset: dayCell.isHoliday ? -1 : 0
-                                    text: dayCell.isCurrentMonth ? dayCell.modelData.day : ""
-                                    color: dayCell.isToday ? Theme.accentText : dayCell.isWeekend ? Theme.text.secondary : Theme.text.primary
+                                    anchors.verticalCenterOffset: dayCell.isHoliday && dayCell.isCurrentMonth ? -2 : 0
+                                    text: dayCell.isCurrentMonth ? dayCell.modelData.day : dayCell.modelData.date.getDate()
+                                    color: dayCell.isToday ? Theme.accentText : !dayCell.isCurrentMonth ? Theme.withAlpha(Theme.text.tertiary, 0.5) : dayCell.isWeekend ? Theme.text.secondary : Theme.text.primary
                                     font.family: Theme.font.ui
                                     font.pixelSize: Theme.type.body.size
+                                    font.features: ({
+                                            "tnum": 1
+                                        })
                                     font.weight: dayCell.isToday ? Theme.type.title.weight : Theme.type.body.weight
                                 }
 
@@ -247,7 +249,7 @@ Item {
                                     anchors.bottomMargin: root.dayMarkerInset
                                     width: root.dayMarkerWidth
                                     height: root.dayMarkerHeight
-                                    radius: height / 2
+                                    radius: width / 2
                                     color: dayCell.isToday ? Theme.accentText : Theme.accent
                                     visible: dayCell.isHoliday && dayCell.isCurrentMonth
                                     antialiasing: true

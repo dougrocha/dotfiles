@@ -1,10 +1,10 @@
 # Quick screenshot
 
-Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+Shift+4. The window under the pointer gets a rounded outline. A drag captures a region on release. A click captures the window under the pointer, or the whole monitor when no window is there. The file goes to `~/Pictures/Screenshots` and the clipboard. A toast shows at the bottom right of DP-1 when Show Notification is on in the toolbar's options.
+Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+Shift+4. The window under the pointer gets a rounded outline. A drag captures a region on release. A click captures the window under the pointer, or the whole monitor when no window is there. The file goes to `$XDG_PICTURES_DIR/Screenshots` (usually `~/Pictures/Screenshots`, or the toolbar's save folder) and the clipboard. A toast shows at the bottom right of DP-1 for 5 seconds when Show Notification is on in the toolbar's options. Hover pauses it, a click opens the in-shell editor, and dragging the thumbnail out (into another app) dismisses it.
 
 ## Sub-features
 
-- `quick-open` opens the overlay on all monitors without a toolbar or dim.
+- `quick-open` opens the overlay on all monitors without a toolbar or dim. A dim appears only while a drag sets a selection.
 - `quick-hover` outlines the window under the pointer, before and after the pointer moves.
 - `quick-drag` saves the dragged region on release.
 - `quick-click` saves the window under the pointer.
@@ -12,7 +12,7 @@ Quick screenshot opens a toolbar-free overlay on every monitor, like macOS Cmd+S
 - `quick-multimonitor` takes clicks and drags on DP-2 and drags across monitors.
 - `quick-clean` saves files with no overlay border or dim in them.
 - `quick-cancel` closes on Escape or on the bind again, and saves nothing.
-- `quick-no-enter` ignores Enter, because quick mode has no selection to confirm.
+- `quick-no-enter` ignores Enter. Quick mode never confirms with Enter, even after a drag starts.
 
 ## How to get to it (user POV)
 
@@ -27,7 +27,7 @@ Preconditions:
 - At least one window is on DP-1 and one on DP-2.
 
 - **Open.** Press the bind. Run `qsv key super+ctrl+s`, wait 0.6s, then `qsv layers qs.screenshot_overlay`. You see two `qs.screenshot_overlay` lines, one per monitor.
-- **Hover.** Point at a window. Run `qsv at 600 700` and `qsv shot hover "0,0 2560x1440"`. The pixel on the window's left edge (`qsv pixel <png> 12 700` for a window at x=12) is the accent at 70% opacity. A grab with no overlay shows the window color there.
+- **Hover.** Point at a window. Run `qsv at 600 700` and `qsv shot hover "0,0 2560x1440"`. The pixel on the window's left edge (`qsv pixel <png> 12 700` for a window at x=12) is a 1px accent border over an 8% accent fill, so the sampled color differs from the window color. A grab with no overlay shows the window color there.
 - **Drag.** Run `qsv mark`, `qsv drag 300 300 800 700`, wait 1.2s, then `qsv captured quick-drag`. One file of `500x400` is saved, and `qsv layers qs.screenshot_overlay` prints nothing.
 - **Click.** Reopen, then run `qsv mark`, `qsv click 600 700`, and `qsv captured quick-click`. The file size equals the window's `size` from `hyprctl clients -j`.
 - **Special workspace.** Focus DP-1 and open a special workspace with `hyprctl dispatch 'hl.dsp.workspace.toggle_special("discord")'`. Reopen and click a point where a workspace window sits under it (`qsv click 100 500`). The saved size is the special workspace window's size, `2536x1380` on 2026-10-08. Close the special workspace afterwards.

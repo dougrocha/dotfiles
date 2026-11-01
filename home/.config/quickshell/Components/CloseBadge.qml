@@ -8,8 +8,8 @@ Rectangle {
 
     signal tapped
 
-    width: 20
-    height: 20
+    width: Theme.row.badge
+    height: Theme.row.badge
     radius: width / 2
     color: Theme.colors.raised
     border.width: 1

@@ -26,31 +26,16 @@ PanelWindow {
         active: TooltipService.tooltipShown
     }
 
-    Rectangle {
+    TooltipBubble {
         id: tip
-        readonly property int padH: 10
 
         x: Math.max(Theme.space.xs, Math.min(parent.width - width - Theme.space.xs, TooltipService.tooltipX - width / 2))
         y: Theme.topBarHeight + Theme.space.sm
-
-        width: label.implicitWidth + padH * 2
-        height: label.implicitHeight + Theme.space.xs * 2
-        radius: Theme.radius.sm
-        color: Theme.colors.raised
-        border.color: Theme.stroke.strong
-        border.width: 1
+        width: implicitWidth
+        height: implicitHeight
+        text: TooltipService.tooltipText
         opacity: presence.progress
         scale: presence.scale
         transformOrigin: Item.Top
-
-        Text {
-            id: label
-            anchors.centerIn: parent
-            text: TooltipService.tooltipText
-            color: Theme.text.primary
-            renderType: Text.NativeRendering
-            font.pixelSize: Theme.type.body.size
-            font.family: Theme.font.ui
-        }
     }
 }

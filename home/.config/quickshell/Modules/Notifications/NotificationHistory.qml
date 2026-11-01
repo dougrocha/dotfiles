@@ -61,7 +61,7 @@ Column {
             anchors.fill: parent
             anchors.leftMargin: -root.bleed
             anchors.rightMargin: -root.bleed
-            radius: Theme.radius.md
+            radius: Theme.radius.row
             color: rowHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
             Behavior on color {
@@ -92,7 +92,7 @@ Column {
                     Layout.preferredWidth: 6
                     Layout.preferredHeight: 6
                     Layout.alignment: Qt.AlignVCenter
-                    radius: 3
+                    radius: width / 2
                     color: Theme.danger
                 }
 

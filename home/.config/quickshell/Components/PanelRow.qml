@@ -11,7 +11,7 @@ Item {
     signal tapped
 
     width: parent ? parent.width : implicitWidth
-    implicitHeight: 34
+    implicitHeight: Theme.row.menu
     activeFocusOnTab: true
 
     Keys.onPressed: function (event) {
@@ -25,7 +25,7 @@ Item {
         x: -Theme.panel.rowBleed
         width: row.width + Theme.panel.rowBleed * 2
         height: row.height
-        radius: Theme.radius.sm
+        radius: Theme.radius.row
         color: {
             if (!row.highlighted)
                 return Theme.withAlpha(Theme.fill.hover, 0);

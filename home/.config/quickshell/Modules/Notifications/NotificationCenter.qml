@@ -6,8 +6,6 @@ import qs.Services
 Item {
     id: root
 
-    property int maxHeight: 0
-
     readonly property bool hasHistory: NotificationService.history.length > 0
 
     readonly property int bleed: Theme.panel.rowBleed
@@ -70,21 +68,11 @@ Item {
             }
         }
 
-        Flickable {
-            id: historyScroll
-            x: -root.bleed
-            width: parent.width + root.bleed * 2
+        PanelScroll {
             visible: root.hasHistory
-            height: root.maxHeight > 0 ? Math.min(history.implicitHeight, root.maxHeight - calendar.height - header.height - Theme.space.lg * 4 - 1) : history.implicitHeight
-            contentHeight: history.implicitHeight
-            clip: true
-            boundsBehavior: Flickable.StopAtBounds
-            interactive: contentHeight > height
 
             NotificationHistory {
-                id: history
-                x: root.bleed
-                width: historyScroll.width - root.bleed * 2
+                width: parent.width
                 bleed: root.bleed
             }
         }

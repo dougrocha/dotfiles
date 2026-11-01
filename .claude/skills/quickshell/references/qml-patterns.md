@@ -107,7 +107,7 @@ CloseBadge {
 
 ## Animate a size change and fade in new content
 
-From `Components/Popup.qml` and `Modules/Notifications/CalendarView.qml`:
+From `Components/Popover.qml` and `Modules/Notifications/CalendarView.qml`:
 
 ```qml
 SizeMotion on height {}
@@ -138,4 +138,4 @@ Rectangle {
 }
 ```
 
-For a popover, set the scale origin to the trigger side (`Popup` does this from `trigger`). For an alert, keep the center. Gate a `SizeMotion` on the same surface with `enabled: presence.progress === 1`. Otherwise content that lays out at open time animates as a slide.
+For a popover, set the scale origin to the trigger side (`Popup` sets `Popover.originX` from `trigger`). For an alert, keep the center. Gate a `SizeMotion` on the same surface with `enabled: presence.progress === 1`. Otherwise content that lays out at open time animates as a slide.

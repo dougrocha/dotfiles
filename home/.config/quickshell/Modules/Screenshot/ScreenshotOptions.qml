@@ -19,8 +19,8 @@ Rectangle {
     y: outputY + placed.y
     enabled: ScreenshotSession.optionsOpen
     implicitWidth: 248
-    implicitHeight: optionsColumn.implicitHeight + 16
-    radius: Theme.radius.lg
+    implicitHeight: optionsColumn.implicitHeight + Theme.row.inset * 2
+    radius: Theme.radius.surface
     color: Theme.colors.surface
     border.width: 1
     border.color: Theme.stroke.hairline
@@ -51,7 +51,7 @@ Rectangle {
             top: parent.top
             left: parent.left
             right: parent.right
-            margins: 8
+            margins: Theme.row.inset
         }
         spacing: 0
 
@@ -68,7 +68,7 @@ Rectangle {
             delegate: ScreenshotOptionRow {
                 required property var modelData
 
-                implicitHeight: 28
+                implicitHeight: Theme.row.control
                 glyphSize: Theme.icon.sm
                 label: modelData.label
                 checked: modelData.checked
@@ -78,13 +78,13 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 28
-            radius: Theme.radius.sm
+            implicitHeight: Theme.row.control
+            radius: Theme.radius.row
             color: otherLocationHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
             Text {
                 anchors.left: parent.left
-                anchors.leftMargin: 28
+                anchors.leftMargin: Theme.row.control
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Other location…"
                 color: Theme.accent
@@ -123,8 +123,8 @@ Rectangle {
                     readonly property bool selected: ScreenshotSession.delay === modelData
 
                     Layout.fillWidth: true
-                    implicitHeight: 26
-                    radius: Theme.radius.sm
+                    implicitHeight: Theme.row.compact
+                    radius: Theme.radius.small
                     color: selected ? Theme.fill.selected : (delayHover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0))
 
                     Text {

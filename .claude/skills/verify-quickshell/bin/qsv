@@ -2,6 +2,7 @@
 # Drive and observe the running quickshell session with real input. Run `qsv help`.
 set -uo pipefail
 
+unset LD_LIBRARY_PATH
 export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-/tmp/.ydotool_socket}"
 CAPTURE_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
 EVIDENCE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/verify-quickshell"
@@ -56,7 +57,7 @@ cmd_start() {
 cmd_doctor() {
   local ok=true
   check() { if eval "$2" >/dev/null 2>&1; then echo "ok    $1"; else echo "FAIL  $1  ($3)"; ok=false; fi; }
-  check "one quickshell instance" '[[ $(( $(pgrep -xc qs) + $(pgrep -xc quickshell) )) -eq 1 ]]' "never start a second one"
+  check "one main quickshell instance" '[[ $(qs list 2>/dev/null | grep -cF "Config path: $HOME/.config/quickshell/shell.qml") -eq 1 ]]' "never start a second one"
   check "quickshell answers IPC" 'qs ipc show | grep -q "target screenshot-overlay"' "wait 1s after a reload"
   check "last reload clean" '[[ -z $(cmd_log) ]]' "run: qsv log"
   check "Hyprland answers" 'hyprctl monitors -j | jq -e "length > 0"' "not in a Hyprland session"
@@ -69,7 +70,7 @@ cmd_doctor() {
 
 cmd_log() {
   qs log 2>&1 | tac | awk '{print} /Reloading configuration/{exit}' | tac |
-    grep -v -E 'Reloading configuration|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError|IslandService.qml\[[0-9]+:[0-9]+\]: Unable to assign \[undefined\] to bool' || true
+    grep -v -E 'Reloading configuration|qt.qpa.wayland.textinput|Configuration Loaded|polkit|qt.qpa.services|qt.text.font.db|Could not load icon|quickshell.dbus.properties|QDBusError|IslandService.qml\[[0-9]+:[0-9]+\]: Unable to assign \[undefined\] to bool' || true
 }
 
 cmd_key() {
@@ -160,7 +161,7 @@ cmd_reset() {
 }
 
 cmd_cleanup() {
-  cmd_reset
+  (cmd_reset) || echo "qsv: reset could not release input; cleanup continues" >&2
   local dir
   dir=$(run_dir)
   if [[ -f $dir/.notifications ]]; then

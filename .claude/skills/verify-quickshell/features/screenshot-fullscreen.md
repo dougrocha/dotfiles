@@ -1,12 +1,12 @@
 # Fullscreen screenshot
 
-Fullscreen screenshot saves one file per monitor with no overlay. Each file goes to the clipboard in turn, so the clipboard ends with the last monitor's file. One toast shows both thumbnails at the bottom right of DP-1 for 5 seconds. With several monitors, each file name ends with the monitor name.
+Fullscreen screenshot saves one file per monitor with no overlay. Each file goes to the clipboard in turn, in `hyprctl monitors` order, so the clipboard ends with the last monitor's file. One toast shows both thumbnails at the bottom right of DP-1 for 5 seconds. With several monitors, each file name ends with the monitor name.
 
 ## Sub-features
 
 - `fullscreen-bind` saves one file per monitor from the keybind.
 - `fullscreen-toolbar` does the same from the toolbar's fullscreen mode after you choose Capture. It also applies the toolbar's options, such as Show Cursor and the save folder.
-- `fullscreen-toast` shows one toast for the batch. Hover pauses it, and a click opens the image.
+- `fullscreen-toast` shows one toast for the batch. Hover pauses it, and a click opens the in-shell editor.
 
 ## How to get to it (user POV)
 
@@ -28,4 +28,4 @@ Preconditions:
 
 - The file name has a timestamp to the second. Two runs in the same second write the same name.
 - Before grim runs, `wait-screenshot-overlay` (in `home/.local/bin`) waits for every `qs.screenshot_overlay` layer to unmap. It checks up to 50 times, 20 ms apart, plus the time of each `hyprctl layers` call. When an overlay never closes, the capture runs anyway.
-- Clicking the toast opens the image in `imv`. Do not click it unless the task is about that.
+- Clicking the toast opens the image in the in-shell screenshot editor. Do not click it unless the task is about that. Close the editor with `qs ipc call screenshot-editor close`.

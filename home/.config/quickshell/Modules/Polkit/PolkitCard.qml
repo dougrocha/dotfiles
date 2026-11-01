@@ -72,9 +72,9 @@ Rectangle {
         event.accepted = true;
     }
 
-    width: 360
+    width: Theme.dialog.width
     height: body.implicitHeight + Theme.space.xxl * 2
-    radius: Theme.radius.xl
+    radius: Theme.radius.surface
     color: Theme.colors.surface
     border.width: 1
     border.color: Theme.stroke.hairline
@@ -132,16 +132,7 @@ Rectangle {
             spacing: 0
 
             Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: PhosphorIcons.lock
-                color: Theme.text.secondary
-                font.family: Theme.font.iconFill
-                font.pixelSize: Theme.icon.xxl
-            }
-
-            Text {
                 Layout.fillWidth: true
-                Layout.topMargin: Theme.space.lg
                 text: card.request.title
                 textFormat: Text.PlainText
                 horizontalAlignment: Text.AlignHCenter
@@ -150,7 +141,7 @@ Rectangle {
                 elide: Text.ElideRight
                 color: Theme.text.primary
                 font.family: Theme.font.ui
-                font.pixelSize: Theme.type.title.size
+                font.pixelSize: Theme.type.heading.size
                 font.weight: Theme.type.title.weight
             }
 
@@ -190,7 +181,7 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.topMargin: Theme.space.xl
                 implicitHeight: formRows.implicitHeight
-                radius: Theme.radius.md
+                radius: Theme.radius.control
                 color: Theme.colors.bg
                 border.width: 1
                 border.color: alarm ? Theme.danger : passwordField.activeFocus || card.menuOpen ? Theme.stroke.accent : Theme.stroke.hairline
@@ -343,7 +334,7 @@ Rectangle {
         required property string label
 
         Layout.fillWidth: true
-        Layout.preferredHeight: 34
+        Layout.preferredHeight: Theme.row.action
         Layout.leftMargin: Theme.space.lg
         Layout.rightMargin: Theme.space.lg
         spacing: Theme.space.md
@@ -366,8 +357,8 @@ Rectangle {
         readonly property bool highlighted: modelData.key === card.menuHighlight || optionHover.hovered
 
         Layout.fillWidth: true
-        implicitHeight: 28
-        radius: Theme.radius.sm
+        implicitHeight: Theme.row.control
+        radius: Theme.radius.small
         color: highlighted ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
 
         Behavior on color {
@@ -430,8 +421,8 @@ Rectangle {
 
         Layout.fillWidth: true
         Layout.preferredWidth: 1
-        implicitHeight: 30
-        radius: Theme.radius.md
+        implicitHeight: Theme.row.action
+        radius: Theme.radius.control
         opacity: available ? 1 : 0.5
         color: isDefault ? (buttonTap.pressed ? Qt.darker(Theme.accent, 1.15) : buttonHover.hovered ? Qt.lighter(Theme.accent, 1.08) : Theme.accent) : buttonTap.pressed || buttonHover.hovered ? Theme.fill.strong : Theme.fill.press
 

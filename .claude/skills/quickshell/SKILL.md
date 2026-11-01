@@ -22,21 +22,25 @@ The config is in `home/.config/quickshell/` in this repo. `~/.config/quickshell`
 | `Services/Desktop.qml`         | Screens and Hyprland state: `primaryScreen(s)`, `focusedScreen()`, `fullscreenKind(screen)` (`none`, `exclusive`, `windowed`), `activeWorkspaceId(screen)`, `openSpecial(screen)`, `isShowing(name)`, `visibleWindows()` (plain rects for the screenshot picker), the commands `focusWorkspace(id)`, `focusNamedWorkspace(name)`, `toggleSpecial(name)`, `setSubmap(name)`, and the one refresh policy. `toggleFullscreen()` (Super+F) puts a browser below the bar as a tagged floating window (`windowed`), and gives every other app real fullscreen (`exclusive`). `placeFullscreen(screen, barShown)` lets `BarService` move that window. | Read monitors, workspaces and fullscreen through it, and dispatch through it. Do not call `Hyprland.dispatch`, `Hyprland.refresh*` or read `lastIpcObject` elsewhere. |
 | `Services/ScreenshotSession.qml` | The screenshot session: `selecting` and `counting`, selection, drag, options, toolbar placement, countdown, capture argv, and the IPC target `screenshot-overlay`. `ScreenshotGeometry.js` next to it holds the maths. | `Modules/Screenshot/` views read it and call `beginDrag`, `dragTo`, `endDrag`, `capture`, `dismiss`, and the option commands. They never write its state. |
 | `Services/SettingsService.qml` | User settings. It writes them to `$XDG_STATE_HOME/quickshell/settings.json`. If `XDG_STATE_HOME` is not set, it uses `$HOME/.local/state`.                                                         | Add a persistent setting here. Put a feature's settings in its own `JsonObject` section, and read them as `SettingsService.<section>.<key>`. |
-| `Components/`                  | Shared controls: `Popup`, `Presence`, `SizeMotion`, `ContentFade`, `SpringMotion`, `PanelHeader`, `PanelGroup`, `PanelRow`, `DeviceRow`, `PanelFooterLink`, `Switch`, `SectionLabel`, `Divider`, `IconActionButton`, `IconButton`, `CloseBadge`, `TextLink`, sliders. | Use a component from here before you make a new one.                                  |
+| `Components/`                  | Shared controls: `Popover`, `Popup`, `PanelCard`, `PanelScroll`, `Presence`, `SizeMotion`, `ContentFade`, `SpringMotion`, `PanelHeader`, `PanelGroup`, `PanelRow`, `DeviceRow`, `PanelFooterLink`, `Switch`, `SectionLabel`, `Divider`, `IconActionButton`, `IconButton`, `CloseBadge`, `TextLink`, sliders. | Use a component from here before you make a new one.                                  |
 | `Modules/<Name>/`              | One feature for each directory: `Bar`, `Notifications`, `Popups`, `Island`, `Screenshot`, `Polkit`, `Dictation`, `TooltipOverlay`.                | Keep files for one feature in its directory. For a window on each monitor, use `Variants { model: Quickshell.screens }` with a `PanelWindow` delegate. |
 | `Widgets/`                     | Small items that the bar uses: clock, tray.                                                                                          |                                                                                       |
-| `palette.json`                 | Colors from matugen. `Theme.qml` reads this file and watches it for changes.                                                         | Do not edit it. Matugen writes it.                                                    |
+| `palette.json`                 | Resolved colors: the neutral ramp, the clamped accent and `accentText`. `Theme.qml` reads this file and watches it for changes.      | Do not edit it. `~/.config/matugen/ramp` writes it, after matugen.                    |
 | `format`                       | A script that runs `qmlformat` on the files you pass, or on all QML files when you pass none.                                        |                                                                                       |
 
 Imports use the `qs.` prefix, for example `import qs.Components` and `import qs.Services`.
 
-A bar panel (settings, sound, Bluetooth, notification center) has four parts: a key in `Visibilities.names` (its value is also the IPC target, which `Visibilities` registers), a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml` that sets `trigger` to the bar control, and the bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. `Popup` sets the position, `shown`, and the enter and exit motion, and closes the panel when the user dismisses it. Use `onOpened` for work at open time. Call `panel.close()` to close the panel from a control.
+`Popover` (`Components/Popover.qml`) owns everything a popup window needs: the `PopupWindow`, `PopupGrab`, `Presence` motion, the mask, focus and Escape, the `SizeMotion` on the card height, and the available height (screen height minus the host window). It hosts a `PanelCard`, a plain surface that renders without a window. Its interface is `open`, `menu` (raised card with a hairline border and `row.inset` padding, for menus), `hostWindow`, `originX` (scale origin), the default `content`, and the signals `opened`, `dismissed`, `hidden`. It does not place itself. Two thin adapters add placement and the open flag: `Popup` for bar panels (right-aligned under the bar, scale from the trigger) and `Modules/Popups/TrayMenuPopup.qml` for tray menus (centered under the tray item, clamped).
+
+Content declares at most one region that scrolls: a `PanelScroll` (`Components/PanelScroll.qml`). It finds its `PanelCard`, which works out the cap once: `maxHeight` minus the padding and minus the height of everything else in the card. Do not subtract heights by hand and do not write a `Flickable`. `PanelScroll` keeps the hover bleed (`bleed`, default `Theme.panel.rowBleed`, `0` for menus) and takes an optional `limit`, for example `Theme.row.menu * Theme.panel.visibleRows`. Put `PanelScroll` only where the card has a cap, which is any `Popover`, or a `PanelCard` with `maxHeight` set. Without a cap it grows to its content.
+
+A bar panel (settings, sound, Bluetooth, notification center) has four parts: a key in `Visibilities.names` (its value is also the IPC target, which `Visibilities` registers), a `Popup` file in `Modules/Popups/`, a `LazyLoader` instance in `Modules/Bar/Bar.qml` that sets `trigger` to the bar control, and the bar control. Copy them from "Add a bar panel" in `references/qml-patterns.md`. `Popup` sets `open` from `Visibilities`, the position and the scale origin, and closes the panel when the user dismisses it. Use `onOpened` for work at open time. Call `panel.close()` to close the panel from a control.
 
 `Visibilities` has one slot, so only one panel or tray menu is open at a time. `Visibilities.close(name)` closes only that panel, so a late dismiss from an old panel does not close the new panel. `open` warns and ignores a name that is not in `names`. Call `dismissAll()` to clear the panel and the tray menu, for example when a control launches an app.
 
 A service does not own panel visibility. A service can read `Visibilities.isOpen(...)`, for example to hide the OSD while the sound panel is open.
 
-Two panels do not use `Popup`. Tray menus use `Modules/Popups/TrayMenuPopup.qml`, a `PopupWindow` whose `open` flag `Widgets/TraySection.qml` binds to `Visibilities.trayMenu`. Open them with `toggleTrayMenu(screen, itemId)` and close them with `closeTrayMenu()`. The music panel is part of `Modules/Island/`.
+Tray menus are the other `Popover` adapter. `Modules/Popups/TrayMenuPopup.qml` has an `open` flag that `Widgets/TraySection.qml` binds to `Visibilities.trayMenu`. Open them with `toggleTrayMenu(screen, itemId)` and close them with `closeTrayMenu()`. The music panel is part of `Modules/Island/` and does not use `Popover`.
 
 ### 1.1 Architecture style
 
@@ -101,16 +105,18 @@ Use only tokens from `Theme.qml` for these values:
 
 | Value             | Token                                                                                                 |
 | ----------------- | ----------------------------------------------------------------------------------------------------- |
-| Surface color     | `Theme.colors.bg`, `.surface`, `.raised`, `.overlay`                                                  |
+| Surface color     | `Theme.colors.bg`, `.surface`, `.raised`, `.overlay`: a fixed neutral lightness ramp tinted with the matugen accent hue. The ramp numbers and rules live only in `home/.config/matugen/ramp`, which writes `palette.json` and Walker's `colors.css`. Theme reads the result and has no ramp math. To change the ramp, edit the script. |
 | Text color        | `Theme.text.primary`, `.secondary`, `.tertiary`                                                       |
 | State fill        | `Theme.fill.hover`, `.press`, `.strong`, `.selected`                                                  |
 | Line              | `Theme.stroke.hairline`, `.strong`, `.accent`                                                         |
 | Accent and status | `Theme.accent`, `Theme.danger`, `Theme.caution`                                                       |
-| Panel             | `Theme.panel.width` (320), `.padding` (12), `.rowBleed` (6)                                          |
+| Panel             | `Theme.panel.width` (360), `.padding` (16), `.rowBleed` (10), `.menuWidth` (240), `.visibleRows` (4.5, scroll cap for growing lists); `Theme.toast.width` (372); `Theme.dialog.width` (400) |
+| Row height        | `Theme.row.tile` (44), `.menu` (36), `.button` (36), `.action` (32), `.control` (28), `.compact` (26), `.badge` (20), `.separator` (17); row geometry `.inset` (6), `.gap` (10) |
+| Control size      | `Theme.control.switchWidth` (34), `.switchHeight` (18), `.track` (4), `.volumeHeight` (22) |
 | Spacing           | `Theme.space.xxs` (2) to `.xxl` (24)                                                                  |
-| Radius            | `Theme.radius.xxs` (2) to `.xxl` (24)                                                                 |
+| Radius            | By role: `Theme.radius.island` (24, expanded Island only), `.surface` (16), `.hud` (12), `.row` (10), `.control` (8), `.small` (6), `.track` (2) |
 | Icon size         | `Theme.icon.xxs` (12) to `.xxl` (40)                                                                  |
-| Type              | `Theme.type.title`, `.body`, `.label`, `.caption`, `.mono`, `.display` (each has `size`, `weight`, and `tracking`) |
+| Type              | `Theme.type.display` (21), `.heading` (17), `.title` (14 medium), `.body` (13), `.label` (12 medium), `.caption` (12), `.mono` (13) (each has `size` and `weight`; `label` and `mono` have `tracking`) |
 | Motion            | `Theme.motion.fast` (140), `.normal` (200), `.slow` (320), and the easing tokens                      |
 | Font              | `Theme.font.ui`, `.mono`, `.icon`, `.iconFill`                                                        |
 
@@ -123,7 +129,8 @@ If a token does not exist, add it to `Theme.qml`. Do not write the value in the 
 
 - Use one level of container. A popup is a card already (`Popup`). Do not put a filled card or a bordered card in it.
 - Make groups with spacing, `Divider`, and hover fills.
-- Card radius is `Theme.radius.xl`. Controls in a card use `radius.md` or `radius.sm`.
+- Pick a radius by role, never by look. `surface`: cards, popups, menus, toasts, toolbars, the Island notification. `hud`: floating overlays. `row`: row fills at the 6 px `row.inset`. `control`: buttons, fields, artwork, window highlights. `small`: chips, tooltips, bar plates, items in a menu with less inset. Write pills as `height / 2` and dots as `width / 2`. Nested corners are concentric: inner radius = outer radius − inset, rounded down to the nearest step. A container with rows uses `row.inset` padding, so the rows can stay on `row`.
+- The sizes follow Tinycast's launcher: one font everywhere (`Theme.font.ui`, JetBrains Mono), 13 px body and 12 px small text, 38 px list rows, 44 px control tiles (`row.tile`), 36 px menu rows (`row.menu`), 32 px compact buttons (`row.action`), section labels 4 px above their content, row fills inset 6 px with 10 px radius. Use the `row` tokens for row and control heights instead of literals.
 - Use a border or a shadow for elevation. Do not use the two together on one surface.
 - Use a solid fill for a critical item: `Qt.tint(Theme.colors.surface, Theme.withAlpha(Theme.danger, 0.12))`. A transparent fill shows the desktop behind the window.
 

@@ -38,7 +38,7 @@ Variants {
             right: true
         }
 
-        implicitWidth: 384
+        implicitWidth: Theme.toast.width + Theme.space.lg
 
         implicitHeight: Math.max(1, modelData.height - Theme.topBarHeight)
 
@@ -48,7 +48,7 @@ Variants {
             anchors.right: parent.right
             anchors.topMargin: Theme.space.lg
             anchors.rightMargin: Theme.space.lg
-            width: 372
+            width: Theme.toast.width
             spacing: Theme.space.sm
 
             HoverHandler {

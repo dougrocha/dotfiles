@@ -2,11 +2,13 @@ import qs.Constants
 
 IconButton {
     property string icon: ""
-    property int iconSize: 20
+    property int iconSize: Theme.icon.md
 
     glyph: icon
     glyphSize: iconSize
-    box: filled ? 0 : 28
+    box: iconSize + Theme.space.xl
+    solid: true
+    hoverFill: true
     restColor: Theme.text.primary
-    hoverColor: Theme.accent
+    hoverColor: Theme.text.primary
 }

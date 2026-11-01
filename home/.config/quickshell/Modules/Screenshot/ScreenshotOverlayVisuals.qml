@@ -43,7 +43,7 @@ Item {
         y: targetWindow != null ? targetWindow.y - root.outputOriginY : 0
         width: targetWindow != null ? targetWindow.width : 0
         height: targetWindow != null ? targetWindow.height : 0
-        radius: Theme.radius.md
+        radius: Theme.radius.control
         color: Theme.withAlpha(root.selectionColor, 0.08)
         border.width: 1
         border.color: root.selectionColor
@@ -136,7 +136,7 @@ Item {
                 y: regionVisuals.sy + regionVisuals.sh * fy - height / 2
                 width: 8
                 height: 8
-                radius: Theme.radius.xs
+                radius: width / 2
                 color: root.selectionColor
                 border.width: 1
                 border.color: Theme.foregroundFor(root.selectionColor)
@@ -167,7 +167,7 @@ Item {
             }
             width: sizeText.implicitWidth + 16
             height: sizeText.implicitHeight + 10
-            radius: Theme.radius.sm
+            radius: Theme.radius.small
             color: Theme.colors.raised
             border.width: 1
             border.color: Theme.stroke.hairline

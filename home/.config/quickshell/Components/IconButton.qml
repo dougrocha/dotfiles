@@ -10,6 +10,8 @@ Rectangle {
     property bool filled: false
     property bool plate: false
     property bool open: false
+    property bool solid: false
+    property bool hoverFill: false
 
     property bool active: false
     property color restColor: plate ? Theme.text.primary : Theme.text.secondary
@@ -25,9 +27,15 @@ Rectangle {
 
     implicitWidth: side > 0 ? side : plate ? plateWidth : glyphLabel.implicitWidth
     implicitHeight: side > 0 ? side : Theme.topBarHeight
-    radius: filled ? width / 2 : 0
-    color: filled ? Theme.fill.press : Theme.withAlpha(Theme.fill.press, 0)
-    scale: plate && tap.pressed ? Theme.motion.pressScale : 1
+    radius: filled || hoverFill ? width / 2 : 0
+    color: filled || (hoverFill && tap.pressed) ? Theme.fill.press : hoverFill && hover.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.press, 0)
+    scale: (plate || hoverFill) && tap.pressed ? Theme.motion.pressScale : 1
+
+    Behavior on color {
+        ColorAnimation {
+            duration: Theme.motion.fast
+        }
+    }
 
     Behavior on scale {
         NumberAnimation {
@@ -57,7 +65,7 @@ Rectangle {
         text: root.glyph
         color: root.active ? root.activeColor : hover.hovered ? root.hoverColor : root.restColor
         font.pixelSize: root.glyphSize
-        font.family: root.active ? Theme.font.iconFill : Theme.font.icon
+        font.family: root.active || root.solid ? Theme.font.iconFill : Theme.font.icon
 
         Behavior on color {
             ColorAnimation {

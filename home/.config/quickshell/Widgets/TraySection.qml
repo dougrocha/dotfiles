@@ -194,8 +194,8 @@ Item {
 
     Rectangle {
         visible: root.dragSource !== null
-        width: 24
-        height: 24
+        width: Theme.bar.plateHeight
+        height: Theme.bar.plateHeight
         radius: Theme.bar.plateRadius
         color: "transparent"
         border.width: 1
@@ -206,8 +206,8 @@ Item {
     }
     IconImage {
         visible: root.dragSource !== null
-        width: 16
-        height: 16
+        width: Theme.icon.sm
+        height: Theme.icon.sm
         source: root.draggedTrayItem?.icon ?? ""
         x: root.dragPoint().x - width / 2
         y: root.dragPoint().y - height / 2
@@ -234,7 +234,7 @@ Item {
         anchorItem: root.activeAnchor
         open: root.menuHere && root.activeAnchor !== null
         menuOpener: menuOpener
-        onCloseRequested: Visibilities.closeTrayMenu()
+        onDismissed: Visibilities.closeTrayMenu()
         onHidden: root.release()
     }
 }
