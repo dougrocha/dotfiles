@@ -89,4 +89,5 @@ To examine a hover state, run `qsv at <x> <y>`. It moves the pointer and starts 
 ## 7. Known problems
 
 - After you change `Theme.qml`, a clean reload shows only that the file parsed. Search for the modules that use the changed token. Examine them too.
+- A hot reload does not register a new inline component name (`component Foo: ...`). The log says `Foo is not a type` at its declaration, even when the code is correct. Reuse an inline component name that the running instance already knows, put the part in its own file, or ask the user to restart Quickshell.
 - When you rename tokens with `sd`, replace the longer name first. For example, `Theme.fill.selected` is the start of `Theme.fill.selectedSolid`. After the rename, search for broken names such as `selectedSolid[A-Za-z]`.

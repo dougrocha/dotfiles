@@ -196,7 +196,7 @@ Item {
         visible: root.dragSource !== null
         width: 24
         height: 24
-        radius: Theme.radius.lg
+        radius: Theme.bar.plateRadius
         color: "transparent"
         border.width: 1
         border.color: Theme.stroke.strong

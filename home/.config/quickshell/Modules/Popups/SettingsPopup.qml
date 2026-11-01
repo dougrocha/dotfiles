@@ -22,97 +22,84 @@ Popup {
         SunsetService.refresh();
     }
 
-    component ControlRow: DeviceRow {
-        detail: selected ? "On" : "Off"
+    component ControlRow: PanelRow {
+        id: controlRow
+
+        required property string label
+        required property bool checked
+
+        implicitHeight: Theme.panel.menuRowHeight
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            textFormat: Text.PlainText
+            elide: Text.ElideRight
+            color: Theme.text.primary
+            font.family: Theme.font.ui
+            font.pixelSize: Theme.type.body.size
+            anchors.left: parent.left
+            anchors.right: toggleSwitch.left
+            anchors.rightMargin: Theme.space.md
+            text: controlRow.label
+        }
+
+        Switch {
+            id: toggleSwitch
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            enabled: false
+            active: controlRow.checked
+        }
     }
 
-    component BatteryRow: DeviceRow {
+    component BatteryRow: PanelRow {
         id: batteryRow
 
+        required property string label
         required property int percent
         property bool charging: false
         readonly property color levelColor: charging || percent > 20 ? Theme.text.secondary : percent > 10 ? Theme.caution : Theme.danger
 
-        Text {
-            visible: batteryRow.charging
-            anchors.verticalCenter: parent.verticalCenter
-            text: PhosphorIcons.batteryCharging
-            color: Theme.accent
-            font.family: Theme.font.icon
-            font.pixelSize: Theme.icon.xxs
-        }
+        implicitHeight: Theme.panel.menuRowHeight
 
         Text {
             anchors.verticalCenter: parent.verticalCenter
-            text: batteryRow.percent + "%"
-            color: batteryRow.levelColor
+            textFormat: Text.PlainText
+            elide: Text.ElideRight
+            color: Theme.text.primary
             font.family: Theme.font.ui
-            font.pixelSize: Theme.type.label.size
-            font.weight: Theme.type.label.weight
+            font.pixelSize: Theme.type.body.size
+            anchors.left: parent.left
+            anchors.right: batteryLevel.left
+            anchors.rightMargin: Theme.space.md
+            text: batteryRow.label
         }
-    }
 
-    component PowerButton: Item {
-        id: powerButton
+        Row {
+            id: batteryLevel
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.space.xs
 
-        required property string glyph
-        required property string label
-        property bool danger: false
-
-        signal tapped
-
-        width: parent.width / 4
-        height: powerColumn.implicitHeight
-
-        Column {
-            id: powerColumn
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: Theme.space.sm
-
-            Rectangle {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 40
-                height: 40
-                radius: height / 2
-                color: {
-                    if (!powerHover.hovered)
-                        return Theme.fill.press;
-                    return powerButton.danger ? Theme.danger : Theme.fill.strong;
-                }
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.motion.fast
-                    }
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: powerButton.glyph
-                    color: powerButton.danger && powerHover.hovered ? Theme.colors.surface : Theme.text.primary
-                    font.family: Theme.font.iconFill
-                    font.pixelSize: Theme.icon.sm
-                }
+            Text {
+                visible: batteryRow.charging
+                anchors.verticalCenter: parent.verticalCenter
+                text: PhosphorIcons.batteryCharging
+                color: Theme.text.secondary
+                font.family: Theme.font.iconFill
+                font.pixelSize: Theme.icon.xxs
             }
 
             Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: powerButton.label
-                color: Theme.text.secondary
+                anchors.verticalCenter: parent.verticalCenter
+                text: batteryRow.percent + "%"
+                color: batteryRow.levelColor
                 font.family: Theme.font.ui
-                font.pixelSize: Theme.type.caption.size
+                font.pixelSize: Theme.type.body.size
+                font.features: ({
+                        "tnum": 1
+                    })
             }
-        }
-
-        HoverHandler {
-            id: powerHover
-
-            cursorShape: Qt.PointingHandCursor
-        }
-
-        TapHandler {
-            onTapped: powerButton.tapped()
         }
     }
 
@@ -127,30 +114,26 @@ Popup {
             width: parent.width
 
             ControlRow {
-                glyph: PhosphorIcons.lockSimple
                 label: "Idle lock"
-                selected: IdleService.active
+                checked: IdleService.active
                 onTapped: IdleService.toggle()
             }
 
             ControlRow {
-                glyph: PhosphorIcons.bellSlash
                 label: "Do not disturb"
-                selected: SettingsService.doNotDisturb
+                checked: SettingsService.doNotDisturb
                 onTapped: SettingsService.doNotDisturb = !SettingsService.doNotDisturb
             }
 
             ControlRow {
-                glyph: PhosphorIcons.moon
                 label: "Night light"
-                selected: SunsetService.active
+                checked: SunsetService.active
                 onTapped: SunsetService.toggle()
             }
 
             ControlRow {
-                glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
                 label: "Microphone"
-                selected: !AudioService.sourceMuted
+                checked: !AudioService.sourceMuted
                 onTapped: AudioService.toggleSourceMute()
             }
         }
@@ -171,7 +154,6 @@ Popup {
                 delegate: BatteryRow {
                     required property var modelData
 
-                    glyph: DeviceBatteryService.upowerIcon(modelData)
                     label: modelData.model
                     percent: Math.round(modelData.percentage * 100)
                     charging: modelData.state === UPowerDeviceState.Charging
@@ -187,7 +169,6 @@ Popup {
                 delegate: BatteryRow {
                     required property var modelData
 
-                    glyph: modelData.icon
                     label: modelData.name
                     percent: Math.round(modelData.battery * 100)
                 }
@@ -197,39 +178,56 @@ Popup {
 
     Column {
         width: parent.width
-        spacing: Theme.space.lg
+        spacing: Theme.space.sm
 
         Divider {}
 
-        Row {
+        Column {
             width: parent.width
 
-            PowerButton {
-                glyph: PhosphorIcons.lockSimple
-                label: "Lock"
-                onTapped: {
-                    Quickshell.execDetached(["loginctl", "lock-session"]);
-                    panel.close();
+            Repeater {
+                model: [
+                    {
+                        label: "Lock Screen",
+                        run: () => {
+                            Quickshell.execDetached(["loginctl", "lock-session"]);
+                            panel.close();
+                        }
+                    },
+                    {
+                        label: "Log Out",
+                        run: () => panel.hyprshutdown("Logging out...", "")
+                    },
+                    {
+                        label: "Restart",
+                        run: () => panel.hyprshutdown("Restarting...", "systemctl reboot")
+                    },
+                    {
+                        label: "Shut Down",
+                        run: () => panel.hyprshutdown("Shutting down...", "shutdown -P 0")
+                    }
+                ]
+
+                delegate: PanelRow {
+                    id: actionRow
+
+                    required property var modelData
+
+                    implicitHeight: Theme.panel.menuRowHeight
+                    onTapped: modelData.run()
+
+                    Text {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: actionRow.modelData.label
+                        textFormat: Text.PlainText
+                        elide: Text.ElideRight
+                        color: Theme.text.primary
+                        font.family: Theme.font.ui
+                        font.pixelSize: Theme.type.body.size
+                    }
                 }
-            }
-
-            PowerButton {
-                glyph: PhosphorIcons.signOut
-                label: "Log out"
-                onTapped: panel.hyprshutdown("Logging out...", "")
-            }
-
-            PowerButton {
-                glyph: PhosphorIcons.arrowCounterClockwise
-                label: "Restart"
-                onTapped: panel.hyprshutdown("Restarting...", "systemctl reboot")
-            }
-
-            PowerButton {
-                glyph: PhosphorIcons.power
-                label: "Shut down"
-                danger: true
-                onTapped: panel.hyprshutdown("Shutting down...", "shutdown -P 0")
             }
         }
     }

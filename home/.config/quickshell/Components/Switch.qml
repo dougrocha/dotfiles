@@ -25,7 +25,7 @@ Rectangle {
         width: root.height - 4
         height: width
         radius: width / 2
-        color: root.active ? Theme.accentText : Theme.text.secondary
+        color: Theme.knob
 
         Behavior on x {
             NumberAnimation {

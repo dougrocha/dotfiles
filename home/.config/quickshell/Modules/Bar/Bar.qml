@@ -74,87 +74,65 @@ Variants {
             }
 
             Rectangle {
+                id: tint
                 anchors.fill: parent
-                color: Theme.colors.bg
-                opacity: topBar.autoHide ? 1 : 0
 
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.motion.fast
-                    }
+                function tintAt(alpha) {
+                    return Theme.withAlpha(Theme.colors.bg, topBar.autoHide ? 1 : alpha);
                 }
 
-                Rectangle {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    height: 1
-                    color: Theme.stroke.hairline
+                gradient: Gradient {
+                    GradientStop {
+                        position: 0
+                        color: tint.tintAt(Theme.bar.tintTop)
+                    }
+                    GradientStop {
+                        position: 0.55
+                        color: tint.tintAt(Theme.bar.tintMid)
+                    }
+                    GradientStop {
+                        position: 1
+                        color: tint.tintAt(0)
+                    }
                 }
             }
 
-            BarPill {
-                faded: topBar.autoHide
+            Workspaces {
+                screen: topBar.modelData
                 anchors.left: parent.left
-                anchors.leftMargin: Theme.space.md
+                anchors.leftMargin: Theme.bar.edgeMargin
                 anchors.verticalCenter: parent.verticalCenter
-                width: workspaceModule.implicitWidth + Theme.space.md
-                clip: true
-
-                SizeMotion on width {}
-
-                Workspaces {
-                    id: workspaceModule
-                    screen: topBar.modelData
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.space.md / 2
-                    anchors.verticalCenter: parent.verticalCenter
-                }
             }
 
-            BarPill {
-                id: indicatorPill
-
-                faded: topBar.autoHide
-
-                readonly property int rightPadding: 14
-                readonly property int leftPadding: traySection.visible ? rightPadding - 4 : rightPadding
-
+            RowLayout {
+                id: indicatorRow
                 anchors.right: parent.right
-                anchors.rightMargin: Theme.space.md
+                anchors.rightMargin: Theme.bar.edgeMargin
                 anchors.verticalCenter: parent.verticalCenter
-                width: indicatorRow.implicitWidth + leftPadding + rightPadding
-                RowLayout {
-                    id: indicatorRow
-                    anchors.right: parent.right
-                    anchors.rightMargin: indicatorPill.rightPadding
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.space.lg
+                spacing: Theme.space.xxs
 
-                    TraySection {
-                        id: traySection
-                        Layout.rightMargin: Theme.space.md - indicatorRow.spacing
-                    }
+                TraySection {
+                    id: traySection
+                }
 
-                    CpuIndicator {}
+                CpuIndicator {}
 
-                    BluetoothIndicator {
-                        id: bluetoothIndicator
-                    }
+                BluetoothIndicator {
+                    id: bluetoothIndicator
+                }
 
-                    VolumeIndicator {
-                        id: volumeIndicator
-                    }
+                VolumeIndicator {
+                    id: volumeIndicator
+                }
 
-                    SettingsButton {
-                        id: settingsButton
-                    }
+                SettingsButton {
+                    id: settingsButton
+                }
 
-                    DoNotDisturbIndicator {}
+                DoNotDisturbIndicator {}
 
-                    ClockButton {
-                        id: clockButton
-                    }
+                ClockButton {
+                    id: clockButton
                 }
             }
         }
@@ -192,20 +170,6 @@ Variants {
             NotificationPopup {
                 anchor.window: topBar
                 trigger: clockButton
-            }
-        }
-    }
-
-    component BarPill: Rectangle {
-        property bool faded: false
-
-        height: Theme.topBarHeight - 8
-        radius: height / 2
-        color: faded ? Theme.withAlpha(Theme.colors.surface, 0) : Theme.colors.surface
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Theme.motion.fast
             }
         }
     }

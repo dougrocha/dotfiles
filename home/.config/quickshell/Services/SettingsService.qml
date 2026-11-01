@@ -68,7 +68,7 @@ Singleton {
 
             property int weekStart: 1
 
-            property string clockFormat: "h:mmAP"
+            property string clockFormat: "h:mm AP"
 
             property JsonObject tray: JsonObject {
                 id: traySettings

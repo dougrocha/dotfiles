@@ -64,6 +64,20 @@ Item {
         Desktop.focusWorkspace(id);
     }
 
+    readonly property Item activeCell: {
+        for (let i = 0; i < labelRepeater.count; ++i) {
+            const cell = labelRepeater.itemAt(i);
+            if (cell?.current)
+                return cell;
+        }
+        for (let i = 0; i < numberRepeater.count; ++i) {
+            const cell = numberRepeater.itemAt(i);
+            if (cell?.current)
+                return cell;
+        }
+        return null;
+    }
+
     implicitWidth: row.implicitWidth
     implicitHeight: Theme.topBarHeight
 
@@ -76,15 +90,19 @@ Item {
         readonly property bool current: root.activeWorkspaceId === modelData
         readonly property bool occupied: root.isOccupied(workspace)
 
-        implicitWidth: 22
+        implicitWidth: Theme.bar.plateHeight
         implicitHeight: Theme.topBarHeight
+
+        BarPlate {
+            hovered: hover.hovered && !cell.current
+        }
 
         Text {
             anchors.centerIn: parent
-            text: cell.current ? PhosphorIcons.circle : cell.modelData === 10 ? "0" : String(cell.modelData)
-            color: cell.current || hover.hovered ? Theme.text.primary : cell.occupied ? Theme.text.secondary : Theme.text.tertiary
-            font.family: cell.current ? Theme.font.iconFill : Theme.font.mono
-            font.pixelSize: cell.current ? Theme.icon.xxs : Theme.type.mono.size
+            text: cell.modelData === 10 ? "0" : String(cell.modelData)
+            color: cell.current || hover.hovered ? Theme.text.primary : cell.occupied ? Theme.text.primary : Theme.text.secondary
+            font.family: Theme.font.mono
+            font.pixelSize: Theme.type.mono.size
             font.weight: Theme.type.mono.weight
 
             Behavior on color {
@@ -112,18 +130,23 @@ Item {
 
         readonly property bool current: root.isCurrentExtra(modelData)
 
-        implicitWidth: labelText.implicitWidth + Theme.space.sm * 2
+        implicitWidth: labelText.implicitWidth + Theme.bar.platePadding * 2
         implicitHeight: Theme.topBarHeight
         Layout.leftMargin: index === 0 ? Theme.space.xs : 0
+
+        BarPlate {
+            hovered: labelHover.hovered && !label.current
+        }
 
         Text {
             id: labelText
             anchors.centerIn: parent
             text: root.labelFor(label.modelData)
-            color: label.current || labelHover.hovered ? Theme.text.primary : Theme.text.secondary
+            color: Theme.text.primary
             font.family: Theme.font.mono
             font.pixelSize: Theme.type.mono.size
             font.weight: Theme.type.mono.weight
+            font.letterSpacing: Theme.type.mono.tracking
 
             Behavior on color {
                 ColorAnimation {
@@ -142,12 +165,46 @@ Item {
         }
     }
 
+    Rectangle {
+        id: indicator
+
+        readonly property real targetStart: root.activeCell ? row.x + root.activeCell.x : 0
+        readonly property real targetEnd: root.activeCell ? targetStart + root.activeCell.width : 0
+        property real start: targetStart
+        property real end: targetEnd
+
+        visible: root.activeCell !== null
+        x: start
+        width: end - start
+        height: Theme.bar.plateHeight
+        anchors.verticalCenter: parent.verticalCenter
+        radius: Theme.bar.plateRadius
+        color: Theme.fill.strong
+
+        Behavior on start {
+            id: startMotion
+            NumberAnimation {
+                duration: startMotion.targetValue > indicator.start ? Theme.motion.slow : Theme.motion.normal
+                easing.type: Theme.motion.easeStandard
+            }
+        }
+
+        Behavior on end {
+            id: endMotion
+            NumberAnimation {
+                duration: endMotion.targetValue < indicator.end ? Theme.motion.slow : Theme.motion.normal
+                easing.type: Theme.motion.easeStandard
+            }
+        }
+    }
+
     RowLayout {
         id: row
         anchors.centerIn: parent
         spacing: 0
 
         Repeater {
+            id: numberRepeater
             model: ScriptModel {
                 values: root.workspaceIds
             }
@@ -156,6 +213,7 @@ Item {
         }
 
         Repeater {
+            id: labelRepeater
             model: ScriptModel {
                 values: root.extraWorkspaces
                 objectProp: "name"

@@ -39,8 +39,6 @@ Popup {
                     id: deviceRow
 
                     required property var modelData
-
-                    glyph: modelData.icon
                     label: modelData.label
                     detail: BluetoothService.rowStatus(modelData)
                     selected: modelData.connected
@@ -49,7 +47,6 @@ Popup {
                     IconActionButton {
                         visible: deviceRow.modelData.known && deviceRow.hovered
                         size: 22
-                        circular: true
                         danger: true
                         glyph: PhosphorIcons.x
                         onTapped: BluetoothService.forget(deviceRow.modelData)

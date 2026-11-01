@@ -118,6 +118,7 @@ Singleton {
     readonly property color dangerText: root.foregroundFor(root.danger)
     readonly property color caution: root.palette.caution
     readonly property color shadow: "#000000"
+    readonly property color knob: "#ffffff"
     readonly property list<color> markupInks: ["#e53935", "#ffcc00", "#007aff", "#ffffff", "#111111"]
 
     readonly property QtObject fill: QtObject {
@@ -134,10 +135,20 @@ Singleton {
         readonly property color accent: root.accent
     }
 
+    readonly property QtObject bar: QtObject {
+        readonly property int plateHeight: 24
+        readonly property int plateRadius: root.radius.sm
+        readonly property int platePadding: root.space.sm
+        readonly property int edgeMargin: root.space.md
+        readonly property real tintTop: 0.25
+        readonly property real tintMid: 0.12
+    }
+
     readonly property QtObject panel: QtObject {
         readonly property int width: 320
         readonly property int padding: root.space.lg
         readonly property int rowBleed: padding - root.space.sm
+        readonly property int menuRowHeight: 30
     }
 
     readonly property QtObject radius: QtObject {
@@ -185,6 +196,7 @@ Singleton {
         readonly property int enterDelay: 70
         readonly property int nudge: 4
         readonly property real scaleFrom: 0.95
+        readonly property real pressScale: 0.94
         readonly property int shakeDistance: 8
         readonly property int shakeCycles: 3
         readonly property real springStiffness: 4.5

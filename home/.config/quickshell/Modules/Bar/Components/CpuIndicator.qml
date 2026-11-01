@@ -5,6 +5,7 @@ import qs.Constants
 import qs.Services
 
 IconButton {
+    plate: true
     glyph: PhosphorIcons.cpu
     active: CpuService.usage > 80
     activeColor: Theme.danger

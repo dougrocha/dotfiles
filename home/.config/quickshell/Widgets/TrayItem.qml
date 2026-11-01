@@ -34,7 +34,7 @@ Rectangle {
     Layout.preferredWidth: 24
     Layout.preferredHeight: 24
     activeFocusOnTab: true
-    radius: height / 2
+    radius: Theme.bar.plateRadius
     color: menuOpen || activeFocus ? Theme.fill.press : hoverHandler.hovered ? Theme.fill.hover : Theme.withAlpha(Theme.fill.hover, 0)
     border.width: trayItem?.status === Status.NeedsAttention || activeFocus ? 1 : 0
     border.color: trayItem?.status === Status.NeedsAttention ? Theme.accent : Theme.stroke.strong
