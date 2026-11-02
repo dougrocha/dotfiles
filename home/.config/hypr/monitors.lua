@@ -15,6 +15,7 @@ hl.monitor({
     scale = "1",
     bitdepth = 10,
     vrr = 3,
+    cm = "edid",
 })
 
 hl.monitor({
@@ -22,6 +23,7 @@ hl.monitor({
     mode = "2560x1440@144",
     position = "2560x0",
     scale = "1",
+    cm = "edid",
 })
 
 hl.config({
