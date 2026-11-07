@@ -67,10 +67,15 @@ keep_sudo_alive() {
 }
 
 # Force the checkout to origin/<branch>. git pull fails on a dirty build tree.
+# Local edits to tracked files are stashed first, so checkout can't refuse and the edits survive.
 sync_repo() {
     local dir="$1" url="$2" branch="$3"
 
     if [[ -d "$dir/.git" ]]; then
+        if ! git -C "$dir" diff --quiet HEAD; then
+            warn "stashing local edits in $dir, see: git -C $dir stash list"
+            git -C "$dir" stash push -m "update: local edits before sync"
+        fi
         git -C "$dir" fetch --prune origin "$branch"
         git -C "$dir" checkout -B "$branch" "origin/$branch"
         git -C "$dir" reset --hard "origin/$branch"
