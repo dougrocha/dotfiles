@@ -1,6 +1,4 @@
-# Raise max open files (macOS only)
-# Default of 256 is too low: nvim file-watchers, swapfiles, sockets, and
-# channels consume file descriptors and can hit EMFILE errors.
-if test (uname) = "Darwin"
+# macOS defaults to 256 open files, which nvim file watchers, swapfiles and sockets exhaust.
+if test -e /System/Library/CoreServices/SystemVersion.plist
     ulimit -n 8192
 end

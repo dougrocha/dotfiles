@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Launch or focus a web app identified by its URL
-# Usage: launch-or-focus-webapp [url]
-
 if (($# != 1)); then
   echo "Usage: launch-or-focus-webapp [url] (rerun install-webapp for launchers that also pass a name)" >&2
   exit 1

@@ -1,5 +1,4 @@
 #!/bin/bash
-# Deploy the dotfiles listed in install/links. See ./link --help.
 
 set -euo pipefail
 
@@ -11,8 +10,7 @@ if ! command -v odin >/dev/null 2>&1; then
     exit 1
 fi
 
-# Compiles in about half a second. odin run deletes the binary only when the
-# linker exits 0, so build it in the cache dir rather than the current one.
+# odin run deletes the binary only when the linker exits 0, so build it in the cache dir rather than the current one.
 out="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles/linker"
 mkdir -p "${out%/*}"
 exec odin run "$DOTFILES_DIR/install/linker" -out:"$out" -- "$@"

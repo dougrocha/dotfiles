@@ -1,15 +1,14 @@
 #!/bin/bash
 
-# Send signal to save replay buffer
 pkill -SIGUSR1 -f gpu-screen-recorder
 
-# Wait for file to be saved
+# gpu-screen-recorder writes the file asynchronously after the signal
 sleep 0.5
 
-REPLAY_DIR="${HOME}/Videos/Replays"
+REPLAY_DIR="$(xdg-user-dir VIDEOS)/Replays"
 mkdir -p "$REPLAY_DIR"
 
-LATEST_REPLAY=$(find "$REPLAY_DIR" -type f -name "*.mp4" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+LATEST_REPLAY=$(latest-file "$REPLAY_DIR" "*.mp4")
 
 if [[ -f "$LATEST_REPLAY" ]]; then
     echo -n "$LATEST_REPLAY" | wl-copy

@@ -1,7 +1,4 @@
-# Environment shared by bash, fish and the uwsm (Hyprland) session.
-# fish sources this as well, so keep to plain `export NAME="value"` lines:
-# no conditionals or $(...). PATH stays per-shell because fish dedupes it
-# with fish_add_path and each shell adds different entries.
+# Sourced by bash, fish and uwsm, so keep to plain export NAME="value" lines.
 
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"

@@ -3,7 +3,7 @@
 - `home/`: Dotfiles
 - `default/`: System-level configurations
 - `install/`: Installation scripts
-- `install/links`: Stow
+- `install/links`: Which files `./link` symlinks into $HOME on each platform
 
 ## Setup
 

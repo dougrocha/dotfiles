@@ -4,7 +4,7 @@ After=graphical-session.target
 
 [Service]
 Type=oneshot
-ExecStart=%h/dev/dotfiles/default/systemd/openrgb/apply-profile.sh
+ExecStart=@DOTFILES_DIR@/default/systemd/openrgb/apply-profile.sh
 RemainAfterExit=yes
 
 [Install]

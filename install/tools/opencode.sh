@@ -1,5 +1,5 @@
 #!/bin/bash
-# opencode v2. A package-managed v1 shares the binary name and must be removed first.
+# opencode v2 from the official installer, which installs to ~/.opencode/bin.
 
 set -euo pipefail
 

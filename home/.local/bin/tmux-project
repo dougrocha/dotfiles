@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Pick a project folder or an open session with fzf, then switch to it.
-# Each project gets a session named after its folder, created on first pick.
-# Pass a path to skip the picker.
-
 SEARCH_PATHS=(~/dev)
 
 list() {

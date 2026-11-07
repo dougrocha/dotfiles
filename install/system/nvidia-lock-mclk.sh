@@ -2,14 +2,17 @@
 
 set -euo pipefail
 
+# shellcheck source=SCRIPTDIR/../lib.sh
+source "$DOTFILES_DIR/install/lib.sh"
+
 SERVICE_FILE="$DOTFILES_DIR/default/systemd/nvidia/nvidia-lock-mclk.service"
 
 echo "NVIDIA Memory Clock Locking Setup"
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo ""
 
-if ! command -v nvidia-smi &> /dev/null; then
-    echo "✗ Error: nvidia-smi not found. Please install NVIDIA drivers first."
+if ! has nvidia-smi; then
+    warn "nvidia-smi not found, install the NVIDIA drivers first"
     exit 1
 fi
 

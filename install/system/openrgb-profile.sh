@@ -2,11 +2,16 @@
 
 set -euo pipefail
 
-SERVICE_FILE="$DOTFILES_DIR/default/systemd/openrgb/openrgb-profile.service"
-OPENRGB_BIN="$BUILD_DIR/openrgb-src/openrgb"
-PROFILES_DIR="$HOME/.config/OpenRGB/profiles"
+# shellcheck source=SCRIPTDIR/../lib.sh
+source "$DOTFILES_DIR/install/lib.sh"
+# shellcheck source=SCRIPTDIR/../../default/lighting/lighting.sh
+source "$DOTFILES_DIR/default/lighting/lighting.sh"
 # shellcheck source=SCRIPTDIR/../../default/systemd/openrgb/profiles.sh
 source "$DOTFILES_DIR/default/systemd/openrgb/profiles.sh"
+
+SERVICE_FILE="$DOTFILES_DIR/default/systemd/openrgb/openrgb-profile.service"
+OPENRGB_BIN="$lighting_openrgb_bin"
+PROFILES_DIR="$HOME/.config/OpenRGB/profiles"
 
 echo "OpenRGB Profile Autostart Setup"
 echo "═══════════════════════════════════════════════════════════════════════════"
@@ -18,7 +23,6 @@ if [[ ! -x "$OPENRGB_BIN" ]]; then
     exit 1
 fi
 
-# set-lighting on/off loads these two profiles.
 for profile in "$profile_on" "$profile_off"; do
     if [[ ! -f "$PROFILES_DIR/$profile.json" ]]; then
         echo "✗ Error: profile not found at $PROFILES_DIR/$profile.json"
@@ -37,7 +41,7 @@ echo ""
 echo "Deploying user service..."
 
 mkdir -p "$HOME/.config/systemd/user"
-cp "$SERVICE_FILE" "$HOME/.config/systemd/user/openrgb-profile.service"
+sed "s|@DOTFILES_DIR@|$DOTFILES_DIR|g" "$SERVICE_FILE" >"$HOME/.config/systemd/user/openrgb-profile.service"
 
 systemctl --user daemon-reload
 systemctl --user enable openrgb-profile.service

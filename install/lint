@@ -1,5 +1,4 @@
 #!/bin/bash
-# Run shellcheck on every tracked shell script. Extra args go to shellcheck.
 
 set -euo pipefail
 

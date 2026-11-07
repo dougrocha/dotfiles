@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Focus the window with the given class, or launch the command when there is none.
-# Some bindings use this to keep a single instance of an app open.
-
 if (($# == 0)); then
   echo "Usage: launch-or-focus [window-class] [launch-command [args...]]"
   exit 1

@@ -6,12 +6,12 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property bool on: _saved !== "off"
+    readonly property bool on: _committedState !== "off"
     readonly property bool busy: _wanted !== ""
     readonly property bool shownOn: busy ? _wanted === "on" : on
     readonly property bool failed: _failed && !busy
 
-    property string _saved: ""
+    property string _committedState: ""
     property string _wanted: ""
     property bool _failed: false
     property bool _started: false
@@ -49,10 +49,10 @@ Singleton {
         printErrors: false
 
         onFileChanged: reload()
-        onLoaded: root._saved = text().trim()
+        onLoaded: root._committedState = text().trim()
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound)
-                root._saved = "";
+                root._committedState = "";
         }
     }
 

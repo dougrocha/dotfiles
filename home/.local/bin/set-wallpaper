@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # set-wallpaper <image> [--system-theme dark|light]
-# matugen regenerates every template in ~/.config/matugen/config.toml (incl. the
-# Base16 palette.json quickshell watches) and the GTK color-scheme; then hyprpaper.
+# matugen renders the templates in ~/.config/matugen/config.toml, and its ramp hook writes quickshell's palette.json and the walker and share picker colors.
 
 set -euo pipefail
 
@@ -23,9 +22,6 @@ image="$(realpath "$image")"
 matugen image -m "$mode" --source-color-index 0 "$image"
 gsettings set org.gnome.desktop.interface color-scheme "prefer-$mode" 2>/dev/null || true
 
-pkill -x hyprpaper || true
-sleep 0.1
-uwsm-app -- hyprpaper &>/dev/null &
-disown
+systemctl --user restart hyprpaper.service
 
 echo "Wallpaper set: $image ($mode)"

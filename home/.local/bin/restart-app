@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Restart an application by killing it and relaunching it detached via uwsm.
-
 if (($# == 0)); then
   echo "Usage: restart-app [application-name] [application-args...]"
   exit 1

@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# shellcheck source=SCRIPTDIR/../lib.sh
+source "$DOTFILES_DIR/install/lib.sh"
+
 SERVICE_FILE="$DOTFILES_DIR/default/systemd/kraken/kraken-lcd.service"
 CURRENT_IMAGE="$DOTFILES_DIR/default/systemd/kraken/images/current"
 
@@ -9,8 +12,8 @@ echo "NZXT Kraken LCD Image Setup"
 echo "═══════════════════════════════════════════════════════════════════════════"
 echo ""
 
-if ! command -v liquidctl &> /dev/null; then
-    echo "✗ Error: liquidctl not found. Install it first (pacman -S liquidctl)."
+if ! has liquidctl; then
+    warn "liquidctl not found, install it first with paru -S liquidctl"
     exit 1
 fi
 

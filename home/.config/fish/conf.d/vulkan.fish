@@ -1,5 +1,4 @@
-# Vulkan SDK Setup (macOS only)
-if test (uname) = "Darwin"
+if test -e /System/Library/CoreServices/SystemVersion.plist
     if test -d "$HOME/VulkanSDK/latest/macOS"
         set -gx VULKAN_SDK $HOME/VulkanSDK/latest/macOS
     else if test -d "$HOME/VulkanSDK/1.4.350.1/macOS"

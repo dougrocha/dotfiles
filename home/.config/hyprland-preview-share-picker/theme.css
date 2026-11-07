@@ -1,15 +1,20 @@
+@import "colors.css";
+
+@define-color muted alpha(@text, 0.6);
+@define-color primary_hover mix(@primary, @background, 0.25);
+
 * {
     all: unset;
     font-family: JetBrains Mono NF;
-    color: #ecf2f8;
+    color: @text;
     font-weight: bold;
     font-size: 16px;
 }
 
 .window {
     border-radius: 5px;
-    background-color: #0d1117;
-    border: solid 2px #21262d;
+    background-color: @background;
+    border: solid 2px @surface_container_high;
     margin: 2px;
 }
 
@@ -22,23 +27,23 @@ tabs > tab {
 }
 
 .tab-label {
-    color: #89929b;
+    color: @muted;
     transition: all 0.2s ease;
 }
 
 tabs > tab:hover > .tab-label {
-    color: #ecf2f8;
+    color: @text;
     cursor: pointer;
 }
 
 tabs > tab:checked > .tab-label,
 tabs > tab:active > .tab-label {
     text-decoration: underline currentColor;
-    color: #ecf2f8;
+    color: @text;
 }
 
 tabs > tab:focus > .tab-label {
-    color: #ecf2f8;
+    color: @text;
 }
 
 .page {
@@ -54,16 +59,16 @@ flowboxchild > .card,
 button > .card {
     transition: all 0.2s ease;
     border: solid 2px transparent;
-    border-color: #161b22;
+    border-color: @surface_container;
     border-radius: 5px;
-    background-color: #161b22;
+    background-color: @surface_container;
     padding: 5px;
 }
 
 flowboxchild:hover > .card,
 button:hover > .card {
-    border: solid 2px #61afef;
-    background-color: #21262d;
+    border: solid 2px @primary;
+    background-color: @surface_container_high;
 }
 
 flowboxchild:active > .card,
@@ -71,7 +76,7 @@ flowboxchild:selected > .card,
 button:active > .card,
 button:selected > .card,
 button:focus > .card {
-    border: solid 2px #61afef;
+    border: solid 2px @primary;
 }
 
 .image {
@@ -81,21 +86,21 @@ button:focus > .card {
 .region-button {
     padding: 0.5rem 1rem;
     border-radius: 5px;
-    background-color: #61afef;
-    color: #161b22;
+    background-color: @primary;
+    color: @surface_container;
     transition: all 0.2s ease;
 }
 
 .region-button:not(:disabled):hover {
-    background-color: #2472c8;
-    color: #ecf2f8;
+    background-color: @primary_hover;
+    color: @text;
 }
 
 .region-button:not(:disabled):focus {
-    background-color: #2472c8;
+    background-color: @primary_hover;
 }
 
 .region-button:disabled {
-    background-color: #89929b;
-    color: #21262d;
+    background-color: @muted;
+    color: @surface_container_high;
 }

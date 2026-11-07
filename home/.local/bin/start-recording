@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RECORDING_DIR="${HOME}/Videos"
+RECORDING_DIR="$(xdg-user-dir VIDEOS)"
 
 MIC=false
 SYSTEM_AUDIO=false
@@ -13,7 +13,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 set -- "${ARGS[@]}"
-TARGET="${1:-screen}" # "screen", "DP-1", "DP-2"
+TARGET="${1:-screen}"
 
 mkdir -p "$RECORDING_DIR"
 

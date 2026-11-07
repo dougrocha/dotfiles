@@ -1,4 +1,3 @@
--- Picture-in-Picture styling
 hl.window_rule({
     name = "picture-in-picture",
     match = { title = "Picture.?in.?[Pp]icture" },

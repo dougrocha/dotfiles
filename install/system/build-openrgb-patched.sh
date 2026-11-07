@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# shellcheck source=SCRIPTDIR/../lib.sh
+source "$DOTFILES_DIR/install/lib.sh"
+
 PATCH_FILE="$DOTFILES_DIR/default/patches/openrgb-lianli-unihub-sl-fix.patch"
 SRC_DIR="$BUILD_DIR/openrgb-src"
 
@@ -15,8 +18,8 @@ echo "combine to make color control a permanent no-op on this device."
 echo ""
 
 for tool in git qmake6 make; do
-    if ! command -v "$tool" &> /dev/null; then
-        echo "✗ Error: $tool not found."
+    if ! has "$tool"; then
+        warn "$tool not found"
         exit 1
     fi
 done

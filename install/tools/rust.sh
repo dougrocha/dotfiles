@@ -1,11 +1,10 @@
 #!/bin/bash
-# Rust via rustup. Arch's rustup package ships no toolchain.
+# Rust via rustup from the official installer, with the nightly toolchain as default.
 
 set -euo pipefail
 
 export PATH="$HOME/.cargo/bin:$PATH"
 
-# --no-modify-path: the shell config is ours.
 if ! command -v rustup >/dev/null 2>&1; then
     echo "Installing rustup..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |

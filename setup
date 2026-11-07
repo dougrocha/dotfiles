@@ -1,5 +1,4 @@
 #!/bin/bash
-# Setup for every machine. Linux-only steps are skipped on macOS.
 
 set -euo pipefail
 
@@ -25,7 +24,6 @@ keep_sudo_alive || warn "no sudo; steps that need root will fail"
 
 mkdir -p "$BUILD_DIR" "$HOME/.local/bin" "$HOME/.config"
 
-# Sourced by config.fish.
 cat >"$HOME/.config/env" <<EOF
 export DOTFILES_DIR="$DOTFILES_DIR"
 export BUILD_DIR="$BUILD_DIR"
@@ -42,7 +40,6 @@ else
     brew bundle --file="$DOTFILES_DIR/install/Brewfile"
 fi
 
-# The linker is written in Odin.
 step "Toolchains"
 "$DOTFILES_DIR/install/tools/odin.sh"
 

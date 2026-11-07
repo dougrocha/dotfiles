@@ -2,35 +2,25 @@
 # set-lighting [on|off]
 #
 # Switches the case lighting between two profiles and remembers the choice
-# for boot:
-#   on   OpenRGB on profile, Kraken LCD shows the current image
-#   off  OpenRGB off profile, Kraken LCD backlight at 0
-# Profile names live in default/systemd/openrgb/profiles.sh.
-# With no argument, re-applies the remembered profile.
-#
+# for boot. With no argument, re-applies the remembered profile.
 # The choice is saved before applying, since the apply scripts read it. If
-# applying fails, the previous choice is restored and re-applied, so boot
-# never replays a state that didn't work.
+# applying fails, the previous choice is restored and re-applied.
 
 set -euo pipefail
 
 # ~/.local/bin links here from the repo, so fall back to the link's target.
 dotfiles_dir="${DOTFILES_DIR:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../.." && pwd)}"
 systemd_dir="$dotfiles_dir/default/systemd"
-state_dir="$HOME/.local/state/lighting"
-state_file="$state_dir/current"
+# shellcheck source=SCRIPTDIR/../../../default/lighting/lighting.sh
+source "$dotfiles_dir/default/lighting/lighting.sh"
 
-mkdir -p "$state_dir"
-
-# Serialize runs so an overlapping on/off can't leave RGB and LCD disagreeing.
-exec 9>"$state_dir/lock"
-flock 9
-export LIGHTING_LOCKED=1
+mkdir -p "$lighting_state_dir"
+lighting_lock
 
 # Write then rename, so a reader never sees an empty file.
 save_state() {
-    printf '%s\n' "$1" >"$state_file.tmp"
-    mv -f "$state_file.tmp" "$state_file"
+    printf '%s\n' "$1" >"$lighting_state_file.tmp"
+    mv -f "$lighting_state_file.tmp" "$lighting_state_file"
 }
 
 apply() {
@@ -41,7 +31,7 @@ apply() {
 }
 
 previous=""
-[[ -f "$state_file" ]] && previous="$(<"$state_file")"
+[[ -f "$lighting_state_file" ]] && previous="$(<"$lighting_state_file")"
 
 case "${1:-}" in
     on|off) save_state "$1" ;;
@@ -60,11 +50,11 @@ if ! apply; then
         if [[ -n "$previous" ]]; then
             save_state "$previous"
         else
-            rm -f "$state_file"
+            rm -f "$lighting_state_file"
         fi
         apply || true
     fi
 fi
 
-echo "Lighting: $(cat "$state_file" 2>/dev/null || echo on)"
+echo "Lighting: $(cat "$lighting_state_file" 2>/dev/null || echo on)"
 exit "$status"

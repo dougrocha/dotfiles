@@ -1,4 +1,3 @@
--- LocalSend floating window
 hl.window_rule({
     match = {
         class = "org.localsend.localsend_app",

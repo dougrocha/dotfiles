@@ -1,9 +1,5 @@
 @import "colors.css";
 
-/* Spacing follows Tinycast's launcher: 750x475 window, 46px search header,
-   38px rows inset 8px with 10px radius, no separators, 52px capsule footer.
-   Colors come from colors.css, which matugen generates. */
-
 @define-color muted alpha(@text, 0.6);
 @define-color placeholder_text alpha(@text, 0.4);
 @define-color divider alpha(@text, 0.1);

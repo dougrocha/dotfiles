@@ -1,4 +1,3 @@
--- Steam window rules
 hl.window_rule({
     name = "steam",
     match = { class = "steam" },

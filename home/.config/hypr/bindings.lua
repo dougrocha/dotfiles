@@ -1,6 +1,5 @@
 local mainMod = "SUPER"
 
--- Universal, so these keep working inside any submap
 local function global_bind(key_str, action, opts)
     opts = opts or {}
     opts.submap_universal = true
@@ -146,7 +145,6 @@ global_bind("XF86AudioNext", hl.dsp.exec_cmd("quickshell ipc call music-control 
 global_bind("XF86AudioPause", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
 global_bind("XF86AudioPlay", hl.dsp.exec_cmd("quickshell ipc call music-control playpause"), { locked = true })
 global_bind("XF86AudioPrev", hl.dsp.exec_cmd("quickshell ipc call music-control previous"), { locked = true })
-bind({ "XF86AudioPlay" }, hl.dsp.exec_cmd("launch-or-focus-tui switch-audio"))
 
 bind({ "CTRL", "Z" }, function()
     local zoom = hl.get_config("cursor.zoom_factor") or 1
@@ -157,7 +155,6 @@ bind({ "CTRL", "ALT", "Z" }, function()
     hl.config({ cursor = { zoom_factor = 1 } })
 end, { description = "Reset zoom" })
 
--- Quickshell enters this while a bar panel is open, so Escape can close it
 hl.define_submap("qs-panel", "reset", function()
     hl.bind("ESCAPE", hl.dsp.exec_cmd("quickshell ipc call panels closeAll"))
 end)

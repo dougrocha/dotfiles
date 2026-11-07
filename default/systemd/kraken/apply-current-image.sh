@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# apply-current-image.sh
-# Applies whatever default/systemd/kraken/images/current points to, or turns
-# the LCD backlight off when set-lighting saved "off". It does no saving or
-# pruning; set-kraken-image does that.
-#
-# The "on" brightness comes from ~/.local/state/lighting/lcd-brightness
-# (0-100) when that file exists, else 50.
 
 set -euo pipefail
 
@@ -13,26 +6,14 @@ images_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/images" && pwd)"
 current="$images_dir/current"
 default_brightness=50  # the cooler's own level before set-lighting existed
 
-# kraken-lcd.service runs this as root, so read the state from the home of
-# the user who owns the dotfiles, not from $HOME.
-owner_home="$(getent passwd "$(stat -c %U "$images_dir")" | cut -d: -f6)" || owner_home=""
-if [[ -z "$owner_home" ]]; then
-    echo "Error: can't find the home of the dotfiles owner" >&2
-    exit 1
-fi
-state_dir="$owner_home/.local/state/lighting"
+# shellcheck source=SCRIPTDIR/../../lighting/lighting.sh
+source "$(dirname "${BASH_SOURCE[0]}")/../../lighting/lighting.sh"
 
-# Share set-lighting's lock so boot and set-kraken-image can't race a switch.
-# set-lighting already holds it when it calls this script. Open the lock
-# read-only, so running as root never creates a root-owned lock the user
-# can't open; if it doesn't exist yet, set-lighting has never run.
-if [[ -z "${LIGHTING_LOCKED:-}" && -e "$state_dir/lock" ]]; then
-    exec 9<"$state_dir/lock"
-    flock 9
-fi
+lighting_lock
 
-state="$(cat "$state_dir/current" 2>/dev/null || echo on)"
-brightness="$(cat "$state_dir/lcd-brightness" 2>/dev/null || echo "$default_brightness")"
+state="$(cat "$lighting_state_file" 2>/dev/null || echo on)"
+# lcd-brightness (0-100) in the state dir sets the "on" level.
+brightness="$(cat "$lighting_state_dir/lcd-brightness" 2>/dev/null || echo "$default_brightness")"
 
 case "$state" in
     on|off) ;;

@@ -1,7 +1,3 @@
-// link -- symlinks dotfiles into $HOME, driven by install/links.
-//
-// The manifest is an allow list. An entry links as-is, so a directory becomes
-// one symlink; a trailing "/*" links each child instead. See install/links.
 package main
 
 import "core:fmt"
@@ -60,7 +56,7 @@ options:
   -f, --force           move conflicts into a unique <name>.bak directory
   -h, --help            show this message
 
-<dotfiles> comes from $DOTFILES_DIR, or the grandparent of this executable.`
+<dotfiles> comes from $DOTFILES_DIR, which ./link sets.`
 
 main :: proc() {
 	if !parse_args() do os.exit(2)
@@ -175,16 +171,14 @@ host_platform :: proc() -> Platform {
 	}
 }
 
-// $DOTFILES_DIR when set, otherwise install/linker/<exe> -> ../..
+// ./link builds into ~/.cache, so the executable's own location says nothing about the repo.
 default_dotfiles_dir :: proc() -> string {
-	if dir := os.get_env("DOTFILES_DIR", context.allocator); dir != "" {
-		return dir
+	dir := os.get_env("DOTFILES_DIR", context.allocator)
+	if dir == "" {
+		fmt.eprintln("link: $DOTFILES_DIR is unset, run ./link instead of the built binary")
+		os.exit(2)
 	}
-	exe := os.args[0]
-	if abs, err := filepath.abs(exe, context.allocator); err == nil {
-		return filepath.dir(filepath.dir(filepath.dir(abs)))
-	}
-	return "."
+	return dir
 }
 
 // -- manifest ----------------------------------------------------------------
@@ -291,7 +285,6 @@ apply :: proc(e: Entry) {
 		return
 	}
 
-	// "/*": the directory stays real so other tools can write into it.
 	dst_dir := join({opts.target, e.rel})
 	if !ensure_dir(dst_dir) do return
 
@@ -400,7 +393,6 @@ create :: proc(src, dst: string) -> bool {
 
 // -- prune -------------------------------------------------------------------
 
-// Remove links into the repo that the manifest no longer claims.
 prune :: proc(universe, wanted: map[string]bool) {
 	dirs: map[string]bool
 	defer delete(dirs)
@@ -428,7 +420,6 @@ prune :: proc(universe, wanted: map[string]bool) {
 				if rerr != nil do continue
 				if !is_within(resolve(path, current), opts.root) do continue
 			case .Directory:
-				// ~/.config/ghostty and ~/.local are structure, not units we own.
 				if contains_managed_path(universe, opts.target, path) do continue
 				if !is_prunable_dir(path) do continue
 				tree = true
@@ -501,9 +492,6 @@ ensure_dir :: proc(path: string) -> bool {
 	return true
 }
 
-// Finds Stow residue: a tree whose every file is a symlink into the source
-// root, left behind when the destination directory already existed.
-//
 // `links` counts them, because "every file is ours" is vacuously true of a
 // tree with no files. A ~/.gem full of empty subdirectories would match.
 scan_reclaimable :: proc(path: string) -> (ok: bool, links: int) {
@@ -534,10 +522,9 @@ scan_reclaimable :: proc(path: string) -> (ok: bool, links: int) {
 	return true, links
 }
 
-// True when any manifest entry, on any platform, lives underneath `dir`.
 contains_managed_path :: proc(universe: map[string]bool, target, dir: string) -> bool {
 	rel, err := filepath.rel(target, dir, context.allocator)
-	if err != nil do return true // cannot place it, so do not touch it
+	if err != nil do return true
 
 	prefix := strings.concatenate({rel, "/"})
 	defer delete(prefix)
@@ -548,13 +535,11 @@ contains_managed_path :: proc(universe: map[string]bool, target, dir: string) ->
 	return false
 }
 
-// A destination we want anyway. An empty directory is fine to replace.
 is_reclaimable_dir :: proc(path: string) -> bool {
 	ok, _ := scan_reclaimable(path)
 	return ok
 }
 
-// Deleting an unlisted path is a stronger claim: prove we created it.
 is_prunable_dir :: proc(path: string) -> bool {
 	ok, links := scan_reclaimable(path)
 	return ok && links > 0

@@ -5,7 +5,6 @@ if [[ -e /proc/driver/nvidia ]]; then
   export __GLX_VENDOR_LIBRARY_NAME=nvidia
 fi
 
-# Set defaults
 source ~/.config/shell/env
 source ~/.config/uwsm/default
 source ~/.config/user-dirs.dirs

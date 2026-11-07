@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 # set-kraken-image [image-path]
 #
-# With an argument: center-crops the image to square, copies it into
-# dotfiles storage, makes it the current image (prunes storage down to the
-# 10 most recent), and applies it. With no argument: just re-applies
-# whatever is already current. While set-lighting is off, the image is saved
-# but the LCD stays dark.
-#
-# The crop matters because liquidctl stretches (non-uniform resize) whatever
-# it's given to the LCD's exact resolution, distorting anything non-square.
+# Crops the image to square and makes it the current Kraken LCD image.
+# With no argument, re-applies the current one.
+# The crop matters because liquidctl stretches whatever it is given to the
+# LCD's exact resolution, which distorts anything non-square.
 
 set -euo pipefail
 
-# ~/.local/bin links here from the repo, so fall back to the link's target.
 dotfiles_dir="${DOTFILES_DIR:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../.." && pwd)}"
 images_dir="$dotfiles_dir/default/systemd/kraken/images"
 current="$images_dir/current"
@@ -35,26 +30,20 @@ else
         exit 1
     fi
 
-    if ! command -v ffmpeg &> /dev/null; then
+    if ! command -v ffmpeg &>/dev/null; then
         echo "Error: ffmpeg not found (pacman -S ffmpeg)" >&2
         exit 1
     fi
 
-    # Timestamp-prefix to avoid name collisions while keeping recency-sortable names
     dest="$images_dir/$(date +%s)-$(basename "$src")"
 
-    # Center-crop to square, then scale to the LCD's exact resolution.
-    # -loop 0 keeps gifs looping infinitely (ffmpeg doesn't preserve it by default).
     ffmpeg -y -loglevel warning -i "$src" \
         -vf "crop='min(iw,ih)':'min(iw,ih)',scale=${lcd_size}:${lcd_size}:flags=lanczos" \
-        -loop 0 \
         "$dest" < /dev/null
 
     ln -sfn "$(basename "$dest")" "$current"
     target="$dest"
 
-    # Prune to the max_images most recent real files (current's target is
-    # always among the newest, so it's never at risk of being pruned)
     mapfile -t old_files < <(
         find "$images_dir" -maxdepth 1 -type f -printf '%T@ %p\n' |
         sort -rn | tail -n +"$((max_images + 1))" | cut -d' ' -f2-
@@ -69,7 +58,6 @@ if ! command -v liquidctl &> /dev/null; then
     exit 1
 fi
 
-# Shares the boot path, so it leaves the LCD dark while set-lighting is off.
 "$dotfiles_dir/default/systemd/kraken/apply-current-image.sh"
 
 echo "Kraken LCD set: $target"

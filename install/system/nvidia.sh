@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# Enable multilib repository in pacman.conf
 if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
     echo "Enabling multilib repository..."
     sudo tee -a /etc/pacman.conf > /dev/null << 'EOF'

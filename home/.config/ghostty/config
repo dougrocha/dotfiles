@@ -1,4 +1,3 @@
-# Theme
 theme = Chalk
 background = 0E1419
 
@@ -10,7 +9,6 @@ font-feature = -dlig
 font-feature = -liga
 font-feature = -calt
 
-# Completly close ghostty
 quit-after-last-window-closed = true
 
 config-file = ?config-macos

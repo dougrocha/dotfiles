@@ -1,0 +1,9 @@
+#!/bin/bash
+# latest-file <dir> <name-glob> [find options]: print the newest matching file.
+
+dir="$1" pattern="$2"
+shift 2
+
+find "$dir" "$@" -type f -name "$pattern" -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-
+
+# vim: ft=sh

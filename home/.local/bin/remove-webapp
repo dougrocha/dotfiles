@@ -8,14 +8,12 @@ DESKTOP_DIR="$HOME/.local/share/applications"
 if (( $# < 1 )); then
   echo -e "\e[32mLet's remove a web app launcher.\n\e[0m"
 
-  # List available web apps
   DESKTOP_FILES=("$DESKTOP_DIR"/*.desktop)
   if [[ ! -e ${DESKTOP_FILES[0]} ]]; then
     echo -e "\e[31mNo web apps found.\e[0m"
     exit 1
   fi
 
-  # Extract app names from current and legacy web app launchers.
   APP_OPTIONS=()
   for file in "$DESKTOP_DIR"/*.desktop; do
     [[ -f "$file" ]] || continue
@@ -41,7 +39,6 @@ else
   SELECTED_APPS=("$@")
 fi
 
-# Process each selected app
 for APP_NAME in "${SELECTED_APPS[@]}"; do
   DESKTOP_FILE="$DESKTOP_DIR/$APP_NAME.desktop"
   ICON_FILE="$ICON_DIR/$APP_NAME.png"
@@ -51,7 +48,6 @@ for APP_NAME in "${SELECTED_APPS[@]}"; do
     continue
   fi
 
-  # Confirm removal
   if ! gum confirm "Remove '$APP_NAME'?"; then
     echo -e "\e[33m⊘ Skipped $APP_NAME\e[0m"
     continue

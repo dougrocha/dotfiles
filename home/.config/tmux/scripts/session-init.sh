@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Auto-initialize new tmux sessions with named windows
-# Called by after-new-session hook in ~/.config/tmux/hooks.conf
 
 SESSION_NAME="$1"
 SESSION_PATH="$2"

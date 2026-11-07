@@ -1,6 +1,3 @@
-# macOS packages. The Arch equivalent is install/packages.arch.
-#
-#   brew bundle --file=install/Brewfile
 
 # Terminal
 brew "bat"
@@ -48,7 +45,7 @@ brew "ninja"
 brew "premake"
 brew "protobuf"
 
-# Neovim build dependencies. install/tools/neovim.sh builds from source.
+# Neovim build dependencies
 brew "gettext"
 
 # Language servers and formatters

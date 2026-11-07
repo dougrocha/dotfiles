@@ -1,5 +1,5 @@
 #!/bin/bash
-# mise, via the official installer. The Homebrew build disables mise self-update.
+# The Homebrew build of mise disables self-update, so install with the official script.
 
 set -euo pipefail
 

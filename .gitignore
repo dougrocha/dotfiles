@@ -13,7 +13,7 @@ home/.config/fish/completions/grok.fish
 # Tmux plugins (TPM installs them next to tmux.conf)
 home/.config/tmux/plugins
 
-# Local Claude Code config / skills
+# Local Claude Code config
 CLAUDE.local.md
 
 # mise per-install lock files (mise.lock itself is tracked)

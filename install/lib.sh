@@ -1,5 +1,4 @@
 #!/bin/bash
-# Helpers and platform detection. Sourced by setup and the step scripts.
 
 set -euo pipefail
 
@@ -54,7 +53,6 @@ report_failures() {
     return 1
 }
 
-# Hold the sudo timestamp open so later steps never prompt.
 keep_sudo_alive() {
     sudo -v || return 1
     while true; do
@@ -78,7 +76,6 @@ sync_repo() {
         fi
         git -C "$dir" fetch --prune origin "$branch"
         git -C "$dir" checkout -B "$branch" "origin/$branch"
-        git -C "$dir" reset --hard "origin/$branch"
     else
         # Blobless: small, but keeps the history that git describe needs.
         git clone --filter=blob:none --branch "$branch" "$url" "$dir"
@@ -91,11 +88,11 @@ needs_build() {
     local stamp="$BUILD_DIR/.stamp-$name"
     local bin
 
-    if [[ ${FORCE:-0} == 1 ]]; then return 0; fi
-    if [[ ! -f $stamp ]]; then return 0; fi
-    if [[ $(cat "$stamp") != "$commit" ]]; then return 0; fi
+    if [[ ${FORCE:-0} == 1 || ! -f $stamp || $(cat "$stamp") != "$commit" ]]; then
+        return 0
+    fi
     for bin in "$@"; do
-        if [[ ! -x $bin ]]; then return 0; fi
+        [[ -x $bin ]] || return 0
     done
     return 1
 }
@@ -104,7 +101,6 @@ mark_built() {
     printf '%s\n' "$2" >"$BUILD_DIR/.stamp-$1"
 }
 
-# One name per line, # starts a comment.
 read_package_list() {
     grep -v '^[[:space:]]*#' "$1" | sed 's/[[:space:]]*#.*$//' | awk 'NF'
 }
