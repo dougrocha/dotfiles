@@ -2,6 +2,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../Constants/MathUtil.js" as MathUtil
 
 Singleton {
     id: root
@@ -15,7 +16,7 @@ Singleton {
     function levelFromPeak(peak) {
         if (peak <= 0)
             return 0;
-        return Math.max(0, Math.min(1, (20 * Math.log10(peak) + 50) / 44));
+        return MathUtil.clamp((20 * Math.log10(peak) + 50) / 44, 0, 1);
     }
 
     onRecordingChanged: if (!recording)

@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import qs.Constants
+import "../Constants/MathUtil.js" as MathUtil
 
 Singleton {
     id: root
@@ -89,13 +90,7 @@ Singleton {
     function setStreamVolume(stream, newVolume, max = 1.5) {
         if (stream?.ready && stream?.audio) {
             stream.audio.muted = false;
-            stream.audio.volume = Math.max(0, Math.min(max, newVolume));
-        }
-    }
-
-    function setStreamMuted(stream, muted) {
-        if (stream?.ready && stream?.audio) {
-            stream.audio.muted = muted;
+            stream.audio.volume = MathUtil.clamp(newVolume, 0, max);
         }
     }
 
@@ -268,11 +263,6 @@ Singleton {
     function setGroupVolume(group, newVolume) {
         for (const stream of group.streams)
             setStreamVolume(stream, newVolume);
-    }
-
-    function setGroupMuted(group, muted) {
-        for (const stream of group.streams)
-            setStreamMuted(stream, muted);
     }
 
     Connections {

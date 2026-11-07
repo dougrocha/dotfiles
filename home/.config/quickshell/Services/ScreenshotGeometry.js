@@ -1,4 +1,5 @@
 .pragma library
+.import "../Constants/MathUtil.js" as MathUtil
 
 const minimumSide = 2;
 const dragThreshold = 3;
@@ -8,7 +9,7 @@ const optionsGap = 8;
 const unfocusedOrder = 9999;
 
 function clamp(value, low, high) {
-    return Math.max(low, Math.min(high, value));
+    return MathUtil.clamp(value, low, high);
 }
 
 function hit(kind, horizontal = 0, vertical = 0) {

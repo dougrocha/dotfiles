@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Constants
 import qs.Services
+import "../Constants/MathUtil.js" as MathUtil
 
 Popover {
     id: popup
@@ -17,7 +18,7 @@ Popover {
             return implicitWidth;
         const triggerCenter = trigger.mapToItem(null, trigger.width / 2, 0).x;
         const inset = Theme.panel.padding;
-        return Math.max(inset, Math.min(implicitWidth - inset, triggerCenter - anchor.rect.x));
+        return MathUtil.clamp(triggerCenter - anchor.rect.x, inset, implicitWidth - inset);
     }
 
     open: Visibilities.isOpen(panelName)

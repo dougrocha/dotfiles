@@ -1,7 +1,6 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Constants
 
 Singleton {
@@ -54,10 +53,6 @@ Singleton {
         setAlert(id, icon, text, seconds, -1);
     }
 
-    function pushProgress(id: string, icon: string, text: string, progress: real): void {
-        setAlert(id, icon, text, 0, Math.max(0, Math.min(1, progress)));
-    }
-
     function clearAlert(id: string): void {
         alerts = alerts.filter(a => a.id !== id);
     }
@@ -71,22 +66,6 @@ Singleton {
             const kept = root.alerts.filter(a => a.until === 0 || a.until > now);
             if (kept.length !== root.alerts.length)
                 root.alerts = kept;
-        }
-    }
-
-    IpcHandler {
-        target: "island"
-
-        function push(id: string, icon: string, text: string, seconds: real): void {
-            root.pushAlert(id, icon, text, seconds);
-        }
-
-        function progress(id: string, icon: string, text: string, value: real): void {
-            root.pushProgress(id, icon, text, value);
-        }
-
-        function clear(id: string): void {
-            root.clearAlert(id);
         }
     }
 

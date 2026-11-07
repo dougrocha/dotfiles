@@ -1,36 +1,25 @@
 pragma Singleton
 import QtQuick
 import Quickshell
-import Quickshell.Io
+import qs.Components
 
 Singleton {
     id: root
 
-    property bool active: false
+    readonly property bool active: toggler.active
 
     function refresh(): void {
-        statusProcess.running = true;
+        toggler.refresh();
     }
 
     function toggle(): void {
-        toggleProcess.running = true;
+        toggler.toggle();
     }
 
-    Process {
-        id: statusProcess
+    UserUnitToggle {
+        id: toggler
 
-        command: ["systemctl", "--user", "is-active", "hypridle.service"]
-        stdout: SplitParser {
-            onRead: data => {
-                root.active = data.trim() === "active";
-            }
-        }
-    }
-
-    Process {
-        id: toggleProcess
-
-        command: ["toggle-idle", "--silent"]
-        onExited: statusProcess.running = true
+        unit: "hypridle.service"
+        toggleCommand: ["toggle-idle", "--silent"]
     }
 }

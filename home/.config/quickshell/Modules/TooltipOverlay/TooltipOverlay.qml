@@ -4,6 +4,7 @@ import Quickshell.Wayland
 import qs.Components
 import qs.Constants
 import qs.Services
+import "../../Constants/MathUtil.js" as MathUtil
 
 PanelWindow {
     color: "transparent"
@@ -29,7 +30,7 @@ PanelWindow {
     TooltipBubble {
         id: tip
 
-        x: Math.max(Theme.space.xs, Math.min(parent.width - width - Theme.space.xs, TooltipService.tooltipX - width / 2))
+        x: MathUtil.clamp(TooltipService.tooltipX - width / 2, Theme.space.xs, parent.width - width - Theme.space.xs)
         y: Theme.topBarHeight + Theme.space.sm
         width: implicitWidth
         height: implicitHeight

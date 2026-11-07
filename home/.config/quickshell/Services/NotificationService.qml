@@ -6,6 +6,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import qs.Constants
+import "../Constants/MathUtil.js" as MathUtil
 
 Singleton {
     id: root
@@ -371,7 +372,7 @@ Singleton {
 
     function _progressOf(notification) {
         const value = notification.hints?.value;
-        return typeof value === "number" ? Math.max(0, Math.min(100, value)) / 100 : -1;
+        return typeof value === "number" ? MathUtil.clamp(value, 0, 100) / 100 : -1;
     }
 
     function _historyId() {

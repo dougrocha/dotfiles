@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import qs.Constants
 import qs.Services
+import "../../Constants/MathUtil.js" as MathUtil
 
 Item {
     id: root
@@ -19,7 +20,7 @@ Item {
     }
 
     function labelPosition(pointer, extent, direction, available): real {
-        return Math.max(8, Math.min(available - extent - 8, preferredPosition(pointer, extent, direction)));
+        return MathUtil.clamp(preferredPosition(pointer, extent, direction), 8, available - extent - 8);
     }
 
     function labelIsClamped(pointer, extent, direction, available): bool {
@@ -28,7 +29,7 @@ Item {
     }
 
     function centeredPosition(pointer, extent, available): real {
-        return Math.max(8, Math.min(available - extent - 8, pointer - extent / 2));
+        return MathUtil.clamp(pointer - extent / 2, 8, available - extent - 8);
     }
 
     function directedPosition(pointer, extent, direction, available): real {

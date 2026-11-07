@@ -24,15 +24,6 @@ Singleton {
         return Object.prototype.hasOwnProperty.call(root.notificationRules, appName) ? root.notificationRules[appName] ?? {} : {};
     }
 
-    function setNotificationRule(appName: string, rule: var): void {
-        const rules = Object.assign({}, root.notificationRules);
-        if (rule === null)
-            delete rules[appName];
-        else
-            rules[appName] = rule;
-        root.notificationRules = rules;
-    }
-
     property bool loaded: false
 
     Timer {

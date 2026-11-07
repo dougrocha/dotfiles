@@ -117,7 +117,6 @@ Singleton {
         readonly property color press: root.withAlpha(root.text.primary, 0.10)
         readonly property color strong: root.withAlpha(root.text.primary, 0.16)
         readonly property color selected: root.withAlpha(root.text.primary, 0.10)
-        readonly property color selectedSolid: root.accent
     }
 
     readonly property QtObject stroke: QtObject {

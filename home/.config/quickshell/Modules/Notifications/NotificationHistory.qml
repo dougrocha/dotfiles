@@ -127,29 +127,21 @@ Column {
                         }
                     }
 
-                    Text {
+                    IconActionButton {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
+                        size: Theme.icon.xs
+                        glyphSize: Theme.icon.xs
+                        circular: true
+                        glyph: PhosphorIcons.x
                         opacity: rowHover.hovered ? 1 : 0
                         enabled: opacity > 0
-                        text: PhosphorIcons.x
-                        color: dismissHover.hovered ? Theme.text.primary : Theme.text.secondary
-                        font.family: Theme.font.icon
-                        font.pixelSize: Theme.icon.xs
+                        onTapped: NotificationService.removeFromHistory(row.modelData.id)
 
                         Behavior on opacity {
                             NumberAnimation {
                                 duration: Theme.motion.fast
                             }
-                        }
-
-                        HoverHandler {
-                            id: dismissHover
-                            cursorShape: Qt.PointingHandCursor
-                        }
-
-                        TapHandler {
-                            onTapped: NotificationService.removeFromHistory(row.modelData.id)
                         }
                     }
                 }
