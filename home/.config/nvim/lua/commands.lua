@@ -1,5 +1,9 @@
 vim.api.nvim_create_user_command('PackList', function()
-    local names = vim.iter(vim.pack.get()):map(function(p) return p.spec.name end):totable()
+    local names = vim.iter(vim.pack.get())
+        :map(function(p)
+            return p.spec.name
+        end)
+        :totable()
     vim.notify(table.concat(names, '\n'), vim.log.levels.INFO)
 end, { desc = 'List installed plugins', nargs = 0 })
 

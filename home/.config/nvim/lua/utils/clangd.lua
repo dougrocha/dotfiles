@@ -1,5 +1,3 @@
---- Thanks you! @url https://github.com/XavierChanth/dotfiles/blob/trunk/dotfiles/dot-config/nvim/lua/util/clangd.lua#L8
-
 ---@class util.clangd
 local M = {}
 

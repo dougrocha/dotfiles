@@ -40,7 +40,6 @@ add {
         opts = function()
             local miniclue = require 'mini.clue'
 
-            -- Add a-z/A-Z marks.
             local function mark_clues()
                 local marks = {}
                 vim.list_extend(marks, vim.fn.getmarklist(vim.api.nvim_get_current_buf()))
@@ -50,13 +49,10 @@ add {
                     :map(function(mark)
                         local key = mark.mark:sub(2, 2)
 
-                        -- Just look at letter marks.
                         if not string.match(key, '^%a') then
                             return nil
                         end
 
-                        -- For global marks, use the file as a description.
-                        -- For local marks, use the line number and content.
                         local desc
                         if mark.file then
                             desc = vim.fn.fnamemodify(mark.file, ':p:~:.')
@@ -77,10 +73,8 @@ add {
 
             return {
                 triggers = {
-                    -- Leader triggers.
                     { mode = { 'n', 'x' }, keys = '<leader>' },
 
-                    -- Builtins.
                     { mode = { 'n', 'x' }, keys = 'g' },
                     { mode = { 'n', 'x' }, keys = '`' },
                     { mode = { 'n', 'x' }, keys = '"' },
@@ -88,7 +82,6 @@ add {
                     { mode = 'n', keys = '<C-w>' },
                     { mode = 'i', keys = '<C-x>' },
                     { mode = 'n', keys = 'z' },
-                    -- Bracket motions.
                     { mode = 'n', keys = '[' },
                     { mode = 'n', keys = ']' },
                 },
@@ -101,14 +94,12 @@ add {
                     { mode = 'n', keys = '[', desc = '+prev' },
                     { mode = 'n', keys = ']', desc = '+next' },
 
-                    -- Builtins
                     miniclue.gen_clues.g(),
                     miniclue.gen_clues.marks(),
                     miniclue.gen_clues.registers(),
                     miniclue.gen_clues.windows(),
                     miniclue.gen_clues.z(),
 
-                    -- custom
                     mark_clues,
                 },
                 window = {
@@ -164,14 +155,11 @@ add {
                 local bufname = vim.api.nvim_buf_get_name(0)
                 local path = vim.fn.fnamemodify(bufname, ':p')
 
-                -- Noop if the buffer isn't valid.
                 if path and vim.uv.fs_stat(path) then
                     require('mini.files').open(bufname, false)
                 end
-            end, { desc = 'Open file diretory' })
+            end, { desc = 'Open file directory' })
 
-            -- Borrowed from mariasolos
-            -- Keeps track of when the explorer is opened
             local minifiles_explorer_group = vim.api.nvim_create_augroup('minifiles', { clear = true })
             vim.api.nvim_create_autocmd('User', {
                 group = minifiles_explorer_group,
@@ -187,40 +175,6 @@ add {
                     vim.g.minifiles_active = false
                 end,
             })
-
-            -- is built in with commit 4f6f84a
-            -- vim.api.nvim_create_autocmd('User', {
-            --     pattern = { 'MiniFilesActionRename', 'MiniFilesActionMove' },
-            --     callback = function(args)
-            --         local will_rename_method = 'workspace/willRenameFiles'
-            --         local did_rename_method = 'workspace/didRenameFiles'
-            --
-            --         local params = {
-            --             files = {
-            --                 {
-            --                     oldUri = vim.uri_from_fname(args.data.from),
-            --                     newUri = vim.uri_from_fname(args.data.to),
-            --                 },
-            --             },
-            --         }
-            --
-            --         local lsp_clients = vim.lsp.get_clients()
-            --         for _, client in ipairs(lsp_clients) do
-            --             if client:supports_method(will_rename_method) then
-            --                 local res = client:request_sync(will_rename_method, params, 1000, 0)
-            --                 if res and res.result then
-            --                     vim.lsp.util.apply_workspace_edit(res.result, client.offset_encoding)
-            --                 end
-            --             end
-            --         end
-            --
-            --         for _, client in ipairs(lsp_clients) do
-            --             if client:supports_method(did_rename_method) then
-            --                 client:notify(did_rename_method, params)
-            --             end
-            --         end
-            --     end,
-            -- })
 
             vim.api.nvim_create_autocmd('User', {
                 desc = 'Add MiniFiles split keymaps',
@@ -252,9 +206,9 @@ add {
                 n_lines = 500,
                 silent = true,
                 custom_textobjects = {
-                    f = gen_spec.treesitter({ a = '@function.outer', i = '@function.inner' }, {}), -- function
-                    g = gen_ai_spec.buffer(), -- buffer
-                    t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' }, -- tags
+                    f = gen_spec.treesitter({ a = '@function.outer', i = '@function.inner' }, {}),
+                    g = gen_ai_spec.buffer(),
+                    t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' },
                 },
             }
         end,

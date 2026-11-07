@@ -3,6 +3,7 @@ local add = require('pack').add
 add {
     {
         'stevearc/conform.nvim',
+        lazy = { event = 'BufWritePre', cmd = 'ConformInfo' },
         ---@module 'conform'
         ---@type conform.setupOpts
         opts = {
@@ -15,7 +16,7 @@ add {
                     stdin = true,
                 },
                 prettier = {
-                    -- Require prettier file to format
+                    -- Only run prettier in projects that have a prettier config.
                     require_cwd = true,
                 },
             },
@@ -47,7 +48,6 @@ add {
                     return nil
                 end
 
-                -- Stop if we disabled auto-formatting.
                 if not vim.g.autoformat then
                     return nil
                 end
@@ -55,9 +55,15 @@ add {
                 return {}
             end,
         },
-        on_setup = function()
+        init = function()
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
             vim.g.autoformat = true
+        end,
+        on_setup = function(ev)
+            -- Conform loads in the middle of the first BufWritePre, which skips its own handler.
+            if ev and ev.event == 'BufWritePre' then
+                vim.api.nvim_exec_autocmds('BufWritePre', { group = 'Conform', buffer = ev.buf, modeline = false })
+            end
         end,
     },
 }

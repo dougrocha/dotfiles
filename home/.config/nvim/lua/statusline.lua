@@ -74,7 +74,6 @@ vim.api.nvim_create_autocmd('LspProgress', {
     desc = 'Update LSP progress in statusline',
     pattern = { 'begin', 'end' },
     callback = function(args)
-        -- This should in theory never happen, but I've seen weird errors.
         if not args.data then
             return
         end
@@ -87,7 +86,6 @@ vim.api.nvim_create_autocmd('LspProgress', {
 
         if progress_status.kind == 'end' then
             progress_status.title = nil
-            -- Wait a bit before clearing the status.
             vim.defer_fn(function()
                 vim.cmd.redrawstatus()
             end, 3000)
@@ -97,7 +95,6 @@ vim.api.nvim_create_autocmd('LspProgress', {
     end,
 })
 
---- Git status.
 ---@return string
 function M.git_component()
     local head = vim.b.gitsigns_head
@@ -110,14 +107,12 @@ function M.git_component()
     return component
 end
 
---- The latest LSP progress message.
 ---@return string
 function M.lsp_progress_component()
     if not progress_status.client or not progress_status.title then
         return ''
     end
 
-    -- Avoid noisy messages while typing.
     if vim.startswith(vim.api.nvim_get_mode().mode, 'i') then
         return ''
     end
@@ -129,7 +124,6 @@ function M.lsp_progress_component()
     }
 end
 
---- The current line, total line count, and column position.
 ---@return string
 function M.position_component()
     local line = vim.fn.line '.'
@@ -143,7 +137,6 @@ function M.position_component()
     }
 end
 
---- Renders the statusline.
 ---@return string
 function M.render()
     ---@param components string[]

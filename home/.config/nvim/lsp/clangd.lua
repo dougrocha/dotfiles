@@ -5,7 +5,7 @@ vim.filetype.add {
     },
 }
 
-local util = require 'utils'
+local clangd = require 'utils.clangd'
 
 ---@class ClangdInitializeResult: lsp.InitializeResult
 ---@field offsetEncoding? string
@@ -36,7 +36,7 @@ return {
     end,
     on_attach = function(_, buf)
         vim.keymap.set('n', '<leader>ch', function()
-            util.clangd.switch_source_header(buf)
+            clangd.switch_source_header(buf)
         end, { buffer = buf, desc = 'Switch Source/Header (C/C++)' })
     end,
 }

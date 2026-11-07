@@ -2,7 +2,6 @@ local function augroup(name)
     return vim.api.nvim_create_augroup(name, { clear = true })
 end
 
--- Highlight when yanking a line
 vim.api.nvim_create_autocmd('TextYankPost', {
     group = augroup 'highlight_yank',
     callback = function()
@@ -10,7 +9,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     end,
 })
 
--- resize splits if window got resized
 vim.api.nvim_create_autocmd({ 'VimResized' }, {
     group = augroup 'resize_splits',
     callback = function()
@@ -20,7 +18,6 @@ vim.api.nvim_create_autocmd({ 'VimResized' }, {
     end,
 })
 
--- From @mariasolos, will toggle relative numbers depending on window focus
 local line_numbers_group = vim.api.nvim_create_augroup('dougrocha/toggle_line_numbers', {})
 vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained', 'InsertLeave', 'CmdlineLeave', 'WinEnter' }, {
     group = line_numbers_group,
@@ -49,12 +46,10 @@ vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'InsertEnter', 'CmdlineEn
     end,
 })
 
--- https://github.com/echasnovski/nvim/blob/a732d0a79dfb2145cb934310016cc580a18a0c8f/src/settings.lua#L26
 vim.api.nvim_create_autocmd('FileType', {
     group = augroup 'custom_settings',
     callback = function()
-        -- Don't auto-wrap comments and don't insert comment leader after hitting 'o'
-        -- Set this on `FileType` because filetype plugins set these options again.
+        -- Filetype plugins reset formatoptions, so this has to run on FileType.
         vim.cmd 'setlocal formatoptions-=c formatoptions-=o'
     end,
     desc = [[Ensure proper 'formatoptions']],

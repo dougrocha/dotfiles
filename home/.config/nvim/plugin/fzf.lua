@@ -3,6 +3,7 @@ local add = require('pack').add
 add {
     {
         'ibhagwan/fzf-lua',
+        lazy = { cmd = 'FzfLua' },
         opts = function()
             local icons = require 'icons'
             local actions = require('fzf-lua').actions
@@ -59,7 +60,6 @@ add {
                     rg_opts = '--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "!.git" -e',
                     rg_glob_fn = function(query, opts)
                         local regex, flags = query:match(string.format('^(.*)%s(.*)$', opts.glob_separator))
-                        -- Return the original query if there's no separator.
                         return (regex or query), flags
                     end,
                 },
@@ -70,13 +70,11 @@ add {
                 },
             }
         end,
-        on_setup = function()
-            local fzf = require 'fzf-lua'
-
+        init = function()
             vim.keymap.set('n', '<leader>/', '<cmd>FzfLua live_grep<CR>', { desc = 'Grep' })
             vim.keymap.set('x', '<leader>/', '<cmd>FzfLua grep_visual<CR>', { desc = 'Grep' })
             vim.keymap.set('n', '<leader>fb', function()
-                fzf.lgrep_curbuf {
+                require('fzf-lua').lgrep_curbuf {
                     winopts = {
                         height = 0.6,
                         width = 0.5,

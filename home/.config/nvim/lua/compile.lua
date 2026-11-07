@@ -14,18 +14,14 @@ local efm = table.concat({
     vim.o.errorformat,
 }, ',')
 
--- Commands are remembered per project, keyed by git root.
 local store = require 'utils.store'
 
--- The terminal is only a display. Output and job lifetime belong to the run.
 local current_run
 
--- Output lines kept per run for quickfix parsing.
 local max_lines = 10000
 
 ---@return string
 local function project_root()
-    -- From the compile window, stay in the project that was last compiled.
     if current_run and vim.api.nvim_get_current_buf() == current_run.buf then
         return current_run.root
     end
@@ -48,7 +44,6 @@ end
 
 local function set_quickfix(run)
     local lines = vim.tbl_map(function(line)
-        -- Strip terminal styling and OSC links before errorformat parsing.
         return line:gsub('\27%][^\7\27]*\7', '')
             :gsub('\27%][^\7\27]*\27\\', '')
             :gsub('\27%[[0-?]*[ -/]*[@-~]', '')
@@ -109,7 +104,6 @@ local function goto_location(run)
         return
     end
 
-    -- Keep the quickfix position in sync so :cnext continues from here.
     set_quickfix(run)
     for i, qf in ipairs(vim.fn.getqflist({ id = run.qf_id, items = 0 }).items) do
         if qf.bufnr == item.bufnr and qf.lnum == item.lnum and qf.col == item.col then
@@ -146,7 +140,6 @@ local function start(root, cmd)
         data[root] = cmd
     end)
 
-    -- Reuse the compile window if it's still open.
     local previous = current_run
     local origin = vim.api.nvim_get_current_win()
     local win = previous and vim.fn.bufwinid(previous.buf) or -1
@@ -186,7 +179,6 @@ local function start(root, cmd)
             for i = 2, #data do
                 run.lines[#run.lines + 1] = data[i]
             end
-            -- Long-running programs can log forever; keep the tail, like terminal scrollback.
             if #run.lines > max_lines + 1000 then
                 run.lines = vim.list_slice(run.lines, #run.lines - max_lines + 1)
             end
@@ -220,7 +212,6 @@ local function start(root, cmd)
     end, { buffer = buf, desc = 'Go to error location' })
     vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, desc = 'Close compile window' })
 
-    -- Keep editing in the window we came from.
     if vim.api.nvim_win_is_valid(origin) then
         vim.api.nvim_set_current_win(origin)
     end

@@ -5,7 +5,6 @@ add {
     {
         'saghen/blink.cmp',
         on_update = function()
-            ---@diagnostic disable-next-line: undefined-field
             require('blink.cmp').build():pwait()
         end,
         ---@module 'blink-cmp'

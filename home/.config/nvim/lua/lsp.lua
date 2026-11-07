@@ -115,7 +115,6 @@ vim.diagnostic.config {
         prefix = '',
         spacing = 2,
         format = function(diagnostic)
-            -- Use shorter, nicer names for some sources:
             local special_sources = {
                 ['Lua Diagnostics'] = 'lua',
                 ['Lua Syntax Check'] = 'lua',
@@ -144,8 +143,7 @@ vim.diagnostic.config {
     signs = false,
 }
 
--- Enable every server config in lsp/. blink.cmp adds its completion capabilities
--- to vim.lsp.config('*') itself.
+-- blink.cmp adds its completion capabilities to the wildcard vim.lsp.config itself.
 local config_dir = vim.fn.stdpath 'config' .. '/lsp'
 local server_configs = vim.iter(vim.fn.glob(config_dir .. '/*.lua', false, true))
     :map(function(file)

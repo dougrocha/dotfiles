@@ -6,6 +6,7 @@ local dashed_bar = require('icons').misc.dashed_bar
 add {
     {
         'lewis6991/gitsigns.nvim',
+        lazy = { event = { 'BufReadPre', 'BufNewFile' } },
         opts = {
             signs = {
                 add = { text = vertical_bar },
@@ -28,7 +29,6 @@ add {
             on_attach = function(bufnr)
                 local gs = package.loaded.gitsigns
 
-                -- Register the leader group with miniclue.
                 vim.b[bufnr].miniclue_config = {
                     clues = {
                         { mode = 'n', keys = '<leader>g', desc = '+git' },
@@ -36,15 +36,18 @@ add {
                     },
                 }
 
-                -- Mappings.
                 ---@param lhs string
                 ---@param rhs function
                 ---@param desc string
                 local function nmap(lhs, rhs, desc)
                     vim.keymap.set('n', lhs, rhs, { desc = desc, buffer = bufnr })
                 end
-                nmap('[g', function() gs.nav_hunk 'prev' end, 'Previous hunk')
-                nmap(']g', function() gs.nav_hunk 'next' end, 'Next hunk')
+                nmap('[g', function()
+                    gs.nav_hunk 'prev'
+                end, 'Previous hunk')
+                nmap(']g', function()
+                    gs.nav_hunk 'next'
+                end, 'Next hunk')
                 nmap('<leader>gR', gs.reset_buffer, 'Reset buffer')
                 nmap('<leader>gb', gs.blame_line, 'Blame line')
                 nmap('<leader>gp', gs.preview_hunk, 'Preview hunk')

@@ -24,13 +24,11 @@ add {
                             return true
                         end
 
-                        -- Non-focusable windows.
                         return not vim.api.nvim_win_get_config(win).focusable
                     end,
                 },
             },
             modes = {
-                -- Enable flash when searching with ? or /
                 search = { enabled = true },
             },
         },

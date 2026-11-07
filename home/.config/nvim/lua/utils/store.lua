@@ -1,5 +1,3 @@
--- Small JSON files under stdpath('data'), for state that should survive restarts.
-
 ---@class util.store
 local M = {}
 

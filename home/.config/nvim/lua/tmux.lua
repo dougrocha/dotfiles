@@ -1,10 +1,8 @@
--- Move between nvim windows and tmux panes with the same keys.
 -- The tmux side comes from the vim-tmux-navigator TPM plugin.
 
 local tmux_dirs = { h = 'L', j = 'D', k = 'U', l = 'R' }
 local names = { h = 'left', j = 'down', k = 'up', l = 'right' }
 
--- Set when the last move left nvim for a tmux pane, so <C-\> goes back there.
 local tmux_was_last = false
 
 ---@param args string[]
@@ -17,7 +15,6 @@ local function navigate(dir)
     local win = vim.api.nvim_get_current_win()
     vim.cmd.wincmd(dir)
 
-    -- At the edge of the nvim layout, hand off to tmux.
     if vim.env.TMUX and vim.api.nvim_get_current_win() == win then
         tmux { '-' .. tmux_dirs[dir] }
         tmux_was_last = true

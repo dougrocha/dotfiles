@@ -1,7 +1,3 @@
--- my custom theme using base miss-dracula colors
--- while I figure out my own colors
-
--- reset highlighting
 vim.cmd.highlight 'clear'
 if vim.fn.exists 'syntax_on' then
     vim.cmd.syntax 'reset'
@@ -65,7 +61,6 @@ vim.g.terminal_color_15 = colors.bright_white
 vim.g.terminal_color_background = colors.bg
 vim.g.terminal_color_foreground = colors.fg
 
--- Groups used for my statusline.
 ---@type table<string, vim.api.keyset.highlight>
 local statusline_groups = {}
 for mode, color in pairs {
@@ -80,7 +75,7 @@ for mode, color in pairs {
     statusline_groups['StatuslineModeSeparator' .. mode] = { fg = color, bg = colors.transparent_black }
 end
 statusline_groups = vim.tbl_extend('error', statusline_groups, {
-    StatusLine = { fg = colors.white, bg = colors.transparent_black }, -- Status line background
+    StatusLine = { fg = colors.white, bg = colors.transparent_black },
     StatuslineItalic = { fg = colors.grey, bg = colors.transparent_black, italic = true },
     StatuslineSpinner = { fg = colors.bright_green, bg = colors.transparent_black, bold = true },
     StatuslineTitle = { fg = colors.bright_white, bg = colors.transparent_black, bold = true },
@@ -325,8 +320,7 @@ local extras = {
 }
 
 ---@type table<string, vim.api.keyset.highlight>
-local groups =
-    vim.tbl_extend('error', statusline_groups, builtins, treesitter, lsp, blink, winbar, extras)
+local groups = vim.tbl_extend('error', statusline_groups, builtins, treesitter, lsp, blink, winbar, extras)
 for group, opts in pairs(groups) do
     vim.api.nvim_set_hl(0, group, opts)
 end

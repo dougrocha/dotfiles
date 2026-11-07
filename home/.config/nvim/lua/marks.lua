@@ -1,5 +1,3 @@
--- Borrowed From MariaOsSol Borrowed from https://github.com/lewis6991/dotfiles/blob/0071d6f1a97f8f6080eb592c4838d92f77901e84/config/nvim/lua/gizmos/marksigns.lua
-
 local ns = vim.api.nvim_create_namespace 'dougrocha/marks'
 
 ---@param bufnr integer
@@ -13,7 +11,6 @@ end
 
 vim.api.nvim_set_decoration_provider(ns, {
     on_win = function(_, _, bufnr, top_row, bot_row)
-        -- Only enable mark signs for buffers with a filename.
         if vim.api.nvim_buf_get_name(bufnr) == '' then
             return
         end
@@ -22,7 +19,6 @@ vim.api.nvim_set_decoration_provider(ns, {
 
         local current_file = vim.api.nvim_buf_get_name(bufnr)
 
-        -- Global marks
         for _, mark in ipairs(vim.fn.getmarklist()) do
             if mark.mark:match '^.[a-zA-Z]$' then
                 local mark_file = vim.fn.fnamemodify(mark.file, ':p:a')
@@ -32,7 +28,6 @@ vim.api.nvim_set_decoration_provider(ns, {
             end
         end
 
-        -- Local marks
         for _, mark in ipairs(vim.fn.getmarklist(bufnr)) do
             if mark.mark:match '^.[a-zA-Z]$' then
                 decor_mark(bufnr, mark)
@@ -41,7 +36,7 @@ vim.api.nvim_set_decoration_provider(ns, {
     end,
 })
 
--- Redraw screen when marks are changed via `m` commands
+-- Setting a mark does not trigger a redraw, so force one after m.
 vim.on_key(function(_, typed)
     if typed:sub(1, 1) ~= 'm' then
         return
@@ -60,7 +55,6 @@ vim.on_key(function(_, typed)
     end)
 end, ns)
 
--- Menu of file marks (A-Z): which letter points at which file.
 local function toggle_menu()
     local marks = vim.iter(vim.fn.getmarklist())
         :filter(function(mark)
