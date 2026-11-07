@@ -426,12 +426,6 @@ aube = { path = "locks/npm-astrojs-language-server/2.17.3", digest = "sha256:0d5
 backend = "npm:@astrojs/language-server"
 specifiers = ["latest"]
 
-[[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "1.5.0"
-aube = { path = "locks/npm-earendil-works-pi-coding-agent/1.5.0", digest = "sha256:13825720f0d5dbddd0944caf20b7e6511688224abb231b6f1cdffa05220c0b85" }
-backend = "npm:@earendil-works/pi-coding-agent"
-specifiers = ["latest"]
-
 [[tools."npm:@tailwindcss/language-server"]]
 version = "0.16.0"
 aube = { path = "locks/npm-tailwindcss-language-server/0.16.0", digest = "sha256:fc4d7ea57df94cfd16f73e26409d8070d4a9383fda9b9e92533a3e3df5c705fe" }

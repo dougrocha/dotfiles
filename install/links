@@ -12,13 +12,6 @@
 .bashrc
 .gitconfig
 
-.pi/agent/AGENTS.md
-.pi/agent/keybindings.json
-.pi/agent/models.json
-.pi/agent/settings.json
-.pi/agent/extensions
-.pi/agent/prompts
-
 .config/fish
 .config/git/allowed_signers
 .config/lazygit
@@ -50,8 +43,7 @@
 .config/voxtype
 .config/walker
 
-# All of these drive the Hyprland desktop. ~/.local/bin stays a real directory
-# because mise and cargo install binaries next to them.
+# ~/.local/bin stays a real directory because mise and install/tools/odin.sh also put binaries there.
 .local/bin/*
 
 # vim: set ft=conf:
