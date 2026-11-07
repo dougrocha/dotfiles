@@ -4,14 +4,17 @@
 # With an argument: center-crops the image to square, copies it into
 # dotfiles storage, makes it the current image (prunes storage down to the
 # 10 most recent), and applies it. With no argument: just re-applies
-# whatever is already current.
+# whatever is already current. While set-lighting is off, the image is saved
+# but the LCD stays dark.
 #
 # The crop matters because liquidctl stretches (non-uniform resize) whatever
 # it's given to the LCD's exact resolution, distorting anything non-square.
 
 set -euo pipefail
 
-images_dir="$DOTFILES_DIR/default/systemd/kraken/images"
+# ~/.local/bin links here from the repo, so fall back to the link's target.
+dotfiles_dir="${DOTFILES_DIR:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../../.." && pwd)}"
+images_dir="$dotfiles_dir/default/systemd/kraken/images"
 current="$images_dir/current"
 max_images=10
 lcd_size=320
@@ -66,12 +69,7 @@ if ! command -v liquidctl &> /dev/null; then
     exit 1
 fi
 
-case "$target" in
-    *.gif) mode="gif" ;;
-    *)     mode="static" ;;
-esac
-
-liquidctl --match kraken initialize all >/dev/null
-liquidctl --match kraken set lcd screen "$mode" "$target"
+# Shares the boot path, so it leaves the LCD dark while set-lighting is off.
+"$dotfiles_dir/default/systemd/kraken/apply-current-image.sh"
 
 echo "Kraken LCD set: $target"

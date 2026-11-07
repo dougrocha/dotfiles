@@ -80,6 +80,7 @@ Singleton {
     readonly property string bluetoothSlash: String.fromCodePoint(0xE0DE)
     readonly property string sun: String.fromCodePoint(0xE472)
     readonly property string sunHorizon: String.fromCodePoint(0xE5B6)
+    readonly property string lightbulb: String.fromCodePoint(0xE2DC)
     readonly property string moon: String.fromCodePoint(0xE330)
     readonly property string moonStars: String.fromCodePoint(0xE58E)
     readonly property string power: String.fromCodePoint(0xE3DA)

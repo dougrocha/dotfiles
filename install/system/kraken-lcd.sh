@@ -29,7 +29,9 @@ echo "Current image: $(readlink -f "$CURRENT_IMAGE")"
 echo ""
 echo "Deploying service..."
 
-sudo cp "$SERVICE_FILE" /etc/systemd/system/kraken-lcd.service
+# A system unit has no %h, so fill in the repo path here.
+sed "s|@DOTFILES_DIR@|$DOTFILES_DIR|g" "$SERVICE_FILE" |
+    sudo tee /etc/systemd/system/kraken-lcd.service >/dev/null
 sudo systemctl daemon-reload
 sudo systemctl enable --now kraken-lcd.service
 

@@ -22,6 +22,7 @@ Column {
     function refresh(): void {
         IdleService.refresh();
         SunsetService.refresh();
+        LightingService.refresh();
     }
 
     component ControlRow: PanelRow {
@@ -30,6 +31,9 @@ Column {
         required property string label
         required property string glyph
         required property bool checked
+        property string caption: checked ? "On" : "Off"
+        property bool busy: false
+        property bool alert: false
 
         implicitHeight: Theme.row.tile
 
@@ -46,6 +50,21 @@ Column {
             Behavior on color {
                 ColorAnimation {
                     duration: Theme.motion.fast
+                }
+            }
+
+            SequentialAnimation on opacity {
+                running: tile.busy
+                loops: Animation.Infinite
+                alwaysRunToEnd: true
+
+                NumberAnimation {
+                    to: 0.4
+                    duration: Theme.motion.pulse
+                }
+                NumberAnimation {
+                    to: 1
+                    duration: Theme.motion.pulse
                 }
             }
 
@@ -75,8 +94,11 @@ Column {
             }
 
             Text {
-                text: tile.checked ? "On" : "Off"
-                color: Theme.text.tertiary
+                width: parent.width
+                text: tile.caption
+                textFormat: Text.PlainText
+                elide: Text.ElideRight
+                color: tile.alert ? Theme.danger : Theme.text.tertiary
                 font.family: Theme.font.ui
                 font.pixelSize: Theme.type.caption.size
             }
@@ -178,6 +200,17 @@ Column {
             glyph: AudioService.sourceMuted ? PhosphorIcons.microphoneSlash : PhosphorIcons.microphone
             checked: !AudioService.sourceMuted
             onTapped: AudioService.toggleSourceMute()
+        }
+
+        ControlRow {
+            width: controls.tileWidth
+            label: "Case lights"
+            glyph: LightingService.failed ? PhosphorIcons.warningCircle : PhosphorIcons.lightbulb
+            checked: LightingService.shownOn && !LightingService.failed
+            busy: LightingService.busy
+            alert: LightingService.failed
+            caption: LightingService.busy ? (LightingService.shownOn ? "Turning on" : "Turning off") : LightingService.failed ? "Failed, retry" : LightingService.on ? "On" : "Off"
+            onTapped: LightingService.toggle()
         }
     }
 

@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/doug/dev/dotfiles/default/systemd/kraken/apply-current-image.sh
+ExecStart=@DOTFILES_DIR@/default/systemd/kraken/apply-current-image.sh
 RemainAfterExit=yes
 
 [Install]
