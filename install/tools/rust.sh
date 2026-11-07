@@ -20,4 +20,6 @@ rustup component add rust-analyzer
 
 cargo --version
 
+cargo install cargo-edit tree-sitter-cli wasm-pack
+
 # vim: ft=sh

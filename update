@@ -27,7 +27,7 @@ targets() {
 usage() {
     echo "usage: update [-f|--force] [tool...]"
     echo
-    echo "with no arguments, updates every tool below"
+    echo "with no arguments, asks before updating each tool below"
     echo "builds are skipped when the checked-out commit is already built"
     echo
     targets | sed 's/^/  /'
@@ -54,7 +54,11 @@ while (($#)); do
 done
 
 if (($# == 0)); then
-    mapfile -t wanted < <(targets)
+    wanted=()
+    for name in $(targets); do
+        read -rp "Update $name? [Y/n] " reply || reply=y
+        [[ $reply == [nN]* ]] || wanted+=("$name")
+    done
 else
     wanted=("$@")
 fi

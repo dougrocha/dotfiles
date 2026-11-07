@@ -29,10 +29,4 @@ else
     info "neovim already built at ${commit:0:8}"
 fi
 
-if has cargo; then
-    cargo install tree-sitter-cli
-else
-    warn "cargo not found, skipping tree-sitter-cli"
-fi
-
 # vim: ft=sh
