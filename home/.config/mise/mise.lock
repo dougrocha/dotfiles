@@ -273,7 +273,6 @@ url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898235
 
 [tools.herdr."platforms.macos-arm64"]
 checksum = "sha256:fb77c2232a05a8035421382c894392f4174e4e38a18e48af3dd0290157c3a7e2"
-checksum_source = "mise-versions"
 url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-macos-aarch64"
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898230"
 
@@ -343,7 +342,6 @@ url_api = "https://api.github.com/repos/casey/just/releases/assets/642949555"
 
 [tools.just."platforms.macos-arm64"]
 checksum = "sha256:6574cea774ed4cae12e24b6aa11857de33e80dab4667cf628fd5840df96a2a9d"
-checksum_source = "mise-versions"
 url = "https://github.com/casey/just/releases/download/1.59.0/just-1.59.0-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/casey/just/releases/assets/643129724"
 
@@ -434,7 +432,7 @@ specifiers = ["latest"]
 
 [[tools."npm:cf"]]
 version = "0.15.0"
-aube = { path = "locks/npm-cf/0.15.0", digest = "sha256:160499ccee77296b62680cc9fe9f3c533b326f0fff7842866fdff3975d9dd993" }
+aube = { path = "locks/npm-cf/0.15.0", digest = "sha256:847e62fcc35f151ec91fd5e09889b678888c12dbc39478d6ea2fde9c87db1330" }
 backend = "npm:cf"
 specifiers = ["latest"]
 
@@ -452,7 +450,7 @@ specifiers = ["latest"]
 
 [[tools."npm:vscode-langservers-extracted"]]
 version = "4.10.0"
-aube = { path = "locks/npm-vscode-langservers-extracted/4.10.0", digest = "sha256:8c37c53ce46961037a4464ce307c15cfe5bd44479ea3b082d3412c0a27b760da" }
+aube = { path = "locks/npm-vscode-langservers-extracted/4.10.0", digest = "sha256:cfcde76c1138b72ec42fbaa9ffa06cc0e4a64bb3343ae5399e3a54d8b9a15de6" }
 backend = "npm:vscode-langservers-extracted"
 specifiers = ["latest"]
 

@@ -1,10 +1,12 @@
 
 # Terminal
+brew "bash"
 brew "bat"
 brew "btop"
 brew "chafa"
 brew "coreutils"
 brew "curl"
+brew "direnv"
 brew "fastfetch"
 brew "fd"
 brew "ffmpeg"
@@ -16,6 +18,9 @@ brew "gum"
 brew "hyperfine"
 brew "imagemagick"
 brew "jq"
+brew "just"
+brew "mole"
+brew "nom"
 brew "openssh"
 brew "p7zip"
 brew "ripgrep"
@@ -25,7 +30,12 @@ brew "tokei"
 brew "tree"
 brew "typst"
 brew "wget"
+brew "yazi"
 brew "zoxide"
+
+# Network
+brew "arp-scan"
+brew "nmap"
 
 # Git
 brew "gh"
@@ -54,6 +64,7 @@ brew "dprint"
 brew "lua-language-server"
 brew "marksman"
 brew "selene"
+brew "stylua"
 brew "tinymist"
 
 # Graphics
@@ -64,14 +75,26 @@ brew "vulkan-validationlayers"
 # Misc
 brew "mkcert"
 brew "pnpm"
+brew "poppler"
+brew "postgresql@15"
+brew "python@3.13"
 brew "uv"
 
 # Apps
+cask "abue-ammar/tinycast/tinycast"
+cask "alfred"
+cask "anki"
+cask "chatgpt"
 cask "claude"
 cask "font-monaspace"
 cask "ghostty"
 cask "linearmouse"
 cask "localsend"
+cask "mitmproxy"
+cask "obsidian"
+cask "opencode-desktop"
 cask "raycast"
+cask "skim"
+cask "tailscale-app"
 
 # vim: set filetype=ruby:
