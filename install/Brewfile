@@ -60,7 +60,6 @@ brew "gettext"
 
 # Language servers and formatters
 brew "clang-format"
-brew "dprint"
 brew "lua-language-server"
 brew "selene"
 brew "stylua"
