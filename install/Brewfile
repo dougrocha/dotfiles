@@ -81,7 +81,7 @@ brew "python@3.13"
 brew "uv"
 
 # Apps
-cask "abue-ammar/tinycast/tinycast"
+cask "tinycast"
 cask "alfred"
 cask "anki"
 cask "chatgpt"
