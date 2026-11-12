@@ -92,7 +92,6 @@ cask "linearmouse"
 cask "localsend"
 cask "obsidian"
 cask "opencode-desktop"
-cask "skim"
 cask "tailscale-app"
 
 # vim: set filetype=ruby:
