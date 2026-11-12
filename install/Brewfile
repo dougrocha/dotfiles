@@ -2,30 +2,21 @@
 # Terminal
 brew "bash"
 brew "bat"
-brew "btop"
 brew "chafa"
 brew "curl"
-brew "fastfetch"
 brew "fd"
 brew "ffmpeg"
 brew "fish"
 brew "fzf"
-brew "glow"
 brew "gum"
-brew "hyperfine"
 brew "imagemagick"
 brew "jq"
 brew "mole"
-brew "nom"
 brew "openssh"
-brew "p7zip"
 brew "ripgrep"
 brew "starship"
 brew "tmux"
-brew "tokei"
 brew "tree"
-brew "typst"
-brew "yazi"
 brew "zoxide"
 
 # Git
@@ -50,7 +41,6 @@ brew "vulkan-tools"
 brew "vulkan-validationlayers"
 
 # Misc
-brew "mkcert"
 brew "pnpm"
 brew "uv"
 
